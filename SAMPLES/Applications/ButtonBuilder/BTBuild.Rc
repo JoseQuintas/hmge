@@ -1,0 +1,10 @@
+BTBUILD      Icon    BTBuild.ico
+
+EXIT         Bitmap  Exit_48.bmp
+RESET        Bitmap  Eraser_48.bmp
+REFRESH      Bitmap  Refresh_48.bmp
+GENCODE      Bitmap  GenCode_48.bmp
+GENIMG       Bitmap  GenImage_48.bmp
+LOADSAMPLE   Bitmap  Import_48.bmp
+SAVESAMPLE   Bitmap  Export_48.bmp
+

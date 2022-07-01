@@ -1,0 +1,1 @@
+call \MiniGUI\batch\compile.bat DBFIndex %*

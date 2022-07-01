@@ -1,0 +1,31 @@
+
+1 VERSIONINFO
+FILEVERSION 0,0,2,0
+PRODUCTVERSION 1,0,0,0
+FILEOS 0x4
+FILETYPE 0x1
+{
+ BLOCK "StringFileInfo"
+ {
+  BLOCK "040904b0"
+  {
+   VALUE "FileDescription", "harbour Registry Database\000"
+   VALUE "FileVersion", "0.0.2.0"
+   VALUE "InternalName", "REGDB\000"
+   VALUE "LegalCopyright", "Copyright © 2020 Yiu-Software\000"
+   VALUE "LegalTrademarks", "Harbour"
+   VALUE "OriginalFilename", "REGDB.EXE"
+   VALUE "CompanyName", "Yiu-Software"
+   VALUE "ProductName", "REGDB\000"
+   VALUE "ProductVersion", "1.0.0.0"
+   VALUE "Comments", "Created by Auge & Ohr\000"
+  }
+}
+
+BLOCK "VarFileInfo"
+{
+ VALUE "Translation", 0x0409, 1252
+ }
+}
+
+ICOREG   ICON RES\REG100.ICO

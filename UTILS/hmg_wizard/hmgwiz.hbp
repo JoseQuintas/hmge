@@ -1,0 +1,10 @@
+hmgwiz.prg
+BROW_WIZ.prg
+BUTT_WIZ.prg
+CHKB_WIZ.prg
+FUNCS.prg
+RADIO_WIZ.prg
+TOOL_WIZ.prg
+
+-inc
+-workdir=obj

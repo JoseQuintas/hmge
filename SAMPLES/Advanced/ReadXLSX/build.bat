@@ -1,0 +1,1 @@
+call ..\..\..\build.bat demo_xlsx_reader.hbp

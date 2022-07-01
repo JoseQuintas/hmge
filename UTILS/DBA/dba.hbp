@@ -1,0 +1,24 @@
+-inc
+-workdir=OBJ
+
+-w2 -es2 -q0
+{!xhb}-ko
+
+DBA.Prg
+current.prg
+DBAArays.prg
+DBACloss.Prg
+DBADebug.prg
+DBAExtnd.Prg
+DBAFBtns.Prg
+DBAGFUS.prg
+DBAModfy.Prg
+DBANewFs.Prg
+DBAOpens.Prg
+DBAOrgan.Prg
+DBAPosit.Prg
+DBARetrv.Prg
+DBAStrgs.prg
+DBATools.Prg
+DBAUpdat.Prg
+DBStrcOps.prg

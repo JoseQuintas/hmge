@@ -1,0 +1,9 @@
+
+-inc
+
+-workdir=OBJ
+
+-jobs=%NUMBER_OF_PROCESSORS%
+
+IDE.prg
+miscfunc.prg

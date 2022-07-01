@@ -1,0 +1,1 @@
+call ..\..\batch\hbmk2.bat %* GUIDES.HBP GUIDES.HBC

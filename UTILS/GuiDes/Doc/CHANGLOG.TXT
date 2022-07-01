@@ -1,0 +1,189 @@
+* Release 0.4.1 (2020/02/26) :
+
+    * New: TAB control has been added with BOTTOM, MULTILINE and BACKCOLOR clauses.
+    * New: AUTOSIZE available at Control (CHECKBOX, RADIOGROUP) creation. (Option in Preferences Window)
+    * New: TRANSPARENT, STRETCH and ADJUST clauses are processed for IMAGE control.
+    * New: EDIT and CELLNAVIGATION clauses are processed for GRID control.
+    * Fixed: Wrong INPLACE property naming in a BROWSE control.
+    * Changed: Revised the HEADERS, WIDTHS, WORKAREA and FIELDS properties of a BROWSE control.
+    * Changed: Revised the method AddControl() of the class gWindow.
+
+
+* Release 0.4 (2020/02/23) :
+
+    * Fixed: Wrong HYPERLINK control class naming.
+    * Fixed: Control creation from DBF file - typo in a Value definition of DatePicker.
+    * New: Added a suggesting of an ALIAS text by default in DB tool as it was mentioned in ToDo list.
+    * New: Added the move buttons actions codeblocks in the control creation from DBF tool.
+    * New: NUMERIC and RIGHTALIGN clauses are processed for TEXTBOX control.
+    * New: Alignment properties are available for LABEL control.
+    * New: SHOWNONE clause is processed for DATEPICKER control.
+    * Changed: Revised the default sizes of the WINDOW SELECTOR, CONTROL SELECTOR, PROPERTIES INSPECTOR forms.
+    * Changed: Revised the default sizes of the GuiDes Text Editor/Readonly Viewer.
+    * Changed: Build of GuiDes application with the Harbour's hbmk2 tool instead of Borland's make utility.
+    * Changed: The all warnings were pacified for Harbour error level 3 (-w3 switch).
+
+
+* Release 0.3 (2004/02/29) :
+
+    * Changed: Improved Property Edition window behaviour
+    * Changed: "PICTURED" property changed to "HASPICTURE" in button and checkbutton controls. 
+			This property allows to select whether a button or checkbutton will show image or text
+    * Changed: MenuEditor has been enhanced for easier TREE creation 
+    * New: BREAK, NOVSCROLL, EDIT and APPEND clauses available for BROWSE controls
+    * New: BACKCOLOR, FONTCOLOR and TRANSPARENT clauses available for checkbox controls
+    * New: TRANSPARENT clause available for button and label controls
+    * New: PICTURENAME property for BUTTON and CHECKBUTTON controls what will be the 
+		content of the PICTURE clause if HASPICTURE property is set to TRUE.
+    * New: ONCHANGE, VALUE clauses available for CHECKBUTTON controls
+    * New: TEXTBOX clauses: FONTCOLOR, BACKCOLOR, FORMAT, FIELD
+    * New: FIELD clause available for CHECKBOX and EDITBOX controls
+    * New: Control creation from DBF file. Labels, Textboxes, Checkboxes and Editboxes can be automatically created
+		from selected database files. "Refresh" and "Save" functions code can be automatically generated.
+    * New: Guides remembers in which directory has every window been loaded from or saved to last time
+		and suggests it next time "Save Window" is called.
+    * New: Recently saved windows are available from File Menu
+    * New: AUTOSIZE available at Control (LABEL, HYPERLINK) creation. (Option in Preferences Window)
+    * New: Window Font. You can choose to omit FONT clauses for controls when same as in parent window 
+		(option in Preferences window).
+    * New: Support for 8-elements font arrays.
+    * New: GuiDes version is saved in every form file (FRM). This is used to prevent possible compatibility
+		problems.
+    * New: One-file compilation is available from GuiDes Text Editor. See "Compilation" tab in "Preferences" 
+		window for customization.
+    * New: HYPERLINK control has been added.
+    * Fixed: Windows NOSIZE clause not included when selected
+
+
+* Release 0.2 (2003/03/02) : Among others these are the new changes:
+
+    * Fixed: GuiDes can detect now the path where it has been installed (without saving 
+		 any information in the registry). Therefore some bugs related to files not 
+		 found (especially "GUIDES.HLP") should be fixed now. 
+    * Fixed: A bug that made CONTROL'S defined events to be quoted in MiniGUI export. 
+    * Fixed: A bug that made ITEMS property in LISTBOX controls to be non-editable.
+    * Fixed: A bug that made VALUE property not to be included in MiniGUI output.
+    * Fixed: A bug that made controls "OF" clause to refer to GuiDes internal-window-name instead of
+             user-defined window ID.
+    * Fixed: A bug that made loaded windows's names to be conflict with existing windows's names. Now, NAME 
+             property is always assigned automatically by Guides, since it exists just for internal
+             purposes.
+    * Changed: GuiDes main window toolbar. Now it uses icons and tooltips.
+    * Changed: "Project folder" is now in "GuiDes" tab.
+    * Changed: Some labels in Preferences window are now clickable to access to property change 
+		    and thus some buttons have been removed.
+    * Changed: Window "mode" in window's properties: Now you can choose from MAIN, CHILD, MODAL 	
+			and SPLITCHILD (SPLITCHILD is not working yet). (No separate checkbox for MODAL option)
+    * Changed: Combobox default size is now "bigger". 
+    * Changed: "Minimize All Windows" has been moved to "View" menu.
+               "Maximize All Windows" replaced by "Restore All Windows". 
+    * Changed: Object Inspector has been replaced by three windows: Control Selector, WIndow Selector and 
+			Property Inspector. Control and Window Selector can be used to select Controls or Windows.
+    * Changed: Styles (i.e. groups of preferences) are no longer saved into a database.
+               Instead they are saved as separate INI-format files.
+    * Changed: Several look improvements.
+    * Changed: Dragging controls is now possible because of faster control repositioning
+    * New: ON SCROLLLEFT, ON SCROLLRIGHT, ON SCROLLUP, ON SCROLLDOWN,
+             ON HSCROLLBOX, ON VSCROLLBOX events for windows and VIRTUAL WIDTH/ VIRTUAL HEIGHT properties
+    * New: Customization file (GUIDES.INI) automatically saves floating windows positions,
+    * New: TAB spaces can be set for output code to suit your code style.
+    * New: Preferences now include "Automatically inspect exported minigui code" and
+           "Ask window properties on window creation".
+    * New: Window/control selector (formerly known as Object Selector) has been split 
+		in two: Window selector and Control Selector and separated from Properties Inspector.
+            Thus, improved control and window selection has been added.
+    * New: A new TOOLBAR has been added which replaces "Tools" floating window.
+    * New: GRID information on STATUSBAR. Clickable.
+    * New: TIMER control added.
+
+
+* 2003/03/16: Release 0.13 published:
+
+    * Fixed: A bug that made the program crash when moving a BROWSE control
+             after having saved a style.
+
+    * Fixed: A bug in converting BACKCOLOR and FONTCOLOR to MIniGUI new
+             syntax. Fixed by Grigory Filatov.
+
+    * Fixed: A bug in AboutWindow menu checked status.
+             Fixed by Grigory Filatov.
+
+    * Fixed: FRAME control MiniGUI code. Fixed by Grigory Filatov.
+
+    * Changed: FRAME control default size is bigger. Changed by Grigory Filatov.
+
+    * Changed: Smaller toolbar icons. Contributed by Grigory Filatov.
+
+    * Added: MenuEditor is working. It is useful for creating Main Menu,
+             Notify Menu and Context Menu for windows. It is also used for
+             editing the contents of a TREE control.
+
+    * Added: GuiDes help has more and better explanations.
+
+
+* Release 0.12 (2003/03/02) :
+
+    * Fixed: A bug that made label BACKCOLOR and FONTCOLOR properties not to
+             be properly retrieved from FRM files.
+
+    * Fixed: Property Edition bugs. Fixed by Grigory Filatov.
+
+    * Fixed: GPF when double-clicking an empty cell on the Object Inspector
+
+    * Fixed: A bug that made impossible to add controls to a window
+             that has been loaded from a file.
+
+    * Changed: BACKCOLOR and FONTCOLOR properties in Exported MiniGUI files,
+               to adapt them to release 60.
+
+    * Changed: BMP and ICO are now included in GUIDES.EXE, through resource
+               file compilation. Contributed by Grigory Filatov.
+    * Changed: WINDOW default position is now always (0,0)
+
+    * Changed: The way GuiDes deals with colors (a color is a number between
+               0 and (2^24)-1).
+
+               This effects how colors are saved in FRM files.
+               GUIDES.DBF structure has been adapted to this.
+
+    * Changed: The way arrays are saved in FRM files (FONT properties).
+
+               You will NOT be able to load previously saved windows unless
+               you by hand change your FRM files. I suggest you FIRSTLY create
+               some sample FRM files to see how FONTCOLOR, BACKCOLOR and FONT
+               properties are now saved.                
+
+               You will NOT be able to use GUIDES.DBF created by a previous version
+               of GuiDes.
+
+
+    * Changed: GUIDES.BC. You can change how GUIDES.BC points your BCC55 root
+               directory from a single line.
+    
+    * Changed: GuiDes release number appears now on GuiDes main window title.
+
+    * Changed: G_INSPEC.PRG to separate File Inspector behavior.
+
+    * Changed: Control ID appear now on the object Inspector top box.
+
+    * Changed: Window properties edition window.
+
+    * Added: Source distribution includes CHANGLOG.TXT and TODO.TXT.
+
+    * Added: Windows can be saved as XML. This is experimental. A DTD
+             and way to parse and retrieve XML files should be
+             implemented. 
+
+    * Added: MenuEditor for editing Menus and Trees.
+
+             This is not fully developed yet, so it is not usable for
+             retrievable menu creation.
+
+             You can try it and see how it looks like by clicking on
+             the statusbar items that appears on every window you create.
+
+    * Added: ID Property to gWINDOW. This allows to specify a Window ID
+             different from GuiDes internal name.
+
+    * Added: Tree control. Tree contents cannot be edited as MenuEditor
+             is not finished.
