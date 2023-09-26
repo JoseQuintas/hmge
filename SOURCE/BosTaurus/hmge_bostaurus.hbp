@@ -1,0 +1,23 @@
+#
+# bostaurus.hbp
+#
+
+#{bcc}-env:DEBUG=yes
+
+-hblib
+-inc
+
+-o../../lib/${hb_name}
+
+-I../../include
+-L../../
+hmge.hbc
+
+-m -n -w3 -es2 -ko -q0
+
+{!DEBUG&bcc}-l
+
+-hbx=../../lib/${hb_name}.hbx
+
+h_Bostaurus.prg
+c_BosTaurus.c

@@ -1,0 +1,16 @@
+-hbcontainer
+source/hmge_main.hbp
+source/bostaurus/hmge_bostaurus.hbp
+source/debugger/hmge_debugger.hbp
+source/graphplus/hmge_graphplus.hbp
+source/hbprinter/hmge_hbprinter.hbp
+source/hbvpdf/hmge_hbvpdf.hbp
+source/miniprint/hmge_miniprint.hbp
+source/miniprint2/hmge_miniprint2.hbp
+source/pdfprinter/hmge_pdfprinter.hbp
+source/propgrid/hmge_propgrid.hbp
+source/propsheet/hmge_propsheet.hbp
+source/qhtm/hmge_qhtm.hbp
+source/tsbrowse/hmge_tsbrowse.hbp
+source/winreport/hmge_winreport.hbp
+

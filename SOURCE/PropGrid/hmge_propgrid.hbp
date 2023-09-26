@@ -1,0 +1,19 @@
+#
+# propgrid.hbp
+#
+
+-hblib
+-inc
+-L../../
+hmge.hbc
+-o../../lib/${hb_name}
+
+-I../../include
+
+-m -n -w2 -es2 -ko -q0
+
+-hbx=../../lib/${hb_name}.hbx
+
+h_propgrid.prg
+h_pglang.prg
+c_propgrid.c

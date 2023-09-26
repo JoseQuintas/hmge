@@ -1,0 +1,18 @@
+#
+# propsheet.hbp
+#
+
+-hblib
+-inc
+-L../../
+hmge.hbc
+-o../../lib/${hb_name}
+
+-I../../include
+
+-m -n -w2 -es2 -ko -q0
+
+-hbx=../../lib/${hb_name}.hbx
+
+h_propsheet.prg
+c_propsheet.c

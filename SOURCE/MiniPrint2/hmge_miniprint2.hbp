@@ -12,7 +12,8 @@
 -warn=max
 
 -I../../include
--o../../lib/miniprint2
+-I.
+-o../../lib/hmge_miniprint2
 
 {!DEBUG&bcc|mingw}-l
 

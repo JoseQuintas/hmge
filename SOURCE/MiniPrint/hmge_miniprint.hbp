@@ -1,0 +1,26 @@
+#
+# miniprint.hbp
+#
+
+#{bcc}-env:DEBUG=yes
+
+-hblib
+-inc
+-L../../
+hmge.hbc
+
+-o../../lib/${hb_name}
+
+-I../../include
+
+-m -n -w3 -es2 -ko -q0
+
+{!DEBUG&bcc|mingw}-l
+
+-hbx=../../lib/${hb_name}.hbx
+
+{!DEBUG}-cflag=-D_ERRORMSG_
+
+h_miniprint.prg
+c_miniprint.c
+

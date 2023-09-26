@@ -1,0 +1,16 @@
+#
+# hbvpdf.hbp
+#
+
+-hblib
+-inc
+-o../../lib/${hb_name}
+
+-I../../include
+
+-m -n -w3 -es2 -ko -q0
+
+-hbx=../../lib/${hb_name}.hbx
+
+hbvpdf.prg
+hbvpsup.prg
