@@ -1,0 +1,23 @@
+# hmg paths
+incpaths=include
+{!xhb}libpaths=lib
+{xhb}libpaths=xLib
+
+# app resources
+incpaths=${hb_curdir}
+#sources=${hb_curdir}*.rc
+
+# hmg resources
+#sources=resources\minigui.res
+# hbprint resources
+#sources=resources\hbprinter.res
+# miniprint resources
+#sources=resources\miniprint.res
+
+libs=hmge_main hmge_hbprinter hmge_miniprint hmge_bostaurus
+libs=hmge_pdfprinter hmge_hbvpdf
+libs=hmge_propgrid hmge_propsheet hmge_tsbrowse hmge_winreport
+{xhb}libs=calldll
+libs=hbhpdf.hbc hbtip.hbc hbwin.hbc xhb.hbc hbct.hbc
+libs=hbmisc.hbc hbziparc.hbc hbmzip.hbc
+libs=vfw32 msvfw32
