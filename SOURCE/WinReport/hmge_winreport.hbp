@@ -1,0 +1,24 @@
+#
+# hmge_winreport.hbp
+#
+
+-hblib
+-inc
+-L../../
+hmge.hbc
+hbwin.hbc
+hbzebra.hbc
+
+-o../../lib/${hb_name}
+
+-I../../include
+
+-hbx=../../lib/${hb_name}.hbx
+
+-m -n -w2 -es2 -ko -q0
+
+h_wrepint.prg
+h_wremix.prg
+h_WrePdf.prg
+hmg_hpdf.prg
+fncMyError.prg
