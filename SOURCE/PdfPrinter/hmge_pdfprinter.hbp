@@ -1,0 +1,23 @@
+#
+# hmge_PdfPrinter.hbp
+#
+
+-hblib
+
+-inc
+
+-o../../lib/${hb_name}
+-L../../
+hmge.hbc
+
+-I./include
+
+-m -n -w2 -es2 -ko -q0
+
+-hbx=../../lib/${hb_name}.hbx
+
+source\THaruPdf.prg
+source\THaruPdfBase.prg
+source\HaruFonts.prg
+source\HaruUtils.prg
+source\HaruPrintMgr.prg
