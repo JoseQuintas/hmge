@@ -34,7 +34,7 @@ FUNCTION DialogBrowse( oTBrowse, cTable, cField, xValue )
 
    LOCAL oThisForm, aItem
 
-   DEFAULT xValue := 1
+   DEFAULT xValue := 0
    oThisForm := frm_Class():New()
    oThisForm:cOptions := ""
    gui_DialogCreate( @oThisForm:oDlg, 0, 0, oThisForm:nDlgWidth, oThisForm:nDlgHeight, cTable, { || Nil } )

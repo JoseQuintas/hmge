@@ -79,9 +79,9 @@ FUNCTION Main()
          WIDTH 220 HEIGHT 50 SIZE 12 FONTCOLOR BLACK NOXPSTYLE HANDCURSOR  ;
          ACTION  {|| ChangeFont("Label_0"), This.Label_0.SetFocus }
 
-       @ This.Btn_Font.Row + This.Btn_Font.Height + nG/2, nG BUTTONEX Btn_F10 CAPTION "F10"                        ;
+       @ This.Btn_Font.Row + This.Btn_Font.Height + nG/2, nG BUTTONEX Btn_F10 CAPTION "F10" ;
          WIDTH 220 HEIGHT 50 SIZE 12 BOLD FONTCOLOR BLACK NOXPSTYLE HANDCURSOR  ;
-         ACTION  {|| ToDimText(aBtn), This.Label_0.SetFocus }
+         ACTION  {|| _wSend(10), This.Label_0.SetFocus }
 
        @ 50 + nG, 260 LABEL Label_1 WIDTH nW - 260 HEIGHT nUnchangPart - 50 - nG ;
          VALUE "Font size:"+CRLF+"Icon size:"+CRLF+"Button height:"  ;
@@ -168,7 +168,7 @@ FUNCTION Main()
                                          HMG_MouseSet(ky), MySelectThis()    } )
             :Event( 2, {|ow,ky,cn| This.&(cn).Setfocus, _PushKey( VK_SPACE ) } )
 
-            :Event(10, {|        | ToDimText(aBtn)                           } )
+            :Event(10, {|        | Alert2Dim(aBtn) /* ==> demo_misc.prg */   } )
          END WITH
 
    END WINDOW
@@ -366,19 +366,6 @@ STATIC FUNCTION ChangeFont(cObjLbl)
    EndIf
 
 RETURN NIL
-
-////////////////////////////////////////////////////////////////////////////
-FUNCTION ToDimText(aBtn)
-   LOCAL nI, cText := ""
-
-   FOR nI := 1 TO LEN(aBtn)
-      cText += HB_ValToExp(aBtn[nI]) + CRLF //";"
-   NEXT
-
-   MsgInfo(cText,'Menu Array')
-   // HMG_Alert(ToDimText(aBtn), , 'Menu Array')
-
-   RETURN cText
 
 //////////////////////////////////////////////////////
 FUNCTION MyTest( nPar, oWnd, nBtn, aSel, aBtn )

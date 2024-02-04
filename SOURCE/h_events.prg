@@ -78,13 +78,16 @@ STATIC s_bEvents, s_lEvents := .F.
 *-----------------------------------------------------------------------------*
 FUNCTION Set_bEvents ( bBlock )
 *-----------------------------------------------------------------------------*
+   LOCAL bOldBlock := s_bEvents
 
    IF HB_ISCHAR( bBlock ) .AND. "(" $ bBlock
       bBlock := hb_ULeft( bBlock, hb_UAt( "(", bBlock ) - 1 )
    ENDIF
-   s_lEvents := !Empty( bBlock )
 
-RETURN ( s_bEvents := bBlock )
+   s_bEvents := bBlock
+   s_lEvents := ! Empty( s_bEvents )
+
+RETURN bOldBlock
 
 #endif
 
@@ -518,7 +521,7 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
          TmpStr := _HMG_aControlType [i]
 
-         IF TmpStr $ "GETBOX,NUMTEXT,MASKEDTEXT,CHARMASKTEXT,EDIT,BTNTEXT,BTNNUMTEXT,MULTILIST,COMBO"
+         IF TmpStr $ "GETBOX,NUMTEXT,MASKEDTEXT,CHARMASKTEXT,EDIT,BTNTEXT,BTNNUMTEXT,MULTILIST,COMBO,MULTICHKLIST"
 
             IF _HMG_aControlFontColor [i] != Nil
 
@@ -841,7 +844,7 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
       IF hwnd != 0
 
-         IF HiWord ( wParam ) == WHEEL_DELTA
+         IF HiWord ( wParam ) < 65000
 
             IF GetScrollPos ( hwnd , SB_VERT ) < 25
                SendMessage ( hwnd , WM_VSCROLL , SB_TOP , 0 )

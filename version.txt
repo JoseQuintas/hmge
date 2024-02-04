@@ -1,1 +1,1 @@
-Harbour MiniGUI Extended Edition 23.09 (Update 2)
+Harbour MiniGUI Extended Edition 24.01 (Release)

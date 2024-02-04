@@ -22,7 +22,9 @@ rem Builds Harbour library TsbViewer.lib.
   if exist TsbViewer.obj   del TsbViewer.obj
   if exist TsbViewLang.c   del TsbViewLang.c
   if exist TsbViewLang.obj del TsbViewLang.obj
+  if exist TsbViewMenu.c   del TsbViewMenu.c
   if exist TsbViewMenu.obj del TsbViewMenu.obj
+  if exist TsbViewMisc.c   del TsbViewMisc.c
   if exist TsbViewMisc.obj del TsbViewMisc.obj
 
 :COPYLIB

@@ -53,6 +53,8 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include "dbstruct.ch"
 #include "dbinfo.ch"
 
+#define IS_SQLRDD ( Select() > 0 .AND. ( RddName()=="SQLRDD" .OR. RddName()=="SQLEX" ) )
+
 #ifndef __XHARBOUR__
    SET PROCEDURE TO netfuncs.prg
 #endif
@@ -1170,12 +1172,18 @@ PROCEDURE _BrowseRefresh ( ControlName , ParentForm , z )
 
    IF s == 1 .OR. s == 0
 
-#ifndef __XHARBOUR__
-      IF ( ! Empty( dbFilter() ) .AND. ! Eval( hb_macroBlock( dbFilter() ) ) )
-#else
-      IF ( ! Empty( dbFilter() ) .AND. ! &( dbFilter() ) )
-#endif
+      IF IS_SQLRDD .AND. ! Empty( dbFilter() )
          SKIP
+         GO TOP
+      ELSE
+
+#ifndef __XHARBOUR__
+         IF ( ! Empty( dbFilter() ) .AND. ! Eval( hb_macroBlock( dbFilter() ) ) )
+#else
+         IF ( ! Empty( dbFilter() ) .AND. ! &( dbFilter() ) )
+#endif
+            SKIP
+         ENDIF
       ENDIF
 
       IF IndexOrd() != 0
@@ -1267,16 +1275,28 @@ PROCEDURE _BrowseSetValue ( ControlName , ParentForm , Value , z , mp )
 
    GO Value
 
+   IF IS_SQLRDD .AND. ! Empty( dbFilter() )
+      SKIP
+      IF EOF()
+         GO _RecNo
+         RestoreWorkArea( _Alias )
+
+         RETURN
+
+      ENDIF
+   ELSE
+
 #ifndef __XHARBOUR__
-   IF ( ! Empty( dbFilter() ) .AND. ! Eval( hb_macroBlock( dbFilter() ) ) )
+      IF ( ! Empty( dbFilter() ) .AND. ! Eval( hb_macroBlock( dbFilter() ) ) )
 #else
-   IF ( ! Empty( dbFilter() ) .AND. ! &( dbFilter() ) )
+      IF ( ! Empty( dbFilter() ) .AND. ! &( dbFilter() ) )
 #endif
-      GO _RecNo
-      RestoreWorkArea( _Alias )
+         GO _RecNo
+         RestoreWorkArea( _Alias )
 
-      RETURN
+         RETURN
 
+      ENDIF
    ENDIF
 
    IF EOF()
@@ -1364,7 +1384,7 @@ FUNCTION  _BrowseDelete (  ControlName , ParentForm , z  )
    Select &_BrowseArea
    _RecNo := RecNo()
 
-   IF lock == .F. .AND. ( _BrowseArea )->( dbInfo( DBI_SHARED ) )
+   IF lock == .F. .AND. ( ( _BrowseArea )->( dbInfo( DBI_SHARED ) ) .OR. IS_SQLRDD )
       lock := .T.
    ENDIF
 
@@ -2048,7 +2068,7 @@ STATIC FUNCTION _BrowseInPlaceEdit ( GridHandle , aValid , aValidMessages , aRea
       GO nRec
    ENDIF
 
-   IF lock == .F. .AND. ( _GridWorkArea )->( dbInfo( DBI_SHARED ) )
+   IF lock == .F. .AND. ( ( _GridWorkArea )->( dbInfo( DBI_SHARED ) ) .OR. IS_SQLRDD )
       lock := .T.
    ENDIF
 
@@ -2153,6 +2173,7 @@ STATIC FUNCTION _BrowseInPlaceEdit ( GridHandle , aValid , aValidMessages , aRea
       ENDIF
 
       IF lock == .T.
+         ( _GridWorkArea )->( dbCommit() )
          ( _GridWorkArea )->( dbRUnlock() )
       ENDIF
 
@@ -2447,6 +2468,9 @@ STATIC PROCEDURE _InPlaceEditSave ( i , FieldName , Alias , r , lock , ControlTy
    REPLACE &FieldName WITH r
 
    IF lock == .T.
+      IF IS_SQLRDD
+         ( Alias )->( dbCommit() )
+      ENDIF
       ( Alias )->( dbRUnlock() )
    ENDIF
 

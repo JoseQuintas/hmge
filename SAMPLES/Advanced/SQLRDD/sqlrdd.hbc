@@ -1,0 +1,4 @@
+incpaths=
+libpaths=
+libs=sqlrdd libmysql odbc32 odbccp32
+

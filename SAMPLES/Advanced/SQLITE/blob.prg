@@ -1,8 +1,4 @@
 /*
- * $Id: blob.prg 10694 2009-03-25 15:34:09Z vszakats $
- */
-
-/*
  * SQLite3 Demo
  *
  * Copyright 2007 P.Chornyj <myorg63@mail.ru>
@@ -18,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -46,16 +42,15 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
- * See COPYING for licensing terms.
- *
  */
 
 #include "hbsqlit3.ch"
 
 #define TABLE_SQL "CREATE TABLE image( id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT(50), image BLOB )"
 
-PROCEDURE main()
-   LOCAL lCreateIfNotExist := .t.
+PROCEDURE Main()
+
+   LOCAL lCreateIfNotExist := .T.
    LOCAL db := sqlite3_open( "test.s3db", lCreateIfNotExist )
    LOCAL stmt
    LOCAL buff, blob
@@ -69,14 +64,14 @@ PROCEDURE main()
 
       sqlite3_exec( db, TABLE_SQL )
 
-      stmt := sqlite3_prepare( db, "INSERT INTO image( title, image ) VALUES( :title, :image )")
+      stmt := sqlite3_prepare( db, "INSERT INTO image( title, image ) VALUES( :title, :image )" )
       IF ! Empty( stmt )
          buff := sqlite3_file_to_buff( "pngtest.png" )
 
          IF sqlite3_bind_text( stmt, 1, "pngtest.png" ) == SQLITE_OK .AND. ;
             sqlite3_bind_blob( stmt, 2, @buff ) == SQLITE_OK
             IF sqlite3_step( stmt ) == SQLITE_DONE
-               ?"Save pngtest.png into BLOB"
+               ? "Save pngtest.png into BLOB"
                ? "INSERT INTO image( title, image ) VALUES( 'pngtest.png', 'pngtest.png' ) - Done"
             ENDIF
          ENDIF
@@ -86,13 +81,13 @@ PROCEDURE main()
       ENDIF
 
       ? ""
-      ? "The number of database rows that were changed: " + ltrim( str( sqlite3_changes( db ) ) )
-      ? "Total changes: " + ltrim( str( sqlite3_total_changes( db ) ) )
+      ? "The number of database rows that were changed: " + hb_ntos( sqlite3_changes( db ) )
+      ? "Total changes: " + hb_ntos( sqlite3_total_changes( db ) )
       ? ""
       sqlite3_sleep( 3000 )
 
       blob := sqlite3_blob_open( db, NIL, "image", "image", sqlite3_last_insert_rowid( db ), 0 /* 0 - RO; 1- RW */ )
-      IF !Empty( blob )
+      IF ! Empty( blob )
          ? "Open BLOB image - Ok"
 
          buff := sqlite3_blob_read( blob )
@@ -101,7 +96,7 @@ PROCEDURE main()
 
          ? "The size in bytes of the blob - ", sqlite3_blob_bytes( blob )
 
-         IF ( sqlite3_buff_to_file( "pngtest1.png", @buff ) == SQLITE_OK )
+         IF sqlite3_buff_to_file( "pngtest1.png", @buff ) == SQLITE_OK
             ? "Save BLOB into pngtest1.png - Done"
          ENDIF
 
@@ -112,14 +107,14 @@ PROCEDURE main()
       ENDIF
       sqlite3_sleep( 3000 )
 
-      ?""
-      ?"Save BLOB using sqlite3_column_blob()"
-      stmt := sqlite3_prepare( db, "SELECT image FROM image WHERE id == ?5 ")
-      IF !Empty( stmt )
+      ? ""
+      ? "Save BLOB using sqlite3_column_blob()"
+      stmt := sqlite3_prepare( db, "SELECT image FROM image WHERE id == ?5 " )
+      IF ! Empty( stmt )
          IF sqlite3_bind_int64( stmt, 5, sqlite3_last_insert_rowid( db ) ) == SQLITE_OK
             IF sqlite3_step( stmt ) == SQLITE_ROW
                buff := sqlite3_column_blob( stmt, 1 )
-               IF ( sqlite3_buff_to_file( "pngtest2.png", @buff ) == SQLITE_OK )
+               IF sqlite3_buff_to_file( "pngtest2.png", @buff ) == SQLITE_OK
                   ? "Save BLOB into pngtest2.png - Done"
                ENDIF
                buff := NIL
@@ -128,7 +123,7 @@ PROCEDURE main()
             sqlite3_finalize( stmt )
          ENDIF
       ENDIF
-      wait
+      WAIT
    ENDIF
 
-RETURN
+   RETURN

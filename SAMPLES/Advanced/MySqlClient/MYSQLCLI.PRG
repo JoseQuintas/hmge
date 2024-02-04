@@ -31,6 +31,8 @@
    + dynamic grid fill (only first 1000 records in old version)
    + cosmetic modifications
 
+  November 2023: add port option by Pierpaolo Martinello
+
 */
 
 #include "hmg.ch"
@@ -41,8 +43,10 @@
 MEMVAR lConnected
 MEMVAR oServer
 MEMVAR cServer
+MEMVAR nPort
 MEMVAR cUser
 MEMVAR cPaswd
+MEMVAR cDBase
 MEMVAR cCryptKey
 
 MEMVAR aDatabases
@@ -62,8 +66,10 @@ PROCEDURE Main()
    PUBLIC lConnected := .F.
    PUBLIC oServer := NIL
    PUBLIC cServer := "localhost"
+   PUBLIC nPort := 3306
    PUBLIC cUser := "root"
    PUBLIC cPaswd := ""
+   PUBLIC cDBase := "test"
    PUBLIC cCryptKey := "topsecret"
 
    PUBLIC aDatabases := {}
@@ -84,15 +90,19 @@ PROCEDURE Main()
    IF File( "MySqlCli.ini" )
       BEGIN INI FILE "MySqlCli.ini"
          GET cServer SECTION "Login" ENTRY "server"
+         GET nPort SECTION "Login" ENTRY "port"
          GET cUser SECTION "Login" ENTRY "user"
          GET cPaswd SECTION "Login" ENTRY "pass"
+         GET cDBase SECTION "Login" ENTRY "database"
       END INI
       cPaswd := hb_decrypt( cPaswd, cCryptKey )
    ELSE
       BEGIN INI FILE "MySqlCli.ini"
          SET SECTION "Login" ENTRY "server" TO cServer
+         SET SECTION "Login" ENTRY "port" TO nPort
          SET SECTION "Login" ENTRY "user" TO cUser
          SET SECTION "Login" ENTRY "pass" TO hb_crypt( cPaswd, cCryptKey )
+         SET SECTION "Login" ENTRY "database" TO cDBase
       END INI
    ENDIF
 
@@ -201,9 +211,9 @@ PROCEDURE Main()
                WIDTH 505 ;
                HEIGHT 380 ;
                HEADERS { "Name", "Type", ;
-                  "Null", "Key", ;
-                  "Default value", ;
-                  "Extra" } ;
+               "Null", "Key", ;
+               "Default value", ;
+               "Extra" } ;
                WIDTHS { 125, 125, 50, 50, 125, 150 } ;
                ON GOTFOCUS {|| setControl( .T. ) } ;
                ON LOSTFOCUS {|| setControl( .F. ) }
@@ -249,6 +259,7 @@ RETURN
 FUNCTION Connect()
 *------------------------------------------------------------------------------*
    LOCAL nRow, nCol
+   LOCAL ndb := 0 //30
 
    IF lConnected
       RETURN NIL
@@ -260,16 +271,18 @@ FUNCTION Connect()
    DEFINE WINDOW F_Connect ;
          AT nRow, nCol ;
          WIDTH 315 ;
-         HEIGHT 205 ;
+         HEIGHT 265 - ndb ;
          TITLE " Connect to MySQL server" ;
-         modal ;
+         MODAL ;
          NOSIZE ;
          nosysmenu
+
+      ON KEY ESCAPE ACTION f_connect.RELEASE
 
       @ 10, 10 FRAME frm_Data ;
          CAPTION "" ;
          WIDTH 285 ;
-         HEIGHT 120 ;
+         HEIGHT 180 - Ndb ;
          BOLD
 
       @ 34, 20 LABEL lblServer ;
@@ -277,15 +290,27 @@ FUNCTION Connect()
          WIDTH 50 ;
          HEIGHT 21
 
-      @ 64, 20 LABEL lblUser ;
+      @ 64, 20 LABEL lport ;
+         VALUE "Port" ;
+         WIDTH 55 ;
+         HEIGHT 21
+
+      @ 94, 20 LABEL lblUser ;
          VALUE "User" ;
          WIDTH 50 ;
          HEIGHT 21
 
-      @ 94, 20 LABEL lblPaswd ;
+      @ 124, 20 LABEL lblPaswd ;
          VALUE "Password" ;
          WIDTH 55 ;
          HEIGHT 21
+
+      IF ndb < 1
+         @ 154, 20 LABEL lblDBase ;
+            VALUE "Database" ;
+            WIDTH 55 ;
+            HEIGHT 21
+      ENDIF
 
       @ 30, 85 TEXTBOX txtServer ;
          HEIGHT 21 ;
@@ -295,7 +320,17 @@ FUNCTION Connect()
          ON LOSTFOCUS {|| setControl( .F. ) } ;
          MAXLENGTH 60
 
-      @ 60, 85 TEXTBOX txtUser ;
+      @ 60, 85 TEXTBOX txtPort ;
+         HEIGHT 21 ;
+         VALUE nPort ;
+         WIDTH 100 ;
+         NUMERIC ;
+         ON GOTFOCUS {|| setControl( .T. ) } ;
+         ON LOSTFOCUS {|| setControl( .F. ) } ;
+         ON ENTER F_Connect.btnConnect.ACTION ;
+         MAXLENGTH 5
+
+      @ 90, 85 TEXTBOX txtUser ;
          HEIGHT 21 ;
          VALUE cUser ;
          WIDTH 100 ;
@@ -303,17 +338,33 @@ FUNCTION Connect()
          ON LOSTFOCUS {|| setControl( .F. ) } ;
          MAXLENGTH 40
 
-      @ 90, 85 TEXTBOX txtPaswd ;
+      @ 120, 85 TEXTBOX txtPaswd ;
          HEIGHT 21 ;
          VALUE cPaswd ;
          WIDTH 100 ;
          PASSWORD ;
          ON GOTFOCUS {|| setControl( .T. ) } ;
          ON LOSTFOCUS {|| setControl( .F. ) } ;
-         ON ENTER F_Connect.btnConnect.Action ;
          MAXLENGTH 40
 
-      @ 140, 225 BUTTON btnConnect ;
+      IF ndb < 1
+         @ 150, 85 TEXTBOX txtDBase ;
+            HEIGHT 21 ;
+            VALUE cDBase ;
+            WIDTH 100 ;
+            ON GOTFOCUS {|| setControl( .T. ) } ;
+            ON LOSTFOCUS {|| setControl( .F. ) } ;
+            ON ENTER F_Connect.btnConnect.ACTION ;
+            MAXLENGTH 40
+      ENDIF
+
+      @ 200 - ndb, 145 BUTTON btnAbort ;
+         CAPTION "&Abort" ;
+         ACTION {|| f_connect.release } ;
+         WIDTH 70 ;
+         HEIGHT 25
+
+      @ 200 - ndb, 225 BUTTON btnConnect ;
          CAPTION "&Connect" ;
          ACTION {|| Login() } ;
          WIDTH 70 ;
@@ -325,28 +376,37 @@ FUNCTION Connect()
 
 RETURN NIL
 
-
 *------------------------------------------------------------------------------*
 FUNCTION Login()
 *------------------------------------------------------------------------------*
    cServer := AllTrim( F_Connect.txtServer.Value )
    cUser := AllTrim( F_Connect.txtUser.Value )
    cPaswd := AllTrim( F_Connect.txtPaswd.Value )
+   cDBase := AllTrim( F_Connect.txtDBase.Value )
+   nPort := F_Connect.txtPort.VALUE
 
    IF ! Empty( cServer ) .AND. ! Empty( cUser )
       setMessage( "Connecting to MySQL server...", 1 )
-      oServer := TMySQLServer():New( cServer, cUser, cPaswd )
+      oServer := TMySQLServer():New( cServer, cUser, cPaswd, nport )
       IF !( oServer:NetErr() )
          lConnected := .T.
          F_main.tabInfo.Enabled := .T.
          UpdateTree()
+         IF ! Empty( cDBase )
+            oServer:SelectDb( cDBase )
+            IF oServer:NetErr()
+               MsgExclamation( "Error connecting to database: " + oServer:Error() )
+            ENDIF
+         ENDIF
       ENDIF
       setMessage()
       UpdateMain()
       BEGIN INI FILE "MySqlCli.ini"
          SET SECTION "Login" ENTRY "server" TO cServer
+         SET SECTION "Login" ENTRY "port" TO nPort
          SET SECTION "Login" ENTRY "user" TO cUser
          SET SECTION "Login" ENTRY "pass" TO hb_crypt( cPaswd, cCryptKey )
+         SET SECTION "Login" ENTRY "database" TO cDBase
       END INI
    ENDIF
    F_connect.RELEASE
@@ -360,7 +420,7 @@ FUNCTION Disconnect()
    IF lConnected
       oServer:Destroy()
       lConnected := .F.
-      F_main.tabinfo.Value := 1
+      F_main.tabinfo.VALUE := 1
       UpdateTree()
       UpdateMain()
       setMessage()
@@ -389,6 +449,7 @@ PROCEDURE UpdateTree()
    LOCAL j
    LOCAL nNodeBase
    LOCAL nNodeTable
+   LOCAL nNodeSelect
 
    IF lConnected
 
@@ -410,6 +471,11 @@ PROCEDURE UpdateTree()
             MsgExclamation( "Error connecting to database: " + oServer:Error() )
             RETURN
          ENDIF
+         IF ! Empty( cDBase )
+            IF Lower( cDBase ) == aDatabases[ i ]
+               nNodeSelect := nNodeBase
+            ENDIF
+         ENDIF
 
          aTables := oServer:ListTables()
          IF oServer:NetErr()
@@ -425,6 +491,10 @@ PROCEDURE UpdateTree()
       NEXT
 
       F_Main.TREE_1.Expand( 1 )
+      IF nNodeSelect <> NIL
+         F_Main.TREE_1.VALUE := nNodeSelect
+         F_Main.TREE_1.Expand( nNodeSelect )
+      ENDIF
    ELSE
       DoMethod( "F_Main", "TREE_1", "DeleteAllItems" )
    ENDIF
@@ -521,7 +591,7 @@ PROCEDURE UpdateData()
       _HMG_aControlHeadClick[ i ] := Array( nColumns )
       _HMG_aControlRangeMax[ i ] := Array( nColumns )
       AEval( Array( nColumns ), ;
-         { | x, k | _HMG_aControlHeadClick[ i ][ k ] := { | n | HMG_SortColumn( n ) }, ;
+         {| x, k | _HMG_aControlHeadClick[ i ][ k ] := {| n | HMG_SortColumn( n ) }, ;
          _HMG_aControlRangeMax[ i ][ k ] := 1, HB_SYMBOL_UNUSED( x ) } )
 
       oQuery:GoTop()
@@ -662,9 +732,9 @@ RETURN
 FUNCTION setControl( lValue )
 *------------------------------------------------------------------------------*
    IF hb_defaultValue( lValue, .F. )
-      SetProperty( thisWindow.Name, this.Name, "BackColor", { 255, 255, 200 } )
+      SetProperty( thisWindow.NAME, this.NAME, "BackColor", { 255, 255, 200 } )
    ELSE
-      SetProperty( thisWindow.Name, this.Name, "BackColor", { 255, 255, 255 } )
+      SetProperty( thisWindow.NAME, this.NAME, "BackColor", { 255, 255, 255 } )
    ENDIF
 
 RETURN NIL
@@ -691,7 +761,7 @@ FUNCTION SQL2Dbf()
    LOCAL cFileName := cTable
 
    IF ! lTableSelect
-      msginfo( "No TABle selected...", PROGRAM )
+      msginfo( "No Table selected...", PROGRAM )
       RETURN NIL
    ENDIF
 
@@ -703,7 +773,7 @@ FUNCTION SQL2Dbf()
          WIDTH 360 ;
          HEIGHT 220 ;
          TITLE " Export to DBF" ;
-         modal ;
+         MODAL ;
          NOSIZE
 
       @ 10, 10 FRAME frm_2Dbf ;
@@ -739,13 +809,13 @@ FUNCTION SQL2Dbf()
 
       @ 60, 305 BUTTON btnFolder ;
          CAPTION "..." ;
-         ACTION {|| ( F_2Dbf.txtMap.Value := GetFolder( "Select folder:" ) ), F_2Dbf.txtMap.SetFocus } ;
+         ACTION {|| ( F_2Dbf.txtMap.VALUE := GetFolder( "Select folder:" ) ), F_2Dbf.txtMap.SetFocus } ;
          WIDTH 30 ;
          HEIGHT 21
 
       @ 120, 275 BUTTON btn2Dbf ;
          CAPTION "&Export" ;
-         ACTION {|| copy2dbf( F_2Dbf.txtMap.Value, F_2Dbf.txtFile.Value ), F_2Dbf.Release } ;
+         ACTION {|| copy2dbf( F_2Dbf.txtMap.VALUE, F_2Dbf.txtFile.Value ), F_2Dbf.Release } ;
          WIDTH 70 ;
          HEIGHT 25
 
@@ -792,11 +862,11 @@ FUNCTION copy2dbf( cFolder, cFile )
       IF ( i := FCreate( cFileName ) ) > 0
          FClose( i )
       ELSE
-         msgexclamation( "Incorrect TABle name...", PROGRAM )
+         msgexclamation( "Incorrect Table name...", PROGRAM )
          RETURN NIL
       ENDIF
 
-      setMessage( "Exporting TABle " + cTable + " in " + cFileName + "...", 1 )
+      setMessage( "Exporting Table " + cTable + " in " + cFileName + "...", 1 )
       oQuery := oServer:Query( "select * from " + cTable )
       IF !( oQuery:NetErr() )
 
@@ -844,7 +914,7 @@ FUNCTION copy2dbf( cFolder, cFile )
 
          USE
          oQuery:Destroy()
-         setMessage( " TABle: " + cFileName, 1 )
+         setMessage( " Table: " + cFileName, 1 )
          setmessage( "Records: " + ntrim( i - 1 ), 2 )
          msginfo( "Export finished!", PROGRAM )
       ELSE
@@ -904,7 +974,7 @@ FUNCTION AddData( nPos )
       oQuery:Destroy()
       setMessage()
 
-      F_Main.GRD_Data.Value := nPos
+      F_Main.GRD_Data.VALUE := nPos
 
    ENDIF
 

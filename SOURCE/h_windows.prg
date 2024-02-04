@@ -175,6 +175,13 @@ FUNCTION _DefineWindow ( FormName, Caption, x, y, w, h, nominimize, nomaximize, 
          mVar := ( nocaption .AND. nosize )
          w := ClientWidth + iif( mVar, 0, GetBorderWidth() ) + iif( mVar .OR. _HMG_IsThemed .AND. nosize, 0, GetBorderWidth() ) - iif( mVar .OR. (!_HMG_IsThemed .AND. !nosize) .OR. (_HMG_IsThemed .AND. !nocaption .AND. !nosize), 0, 2 )
          h := ClientHeight + iif( nocaption, 0, GetTitleHeight() ) + iif( mVar .OR. _HMG_IsThemed .AND. nosize, 0, GetBorderWidth() ) + iif( mVar, 0, GetBorderWidth() ) - iif( mVar .OR. (!_HMG_IsThemed .AND. !nosize) .OR. (_HMG_IsThemed .AND. !nocaption .AND. !nosize), 0, 2 )
+         IF MSC_VER() > 0 .OR. _HMG_IsBcc77
+            IF !mVar .AND. _HMG_IsThemed
+               mVar := 2 * GetBorderWidth() + 2 * GetBorderHeight()
+               w += mVar
+               h += mVar
+            ENDIF
+         ENDIF
       ENDIF
 
    ENDIF
@@ -250,7 +257,7 @@ FUNCTION _DefineWindow ( FormName, Caption, x, y, w, h, nominimize, nomaximize, 
       hscroll := .T.
    ENDIF
 
-   IF MSC_VER() > 0 .OR. "7.60" $ hb_Ccompiler()
+   IF MSC_VER() > 0 .OR. _HMG_IsBcc77
       IF nosize .AND. _HMG_IsThemed
          w += 10
          h += 10
@@ -537,6 +544,13 @@ FUNCTION _DefineModalWindow ( FormName, Caption, x, y, w, h, Parent, nosize, nos
          mVar := ( nocaption .AND. nosize )
          w := ClientWidth + iif( mVar, 0, GetBorderWidth() ) + iif( mVar .OR. _HMG_IsThemed .AND. nosize, 0, GetBorderWidth() ) - iif( mVar .OR. (!_HMG_IsThemed .AND. !nosize) .OR. (_HMG_IsThemed .AND. !nocaption .AND. !nosize), 0, 2 )
          h := ClientHeight + iif( nocaption, 0, GetTitleHeight() ) + iif( mVar .OR. _HMG_IsThemed .AND. nosize, 0, GetBorderWidth() ) + iif( mVar, 0, GetBorderWidth() ) - iif( mVar .OR. (!_HMG_IsThemed .AND. !nosize) .OR. (_HMG_IsThemed .AND. !nocaption .AND. !nosize), 0, 2 )
+         IF MSC_VER() > 0 .OR. _HMG_IsBcc77
+            IF !mVar .AND. _HMG_IsThemed
+               mVar := 2 * GetBorderWidth() + 2 * GetBorderHeight()
+               w += mVar
+               h += mVar
+            ENDIF
+         ENDIF
       ENDIF
 
    ENDIF
@@ -585,10 +599,10 @@ FUNCTION _DefineModalWindow ( FormName, Caption, x, y, w, h, Parent, nosize, nos
       hscroll := .T.
    ENDIF
 
-   IF MSC_VER() > 0 .OR. "7.60" $ hb_Ccompiler()
+   IF MSC_VER() > 0 .OR. _HMG_IsBcc77
       IF nosize .AND. !nocaption .AND. _HMG_IsThemed
          w += 10
-         h += 10
+         h += 5
       ENDIF
    ENDIF
 

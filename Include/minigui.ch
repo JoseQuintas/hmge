@@ -50,6 +50,15 @@
 #include "mgver.h"
 
 /* ***********************************************************************
+ * Enable lite build without the internal OOP classes
+ *
+ * By default this is turned OFF.
+ */
+#ifdef __XHARBOUR__
+#define _LITE_
+#endif
+
+/* ***********************************************************************
  * Enable support for legacy functions
  *
  * By default this is turned OFF.
@@ -87,7 +96,7 @@
  *
  * By default this is turned ON.
  */
-#ifndef __XHARBOUR__
+#ifndef _LITE_
 #define _NAMES_LIST_
 #endif
 
@@ -142,7 +151,9 @@
  *
  * By default this is turned ON.
  */
+#ifndef _LITE_
 #define _OBJECT_
+#endif
 
 /* ***********************************************************************
  * Enable support for User Components in HMG

@@ -13,8 +13,8 @@ STATIC aTypes
 FUNCTION Main()
 
    DEFINE WINDOW winmain ;
-         TITLE 'READ AN EXCEL !!!! ' ;
-         MAIN
+      TITLE 'READ AN EXCEL !!!! ' ;
+      MAIN
 
       @ 050, 003 GRID Grid_1 ;
          WIDTH winmain.WIDTH -20 ;
@@ -22,7 +22,7 @@ FUNCTION Main()
          HEADERS { "" } ;
          WIDTHS { 100 } ;
          ITEMS { { "" } } ;
-         VALUE 1 ;
+         VALUE 0 ;
          FONT "Helv" SIZE 10 ;
          PAINTDOUBLEBUFFER
 
@@ -36,6 +36,7 @@ FUNCTION Main()
          FONTSIZE 9
          ACTION FAR_OpenXLS()
          FLAT .T.
+         DEFAULT .T.
       END BUTTON
 
       DEFINE BUTTON cmdxls2dbf
@@ -95,10 +96,12 @@ STATIC PROCEDURE Load_XLS_CLI( cArchivo )
    SET DECIMALS TO 0
    SET DATE FORMAT "YYYY-MM-DD"
 
-   IF ( oExcel := CreateObject( "Excel.Application" ) ) == NIL
+   TRY
+      oExcel := CreateObject( "Excel.Application" )
+   CATCH
       MsgStop( 'Excel no está instalado!', 'Error' )
       RETURN
-   ENDIF
+   END
 
    oWorkBook := oExcel:WorkBooks:Open( cArchivo )
 

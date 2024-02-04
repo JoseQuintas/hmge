@@ -63,8 +63,10 @@
 LPWSTR      AnsiToWide( LPCSTR );
 #endif
 HINSTANCE   GetInstance( void );
+extern HB_EXPORT BOOL Array2ColorRef( PHB_ITEM aCRef, COLORREF * cr );
 
-static int m_nHeightItem = 16;
+static int      m_nHeightItem = 16;
+static COLORREF m_crText, m_crBack;
 
 HB_FUNC( INITCHKLISTBOX )
 {
@@ -90,6 +92,16 @@ HB_FUNC( INITCHKLISTBOX )
    if( hb_parni( 12 ) )
    {
       m_nHeightItem = hb_parni( 12 );
+   }
+
+   if( ! Array2ColorRef( hb_param( 13, HB_IT_ANY ), &m_crText ) )
+   {
+      m_crText = GetSysColor( COLOR_WINDOWTEXT );
+   }
+
+   if( ! Array2ColorRef( hb_param( 14, HB_IT_ANY ), &m_crBack ) )
+   {
+      m_crBack = GetSysColor( COLOR_WINDOW );
    }
 
    hmg_ret_raw_HWND
@@ -144,6 +156,16 @@ HB_FUNC( INITMULTICHKLISTBOX )
    if( hb_parni( 12 ) )
    {
       m_nHeightItem = hb_parni( 12 );
+   }
+
+   if( ! Array2ColorRef( hb_param( 13, HB_IT_ANY ), &m_crText ) )
+   {
+      m_crText = GetSysColor( COLOR_WINDOWTEXT );
+   }
+
+   if( ! Array2ColorRef( hb_param( 14, HB_IT_ANY ), &m_crBack ) )
+   {
+      m_crBack = GetSysColor( COLOR_WINDOW );
    }
 
    hmg_ret_raw_HWND
@@ -247,6 +269,23 @@ HB_FUNC( SETCHKLBITEMHEIGHT ) // set the height of a string in pixels
    ReleaseDC( hwnd, hdc );
 }
 
+HB_FUNC( CHKLIST_SETCOLOR )
+{
+   HWND hwnd = hmg_par_raw_HWND( 1 );
+
+   if( ! Array2ColorRef( hb_param( 2, HB_IT_ANY ), &m_crText ) )
+   {
+      m_crText = GetSysColor( COLOR_WINDOWTEXT );
+   }
+
+   if( ! Array2ColorRef( hb_param( 3, HB_IT_ANY ), &m_crBack ) )
+   {
+      m_crBack = GetSysColor( COLOR_WINDOW );
+   }
+
+   RedrawWindow( hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASENOW | RDW_UPDATENOW );
+}
+
 HB_FUNC( CHKLIST_SETCHECKBOX )
 {
    HWND  hwnd            = hmg_par_raw_HWND( 1 );
@@ -310,9 +349,9 @@ HB_FUNC( _ONDRAWLISTBOXITEM )
             }
             else
             {
-               SetTextColor( pdis->hDC, GetSysColor( COLOR_WINDOWTEXT ) );
-               SetBkColor( pdis->hDC, GetSysColor( COLOR_WINDOW ) );
-               hBackBrush = CreateSolidBrush( GetSysColor( COLOR_WINDOW ) );
+               SetTextColor( pdis->hDC, m_crText );
+               SetBkColor( pdis->hDC, m_crBack );
+               hBackBrush = CreateSolidBrush( m_crBack );
             }
 
             FillRect( pdis->hDC, &pdis->rcItem, hBackBrush );

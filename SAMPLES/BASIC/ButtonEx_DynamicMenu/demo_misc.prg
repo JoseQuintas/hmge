@@ -31,11 +31,13 @@ FUNC SetsEnv()
    SET DEFAULT ICON TO "1MAIN_ICO"
 
    SET DIALOGBOX CENTER OF PARENT
-   SET CENTERWINDOW RELATIVE PARENT                // for HMG_Alert()
 
    DEFINE FONT FontBold FONTNAME _HMG_DefaultFontName SIZE _HMG_DefaultFontSize BOLD
-   DEFINE FONT DlgFont  FONTNAME "Verdana" SIZE 16  // for HMG_Alert()
-   DEFINE FONT AgeCard  FONTNAME "Verdana" SIZE  12  BOLD
+   DEFINE FONT AgeCard  FONTNAME "Verdana" SIZE 12  BOLD
+   // for HMG_Alert()
+   DEFINE FONT DlgFont  FONTNAME "Verdana" SIZE 16  
+   SET MSGALERT BACKCOLOR TO SILVER
+   SET MSGALERT FONTCOLOR TO BLACK
 
    // --------------------------------
    SET OOP ON
@@ -170,6 +172,59 @@ FUNCTION FontSizeMaxAutoFit( cText, cFontName, lBold, nWidth, nHeight )
    ENDDO
 
 RETURN nFSize
+
+////////////////////////////////////////////////////////////////////////////
+FUNCTION Alert2Dim(aXDim)
+   LOCAL bOnInit, aButton, cIcoRes, nIcoSize
+   LOCAL aBClr := {248,209,211}, aFClr := MAROON
+   LOCAL aDlgClrOld := _SetMsgAlertColors( aBClr, aFClr )
+   LOCAL aDlgFntOld := GetFontParam(GetFontHandle("DlgFont")) // всегда массив
+   LOCAL aBtnColors := { RED }, cText := "", cTitle := 'Menu Array'
+   LOCAL cFont := "DejaVu Sans Mono", nSize := 10
+
+   DEFINE FONT DlgFont FONTNAME cFont SIZE nSize // for HMG_Alert() and AlertXXX()
+
+   AEval(Array(Len(aXDim)), {|t| t := repl("*", 70), cText += t + CRLF})
+
+   bOnInit := {|| // свои параметры окна
+                  Local nW := System.DesktopWidth * 0.94
+                  Local ow := ThisWindow.Object
+                  Local oc, cv, nn, nL, nG := 10
+                  This.Width := nW 
+                  This.Center
+                  nL := This.ClientWidth - This.Say_01.Col - nG
+                  //? "Window: ", ow:Name, "Width=", This.Width, ow:Width, nL ; ?
+                  //?v aXDim  ; ?
+                  FOR EACH oc IN ow:GetObj4Type("LABEL")
+                      nn := hb_enumindex(oc)
+                      cv := hb_ntos(nn) + ". " + hb_valtoexp(aXDim[ nn ])
+                      //? nn, oc:type, oc:name, oc:Width, cv
+                      oc:Width := nL
+                      oc:Value := cv
+                  NEXT
+                  This.Btn_01.Col := This.ClientWidth - This.Btn_01.Width - nG
+                  This.Btn_01.SetFocus
+                  Return Nil
+               }
+
+   // ------------ alerts.prg ---------
+   //AlertInfo( Message, Title, Icon, nSize, aColors, lTopMost, bInit, lNoSound )
+   AlertInfo(cText,cTitle, , ,aBtnColors, .F. /*topmost*/, bOnInit, .T.)
+
+   // восстановить цвета HMG_Alert()
+   _SetMsgAlertColors( aDlgClrOld[1], aDlgClrOld[2] )
+   // восстановить фонт HMG_Alert()
+   _DefineFont("DlgFont", aDlgFntOld[1], ; // <fontname>
+                          aDlgFntOld[2], ; // <fontsize>  
+                          aDlgFntOld[3], ; // <.bold.>
+                          aDlgFntOld[4], ; // <.italic.>
+                          aDlgFntOld[5], ; // <.underline.>
+                          aDlgFntOld[6], ; // <.strikeout.>
+                          aDlgFntOld[7])   // <Angle>
+   //?v aDlgClrOld ; ? Repl(".",10)
+   DO EVENTS
+
+RETURN NIL
 
 *----------------------------------------------------------------------------*
 // ‘ункци€ проверки установлен ли ЅќЋ№Ўќ… фонт в настройках системы

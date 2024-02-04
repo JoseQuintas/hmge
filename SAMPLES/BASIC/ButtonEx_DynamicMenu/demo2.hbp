@@ -18,4 +18,4 @@ demo2.prg
 demo_misc.prg
 
 # project Resources
-demo.rc
+#demo.rc

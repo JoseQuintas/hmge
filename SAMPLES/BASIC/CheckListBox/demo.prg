@@ -1,191 +1,240 @@
-#include "MiniGUI.ch"
+#include "minigui.ch"
 
 #xcommand ON KEY SPACE [ OF <parent> ] ACTION <action> ;
-=> ;
-_DefineHotKey ( <"parent"> , 0 , VK_SPACE , <{action}> )
+      = > ;
+      _DefineHotKey ( < "parent" >, 0, VK_SPACE, < { action } > )
 
 
-Function Main()
-   Local aItems := {"Item 1","Item 2","Item 3","Item 4","Item 5"}
+FUNCTION Main()
 
-   DEFINE WINDOW Form_1 AT 97,62 WIDTH 402 HEIGHT 449 ;
-      TITLE "Checked ListBox - By Janusz Pora" ;
-      MAIN ;
-      NOMAXIMIZE NOSIZE
+   LOCAL aItems := { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" }
 
-      @ 10,10 CHECKLISTBOX ListBox_1 ;
+   DEFINE WINDOW Form_1 AT 97, 62 WIDTH 402 HEIGHT 449 ;
+         TITLE "Checked ListBox - By Janusz Pora" ;
+         MAIN ;
+         NOMAXIMIZE NOSIZE
+
+      @ 10, 10 CHECKLISTBOX ListBox_1 ;
          WIDTH 150 HEIGHT 160 ;
          ITEMS aItems ;
          VALUE 2 ;
-         CHECKBOXITEM {3,5} ;
+         FONTCOLOR { 0, 255, 64 } ;
+         BACKCOLOR { 255, 0, 128 } ;
+         CHECKBOXITEM { 3, 5 } ;
+         ON GOTFOCUS cmlb_setclr( this.Name, { 0 , 255 , 64 }, { 255 , 0 , 128 } ) ;
+         ON LOSTFOCUS cmlb_setclr( this.Name, { 0 , 255 , 64 }, { 255 , 0 , 128 } ) ;
          ON DBLCLICK clb_Check() ;
          ITEMHEIGHT 19 ;
          FONT 'Arial' SIZE 9
 
-      @ 10,200 CHECKLISTBOX ListBox_2 ;
+      @ 10, 200 CHECKLISTBOX ListBox_2 ;
          WIDTH 150 HEIGHT 160 ;
          ITEMS aItems ;
-         VALUE {2} ;
-         CHECKBOXITEM {4,5};
+         VALUE { 2 } ;
+         BACKCOLOR { 0, 255, 64 } ;
+         FONTCOLOR { 255, 0, 128 } ;
+         CHECKBOXITEM { 4, 5 } ;
+         ON GOTFOCUS cmlb_setclr( this.Name, { 255 , 0 , 128 }, { 0 , 255 , 64 } ) ;
+         ON LOSTFOCUS cmlb_setclr( this.Name, { 255 , 0 , 128 }, { 0 , 255 , 64 } ) ;
          ON DBLCLICK cmlb_Check() ;
          MULTISELECT ;
          ITEMHEIGHT 19 ;
          FONT 'Arial' SIZE 9
 
-      @ 200,10 button bt1 caption 'Add'     action clb_add()
-      @ 230,10 button bt2 caption 'Del'     action clb_del()
-      @ 260,10 button bt3 caption 'Del All' action clb_delete_all()
-      @ 290,10 button bt4 caption 'Modify'  action clb_modify()
-      @ 320,10 button bt5 caption 'Check'   action clb_Check()
-      @ 350,10 button bt6 caption 'Check #4'   action clb_Check(4)
+      @ 200, 10 BUTTON bt1 CAPTION 'Add' ACTION clb_add()
+      @ 230, 10 BUTTON bt2 CAPTION 'Del' ACTION clb_del()
+      @ 260, 10 BUTTON bt3 CAPTION 'Del All' ACTION clb_delete_all()
+      @ 290, 10 BUTTON bt4 CAPTION 'Modify' ACTION clb_modify()
+      @ 320, 10 BUTTON bt5 CAPTION 'Check' ACTION clb_Check()
+      @ 350, 10 BUTTON bt6 CAPTION 'Check #4' ACTION clb_Check( 4 )
 
-      @ 200,200 button btm1 caption 'Add'     action cmlb_add()
-      @ 230,200 button btm2 caption 'Del'     action cmlb_del()
-      @ 260,200 button btm3 caption 'Del All' action cmlb_delete_all()
-      @ 290,200 button btm4 caption 'Modify'  action cmlb_modify()
-      @ 320,200 button btm5 caption 'Check'   action cmlb_Check()
-      @ 350,200 button btm6 caption 'Check #4'   action cmlb_Check(4)
+      @ 200, 200 BUTTON btm1 CAPTION 'Add' ACTION cmlb_add()
+      @ 230, 200 BUTTON btm2 CAPTION 'Del' ACTION cmlb_del()
+      @ 260, 200 BUTTON btm3 CAPTION 'Del All' ACTION cmlb_delete_all()
+      @ 290, 200 BUTTON btm4 CAPTION 'Modify' ACTION cmlb_modify()
+      @ 320, 200 BUTTON btm5 CAPTION 'Check' ACTION cmlb_Check()
+      @ 350, 200 BUTTON btm6 CAPTION 'Check #4' ACTION cmlb_Check( 4 )
 
-      on key space action OnPressSpacebar()
+      ON KEY space ACTION OnPressSpacebar()
 
    END WINDOW
 
-   Form_1.Center ; Form_1.Activate
-Return Nil
+   Form_1.CENTER ; Form_1.ACTIVATE
+
+RETURN NIL
 
 *.....................................................*
 
-proc clb_add
-   local nn := form_1.ListBox_1.ItemCount + 1
-   form_1.ListBox_1.AddItem( 'ITEM_' + alltrim(str( nn )) )
-   form_1.ListBox_1.value := nn
-return
+PROC clb_add
+
+   LOCAL nn := form_1.ListBox_1.ItemCount + 1
+   form_1.ListBox_1.Setfocus
+   form_1.ListBox_1.AddItem( 'ITEM_' + AllTrim( Str( nn ) ) )
+   form_1.ListBox_1.VALUE := nn
+
+RETURN
 
 *.....................................................*
 
-proc clb_del
-   local n1
-   local nn := form_1.ListBox_1.value
+PROC clb_del
+
+   LOCAL n1
+   LOCAL nn := form_1.ListBox_1.VALUE
+   form_1.ListBox_1.Setfocus
    form_1.ListBox_1.DeleteItem( nn )
    n1 := form_1.ListBox_1.ItemCount
-   if nn <= n1
-      form_1.ListBox_1.value := nn
-   else
-      form_1.ListBox_1.value := n1
-   endif
-return
+   IF nn <= n1
+      form_1.ListBox_1.VALUE := nn
+   ELSE
+      form_1.ListBox_1.VALUE := n1
+   ENDIF
+
+RETURN
 
 *.....................................................*
 
-proc clb_delete_all
+PROC clb_delete_all
+
    form_1.ListBox_1.DeleteAllItems
-   form_1.ListBox_1.value := 1
-return
+   form_1.ListBox_1.VALUE := 1
+
+RETURN
 
 *.....................................................*
 
-proc clb_modify
-   local nn := form_1.ListBox_1.value
-   if nn > 0
-      form_1.ListBox_1.item( nn ) := 'New ' + alltrim( str(nn) )
-   endif
+PROC clb_modify
+
+   LOCAL nn := form_1.ListBox_1.VALUE
    form_1.ListBox_1.Setfocus
-return
+   IF nn > 0
+      form_1.ListBox_1.item( nn ) := 'New ' + AllTrim( Str( nn ) )
+   ENDIF
+
+RETURN
 
 *.....................................................*
 
-Function clb_Check(nn)
-   Local lCheck
-   Default nn := form_1.ListBox_1.value
-   if nn > 0
-      lCheck :=  clb_getCheck(nn)
-      setproperty('form_1','ListBox_1',"CHECKBOXITEM",nn,!lCheck)
-   endif
+FUNCTION clb_Check( nn )
+
+   LOCAL lCheck
+   DEFAULT nn := form_1.ListBox_1.VALUE
    form_1.ListBox_1.Setfocus
+   IF nn > 0
+      lCheck := clb_getCheck( nn )
+      SetProperty( 'form_1', 'ListBox_1', "CHECKBOXITEM", nn, ! lCheck )
+   ENDIF
 
-return nil
-
-*.....................................................*
-
-function clb_getCheck(nn)
-   local lCheck
-   lCheck := GetProperty('form_1','ListBox_1',"CHECKBOXITEM",nn)
-return lCheck
+RETURN NIL
 
 *.....................................................*
 
-proc OnPressSpacebar()
-   if GetProperty('form_1',"FOCUSEDCONTROL") == "ListBox_1"
+FUNCTION clb_getCheck( nn )
+
+   LOCAL lCheck
+   lCheck := GetProperty( 'form_1', 'ListBox_1', "CHECKBOXITEM", nn )
+
+RETURN lCheck
+
+*.....................................................*
+
+PROC OnPressSpacebar()
+
+   IF GetProperty( 'form_1', "FOCUSEDCONTROL" ) == "ListBox_1"
       clb_Check()
-   else
+   ELSE
       cmlb_Check()
-   endif
-return
+   ENDIF
+
+RETURN
 
 *.....................................................*
 
-proc cmlb_add
-   local nn := form_1.ListBox_2.ItemCount + 1
-   form_1.ListBox_2.AddItem( 'ITEM_' + alltrim(str( nn )) )
-   form_1.ListBox_2.value := {nn}
-return
+PROC cmlb_add
+
+   LOCAL nn := form_1.ListBox_2.ItemCount + 1
+   form_1.ListBox_2.Setfocus
+   form_1.ListBox_2.AddItem( 'ITEM_' + AllTrim( Str( nn ) ) )
+   form_1.ListBox_2.VALUE := { nn }
+
+RETURN
 
 *.....................................................*
 
-proc cmlb_del
-   local n1, i
-   local nn := form_1.ListBox_2.value
-   if len (nn) > 0
-      for i:= len(nn) to 1 step -1
-         form_1.ListBox_2.DeleteItem( nn[i] )
-      next
+PROC cmlb_del
+
+   LOCAL n1, i
+   LOCAL nn := form_1.ListBox_2.VALUE
+   form_1.ListBox_2.Setfocus
+   IF Len ( nn ) > 0
+      FOR i := Len( nn ) TO 1 STEP -1
+         form_1.ListBox_2.DeleteItem( nn[ i ] )
+      NEXT
       n1 := form_1.ListBox_2.ItemCount
-      if nn[1] <= n1
-         form_1.ListBox_2.value := {nn[1]}
-      else
-         form_1.ListBox_2.value := {n1}
-      endif
-   endif
-return
+      IF nn[ 1 ] <= n1
+         form_1.ListBox_2.VALUE := { nn[ 1 ] }
+      ELSE
+         form_1.ListBox_2.VALUE := { n1 }
+      ENDIF
+   ENDIF
+
+RETURN
 
 *.....................................................*
 
-proc cmlb_delete_all
+PROC cmlb_delete_all
+
+   form_1.ListBox_2.Setfocus
    form_1.ListBox_2.DeleteAllItems
-   form_1.ListBox_2.value := 1
-return
+   form_1.ListBox_2.VALUE := 1
+
+RETURN
 
 *.....................................................*
 
-proc cmlb_modify
-   local i, nn := form_1.ListBox_2.value
-   for i := 1 to len(nn)
-      form_1.ListBox_2.item( nn[i] ) := 'New ' + alltrim( str(nn[i]) )
-   next
+PROC cmlb_modify
+
+   LOCAL i, nn := form_1.ListBox_2.VALUE
    form_1.ListBox_2.Setfocus
-return
+   FOR i := 1 TO Len( nn )
+      form_1.ListBox_2.item( nn[ i ] ) := 'New ' + AllTrim( Str( nn[ i ] ) )
+   NEXT
+
+RETURN
 
 *.....................................................*
 
-function cmlb_Check(n)
-   Local lCheck, i
-   Local nn := form_1.ListBox_2.value
-   Default n := 0
-   if n == 0
-      for i :=1 to len(nn)
-         lCheck :=  cmlb_getCheck(nn[i])
-         setproperty('form_1','ListBox_2',"CHECKBOXITEM",nn[i],!lCheck)
-      next
-   else
-      lCheck :=  cmlb_getCheck(n)
-      setproperty('form_1','ListBox_2',"CHECKBOXITEM",n,!lCheck)
-   endif
+FUNCTION cmlb_Check( n )
+
+   LOCAL lCheck, i
+   LOCAL nn := form_1.ListBox_2.VALUE
+   DEFAULT n := 0
    form_1.ListBox_2.Setfocus
-return nil
+   IF n == 0
+      FOR i := 1 TO Len( nn )
+         lCheck := cmlb_getCheck( nn[ i ] )
+         SetProperty( 'form_1', 'ListBox_2', "CHECKBOXITEM", nn[ i ], ! lCheck )
+      NEXT
+   ELSE
+      lCheck := cmlb_getCheck( n )
+      SetProperty( 'form_1', 'ListBox_2', "CHECKBOXITEM", n, ! lCheck )
+   ENDIF
+
+RETURN NIL
 
 *.....................................................*
 
-function cmlb_getCheck(nn)
-   local lCheck
-   lCheck := GetProperty('form_1','ListBox_2',"CHECKBOXITEM",nn)
-return lCheck
+FUNCTION cmlb_getCheck( nn )
+
+   LOCAL lCheck
+   lCheck := GetProperty( 'form_1', 'ListBox_2', "CHECKBOXITEM", nn )
+
+RETURN lCheck
+
+*.....................................................*
+
+FUNCTION cmlb_setclr( nn, clr1, clr2 )
+
+   SetProperty( 'form_1', nn, "FONTCOLOR", clr1 )
+   SetProperty( 'form_1', nn, "BACKCOLOR", clr2 )
+
+RETURN NIL

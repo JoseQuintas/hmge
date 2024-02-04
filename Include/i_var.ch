@@ -614,5 +614,5 @@ Memvariables
 #xtranslate _HMG_GridInplaceEdit_GridIndex		=> _HMG_GridInplaceEdit\[3]
 
 #xtranslate _HMG_ProceedEachRadioButtonEvent 		=> _HMG_SYSDATA\[458]
-#xtranslate _hmg_OwnerModalHandle			=> _HMG_SYSDATA\[459]
-#xtranslate _hmg_Reserved				=> _HMG_SYSDATA\[460]
+#xtranslate _HMG_OwnerModalHandle			=> _HMG_SYSDATA\[459]
+#xtranslate _HMG_IsBcc77				=> _HMG_SYSDATA\[460]

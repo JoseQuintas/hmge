@@ -122,20 +122,22 @@ FUNCTION NetFileLock( nSeconds )
 
 FUNCTION NetAppend( nSeconds, lReleaseLocks )
 
-   LOCAL nOrd
+   LOCAL cOrd
 
    __defaultNIL( @lReleaseLocks, .T. )
    __defaultNIL( @nSeconds, s_nNetDelay )
 
    s_lNetOk := .F.
 
-   nOrd := ordSetFocus( 0 )          // set order to 0 to append
+   cOrd := ordSetFocus( 0 )        // set order to 0 to append
 
    IF NetLock( NET_APPEND, lReleaseLocks, nSeconds )
       s_lNetOk := .T.
    ENDIF
 
-   ordSetFocus( nOrd )
+   IF ! Empty( cOrd )
+      ordSetFocus( cOrd )
+   ENDIF
 
    RETURN s_lNetOk
 

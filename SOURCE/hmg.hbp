@@ -9,6 +9,8 @@
 
 -inc
 
+-jobs=%NUMBER_OF_PROCESSORS%
+
 -workdir=../lib/hbmk/obj
 
 -o../lib/minigui

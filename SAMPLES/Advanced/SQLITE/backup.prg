@@ -1,8 +1,4 @@
 /*
- * $Id$
- */
-
-/*
  * SQLite3 Demo. Using sqlite3_backup_*()
  *
  * Copyright 2009 P.Chornyj <myorg63@mail.ru>
@@ -18,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -46,178 +42,167 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
- * See COPYING for licensing terms.
- *
  */
 
 /*
  * Using sqlite3_backup_*()
  *
- * This API is used to overwrite the contents of one database with that 
- * of another. It is useful either for creating backups of databases or 
+ * This API is used to overwrite the contents of one database with that
+ * of another. It is useful either for creating backups of databases or
  * for copying in-memory databases to or from persistent files.
  *
- * sqlite3_backup_init() is called once to initialize the backup, 
+ * sqlite3_backup_init() is called once to initialize the backup,
  * sqlite3_backup_step() is called one or more times to transfer the data
- *                       between the two databases, and finally 
+ *                       between the two databases, and finally
  * sqlite3_backup_finish() is called to release all resources associated
  *                       with the backup operation.
  */
 
-#include "common.ch"
 #include "hbsqlit3.ch"
+#include "fileio.ch"
 
-FUNCTION main()
+
+PROCEDURE init_trace( pDb, cPrefix )
+   LOCAL hFile
+   IF sqlite3_libversion_number() < 3014000
+      sqlite3_trace( pDb, .T., cPrefix + ".log" )
+   ELSE
+      hFile := FOpen( cPrefix + ".log", FO_READWRITE + HB_FO_CREAT )
+      FSeek( hFile, 0, FS_END )
+      sqlite3_trace_v2( pDb, SQLITE_TRACE_STMT + SQLITE_TRACE_CLOSE, {| nMask, p, x |
+         IF nMask == SQLITE_TRACE_STMT  /* p is pPreparedStatement, x is cOriginalSql */
+            IF hb_LeftEq( x, "--" )
+               FWrite( hFile, x + hb_eol() )
+            ELSE
+               FWrite( hFile, sqlite3_expanded_sql( p ) + hb_eol() )
+            ENDIF
+         ELSEIF nMask == SQLITE_TRACE_CLOSE  /* p is the database connection */
+            FWrite( hFile, "Closing the database connection: " + sqlite3_db_filename( p, "main" ) + hb_eol() )
+         ENDIF
+         RETURN 0
+      } )
+   ENDIF
+   RETURN
+
+PROCEDURE Main()
+
    LOCAL cFileSource := ":memory:", cFileDest := "backup.db", cSQLTEXT
    LOCAL pDbSource, pDbDest, pBackup, cb, nDbFlags
-   //
+
+   ? "Using SQLite3 version " + hb_NToS( sqlite3_libversion_number() )
+
    IF sqlite3_libversion_number() < 3006011
-      RETURN 1
+      ErrorLevel( 1 )
+      RETURN
    ENDIF
 
-   IF Empty( pDbSource := PrepareDB(cFileSource) )
-      RETURN 1
+   IF Empty( pDbSource := PrepareDB( cFileSource ) )
+      ErrorLevel( 1 )
+      RETURN
    ENDIF
 
    nDbFlags := SQLITE_OPEN_CREATE + SQLITE_OPEN_READWRITE + ;
-               SQLITE_OPEN_EXCLUSIVE
+      SQLITE_OPEN_EXCLUSIVE
    pDbDest := sqlite3_open_v2( cFileDest, nDbFlags )
 
    IF Empty( pDbDest )
-      QOut( "Can't open database : ", cFileDest )
-
-      RETURN 1
+      ? "Can't open database : ", cFileDest
+      ErrorLevel( 1 )
+      RETURN
    ENDIF
 
-   sqlite3_trace( pDbDest, TRUE, "backup.log" )
+   init_trace( pDbDest, "backup" )
 
-   //
    pBackup := sqlite3_backup_init( pDbDest, "main", pDbSource, "main" )
    IF Empty( pBackup )
-      QOut( "Can't initialize backup" )
-
-      RETURN 1
+      ? "Can't initialize backup"
+      ErrorLevel( 1 )
+      RETURN
    ELSE
-      QOut( "Start backup.." )
+      ? "Start backup.."
    ENDIF
 
-   IF sqlite3_backup_step(pBackup, -1) == SQLITE_DONE
-      QOut( "Backup successful." )
+   IF sqlite3_backup_step( pBackup, -1 ) == SQLITE_DONE
+      ? "Backup successful."
    ENDIF
 
    sqlite3_backup_finish( pBackup ) /* !!! */
 
-   pDbSource := Nil /* close :memory: database */
+   pDbSource := NIL /* close :memory: database */
 
    /* Little test for sqlite3_exec with callback  */
-   QOut( "" )
-   QOut( cSQLTEXT := "SELECT * FROM main.person WHERE age BETWEEN 20 AND 40" )
+   ?
+   ? cSQLTEXT := "SELECT * FROM main.person WHERE age BETWEEN 20 AND 40"
    cb := @CallBack() // "CallBack"
-   Qout( cErrorMsg(sqlite3_exec(pDbDest, cSQLTEXT, cb)) )
+   ? cErrorMsg( sqlite3_exec( pDbDest, cSQLTEXT, cb ) )
 
-   pDbDest := Nil   // close database
+   pDbDest := NIL // close database
 
    sqlite3_sleep( 3000 )
-   //
-RETURN 0
+
+   RETURN
 
 /**
 */
+
 FUNCTION CallBack( nColCount, aValue, aColName )
-LOCAL nI
-LOCAL oldColor := SetColor( "G/N" )
-   //
+
+   LOCAL nI
+   LOCAL oldColor := SetColor( "G/N" )
+
    FOR nI := 1 TO nColCount
-      Qout( Padr(aColName[nI], 5) , " == ", aValue[nI] )
+      ? PadR( aColName[ nI ], 5 ), " == ", aValue[ nI ]
    NEXT
 
    SetColor( oldColor )
-   //
-RETURN 0
+
+   RETURN 0
 
 /**
 */
+
 STATIC FUNCTION cErrorMsg( nError, lShortMsg )
-   LOCAL aErrorCodes := { ;
-      { SQLITE_ERROR      , "SQLITE_ERROR"      , "SQL error or missing database"               }, ;
-      { SQLITE_INTERNAL   , "SQLITE_INTERNAL"   , "NOT USED. Internal logic error in SQLite"    }, ;
-      { SQLITE_PERM       , "SQLITE_PERM"       , "Access permission denied"                    }, ;
-      { SQLITE_ABORT      , "SQLITE_ABORT"      , "Callback routine requested an abort"         }, ;
-      { SQLITE_BUSY       , "SQLITE_BUSY"       , "The database file is locked"                 }, ;
-      { SQLITE_LOCKED     , "SQLITE_LOCKED"     , "A table in the database is locked"           }, ;
-      { SQLITE_NOMEM      , "SQLITE_NOMEM"      , "A malloc() failed"                           }, ;
-      { SQLITE_READONLY   , "SQLITE_READONLY"   , "Attempt to write a readonly database"        }, ;
-      { SQLITE_INTERRUPT  , "SQLITE_INTERRUPT"  , "Operation terminated by sqlite3_interrupt()" }, ;
-      { SQLITE_IOERR      , "SQLITE_IOERR"      , "Some kind of disk I/O error occurred"        }, ;
-      { SQLITE_CORRUPT    , "SQLITE_CORRUPT"    , "The database disk image is malformed"        }, ;
-      { SQLITE_NOTFOUND   , "SQLITE_NOTFOUND"   , "NOT USED. Table or record not found"         }, ;
-      { SQLITE_FULL       , "SQLITE_FULL"       , "Insertion failed because database is full"   }, ;
-      { SQLITE_CANTOPEN   , "SQLITE_CANTOPEN"   , "Unable to open the database file"            }, ;
-      { SQLITE_PROTOCOL   , "SQLITE_PROTOCOL"   , "NOT USED. Database lock protocol error"      }, ;
-      { SQLITE_EMPTY      , "SQLITE_EMPTY"      , "Database is empty"                           }, ;
-      { SQLITE_SCHEMA     , "SQLITE_SCHEMA"     , "The database schema changed"                 }, ;
-      { SQLITE_TOOBIG     , "SQLITE_TOOBIG"     , "String or BLOB exceeds size limit"           }, ;
-      { SQLITE_CONSTRAINT , "SQLITE_CONSTRAINT" , "Abort due to constraint violation"           }, ;
-      { SQLITE_MISMATCH   , "SQLITE_MISMATCH"   , "Data type mismatch"                          }, ;
-      { SQLITE_MISUSE     , "SQLITE_MISUSE"     , "Library used incorrectly"                    }, ;
-      { SQLITE_NOLFS      , "SQLITE_NOLFS"      , "Uses OS features not supported on host"      }, ;
-      { SQLITE_AUTH       , "SQLITE_AUTH"       , "Authorization denied"                        }, ;
-      { SQLITE_FORMAT     , "SQLITE_FORMAT"     , "Auxiliary database format error"             }, ;
-      { SQLITE_RANGE      , "SQLITE_RANGE"      , "2nd parameter to sqlite3_bind out of range"  }, ;
-      { SQLITE_NOTADB     , "SQLITE_NOTADB"     , "File opened that is not a database file"     }, ;
-      { SQLITE_ROW        , "SQLITE_ROW"        , "sqlite3_step() has another row ready"        }, ;
-      { SQLITE_DONE       , "SQLITE_DONE"       , "sqlite3_step() has finished executing"       } ;
-   }, nIndex, cErrorMsg := "UNKNOWN"
-   //
-   DEFAULT lShortMsg TO TRUE
 
-   IF hb_IsNumeric( nError ) 
-      IF nError == 0
-         cErrorMsg := "SQLITE_OK"
-      ELSE
-         nIndex    := AScan( aErrorCodes, {|x| x[1] == nError } )
-         cErrorMsg := iif( nIndex > 0, aErrorCodes[ nIndex ][ iif(lShortMsg,2,3) ], cErrorMsg )
-      ENDIF
-   ENDIF
-   //
-RETURN cErrorMsg
+   hb_default( @lShortMsg, .T. )
+
+   RETURN iif( lShortMsg, hb_sqlite3_errstr_short( nError ), sqlite3_errstr( nError ) )
 
 /**
 */
+
 STATIC FUNCTION PrepareDB( cFile )
-   LOCAL cSQLTEXT, cMsg
+
+   LOCAL cSQLTEXT
    LOCAL pDb, pStmt
    LOCAL hPerson := { ;
-                     "Bob"   => 52, ;
-                     "Fred"  => 32, ;
-                     "Sasha" => 17, ;
-                     "Andy"  => 20, ;
-                     "Ivet"  => 28  ;
-                    }, enum
-   //
-   pDb := sqlite3_open( cFile, TRUE )
+      "Bob" => 52, ;
+      "Fred" => 32, ;
+      "Sasha" => 17, ;
+      "Andy" => 20, ;
+      "Ivet" => 28 ;
+      }, enum
+
+   pDb := sqlite3_open( cFile, .T. )
    IF Empty( pDb )
-      QOut( "Can't open/create database : ", cFile )
+      ? "Can't open/create database : ", cFile
 
       RETURN NIL
    ENDIF
 
-   sqlite3_trace( pDb, TRUE, "backup.log" )
+   init_trace( pDb, "backup" )
 
    cSQLTEXT := "CREATE TABLE person( name TEXT, age INTEGER )"
-   cMsg := cErrorMsg( sqlite3_exec(pDb, cSQLTEXT) )
-
-   IF cMsg <> "SQLITE_OK"
-      QOut( "Can't create table : person" )
+   IF sqlite3_exec( pDb, cSQLTEXT ) != SQLITE_OK
+      ? "Can't create table : person"
       pDb := NIL // close database
 
       RETURN NIL
    ENDIF
-   //
+
    cSQLTEXT := "INSERT INTO person( name, age ) VALUES( :name, :age )"
    pStmt := sqlite3_prepare( pDb, cSQLTEXT )
    IF Empty( pStmt )
-      QOut( "Can't prepare statement : ", cSQLTEXT )
+      ? "Can't prepare statement : ", cSQLTEXT
       pDb := NIL
 
       RETURN NIL
@@ -225,12 +210,12 @@ STATIC FUNCTION PrepareDB( cFile )
 
    FOR EACH enum IN hPerson
       sqlite3_reset( pStmt )
-      sqlite3_bind_text( pStmt, 1, enum:__enumKey )
-      sqlite3_bind_int( pStmt,  2, enum:__enumValue )
+      sqlite3_bind_text( pStmt, 1, enum:__enumKey() )
+      sqlite3_bind_int( pStmt, 2, enum:__enumValue() )
       sqlite3_step( pStmt )
    NEXT
 
    sqlite3_clear_bindings( pStmt )
    sqlite3_finalize( pStmt )
-   //
-RETURN pDb
+
+   RETURN pDb

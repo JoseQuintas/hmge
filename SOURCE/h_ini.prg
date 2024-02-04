@@ -85,7 +85,10 @@ FUNCTION _LogFile( ... )
 #ifdef __XHARBOUR__
    LOCAL lCrLf
 #endif
-   IF nParams > 0
+    IF ! IsErrorLogActive()
+       RETURN .F.
+    ENDIF
+    IF nParams > 0
       IF HB_ISCHAR( aParams[ 1 ] )
          aParams[ 1 ] := { .T., aParams[ 1 ] }
       ENDIF
@@ -110,7 +113,9 @@ FUNCTION _LogFile( ... )
             aParams[ 1 ] := .T.
          ENDIF
          cTp := NIL
+#ifndef __XHARBOUR__
          lCrlf := aParams[ 1 ]
+#endif
       ENDIF
    ENDIF
    IF !Empty( cFile )

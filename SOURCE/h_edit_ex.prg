@@ -203,6 +203,7 @@
 #define ABM_LIS_SET2            2
 
 
+#define IS_SQLRDD ( Select() > 0 .AND. ( RddName()=="SQLRDD" .OR. RddName()=="SQLEX" ) )
 #xtranslate Alltrim( Str( <i> ) ) => hb_NtoS( <i> )
 
 
@@ -466,7 +467,7 @@ FUNCTION ABM2( cArea, cTitulo, aNombreCampo, ;
       _bBuscar := NIL
    ENDIF
 
-   // Acción al buscar.
+   // Acción al imprimir.
    IF ValType( bImprimir ) == "B"
       _bImprimir := bImprimir
    ELSE
@@ -774,10 +775,12 @@ STATIC FUNCTION ABM2salir( nRegistro, cIndiceActivo, cFiltroAnt, nArea )
 
    // ------- Restaura el area de la bdd inicial.---------------------------------
    ( _cArea )->( dbGoto( nRegistro ) )
-   ( _cArea )->( ordSetFocus( cIndiceActivo ) )
+   IF ! Empty( cIndiceActivo )
+      ( _cArea )->( ordSetFocus( cIndiceActivo ) )
+   ENDIF
    IF Empty( cFiltroAnt )
       ( _cArea )->( dbClearFilter() )
-   ELSE
+   ELSEIF ! IS_SQLRDD
       ( _cArea )->( dbSetFilter( &( "{||" + cFiltroAnt + "}" ), cFiltroAnt ) )
    ENDIF
    dbSelectArea( nArea )
@@ -855,7 +858,9 @@ STATIC FUNCTION ABM2CambiarOrden()
 
    // ------- Cambia el orden del area de trabajo.--------------------------------
    ( _cArea )->( ordSetFocus( nIndice ) )
-   // (_cArea)->( dbGoTop() )
+   IF IS_SQLRDD
+      ( _cArea )->( dbGoTop() )
+   ENDIF
    _nIndiceActivo := ++nIndice
    ABM2Redibuja( .T. )
 
@@ -1865,6 +1870,7 @@ STATIC FUNCTION ABM2EstableceFiltro()
    LOCAL nCampo /*as numeric*/
    LOCAL nCompara /*as numeric*/
    LOCAL cValor AS character
+   LOCAL bd
 
    // ------- Inicialización de variables.----------------------------------------
    nCompara := wndABM2Filtro.lbxCompara.VALUE
@@ -1905,6 +1911,9 @@ STATIC FUNCTION ABM2EstableceFiltro()
       _cFiltro += AllTrim( cValor )
 
    CASE _aEstructura[ nCampo, DBS_TYPE ] == "D"
+      IF IS_SQLRDD
+         bd := Set ( _SET_DATEFORMAT, "yyyy-mm-dd" )
+      ENDIF
       _cFiltro := _cArea + "->" + ;
          _aEstructura[ nCampo, DBS_NAME ] + ;
          aOperador[ nCompara ]
@@ -1918,6 +1927,9 @@ STATIC FUNCTION ABM2EstableceFiltro()
    ENDCASE
    ( _cArea )->( dbSetFilter( {|| &_cFiltro }, _cFiltro ) )
    _lFiltro := .T.
+   IF IS_SQLRDD
+      SET ( _SET_DATEFORMAT, bd )
+   ENDIF
    wndABM2Filtro.RELEASE
    ABM2Redibuja( .T. )
 
@@ -2451,8 +2463,13 @@ STATIC FUNCTION ABM2Listado( aImpresoras )
       xRegistro1 := Val( cRegistro1 )
       xRegistro2 := Val( cRegistro2 )
    CASE _aEstructura[ _aIndiceCampo[ _nIndiceActivo ], DBS_TYPE ] == "D"
-      xRegistro1 := CToD( cRegistro1 )
-      xRegistro2 := CToD( cRegistro2 )
+      IF IS_SQLRDD
+         xRegistro1 := hb_CToD( cRegistro1, "yyyy-mm-dd" )
+         xRegistro2 := hb_CToD( cRegistro2, "yyyy-mm-dd" )
+      ELSE
+         xRegistro1 := CToD( cRegistro1 )
+         xRegistro2 := CToD( cRegistro2 )
+      ENDIF
    CASE _aEstructura[ _aIndiceCampo[ _nIndiceActivo ], DBS_TYPE ] == "L"
       xRegistro1 := ( cRegistro1 == ".t." )
       xRegistro2 := ( cRegistro2 == ".t." )

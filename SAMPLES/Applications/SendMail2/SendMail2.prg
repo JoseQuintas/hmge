@@ -815,7 +815,7 @@ Local cSMTP, nPort, cUser := "", cFrom, cPassWord, oMail, ;
 
               // add smtp
               aadd(acCmd, cSmtp+":"+aData[1][2])
-              aadd(acCmd," --user "+cFrom+":"+cPassword)
+              aadd(acCmd,[ --user "]+cFrom+":"+cPassword+["])
               aadd(acCmd," --mail-from "+cFrom+"|"+cUser )
               aadd(acCmd," --mail-rcpt "+cTo )
 
@@ -1115,7 +1115,7 @@ FUNCTION CmdExe( cCommand )
       cCommand := pCurl+ " "+ cCommand
    EndIF
 
-   cBuff := Space( 1024 )
+   cBuff := Space( 2048 )
 
    hProcess := hb_processOpen( cCommand, NIL, @hStdOut, @hStdErr, .T. )
 
@@ -1125,7 +1125,7 @@ FUNCTION CmdExe( cCommand )
 
       WHILE nState <> -1
 
-         nBytes := FRead( hStdOut, @cBuff, 1024 )
+         nBytes := FRead( hStdOut, @cBuff, 2048 )
 
          IF nBytes == 0
             EXIT

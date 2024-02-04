@@ -1,73 +1,76 @@
 /*
  * MINIGUI - Harbour Win32 GUI library Demo
  *
- * Copyright 2021 Sergej Kiselev <bilance@bilance.lv>
- * Copyright 2021 Verchenko Andrey <verchenkoag@gmail.com> Dmitrov, Moscow region
+ * Copyright 2021-23 Sergej Kiselev <bilance@bilance.lv>
+ * Copyright 2021-23 Verchenko Andrey <verchenkoag@gmail.com> Dmitrov, Moscow region
  *
  * Просмотр/правка Dbf файла. Опции/свойства по базе. Объекты на окне таблицы
  * View/edit Dbf file. Options/properties by base. Objects on the table window
 */
-                   
+
 #define  _HMG_OUTLOG           // вывод отладки в файл
 #include "hmg.ch"
 #include "tsbrowse.ch"
 #include "Dbinfo.ch"
 
+REQUEST HB_CODEPAGE_UA1251, HB_CODEPAGE_UA866    // украинский язык
+REQUEST HB_CODEPAGE_RU1251, HB_CODEPAGE_RU866    // русский язык
+
 #define  SHOW_TITLE  "TsbViewer(c)"
-#define  SHOW_VERS   SPACE(5) + "Ver 0.7 - 29.06.23"
+#define  SHOW_VERS   SPACE(5) + "Ver 1.0 - 03.12.23"
 ////////////////////////////////////////////////////////////////////////////////////
 FUNCTION TsbObjViewer(oWin, oUse, oIndx, oMenu, oTsb, aEvent, bInitForm)
    LOCAL cWait, cAlias, nY, nX, nW, nH, lCenter, aBClr, lTopmost
-   LOCAL bOnInit, bOnRele, bIClose, aWndDown
+   LOCAL bOnInit, bOnRele, bIClose, aWndDown, cIcoWin, aCurrLang
    LOCAL c1Title, c2Title, aTsbPar, aWinPar, cTtlWin
 
-   nY       := oWin:nPosY
-   nX       := oWin:nPosX
-   nW       := oWin:nPosW
-   nH       := oWin:nPosH
-   cTtlWin  := oWin:cTitle
-   lCenter  := oWin:lCenter
-   aBClr    := oWin:aBackcolor
-   cWait    := IIF( oWin:lWait, "WAIT", "NOWAIT" )
-   lTopmost := oWin:lTopmost
-   bOnInit  := oWin:bOnInit
-   bOnRele  := oWin:bOnRelease
-   bIClose  := oWin:bIAClose
-   aWndDown := oWin:aDown      // label внизу окна { имя, высота, цвет фона, цвет текста, центровка, сам текст}
+   nY        := oWin:nPosY
+   nX        := oWin:nPosX
+   nW        := oWin:nPosW
+   nH        := oWin:nPosH
+   cTtlWin   := oWin:cTitle
+   cIcoWin   := IIF( oWin:cIcon == NIL, "", oWin:cIcon )
+   lCenter   := oWin:lCenter
+   aBClr     := oWin:aBackcolor
+   cWait     := IIF( oWin:lWait, "WAIT", "NOWAIT" )
+   lTopmost  := oWin:lTopmost
+   bOnInit   := oWin:bOnInit
+   bOnRele   := oWin:bOnRelease
+   bIClose   := oWin:bIAClose
+   aWndDown  := oWin:aDown       // label внизу окна { имя, высота, цвет фона, цвет текста, центровка, сам текст}
+   aCurrLang := oWin:aCurrLang   // текущий язык программы, если задан
+   IF !HB_IsArray(aCurrLang)
+      aCurrLang := {}
+   ENDIF
 
    cAlias   := oUse:cAlias
    c1Title  := oTsb:cSupHd1Title
    c2Title  := oTsb:cSupHd2Title
 
    aTsbPar  := { cAlias, c1Title, c2Title }
-   aWinPar  := { cWait,cTtlWin,nY,nX,nW,nH,lCenter,aBClr,aWndDown,lTopmost,bOnInit,bOnRele,bIClose }
+   aWinPar  := { cWait,cTtlWin,nY,nX,nW,nH,lCenter,aBClr,aWndDown,lTopmost,bOnInit,bOnRele,bIClose,cIcoWin }
 
-   TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitForm)
+   TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitForm, aCurrLang)
 
 RETURN NIL
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitForm)
+///////////////////////////////////////////////////////////////////////////////////////////////
+FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitForm, aCurrLang)
    LOCAL nWBrw, nHBrw, nYBrw, nXBrw, nWGaps, nHGaps, cForm, oThis, lTsb2
    LOCAL cTitle, cIcon, lModal, cSetCP, cSelCdp, cLngSel, lTsb, aBClr
    LOCAL cWait, cAlias, cDbfCP, c2Title, nY, nX, nW, nH, lCenter
    LOCAL nSel, cErr, aPosiW, aEve, aEditFunc, cPrev := ALIAS()
    LOCAL lTopmst, bOnInit, bOnRele, bIClose, nHDown, aWndDown
-   LOCAL cObj, cInitForm, lInitForm, lMainWnd, cMsg
+   LOCAL cObj, cInitForm, lInitForm, lMainWnd, cMsg, cIcoWin
    LOCAL oBrw   // наилучшее решение для объекта
-   DEFAULT aTsbPar  := {}, aWinPar := {}
-   DEFAULT oUse     := oHmgData(), oIndx := oHmgData()
-   DEFAULT oMenu    := oHmgData(), oTsb  := oHmgData()
-   DEFAULT aEvent   := {}
+   DEFAULT aTsbPar   := {}, aWinPar := {}
+   DEFAULT oUse      := oHmgData(), oIndx := oHmgData()
+   DEFAULT oMenu     := oHmgData(), oTsb  := oHmgData()
+   DEFAULT aEvent    := {}
+   DEFAULT aCurrLang := {}  // нет смены текущего языка программы
 
    DEFINE FONT DlgFont FONTNAME "DejaVu Sans Mono" SIZE 14   // for HMG_Alert()
-
-   // убрал 14.09.23 - ниже строим MAIN
-   //SET MSGALERT BACKCOLOR TO { 183, 221, 232 }       // for HMG_Alert()
-   //IF Empty( _HMG_MainHandle )                       // --- Main window ---
-   //   AlertStop("There is no MAIN window in the program !;;"+ProcNL()+";"+ProcNL(1))
-   //   RETURN NIL
-   //ENDIF
+   SET OOP ON    // на всякий случай
 
    // параметры для передачи - вместо public переменных
    IF !hb_IsObject(App.Cargo)
@@ -79,12 +82,11 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
    App.Cargo:cTempPath := myGetPathTemp()         // где создавать временные файлы
 
    // параметры окна, см.ниже
-   myWinParam(aWinPar,@cWait,@cTitle,@nY,@nX,@nW,@nH,@lCenter,@aBClr,@aWndDown,@lTopmst,@bOnInit,@bOnRele,@bIClose)
-   //? ProcNL(), "aWinPar=", aWinPar ; ? SPACE(5) + HB_ValToExp( aWinPar )
+   myWinParam(aWinPar,@cWait,@cTitle,@nY,@nX,@nW,@nH,@lCenter,@aBClr,@aWndDown,@lTopmst,@bOnInit,@bOnRele,@bIClose,@cIcoWin)
 
    IF LEN(aTsbPar) == 0
       cAlias  := ALIAS()
-      cDbfCP  := "???"
+      cDbfCP  := dbInfo( DBI_CODEPAGE )   // узнать кодовую страницу базы
       c2Title := SHOW_TITLE
    ELSE
       cAlias  := aTsbPar[1]
@@ -93,19 +95,23 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
    ENDIF
 
    cForm   := "HMG_" + cAlias + "_" + HB_NtoS( _GetId() )
-   cIcon := Icon32TempCreate()      // -> TsbViewMisc.prg
-   //cIcon   := Icon64TempCreate()      // -> TsbViewMisc.prg
+   IF LEN(cIcoWin) > 0
+      cIcon := cIcoWin                 // внешняя иконка
+   ELSE
+      cIcon := Icon32TempCreate()      // -> TsbViewMisc.prg
+      //cIcon := Icon64TempCreate()    // -> TsbViewMisc.prg
+      IF !FILE(cIcon)
+         cMsg := "Error ! Could not create icon resources for the table !;"
+         cMsg += cIcon + ";;" + ProcNL() + ";" + ProcNL(1)
+         AlertStop( cMsg, "Result", "ZZZ_B_STOP64", 64 )
+      ENDIF
+   ENDIF
+
    cSetCP  := hb_SetCodepage()
    cSelCdp := hb_CdpSelect()
    cLngSel := Hb_LangSelect()
    lTsb    := lTsb2 := .T.
    aPosiW  := { 0, 0, 0, 0 }
-
-   IF !FILE(cIcon)
-      cMsg := "Error ! Could not create icon resources for the table !;" 
-      cMsg += cIcon + ";;" + ProcNL() + ";" + ProcNL(1)
-      AlertStop( cMsg, "Result", "ZZZ_B_STOP64", 64 )
-   ENDIF
 
    IF LEN(cTitle) == 0 .AND. LEN(cAlias) > 0
       cTitle := cAlias + " " + DBINFO( DBI_FULLPATH ) + " " + RddName()
@@ -113,7 +119,7 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
    ENDIF
 
    // определяем обработчики окна
-   IF bOnInit == Nil ; bOnInit := {|| This.Topmost := lTopmst, iif(oBrw==Nil, Nil, oBrw:Setfocus()) }
+   IF bOnInit == Nil ; bOnInit := {|| This.Topmost := lTopmst, _wPost(0), iif(oBrw==Nil, Nil, oBrw:Setfocus()) }
    ENDIF
    IF bOnRele == Nil ; bOnRele := {|| iif( !Empty(cPrev), dbSelectArea(cPrev), Nil ) }
    ENDIF
@@ -124,48 +130,51 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
    lModal   := _HMG_IsModalActive
    lMainWnd := .F.
 
-   //? ProcNL(), cForm,nY,nX,nW,nH,cTitle
    IF Empty( _HMG_MainHandle )                // --- MAIN window ---
       DEFINE WINDOW &cForm AT nY,nX WIDTH nW HEIGHT nH TITLE cTitle   ;
-         ICON cIcon MAIN TOPMOST NOMAXIMIZE NOSIZE    ;
-         ON GOTFOCUS {|| App.Cargo:cFormGotFocus := This.Name, ;
-            myLangRecover(cAlias,cSetCP,cSelCdp,cLngSel) } ; // возврат фокуса на форму
-         BACKCOLOR aBClr
+         ICON cIcon MAIN TOPMOST NOMAXIMIZE NOSIZE BACKCOLOR aBClr    ;
+         ON GOTFOCUS {|| App.Cargo:cFormGotFocus := This.Name,        ;
+            myLangRecover(cAlias,cSetCP,cSelCdp,cLngSel) }            ; // возврат фокуса на форму
+         ON LOSTFOCUS {|| myLangRecoverLost(This.Cargo:aCurrLang) }     // снятие фокуса с формы
       This.OnInterActiveClose := bIClose
       lMainWnd := .T.
    ELSEIF lModal                              // --- MODAL window ---
-      DEFINE WINDOW &cForm AT nY,nX WIDTH nW HEIGHT nH TITLE cTitle    ;
-         ICON cIcon MODAL NOSIZE                                       ;
-         ON GOTFOCUS {|| App.Cargo:cFormGotFocus := This.Name, ;
-            myLangRecover(cAlias,cSetCP,cSelCdp,cLngSel) } ; // возврат фокуса на форму
-         BACKCOLOR aBClr
+      DEFINE WINDOW &cForm AT nY,nX WIDTH nW HEIGHT nH TITLE cTitle   ;
+         ICON cIcon MODAL NOSIZE BACKCOLOR aBClr                      ;
+         ON GOTFOCUS {|| App.Cargo:cFormGotFocus := This.Name,        ;
+            myLangRecover(cAlias,cSetCP,cSelCdp,cLngSel) }            ; // возврат фокуса на форму
+         ON LOSTFOCUS {|| myLangRecoverLost(This.Cargo:aCurrLang) }     // снятие фокуса с формы
    ELSE                                    // --- STANDARD window ---
-      DEFINE WINDOW &cForm AT nY,nX WIDTH nW HEIGHT nH TITLE cTitle    ;
-         ICON cIcon WINDOWTYPE STANDARD TOPMOST NOMAXIMIZE NOSIZE      ;
-         ON GOTFOCUS {|| App.Cargo:cFormGotFocus := This.Name, ;
-            myLangRecover(cAlias,cSetCP,cSelCdp,cLngSel) } ; // возврат фокуса на форму
-         BACKCOLOR aBClr
+      DEFINE WINDOW &cForm AT nY,nX WIDTH nW HEIGHT nH TITLE cTitle   ;
+         ICON cIcon WINDOWTYPE STANDARD TOPMOST NOMAXIMIZE NOSIZE     ;
+         BACKCOLOR aBClr                                              ;
+         ON GOTFOCUS  {|| App.Cargo:cFormGotFocus := This.Name,       ;
+            myLangRecover(cAlias,cSetCP,cSelCdp,cLngSel) }            ; // возврат фокуса на форму
+         ON LOSTFOCUS {|| myLangRecoverLost(This.Cargo:aCurrLang) }     // снятие фокуса с формы
       This.OnInterActiveClose := bIClose
    ENDIF
-   //?? This.Type
+
       //bOnGotFocus := myLangRecover(cAlias,cSetCP,cSelCdp,cLngSel) // возврат фокуса на форму
       // _SetFormAction( This.Name , "OnGotFocus" , bOnGotFocus )
       // _SetFormAction( This.Name , "OnLostFocus" , bOnLostFocus )
+
+      // установим обработчики окна
       This.OnInit    := bOnInit
       This.OnRelease := bOnRele
 
-      oThis              := This.Object
-      cForm              := This.Name
-      This.Cargo         := oHmgData()           // контейнер для ЭТОГО окна
-      This.Cargo:cMenu   := "Table"
-      This.Cargo:aObjBtn := {}
-      This.Cargo:cForm   := cForm
-      This.Cargo:oUse    := oUse
-      This.Cargo:oIndx   := oIndx
-      This.Cargo:oMenu   := oMenu
-      This.Cargo:oTsb    := oTsb
-      nW                 := This.ClientWidth
-      nH                 := This.ClientHeight
+      oThis                := This.Object
+      cForm                := This.Name
+      This.Cargo           := oHmgData()           // контейнер для ЭТОГО окна
+      This.Cargo:cMenu     := "Table"
+      This.Cargo:aObjBtn   := {}
+      This.Cargo:cForm     := cForm
+      This.Cargo:oUse      := oUse
+      This.Cargo:oIndx     := oIndx
+      This.Cargo:oMenu     := oMenu
+      This.Cargo:oTsb      := oTsb
+      nW                   := This.ClientWidth
+      nH                   := This.ClientHeight
+      This.Cargo:aCurrLang := aCurrLang           // текущий язык программы, если он есть, иначе {}
 
       // отступ по ширине формы
       IF hb_IsNumeric(oTsb:nWGaps)
@@ -191,10 +200,10 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
          aPosiW := TsbButtonMenu(oMenu,nWGaps,nHGaps,oThis)   // меню кнопок для таблицы
       ENDIF
 
-      nYBrw  := nHGaps + aPosiW[1]
-      nXBrw  := nWGaps + aPosiW[2]
-      nWBrw  := nW - nWGaps*2 + aPosiW[3]
-      nHBrw  := nH - nHGaps*2 + aPosiW[4]
+      nYBrw := nHGaps + aPosiW[1]
+      nXBrw := nWGaps + aPosiW[2]
+      nWBrw := nW - nWGaps*2 + aPosiW[3]
+      nHBrw := nH - nHGaps*2 + aPosiW[4]
 
       IF hb_IsArray(aWndDown)
          IF LEN(aWndDown) == 0    // нет label внизу окна
@@ -235,12 +244,10 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
          ENDIF
          DbGotop()
          // начальные данные для таблицы
-         oTsb   := Tbrowse_OnInit(cAlias, cDbfCP, c2Title, oTsb)
-         //? ProcNL(), "oTsb=", oTsb 
-         //myLogCargo(oTsb,SPACE(5)+"oTsb=")  // вывести содержимое объекта
+         oTsb := Tbrowse_OnInit(cAlias, cDbfCP, c2Title, oTsb)
 
          // вызов функции таблицы из h_controlmisc2.prg
-         oBrw   := _TBrowse( oTsb, cAlias, , nYBrw, nXBrw, nWBrw, nHBrw )
+         oBrw := _TBrowse( oTsb, cAlias, , nYBrw, nXBrw, nWBrw, nHBrw )
          Tbrowse_Customization(oBrw, oTsb)           // донастройка таблицы
          This.Cargo:oBrw  := oBrw                    // запомнить объект таблицы
          oTsb:aColFilter  :=  {}                     // колонки таблицы с фильтром
@@ -283,7 +290,7 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
          ENDIF
       ENDIF */
 
-      ON KEY F1     ACTION   MsgAbout_TsbViewer()
+      ON KEY F1 ACTION {|| MsgAbout_TsbViewer() }
       //ON KEY ESCAPE ACTION {|| iif(oBrw==Nil, ThisWindow.Release,;
       //                              iif( oBrw:IsEdit, oBrw:SetFocus(), ThisWindow.Release ) ) }
 
@@ -296,6 +303,7 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
          cInitForm := bInitForm
          bInitForm := &( bInitForm )
       ENDIF
+
       lInitForm := .F.
       IF HB_ISBLOCK( bInitForm )
          BEGIN SEQUENCE WITH { |e|break(e) }
@@ -309,6 +317,38 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
             MsgDebug(cErr, bInitForm)
          ENDIF
       ENDIF
+
+      WITH OBJECT This.Object
+         :Event(  0, {|ow|// start ON INIT
+                          Local p1, p2, cMsg, cTitle := This.Title
+                          Local aLang := ow:Cargo:aCurrLang
+                          // aCurrLang := { hb_SetCodepage(), hb_CdpSelect(), Hb_LangSelect() }
+                          // восстановим язык если была переменная oWin:aCurrLang := aCurrLang
+                          IF HB_IsArray(aLang)
+                             IF LEN(aLang) >= 3
+                                p1 := SUBSTR(aLang[3],1,AT(".",aLang[3])-1)
+                                p2 := SUBSTR(aLang[3],AT(".",aLang[3])+1)
+                                hb_LangSelect(p1,p2)
+                                hb_SetCodepage(aLang[1])
+                                hb_CdpSelect(aLang[2])
+                                DO EVENTS
+                                cTitle += SPACE(3)+ "{восстановили: "
+                                cTitle += hb_LangSelect() + "}"
+                                This.Title := cTitle
+                             ENDIF
+                          ENDIF
+                          cMsg := "hb_SetCodepage()= " + hb_SetCodepage() + ";"
+                          cMsg += "hb_CdpSelect()  = " + hb_CdpSelect() + ";"
+                          cMsg += "hb_LangSelect() = " + hb_LangSelect() + ";"
+                          cMsg += ";" + ProcNL()
+                          //AlertInfo(cMsg)
+                          DO EVENTS
+                          Return Nil
+                     } )
+         // меню для работы с буфером Windows
+         // menu for working with the Windows buffer
+         :Event(10, {|ow,ky,ob| myRCellClick(ow,ky,ob) } )
+      END WITH
 
    END WINDOW
 
@@ -325,14 +365,14 @@ FUNCTION TsbViewer( aTsbPar, aWinPar, oUse, oIndx, oMenu, oTsb, aEvent, bInitFor
                                                 This.Restore , DoEvents() }
    ELSE
       ACTIVATE WINDOW &cForm ON INIT {|| This.Minimize, wApi_Sleep(50), ;
-                                         This.Restore , DoEvents() }
+                                         This.Restore , DoEvents()        }
    ENDIF
 
 RETURN oThis
 
 ///////////////////////////////////////////////////////////////////////////////
 STATIC FUNCTION myWinParam(aWinPar,cWait,cTitle,nY,nX,nW,nH,lCenter,aBClr,;
-                                        aDown,lTopmst,bOnInit,bOnRele,bIClose)
+                                 aDown,lTopmst,bOnInit,bOnRele,bIClose,cIcoWin)
    LOCAL cErr
 
    IF LEN(aWinPar) == 0
@@ -347,6 +387,7 @@ STATIC FUNCTION myWinParam(aWinPar,cWait,cTitle,nY,nX,nW,nH,lCenter,aBClr,;
       bOnInit := Nil
       bOnRele := Nil
       bIClose := Nil
+      cIcoWin := ""
    ELSE
       IF LEN(aWinPar) < 6
          cErr := "Error ! Wrong number of parameters !;"
@@ -414,27 +455,54 @@ STATIC FUNCTION myWinParam(aWinPar,cWait,cTitle,nY,nX,nW,nH,lCenter,aBClr,;
          ENDIF
       ENDIF
 
+      IF LEN(aWinPar) < 14 ; cIcoWin := ""
+      ELSE                 ; cIcoWin := aWinPar[14]
+      ENDIF
+
    ENDIF
    lCenter := IIF( lCenter == NIL, .F. , lCenter )
 
 RETURN NIL
 
 ///////////////////////////////////////////////////////////////////////////////
-FUNCTION myLangRecover(cAlias,cSetCP,cSelCdp,cLngSel)
-   DO EVENTS
+STATIC FUNCTION myLangRecover(cAlias,cSetCP,cSelCdp,cLngSel)
+   LOCAL p1,p2
+
+   p1 := SUBSTR(cLngSel,1,AT(".",cLngSel)-1)
+   p2 := SUBSTR(cLngSel,AT(".",cLngSel)+1)
+
+   hb_LangSelect(p1,p2)
    hb_SetCodepage(cSetCP)
    hb_CdpSelect(cSelCdp)
-   hb_LangSelect(cLngSel)
    IF LEN(cAlias) > 0
       IF ( Select( cAlias ) > 0 )
          dbSelectArea( cAlias )
       ENDIF
    ENDIF
    DO EVENTS
+
 RETURN NIL
 
 //////////////////////////////////////////////////////////////////////////////////////
-FUNCTION MG_YesNoQuit()
+STATIC FUNCTION myLangRecoverLost(aLang)   // снятие фокуса с формы
+   LOCAL p1,p2
+   // aCurrLang := { hb_SetCodepage(), hb_CdpSelect(), Hb_LangSelect() }
+   // переключим язык если была переменная oWin:aCurrLang := aCurrLang
+   IF HB_IsArray(aLang)
+      IF LEN(aLang) >= 3
+         p1 := SUBSTR(aLang[3],1,AT(".",aLang[3])-1)
+         p2 := SUBSTR(aLang[3],AT(".",aLang[3])+1)
+         hb_LangSelect(p1,p2)
+         hb_SetCodepage(aLang[1])
+         hb_CdpSelect(aLang[2])
+         DO EVENTS
+      ENDIF
+   ENDIF
+
+RETURN NIL
+
+//////////////////////////////////////////////////////////////////////////////////////
+STATIC FUNCTION MG_YesNoQuit()
    LOCAL aColors, aOptions, nRet, lRet, nType, xIcon, nSize, bInit, lClosable
    LOCAL cTitle, aLang, cMsg
 
@@ -444,7 +512,7 @@ FUNCTION MG_YesNoQuit()
    cTitle    := aLang[2]
    aColors   := { LGREEN, RED   , YELLOW }
    aOptions  := { '&' + aLang[3], '&' + aLang[4] , '&QuitExe' }
-   nType     := NIL                                              
+   nType     := NIL
    xIcon     := NIL
    nSize     := NIL
    bInit     := {|| This.TopMost := .T. }
@@ -463,10 +531,10 @@ FUNCTION MG_YesNoQuit()
 RETURN lRet
 
 ////////////////////////////////////////////////////////////////////////////////////////
-FUNCTION Tbrowse_OnInit(cAls, c1Title, c2Title, oTsb)  // начальные данные для таблицы
+STATIC FUNCTION Tbrowse_OnInit(cAls, c1Title, c2Title, oTsb)  // начальные данные для таблицы
    LOCAL cTitle, cFont1, cFont2, cFont3, cFont5, cFont6, nFS5, nClrFace, nGrad
    LOCAL nClrFocus1, nClrFocus2, nClrNoFocus1, nClrNoFocus2, nClrSeleF, nClrNoEdit
-   LOCAL aResCheck, aResBitMaps, cFile, aFile, cMsg, cErr, nI
+   LOCAL aResCheck, aResBitMaps, cFile, aFile, cMsg, cErr, nI, aClrDef
    DEFAULT c1Title := hb_SetCodepage()
 
    cMsg        := ""
@@ -484,7 +552,7 @@ FUNCTION Tbrowse_OnInit(cAls, c1Title, c2Title, oTsb)  // начальные данные для т
    NEXT
 
    IF LEN(cMsg) > 0
-      cErr := "Error ! Could not create icon resources for the table !;;" 
+      cErr := "Error ! Could not create icon resources for the table !;;"
       cErr += cMsg + ";;" + ProcNL() + ";" + ProcNL(1)
       AlertStop( cErr, "Result", "ZZZ_B_STOP64", 64 )
    ENDIF
@@ -526,7 +594,7 @@ FUNCTION Tbrowse_OnInit(cAls, c1Title, c2Title, oTsb)  // начальные данные для т
 
    // цвета таблицы
    IF oTsb:nClr2Back == NIL
-      oTsb:nClr2Back := RGB(0,176,240)
+      oTsb:nClr2Back := RGB(202,233,244)
       oTsb:nClr22Bck := RGB(186,216,232)
    ENDIF
    nGrad := RGB(48,29,26)
@@ -539,12 +607,16 @@ FUNCTION Tbrowse_OnInit(cAls, c1Title, c2Title, oTsb)  // начальные данные для т
    ENDIF
    IF oTsb:nClr3Fore == NIL
       oTsb:nClr3Fore  := CLR_YELLOW                         // 3 , текста шапки таблицы
+   ENDIF
+   IF oTsb:nClr9Fore == NIL
       oTsb:nClr9Fore  := CLR_YELLOW                         // 9 , текста подвала таблицы
+   ENDIF
+   IF oTsb:nClr17Fore == NIL
       oTsb:nClr17Fore := CLR_WHITE                          // 17, текста суперхидера
    ENDIF
 
    nClrFace         := GetSysColor( COLOR_BTNFACE )
-   nClrNoEdit       := RGB(242,163,167)                                                           // шапка/подвал колонок типа "+=^"
+   nClrNoEdit       := RGB(242,163,167)                                                            // шапка/подвал колонок типа "+=^"
    oTsb:aBrush      := IIF( hb_IsArray(oTsb:aBrush)      , oTsb:aBrush      , RGB(240,240,240) )   // под таблицей
    oTsb:nClrNoDbf   := IIF( hb_IsNumeric(oTsb:nClrNoDbf ) , oTsb:nClrNoDbf  , nClrFace         )   // селектор/нумератор
    oTsb:nForeNoDbf  := IIF( hb_IsNumeric(oTsb:nForeNoDbf) , oTsb:nForeNoDbf , CLR_RED          )   // селектор/нумератор
@@ -555,23 +627,36 @@ FUNCTION Tbrowse_OnInit(cAls, c1Title, c2Title, oTsb)  // начальные данные для т
    oTsb:nClr1Fore   := IIF( hb_IsNumeric(oTsb:nClr1Fore  ), oTsb:nClr1Fore  , CLR_BLACK        )   // 1 , текст в ячейках таблицы
    oTsb:nClr2Back   := IIF( hb_IsNumeric(oTsb:nClr2Back  ), oTsb:nClr2Back  , CLR_WHITE        )   // 2 , фон   в ячейках таблицы
    oTsb:nClr3Fore   := IIF( hb_IsNumeric(oTsb:nClr3Fore  ), oTsb:nClr3Fore  , CLR_BLACK        )   // 3 , текста шапки таблицы
-   IF !hb_IsArray(oTsb:nClr4Back)                                                              
+   IF !hb_IsArray(oTsb:nClr4Back)
    oTsb:nClr4Back   := IIF( hb_IsNumeric(oTsb:nClr4Back)  , oTsb:nClr4Back  , CLR_BLACK        )   // 4 , фона шапки таблицы
-   ENDIF                                                                                       
+   ENDIF
    oTsb:nClr9Fore   := IIF( hb_IsNumeric(oTsb:nClr9Fore)  , oTsb:nClr9Fore  , CLR_RED          )   // 9 , текста подвала таблицы
-   IF !hb_IsArray(oTsb:nClr10Back)                                                             
+   IF !hb_IsArray(oTsb:nClr10Back)
    oTsb:nClr10Back  := IIF( hb_IsNumeric(oTsb:nClr10Back) , oTsb:nClr10Back , CLR_BLACK        )   // 10, фона подвала таблицы
-   ENDIF                                                                                       
-   IF !hb_IsArray(oTsb:n1Clr16Back)                                                            
+   ENDIF
+   IF !hb_IsArray(oTsb:n1Clr16Back)
    oTsb:n1Clr16Back := IIF( hb_IsNumeric(oTsb:n1Clr16Back), oTsb:n1Clr16Back, RGB(84,141,212)  )   // 16, фона суперхидера колонка 1
-   ENDIF                                                                                       
+   ENDIF
    oTsb:n1Clr17Fore := IIF( hb_IsNumeric(oTsb:n1Clr17Fore), oTsb:n1Clr17Fore, CLR_YELLOW       )   // 17, текста суперхидера колонка 1
    // цвета курсора
-   nClrFocus1   := IIF( hb_IsNumeric(oTsb:nClrFocus1  ), oTsb:nClrFocus1  , -CLR_HRED                       )
-   nClrFocus2   := IIF( hb_IsNumeric(oTsb:nClrFocus2  ), oTsb:nClrFocus2  , -RGB(1,1,1)                     )
-   nClrSeleF    := IIF( hb_IsNumeric(oTsb:nClrSeleF   ), oTsb:nClrSeleF   , GetSysColor( COLOR_WINDOWTEXT ) )
-   nClrNoFocus1 := IIF( hb_IsNumeric(oTsb:nClrNoFocus1), oTsb:nClrNoFocus1, -CLR_BLUE                       )
-   nClrNoFocus2 := IIF( hb_IsNumeric(oTsb:nClrNoFocus2), oTsb:nClrNoFocus2, -RGB( 128, 225, 225 )           )
+   nClrFocus1   := IIF( hb_IsNumeric(oTsb:nClrFocus1  ), oTsb:nClrFocus1  , -CLR_HRED                       ) // черная окантовка ячейка в фокусе
+   nClrFocus2   := IIF( hb_IsNumeric(oTsb:nClrFocus2  ), oTsb:nClrFocus2  , -RGB(1,1,1)                     ) // красная окантовка строки таблицы в фокусе
+   nClrSeleF    := IIF( hb_IsNumeric(oTsb:nClrSeleF   ), oTsb:nClrSeleF   , GetSysColor( COLOR_WINDOWTEXT ) ) // цвет текста ячейки таблицы вне фокуса
+   nClrNoFocus1 := IIF( hb_IsNumeric(oTsb:nClrNoFocus1), oTsb:nClrNoFocus1, -CLR_BLUE                       ) // окантовка вне фокуса
+   nClrNoFocus2 := IIF( hb_IsNumeric(oTsb:nClrNoFocus2), oTsb:nClrNoFocus2, -RGB( 128, 225, 225 )           ) // окантовка вне фокуса
+   //----- 07.11.23
+   aClrDef      := {nClrFace,nClrFace}
+   IF !hb_IsArray(oTsb:n12Clr10Back)
+   oTsb:n12Clr10Back := IIF( hb_IsNumeric(oTsb:n12Clr10Back), oTsb:n12Clr10Back, aClrDef  )     // 10, фона подвала таблицы колонка 1-2
+   ENDIF
+   IF !hb_IsArray(oTsb:n12Clr4Back)
+   oTsb:n12Clr4Back := IIF( hb_IsNumeric(oTsb:n12Clr4Back), oTsb:n12Clr4Back, aClrDef  )        // 4 , фона шапки таблицы колонка 1-2
+   ENDIF
+   oTsb:n12Clr9Fore  := IIF( hb_IsNumeric(oTsb:n12Clr9Fore) , oTsb:n12Clr9Fore , CLR_HMAGENTA )   // 9 , текста подвала таблицы колонка 1-2
+   oTsb:n12Clr3Fore  := IIF( hb_IsNumeric(oTsb:n12Clr9Fore) , oTsb:n12Clr3Fore , CLR_HMAGENTA )   // 3 , текста шапки таблицы колонка 1-2
+   IF !hb_IsArray(oTsb:nClrSelectorHdBack)
+      oTsb:nClrSelectorHdBack := aClrDef       // цвет фона шапки/подвала таблицы колонка 1 Selector
+   ENDIF
 
    oTsb:aColor := { ;
           { CLR_FOCUSB, {|c,n,b| c := n, iif( b:nCell == n, nClrFocus1, nClrFocus2 ) } }, ;
@@ -831,7 +916,20 @@ FUNCTION Tbrowse_OnInit(cAls, c1Title, c2Title, oTsb)  // начальные данные для т
                       ELSE
                          ob:SetNoHoles()
                       ENDIF
-
+                      //----- 07.11.23
+                      // перестроить цвета в шапке для виртуальной колонки
+                      //? ProcNL(), "==========", hb_IsArray(op:nClr4Back)
+                      IF hb_IsArray(op:nClr4Back)
+                         ob:oPhant:nClrHeadBack := op:nClr4Back
+                         //?? HB_ValToExp(op:nClr4Back)
+                      ENDIF
+                      // перестроить цвета в подвале для виртуальной колонки
+                      //?? hb_IsArray(op:nClr10Back)
+                      IF hb_IsArray(op:nClr10Back)
+                         ob:oPhant:nClrFootBack := op:nClr10Back
+                      ENDIF
+                      ob:Refresh()
+                      //------- 07.11.23
                       ob:SetFocus()
                       Return Nil
                     }
@@ -839,7 +937,7 @@ FUNCTION Tbrowse_OnInit(cAls, c1Title, c2Title, oTsb)  // начальные данные для т
 RETURN oTsb
 
 //////////////////////////////////////////////////////////////////////
-FUNCTION Tbrowse_Customization( oBrw, oTsb )   // донастройка таблицы
+STATIC FUNCTION Tbrowse_Customization( oBrw, oTsb )   // донастройка таблицы
    LOCAL oCol, nI, cCol, cTyp, nClrNoDbf, nClrNoEdit, nForeNoDbf
    LOCAL cErr, hFont, cMsg, nJ, aRelat, aVal, aWidthCol := {}
    LOCAL cFld, cName, cAls, nCol, cHead, nSize, nAlgn, cFunc
@@ -1037,7 +1135,7 @@ FUNCTION Tbrowse_Customization( oBrw, oTsb )   // донастройка таблицы
    // правим Super Header
    IF oBrw:lSelector .and. oBrw:nColumn( "ORDKEYNO", .T. ) > 0
       FOR nI := 1 TO Len( oBrw:aSuperHead )  // с первой или со 2-ой колонки менять
-          oBrw:aSuperHead[ nI ][2] += 1
+         oBrw:aSuperHead[ nI ][2] += 1
       NEXT
    ENDIF
 
@@ -1059,10 +1157,16 @@ FUNCTION Tbrowse_Customization( oBrw, oTsb )   // донастройка таблицы
                      Local oCol := ob:aColumns[ nCol ]
                      Local cCol := oCol:cName
                      nMsg := oFun:Get(cCol, 100) // для др. field 100
+                     MsgDebug(nMsg,oFun)
                      _wPost( nMsg, ob:cParentWnd, ob)
                      Return Nil
                 } )
    ENDIF
+
+   // обработка мышкой и клавишами
+   oBrw:bLDblClick := {|p1,p2,nf,ob| p1:=p2:=nf, ob:PostMsg(WM_KEYDOWN, VK_RETURN, 0) }
+   oBrw:bRClicked  := {|p1,p2,p3,ob| p1:=p2:=p3, _wPost(10, ob:cParentWnd, ob)        }
+   oBrw:UserKeys(VK_F2, {|ob| TsbTracing(ob)   })  // инфо по списку колонок
 
    // снятие фильтра, если нет записей по фильтру - разблокировка шапки колонок
    oBrw:bEvents := {|ob,nmsg|
@@ -1095,35 +1199,56 @@ FUNCTION Tbrowse_Customization( oBrw, oTsb )   // донастройка таблицы
                      Return Nil
                     }
 
-   IF !hb_IsArray(oTsb:aFoot)                                                            
+   IF !hb_IsArray(oTsb:aFoot)
       // В подвал записываем имена полей
       FOR EACH oCol IN oBrw:aColumns
          cCol := oCol:cName
          IF cCol == "ORDKEYNO" .OR. cCol == "SELECTOR"
          ELSE
-            cCol := oCol:cName 
+            cCol := oCol:cName
             oCol:cFooting := "[" + cCol + "]"
          ENDIF
       NEXT
+   ENDIF
+
+   //----- 07.11.23 ---- меняем колонку
+   FOR EACH oCol IN oBrw:aColumns
+      cCol := oCol:cName
+      IF cCol == "ORDKEYNO"
+         oCol:nClrHeadFore := oTsb:n12Clr3Fore    // 3 , текста шапки таблицы   колонка 2
+         oCol:nClrHeadBack := oTsb:n12Clr4Back    // 4 , фона шапки таблицы     колонка 2
+         oCol:nClrFootFore := oTsb:n12Clr9Fore    // 9 , текста подвала таблицы колонка 2
+         oCol:nClrFootBack := oTsb:n12Clr10Back   // 10, фона подвала таблицы   колонка 2
+      ELSEIF cCol == "SELECTOR"
+      ELSE
+         EXIT
+      ENDIF
+   NEXT
+
+   IF oBrw:lSelector
+      oBrw:nClrSelectorHdBack := oTsb:nClrSelectorHdBack // фона шапки и подвала селектора - колонка 1
    ENDIF
 
 RETURN NIL
 
 ///////////////////////////////////////////////////////////////////
 // трассировка полей для просмотра результата
-FUNCTION TsbTracing(oBrw)
-   LOCAL oCol
+STATIC FUNCTION TsbTracing(oBrw)
+   LOCAL oCol, cMsg
 
-? "----------" + ProcNL(1)
-? oBrw:aColumns
-FOR EACH oCol IN oBrw:aColumns
-    ? hb_enumindex(oCol), oCol:cName, oCol:cFieldTyp, oCol:cPicture, oCol:nWidth, oCol:nAlign
-NEXT
-?
+   cMsg := "----------" + ProcNL(1) + ";"
+   FOR EACH oCol IN oBrw:aColumns
+       cMsg += HB_NtoS(hb_enumindex(oCol)) + "  " + oCol:cName
+       cMsg += "  " + oCol:cFieldTyp  + "  " + oCol:cPicture
+       cMsg += "  nWidth=" + HB_NtoS(oCol:nWidth)
+       cMsg += "  nAlign=" + HB_NtoS(oCol:nAlign) + ";"
+   NEXT
+   AlertInfo(cMsg + REPL(";",30))
+
 RETURN NIL
 
 ///////////////////////////////////////////////////////////////////
-FUNCTION myGetNumbaColumn(oBrw,cFld)
+STATIC FUNCTION myGetNumbaColumn(oBrw,cFld)
    LOCAL nI, oCol, cCol, nCol := 0
 
    FOR nI := 1 TO Len(oBrw:aColumns)
@@ -1229,7 +1354,9 @@ STATIC FUNCTION myCellColorBack( nAt, nCol, oBrw )
    aColFltr := oTsb:aColNumFltr                // номера колонок таблицы с фильтром
    lDel     := (oBrw:cAlias)->( DELETED() )    // удалена ли запись ?
    lZebra   := oTsb:lShowZebra                 // показ чётная\нечётная строка
-   lZebra   := IIF( lZebra == NIL, .F., .T. )
+   IF lZebra == NIL
+      lZebra := .F.
+   ENDIF
 
    cCol := oBrw:aColumns[ nCol ]:cName
    IF cCol == "SELECTOR" .OR. cCol == "ORDKEYNO"
@@ -1698,3 +1825,174 @@ RETURN NIL
 FUNCTION myFunc0(oWnd, nMsg, oBrw)
    MsgDebug(oWnd:Name,nMsg, oBrw:cAlias)
 RETURN NIL
+
+//////////////////////////////////////////////////////////////////////////
+STATIC FUNCTION myRCellClick(oWnd,ky,oBrw)
+   LOCAL oCol, nCol, cType, xVal, cMsg, nY, nX, cForm, nPost
+   LOCAL nI, aLang, nLen, oPos, hFont1, hFont2, nHFS
+   LOCAL lMenuStyle, nMenuBitmap
+
+   cForm := oWnd:Name
+   cForm := oBrw:cParentWnd                // или так
+   nCol  := oBrw:nCell
+   oCol  := oBrw:aColumns[nCol]
+   cType := oCol:cFieldTyp                 // valtype field
+   xVal  := oBrw:GetValue(nCol)            // real value
+   nPost := ky                             // номер события - резерв
+   oPos  := oBrw_Cell(oBrw, nCol)          // координаты выбранной ячейки
+
+   //? ProcNL(), "||", cForm, "ky=",ky, "nCol=",nCol
+   //_o2Log(oPos, 20, "==> .T. oPos: ", .T.)
+
+   DrawRR(YELLOW, 3, oPos:Y, oPos:X, oPos:H, oPos:W)
+   wApi_Sleep(500)
+   DrawRR(GREEN, 3, oPos:Y, oPos:X, oPos:H, oPos:W)
+   wApi_Sleep(500)
+
+   // возмём координаты от местоположения мышки
+   //nX := _HMG_MouseCol
+   //nY := _HMG_MouseRow
+   // возмём координаты от ячеек таблицы + координаты окна
+   nY := INT( oPos:Y + oPos:H + GetTitleHeight() + oWnd:Row )
+   nX := INT( oPos:X + oWnd:Col )
+
+   hFont1 := oBrw:hFontHead
+   hFont2 := oBrw:hFont
+   nHFS   := GetTextHeight( 0, "H", hFont1 )   // высота фонта
+   nHFS   += nHFS/2                            // высота ОДНОГО контекстного меню
+
+   nLen  := 0
+   aLang := myLangeRes(13)  // -> TsbViewLang.prg
+   FOR nI := 1 TO LEN(aLang) - 1
+       nLen := MAX(nLen, LEN(aLang[nI]))
+   NEXT
+   cMsg := REPL("A",nLen)
+
+   lMenuStyle  := IsExtendedMenuStyleActive()     // menu style EXTENDED/STANDARD
+   nMenuBitmap := GetMenuBitmapHeight()           // bmp height in context menu
+
+   SET MENUSTYLE EXTENDED        // switch menu style to advanced
+   SetMenuBitmapHeight( nHFS )   // set image size
+
+   //SetThemes(2)  // тема "Office 2000 theme" в ContextMenu
+   //SetThemes(3)  // тема "Dark theme" в ContextMenu
+
+   DEFINE CONTEXT MENU OF &cForm
+       // Копировать в буфер
+       MENUITEM  aLang[1]  ACTION  {|| System.Clipboard := cValToChar(oBrw:GetValue(nCol)) , oBrw:SetFocus() } FONT hFont1
+       SEPARATOR
+       // Вставить из буфера
+       MENUITEM  aLang[2]  ACTION  {|| Copy_Cell_Clipboard(1,oBrw,cType,nCol) }  FONT hFont1
+       SEPARATOR
+       // Удалить
+       MENUITEM  aLang[3]  ACTION  {|| Copy_Cell_Clipboard(0,oBrw,cType,nCol) }  FONT hFont2
+   END MENU
+
+   _ShowContextMenu(cForm, nY, nX, .f. ) // SHOWING DROP OUT MENU
+   InkeyGui(100)
+
+   IF _IsWindowDefined( cForm )
+      DEFINE CONTEXT MENU OF &cForm    // deleting menu after exiting
+      END MENU
+   ENDIF
+
+   //SetThemes(1)                   // restoring the themes - ContextMenu
+   SetMenuBitmapHeight(nMenuBitmap) // bmp height in context menu   - return as it was
+   _NewMenuStyle( lMenuStyle )      // menu style EXTENDED/STANDARD - return as it was
+
+   DO EVENTS
+
+RETURN Nil
+
+//////////////////////////////////////////////////////////////////
+STATIC FUNCTION Copy_Cell_Clipboard(nMenu,oBrw,cType,nCol)
+   LOCAL xWrt
+
+   IF nMenu == 1
+      xWrt := System.Clipboard
+   ELSE
+      xWrt := ""
+   ENDIF
+
+   IF cType == VALTYPE(xWrt)
+   ELSEIF cType == "C" .AND. VALTYPE(xWrt) == "N"
+      xWrt := HB_NtoS(xWrt)
+   ELSEIF cType == "N" .AND. VALTYPE(xWrt) == "C"
+      xWrt := VAL(xWrt)
+   ELSEIF cType == "D"
+      xWrt := CTOD(xWrt)
+   ELSEIF cType == "T" .OR. cType == "@"
+      xWrt := hb_CToT(xWrt)
+   ELSEIF cType == "L"
+      xWrt := IIF( nMenu == 1, .T., .F. )
+   ENDIF
+
+   IF cType $ "+=^"   // Type field: [+] [=] [^]
+      AlertStop('Fields of type: "+" "=" "^" cannot be edited in the database!')
+   ELSE
+      IF (oBrw:cAlias)->( RLock() )
+          oBrw:SetValue(nCol, xWrt)
+         (oBrw:cAlias)->( DbUnlock() )
+         (oBrw:cAlias)->( DbCommit() )
+      ELSE
+         AlertStop("Recording is locked!")
+      ENDIF
+   ENDIF
+
+   oBrw:DrawSelect()
+   oBrw:Refresh()
+   DO EVENTS
+   oBrw:SetFocus()
+
+RETURN Nil
+
+//////////////////////////////////////////////////////////////////
+STATIC FUNCTION oBrw_Cell( oBrw, nCol, nRow )
+   LOCAL o := oHmgData(), oCol
+   Default nCol := oBrw:nCell, nRow := oBrw:nRowPos
+
+   IF HB_ISCHAR(nCol) ; nCol := oBrw:nColumn(nCol)
+   ENDIF
+
+   oCol := oBrw:aColumns[ nCol ]
+
+   o:N := oCol:cName
+   o:Y := oBrw:nTop
+   o:X := GetBorderWidth()
+   IF oBrw:lDrawSuperHd ; o:Y += oBrw:nHeightSuper
+   ENDIF
+   IF oBrw:lDrawHeaders ; o:Y += oBrw:nHeightHead
+   ENDIF
+   IF oBrw:lDrawSpecHd  ; o:Y += oBrw:nHeightSpecHd
+   ENDIF
+   IF nRow > 0 .and. nRow <= oBrw:nRowCount()
+      o:Y += ( nRow - 1 ) * oCol:oCell:nHeight
+   ENDIF
+   o:X += oCol:oCell:nCol
+   o:H := oCol:oCell:nHeight
+   o:W := oCol:oCell:nWidth
+
+RETURN o
+
+///////////////////////////////////////////////////////////////////////////////
+STATIC FUNCTION DrawRR( focus, nPen, y, x, h, w, cWindowName, nCurve )
+   LOCAL aColor
+
+   DEFAULT y := This.Row, x := This.Col, h := This.Height, w := This.Width
+   DEFAULT focus := .F., cWindowName := ThisWindow.Name, nCurve := 5
+   DEFAULT nPen := 3, focus := .F.
+
+   IF ISARRAY( focus ) ; aColor := focus
+   ELSE ; aColor := iif( focus, { 0, 120, 215 }, { 100, 100, 100 } )
+   ENDIF
+
+   DRAW ROUNDRECTANGLE IN WINDOW ( cWindowName ) ;
+      AT y + 2, x + 2 TO y + h - 2, x + w - 2 ;
+      ROUNDWIDTH nCurve ROUNDHEIGHT nCurve ;
+      PENCOLOR aColor PENWIDTH nPen
+
+RETURN NIL
+
+///////////////////////////////////////////////////////////////////////////////
+FUNCTION MsgAboutThis()
+RETURN SHOW_TITLE + SHOW_VERS

@@ -82,16 +82,19 @@ FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, cFie
       AAdd( aFieldList, aItem[2] )
       AAdd( aWidthList, Max( Len( aItem[3] ), Len( Transform(FieldGet(FieldNum(aItem[1] ) ), "" ) ) ) * 10 + 10 )
    NEXT
-   @ nRow, nCol GRID ( xControl ) ;
-      OF ( xDlg ) ;
-      WIDTH nWidth - 20 ;
-      HEIGHT nHeight - 20 ;
-      ON DBLCLICK gui_BrowseDblClick( xDlg, xControl, workarea, cField, @xValue ) ;
-      HEADERS aHeaderList ;
-      WIDTHS aWidthList ;
-      VALUE xValue ;
-      ROWSOURCE ( workarea ) ;
-      COLUMNFIELDS aFieldList
+
+   DEFINE BROWSE ( xControl )
+      PARENT ( xDlg )
+      ROW nRow
+      COL nCol
+      WIDTH nWidth - 20
+      HEIGHT nHeight - 20
+      ONDBLCLICK gui_BrowseDblClick( xDlg, xControl, workarea, cField, @xValue )
+      HEADERS aHeaderList
+      WIDTHS aWidthList
+      WORKAREA ( workarea )
+      FIELDS aFieldList
+   END BROWSE
 
    (xDlg);(cField);(xValue);(workarea)
 
@@ -102,8 +105,8 @@ FUNCTION gui_BrowseDblClick( xDlg, xControl, workarea, cField, xValue )
    IF ! Empty( cField )
       xValue := &(workarea)->( FieldGet( FieldNum( cField ) ) )
    ENDIF
-   DoMethod( xDlg, "RELEASE" )
    (xControl)
+   DoMethod( xDlg, "RELEASE" )
 
    RETURN Nil
 
@@ -113,7 +116,7 @@ FUNCTION gui_DialogActivate( xDlg, bCode )
       Eval( bCode )
    ENDIF
    DoMethod( xDlg, "CENTER" )
-   ACTIVATE WINDOW ( xDlg )
+   DoMethod( xDlg, "ACTIVATE" )
 
    RETURN Nil
 

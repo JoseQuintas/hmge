@@ -32,6 +32,8 @@ FUNCTION Main()
    SET DELETED OFF
    SET OOP ON
 
+   SET CODEPAGE TO ENGLISH            
+   SET LANGUAGE TO ENGLISH            
    RddSetDefault("DBFCDX")
 
    SET FONT TO "DejaVu Sans Mono", 13

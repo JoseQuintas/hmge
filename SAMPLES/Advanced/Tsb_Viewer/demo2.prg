@@ -57,6 +57,7 @@ FUNCTION Main(cMode)
    cFileIco  := Icon64TempCreate()  // иконку создаём во временной папке
    App.Cargo := oHmgData()          // создадим контейнер для всего приложения
    App.Cargo:nHMain := nH           // сохраним высоту окна Main
+   App.Cargo:cIco64 := cFileIco
 
    DEFINE WINDOW Form_Main WIDTH nW HEIGHT nH TITLE cTtl ICON cFileIco ;
       MAIN NOMAXIMIZE NOSIZE TOPMOST BACKCOLOR  aBClr                  ;
@@ -123,12 +124,12 @@ FUNCTION EventTwo()
    // или можно так делать
    //DbSelectArea("BookAbon")
    //DbSetOrder(4)
-   aEvent := {}                                 // события на окне, вызов функций
-   AAdd( aEvent, {99, {|ow| myExit(ow) }} )     // выход
-   AAdd( aEvent, { 1, {|ow| myBtn1(ow) }} )     // кнопка 1
-   AAdd( aEvent, { 2, {|ow| myBtn2(ow) }} )     // кнопка 2
-   AAdd( aEvent, { 3, {|ow| myBtn3(ow) }} )     // кнопка 3
-   AAdd( aEvent, { 4, {|ow| myBtn4(ow) }} )     // кнопка 4
+   aEvent := {}                                             // события на окне, вызов функций
+   AAdd( aEvent, {99, {|ow,ky,cn| myExit(ow,ky,cn) }} )     // выход
+   AAdd( aEvent, { 1, {|ow,ky,cn| myBtn1(ow,ky,cn) }} )     // кнопка 1
+   AAdd( aEvent, { 2, {|ow,ky,cn| myBtn2(ow,ky,cn) }} )     // кнопка 2
+   AAdd( aEvent, { 3, {|ow,ky,cn| myBtn3(ow,ky,cn) }} )     // кнопка 3
+   AAdd( aEvent, { 4, {|ow,ky,cn| myBtn4(ow,ky,cn) }} )     // кнопка 4
 
    TsbObjViewer(oWin, oUse, oIndx, oMenu, oTsbW, aEvent)   // окно с таблицей
 
@@ -139,10 +140,10 @@ FUNCTION EventTwo()
    oMenu := CreateDateMenu2( {99,2,4} )  // события                      // меню-кнопки окна
    oTsbW := CreateDateTsb2(oUse,oUse:cCodePage,"Checkpoint (2) !",oWin)  // параметры ТСБ
 
-   aEvent := {}                                   // события на окне, вызов функций
-   AAdd( aEvent, {99, {|ow| myExit(ow)     }} )   // выход
-   AAdd( aEvent, { 2, {|ow| myBtn2(ow)     }} )   // кнопка 2
-   AAdd( aEvent, { 4, {|ow| myBtn4Tbl2(ow) }} )   // кнопка 4
+   aEvent := {}                                               // события на окне, вызов функций
+   AAdd( aEvent, {99, {|ow,ky,cn| myExit(ow,ky,cn)     }} )   // выход
+   AAdd( aEvent, { 2, {|ow,ky,cn| myBtn2(ow,ky,cn)     }} )   // кнопка 2
+   AAdd( aEvent, { 4, {|ow,ky,cn| myBtn4Tbl2(ow,ky,cn) }} )   // кнопка 4
 
    // переключиться на 1 ордер индекса
    oIndx:nSetOrder := 4
@@ -698,15 +699,15 @@ FUNCTION myExit()
 RETURN NIL
 
 ///////////////////////////////////////////////////////////////////////////////
-FUNCTION myBtn4(ow,ky,xp)
-   LOCAL cForm, cObj  := ow:Name
+FUNCTION myBtn4(ow,ky,cn)
+   LOCAL cForm, cObj  := cn
    LOCAL cMsg, cTxt, cLog, oWnd, oCtl, a2Dim, oCargo, nI, oBrw
 
    cLog := _SetGetLogFile()
    fErase( cLog )
-   ?  "--------- " + ProcNL() + "(", ow,ky,xp,")"
+   ?  "--------- " + ProcNL() + "(", ow,ky,cn,")"
    ?  "Доступные параметры по этой кнопке !"
-   ?  ow:Name, ow:Type
+   ?  ow:Name, ow:Type, cn
    oWnd  := ThisWindow.Object  // объект окна
    oCtl  := This.Object        // объект контола кнопки
    cForm := oWnd:Name
@@ -754,64 +755,75 @@ FUNCTION myBtn4(ow,ky,xp)
 RETURN NIL
 
 ///////////////////////////////////////////////////////////////////////////////
-FUNCTION myBtn1(ow)
+FUNCTION myBtn1(ow,ky,cn)
    LOCAL cForm, cObj, oWnd, oCtl
 
    oWnd  := ThisWindow.Object  // объект окна
    oCtl  := This.Object        // объект контола кнопки
    cForm := oWnd:Name
-   cObj  := ow:Name
+   cObj  := cn
 
-   ? ProcNL(), cForm, cObj
-   BtnTsbMenu(1,ow)       // смотреть TsbViewer.prg
+   ? ProcNL(), cForm, cObj, "ky=",ky, ow:Name
+   BtnTsbMenu(1,cObj)       // смотреть TsbViewer.prg
    SetProperty(cForm, cObj, "Enabled", .T. )
 
 RETURN NIL
 
 ///////////////////////////////////////////////////////////////////////////////
-FUNCTION myBtn2(ow)
+FUNCTION myBtn2(ow,ky,cn)
    LOCAL cForm, cObj, oWnd, oCtl
 
    oWnd  := ThisWindow.Object  // объект окна
    oCtl  := This.Object        // объект контола кнопки
    cForm := oWnd:Name
-   cObj  := ow:Name
+   cObj  := cn
 
-   ? ProcNL(), cForm, cObj
-   BtnTsbMenu(2,ow)       // смотреть TsbViewer.prg
+   ? ProcNL(), cForm, cObj, "ky=", ky, ow:Name
+   BtnTsbMenu(2,cObj)       // смотреть TsbViewer.prg
+   
    SetProperty(cForm, cObj, "Enabled", .T. )
 
 RETURN NIL
 
 ///////////////////////////////////////////////////////////////////////////////
-FUNCTION myBtn3(ow)
+FUNCTION myBtn3(ow,ky,cn)
    LOCAL cForm, cObj, oWnd, oCtl
 
    oWnd  := ThisWindow.Object  // объект окна
    oCtl  := This.Object        // объект контола кнопки
    cForm := oWnd:Name
-   cObj  := ow:Name
+   cObj  := cn
 
-   MsgDebug(cForm,cObj,oCtl:Name)
+   MsgDebug(ow:Name, cForm,cObj,oCtl:Name, "ky=",ky)
+
    SetProperty(cForm, cObj, "Enabled", .T. )
 
 RETURN NIL
 
 ///////////////////////////////////////////////////////////////////////////////
-FUNCTION myBtn4Tbl2(ow)
-   LOCAL cForm, cObj, oWnd
+FUNCTION myBtn4Tbl2(ow,ky,cn)
+   LOCAL cForm, cObj, oWnd, cTitle, cMsg, nEv := ky
 
-   oWnd  := ThisWindow.Object
-   cForm := oWnd:Name
-   cObj  := ow:Name
+   ? ow:Name, ky, cn
+   oWnd   := ThisWindow.Object
+   cForm  := oWnd:Name
+   cObj   := cn
+   cTitle := "About the program - " + ow:Name
+   cMsg   := SHOW_TITLE + SHOW_VERS + ";;"
+   cMsg   += "(c) 2021 Verchenko Andrey <verchenkoag@gmail.com>;"
+   cMsg   += "(c) 2021 Sergej Kiselev <bilance@bilance.lv>;;"
+   cMsg   += hb_compiler() + ";" + Version() + ";" + MiniGuiVersion() + ";"
+   cMsg   += "(c) Grigory Filatov http://www.hmgextended.com;;"
+   cMsg   += PadC( "This program is Freeware!", 60 ) + ";"
+   cMsg   += PadC( "Copying is allowed!", 60 ) + ";"
 
    SET MSGALERT BACKCOLOR TO { 203, 236, 176 }    // for HMG_Alert()
 
-   MsgAbout("Info!")
-
-   SetProperty(cForm, cObj, "Enabled", .T. )
+   AlertInfo( cMsg, cTitle, App.Cargo:cIco64, 64, {RED} )
 
    SET MSGALERT BACKCOLOR TO { 183, 221, 232 }    // for HMG_Alert()
+
+   SetProperty(cForm, cObj, "Enabled", .T. )
 
 RETURN NIL
 

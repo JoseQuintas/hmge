@@ -3,33 +3,32 @@
  * Threads in MiniGui
  * Preloader in MiniGui
  *
- * Copyright 2023 Verchenko Andrey <verchenkoag@gmail.com>
- * Copyright 2023 Sergej Kiselev <bilance@bilance.lv>
+ * Copyright 2023-24 Verchenko Andrey <verchenkoag@gmail.com>
+ * Copyright 2023-24 Sergej Kiselev <bilance@bilance.lv>
  *
  * An example of showing a preloader. Displays the loading process for windows
  * Пример показа прелоадера. Отображает процесс загрузки для окна
+ * Работа с Gif-объектом / Working with a Gif object
 */
 #define _HMG_OUTLOG
 
 #include "minigui.ch"
 #include "hbthread.ch"
 
-// for the start of the cycle in the window "waiting"
-STATIC lStatWinWait := .T.
-STATIC nStaticSeconds := 0
-STATIC nStaticTimeStart := 0
-STATIC nStaticProgressStart := 0
-STATIC oStaticGif // для картинки GIF
+//////////////////////////////
+SET PROCEDURE TO WaitThreadGif
 
 // общие цвета: фон окна
 #define COLOR_0  { 179, 116, 215 }
-
 // общие цвета: фон кнопок
 #define COLOR_1  { 159, 191, 236 }
 #define COLOR_2  {  94, 230, 203 }
 #define COLOR_3  { 250, 253, 214 }
 #define COLOR_4  { 195, 224, 133 }
 #define COLOR_5  { 255, 178, 178 }
+
+STATIC nStaticTimeStart     := 0
+STATIC nStaticProgressStart := 0
 
 PROCEDURE Main
 
@@ -78,13 +77,15 @@ PROCEDURE Main
          WIDTH nW HEIGHT 60 FONTCOLOR WHITE BOLD TRANSPARENT CENTERALIGN
       nY += 60
 
-      aBtn := Btn_Form_Main_Init() // массив кнопок - 5 штук
+      aBtn := Btn_Form_Main_Init() // массив кнопок - 6 штук
 
       y := nY ; x := nG ; w := nWBtn ; h := nHBtn
 
       Btn_Forma( y, x, w, h, aBtn[ 1 ] ) // положить кнопку 1 на форму
       y += h + nG
       Btn_Forma( y, x, w, h, aBtn[ 2 ] ) // положить кнопку 2 на форму
+      y += h + nG
+
       y := nY // вернули позицию левой кнопки
       x := nW - nG - w
       Btn_Forma( y, x, w, h, aBtn[ 3 ] ) // положить кнопку 3 на форму
@@ -201,8 +202,10 @@ STATIC FUNCTION Btn_Form_Main_Init()
 
    oBtn := oHmgData() // создать контейнер для кнопки
 
-   oBtn:nBtn := 5
-   oBtn:cBtn := "Btn_5"
+   oBtn := oHmgData() // создать контейнер для кнопки
+
+   oBtn:nBtn  := 5
+   oBtn:cBtn  := "Btn_5"
    oBtn:cCapt := "Exit"
    oBtn:aBClr := COLOR_5 // цвет фона текущей кнопки
    oBtn:aBtnFClr := { BLACK, YELLOW } // два цвета фонта текущей кнопки для события по мышке
@@ -305,12 +308,12 @@ FUNCTION StartSample1( oBtn )
    ? "Btn =", cBtn, oBtn:Name, oBtn:Index, oBtn:Handle, oBtn:Caption
    ? "Cargo", oBtnCargo:GetAll() ; ?v oBtnCargo:GetAll() ; ?
 
-   c2Form := oBtnCargo:c2Form // имя нового окна
-   c2Title := oBtnCargo:c2Title // титул нового окна
-   a2WinBClr := oBtnCargo:a2WinBClr // цвет фона нового окна
-   nWaitType := oBtnCargo:nWaitType // тип окна ожидания 1/2/3
-   nWaitTime := oBtnCargo:nWaitTime // тип показа времени: 0-новое время/1-продолжение времени
-   tTimeStart := hb_DateTime() // время начала процесса
+   c2Form     := oBtnCargo:c2Form     // имя нового окна
+   c2Title    := oBtnCargo:c2Title    // титул нового окна
+   a2WinBClr  := oBtnCargo:a2WinBClr  // цвет фона нового окна
+   nWaitType  := oBtnCargo:nWaitType  // тип окна ожидания 1/2/3
+   nWaitTime  := oBtnCargo:nWaitTime  // тип показа времени: 0-новое время/1-продолжение времени
+   tTimeStart := hb_DateTime()        // время начала процесса
 
    SetProperty( cForm, cBtn, "Enabled", .F. ) // lock a button
    DoMethod( cForm, "Minimize" ) ; DO EVENTS
@@ -345,12 +348,12 @@ FUNCTION StartSample2()
    ? "Btn =", cBtn, oBtn:Name, oBtn:Index, oBtn:Handle, oBtn:Caption
    ? "Cargo", oBtnCargo:GetAll() ; ?v oBtnCargo:GetAll() ; ?
 
-   c2Form := oBtnCargo:c2Form // имя нового окна
-   c2Title := oBtnCargo:c2Title // титул нового окна
-   a2WinBClr := oBtnCargo:a2WinBClr // цвет фона нового окна
-   nWaitType := oBtnCargo:nWaitType // тип окна ожидания 1/2/3
-   nWaitTime := oBtnCargo:nWaitTime // тип показа времени: 0-новое время/1-продолжение времени
-   tTimeStart := hb_DateTime() // время начала процесса
+   c2Form     := oBtnCargo:c2Form     // имя нового окна
+   c2Title    := oBtnCargo:c2Title    // титул нового окна
+   a2WinBClr  := oBtnCargo:a2WinBClr  // цвет фона нового окна
+   nWaitType  := oBtnCargo:nWaitType  // тип окна ожидания 1/2/3
+   nWaitTime  := oBtnCargo:nWaitTime  // тип показа времени: 0-новое время/1-продолжение времени
+   tTimeStart := hb_DateTime()        // время начала процесса
 
    SetProperty( cForm, cBtn, "Enabled", .F. ) // lock a button
    DoMethod( cForm, "Minimize" ) ; DO EVENTS
@@ -389,18 +392,18 @@ FUNCTION Wait1Window( aBeg )
       nTimeRun := nStaticTimeStart
    ENDIF
 
-   aThread := WaitThreadCreate( 'Create a calculation window ...', nTimeRun )
+   aThread := WaitThreadGif( 'Create a calculation window ...', nTimeRun )
 
    FOR nI := nJ1 TO nJ2
       wApi_Sleep( 100 )
       DO EVENTS
       cVal := hb_ntos( nI ) + "/" + cJ3
-      WaitThreadSay( aThread, cVal )
+      WaitThreadGifSay( aThread, cVal )
       // final waiting
       // INKEYGUI(100)
    NEXT
 
-   WaitThreadClose( aThread )
+   WaitThreadGifClose( aThread )
 
 RETURN NIL
 
@@ -456,11 +459,11 @@ FUNCTION Wait3Window( aBeg, lProgressStart )
    IF Len( aBeg ) < 5 ; aBeg := ASize( aBeg, 5 )
    ENDIF
 
-   nJ1 := aBeg[ 1 ]
-   nJ2 := aBeg[ 2 ]
-   cJ3 := aBeg[ 3 ]
+   nJ1    := aBeg[ 1 ]
+   nJ2    := aBeg[ 2 ]
+   cJ3    := aBeg[ 3 ]
    nWTime := aBeg[ 4 ] // тип показа времени: 0-новое время/1-продолжение времени
-   bWait := aBeg[ 5 ] // вып. блок кода в окне WaitWindow
+   bWait  := aBeg[ 5 ] // вып. блок кода в окне WaitWindow
 
    IF nWTime == 0
       nTimeRun := Seconds()
@@ -484,43 +487,43 @@ FUNCTION Wait3Window( aBeg, lProgressStart )
       RETURN nI
       }
 
-aSay := { 'Program download ...', GetExeFileName(), '', '' }
-cWWin := WaitWindow( aSay, .T., 800, 18, NIL, BLACK, { 247, 172, 8 }, 20, BLUE, 4 ) // open the wait window
+   aSay := { 'Program download ...', GetExeFileName(), '', '' }
+   cWWin := WaitWindow( aSay, .T., 800, 18, NIL, BLACK, { 247, 172, 8 }, 20, BLUE, 4 ) // open the wait window
 
-DoMethod( cWWin, "Minimize" ) ; DO EVENTS
-DoMethod( cWWin, "Restore" ) ; DO EVENTS
+   DoMethod( cWWin, "Minimize" ) ; DO EVENTS
+   DoMethod( cWWin, "Restore" ) ; DO EVENTS
 
-SET WINDOW THIS TO cWWin
+   SET WINDOW THIS TO cWWin
 
-h := This.Message2.HEIGHT - 6
-This.Message.FONTCOLOR := BLUE
-This.Message.FONTBOLD := .T.
-This.Message3.Hide
+   h := This.Message2.HEIGHT - 6
+   This.Message.FONTCOLOR := BLUE
+   This.Message.FONTBOLD := .T.
+   This.Message3.Hide
 
-y := This.Message2.ROW + This.Message2.HEIGHT
-x := This.Message2.COL
-w := This.Message2.WIDTH
+   y := This.Message2.ROW + This.Message2.HEIGHT
+   x := This.Message2.COL
+   w := This.Message2.WIDTH
 
-IF lProgressStart ; nStaticProgressStart := 0
-ENDIF
+   IF lProgressStart ; nStaticProgressStart := 0
+   ENDIF
 
-@ y, x PROGRESSBAR PROGRESS OF &( cWWin ) RANGE 0, nJ2 WIDTH w HEIGHT h
+   @ y, x PROGRESSBAR PROGRESS OF &( cWWin ) RANGE 0, nJ2 WIDTH w HEIGHT h
 
-nJ1 := nStaticProgressStart
-This.Progress.VALUE := nJ1
-DO EVENTS
+   nJ1 := nStaticProgressStart
+   This.Progress.VALUE := nJ1
+   DO EVENTS
 
-Eval( bWait, cWWin, nTimeRun, { nJ1, nJ2, cJ3 } )
+   Eval( bWait, cWWin, nTimeRun, { nJ1, nJ2, cJ3 } )
 
-nStaticProgressStart := GetProperty( cWWin, "Progress", "Value" )
+   nStaticProgressStart := GetProperty( cWWin, "Progress", "Value" )
 
-IF lProgressStart .AND. nStaticProgressStart != nJ2
-   SetProperty( cWWin, "Progress", "Value", nJ2 )
-ENDIF
+   IF lProgressStart .AND. nStaticProgressStart != nJ2
+      SetProperty( cWWin, "Progress", "Value", nJ2 )
+   ENDIF
 
-SET WINDOW THIS TO
+   SET WINDOW THIS TO
 
-WaitWindow()
+   WaitWindow()
 
 RETURN NIL
 
@@ -530,13 +533,13 @@ FUNCTION myWinTable( aParam )
    LOCAL nWinWidth, nWinHeight, cFormName, cFormTitle, aBackColor, tTimeStart
    LOCAL nWaitType, nWaitTime
 
-   cFormName := aParam[ 1 ]
+   cFormName  := aParam[ 1 ]
    cFormTitle := aParam[ 2 ]
    aBackColor := aParam[ 3 ]
    tTimeStart := aParam[ 4 ]
-   nWaitType := aParam[ 5 ] // тип окна ожидания 1/2/3
-   nWaitTime := aParam[ 6 ] // тип показа времени: 0-новое время/1-продолжение времени
-   nWinWidth := System.DesktopWidth
+   nWaitType  := aParam[ 5 ] // тип окна ожидания 1/2/3
+   nWaitTime  := aParam[ 6 ] // тип показа времени: 0-новое время/1-продолжение времени
+   nWinWidth  := System.DesktopWidth
    nWinHeight := System.DesktopHeight - 30
    ? ProcNL(), "aParam=", hb_ValToExp( aParam )
 
@@ -571,7 +574,7 @@ FUNCTION myWinTable( aParam )
             :Event( 1, {| ow | // ON INIT windows + close the "calculation" window
                LOCAL cMsg, Ctrl
                This.Topmost := .F.
-               DoMethod(ow:Name, "DisableUpdate")  // блокировать всю форму 
+               DoMethod(ow:Name, "DisableUpdate")  // блокировать всю форму
                                                                // block the whole form
                FOR EACH Ctrl IN HMG_GetFormControls( ow:Name )
                   IF "oBut" $ Ctrl
@@ -599,7 +602,7 @@ FUNCTION myWinTable( aParam )
                   ENDIF
                NEXT
                DoMethod(ow:Name, "EnableUpdate")    // разблокировка всей формы
-                                                               // unlock the whole form  
+                                                               // unlock the whole form
                RETURN NIL
                } )
 
@@ -645,155 +648,6 @@ FUNCTION myWinTable( aParam )
 
 RETURN NIL
 
-//////////////////////////////////////////////////////////////////////////////
-FUNCTION WaitThreadCreate( cTitle, nTimeRun )
-
-   LOCAL aParam, cFormName := "WaitWin_" + hb_ntos( _GetId() )
-   // an array of images to window "waiting"
-   LOCAL aPicture := {} // {"FR01","FR02","FR03","FR04","FR05","FR06","FR07","FR08",;
-   // не используется здесь !   "FR09","FR10","FR11","FR12"}
-   DEFAULT cTitle := "Working...", nTimeRun := Seconds()
-
-   // To start an infinite loop in the flow preloding
-   lStatWinWait := .T.
-
-   SET INTERACTIVECLOSE OFF
-
-   DEFINE WINDOW &cFormName ;
-         WIDTH 420 HEIGHT 230 ;
-         MINWIDTH 420 MINHEIGHT 230 ;
-         MAXWIDTH 420 MAXHEIGHT 230 ;
-         CHILD NOCAPTION TOPMOST ;
-         BACKCOLOR WHITE ;
-         FONT 'Tahoma' SIZE 12 ;
-         ON MOUSECLICK MoveActiveWindow()
-
-      @ 10, 10 LABEL Label_0 ;
-         WIDTH 100 HEIGHT 20 ;
-         VALUE "" ;
-         VCENTERALIGN TRANSPARENT
-
-      @ 10, 10 LABEL Label_1 ;
-         WIDTH 400 HEIGHT 20 ;
-         VALUE "Elapsed time " + Time() ;
-         CENTERALIGN VCENTERALIGN TRANSPARENT
-
-      // @ 40, (420-128)/2 IMAGE Image_1 PICTURE aPicture[1] ;
-      // WIDTH 128 HEIGHT 128 ;
-      // STRETCH ;
-      // WHITEBACKGROUND TRANSPARENT    // для смены типа картинки
-
-      @ 40, ( 420 - 128 ) / 2 ANIGIF Gif_1 OBJ oStaticGif PICTURE "Ani3dMan128" ;
-         WIDTH 142 HEIGHT 128 ;
-         DELAY 5 BACKGROUNDCOLOR WHITE
-
-      @ 188, 10 LABEL Label_2 ;
-         WIDTH 400 HEIGHT 20 ;
-         VALUE cTitle ;
-         TRANSPARENT ;
-         CENTERALIGN VCENTERALIGN
-
-   END WINDOW
-
-   CENTER WINDOW &cFormName
-   ACTIVATE WINDOW &cFormName NoWait
-
-   ? "===[] CREATE FORM -> cFormName=", cFormName, ProcNL() ; ?
-
-   aParam := { cFormName, aPicture, nTimeRun }
-   // Start preloding in a separate thread
-   hb_threadDetach( hb_threadStart( HB_THREAD_INHERIT_MEMVARS, @WaitThreadTimer(), aParam ) )
-
-   DO EVENTS
-
-RETURN aParam // вернуть номер окна, чтобы по нему потом убить окно + картинки + время начала запуска
-
-//////////////////////////////////////////////////////////////////////////////
-// вывод доп.информации / output of additional information
-FUNCTION WaitThreadSay( aDim, cVal )
-
-   LOCAL cFormName := aDim[ 1 ]
-
-   IF _IsWindowActive( cFormName )
-      IF _IsControlDefined( "Label_0", cFormName )
-         SetProperty( cFormName, "Label_0", "Value", cVal )
-      ENDIF
-   ENDIF
-   DO EVENTS
-
-RETURN NIL
-
-//////////////////////////////////////////////////////////////////////
-FUNCTION WaitThreadClose( aDim )
-
-   LOCAL i, cFormName := aDim[ 1 ]
-
-   ? "===[] CLOSE FORM -> cFormName=", cFormName, ProcNL()
-   // complete function in the stream
-   lStatWinWait := .F.
-   InkeyGUI( 100 )
-
-   SET INTERACTIVECLOSE ON
-
-   i := GetFormIndex( cFormName )
-   myLogForms( { cFormName, i, "close", 0 } )
-
-   DoMethod( cFormName, "Release" )
-
-   DO MESSAGE LOOP
-
-   myLogForms( { ProcNL(), "close", 1 } ) // тест списка открытых окон
-
-   ?
-
-RETURN NIL
-
-//////////////////////////////////////////////////////////////////////////////
-FUNCTION WaitThreadTimer( aDim )
-
-   LOCAL cFormName := aDim[ 1 ]
-   // LOCAL aPicture := aDim[ 2 ]
-   LOCAL nTime := aDim[ 3 ] // Variable nTime is equal SECONDS() - gives an example of the transmission
-   LOCAL /*nLogo := 1,*/ cTime
-
-   DO WHILE lStatWinWait
-
-      IF Abs( Seconds() - nStaticSeconds ) >= 0.1
-
-         cTime := "Elapsed time " + SECTOTIME( Seconds() - nTime )
-
-         // nLogo ++
-         // nLogo := iif( nLogo > LEN( aPicture ), 1, nLogo )
-
-         SetProperty( cFormName, "Label_1", "Value", cTime )
-         // SetProperty( cFormName, "Image_1", "Picture", aPicture[ nLogo ] )  - резерв для других картинок
-
-         DO EVENTS
-         nStaticSeconds := Seconds()
-
-      ENDIF
-
-   ENDDO
-
-   IF ! oStaticGif:IsRunning()
-      oStaticGif:Play()
-   ENDIF
-
-RETURN NIL
-
-/////////////////////////////////////////////////
-#define HTCAPTION  2
-#define WM_NCLBUTTONDOWN   161
-
-PROCEDURE MoveActiveWindow( hWnd )
-   DEFAULT hWnd := GetActiveWindow()
-
-   PostMessage( hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0 )
-
-   RC_CURSOR( "MINIGUI_FINGER" )
-
-RETURN
-
 /////////////////////////////////////////////////
 FUNCTION SwitchToWin( cForm )
 
@@ -834,5 +688,5 @@ RETURN NIL
 ///////////////////////////////////////////////////////////////////
 FUNCTION ProcNL( nVal )
    DEFAULT nVal := 0
-
-RETURN "Call from: " + ProcName( nVal + 1 ) + "(" + hb_ntos( ProcLine( nVal + 1 ) ) + ") --> " + ProcFile( nVal + 1 )
+RETURN "Call from: " + ProcName( nVal + 1 ) + "(" + ;
+       hb_ntos( ProcLine( nVal + 1 ) ) + ") --> " + ProcFile( nVal + 1 )

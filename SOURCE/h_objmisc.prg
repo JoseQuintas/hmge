@@ -212,22 +212,31 @@ FUNCTION _oThis( oThis, lSets )      // Snapshot of current data This or Sets
 
 RETURN o
 
+#ifdef __XHARBOUR__
+   #xtranslate hb_ValToExp( [<x,...>] ) => ValToPrgExp( <x> )
+#endif
 *----------------------------------------------------------------------------*
 FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
 *----------------------------------------------------------------------------*
-   LOCAL a, b, c, i, j, k := pCount()
+   LOCAL a, b, c, i, j, k := pCount(), l := .F., xRet := .T.
+
+   IF Valtype(cLog) $ "LND"
+      l := .T.
+      cLog := hb_FNameDir( _SetGetLogFile() ) + "_" + hb_ntos( Seconds() )
+   ENDIF
+
    DEFAULT lExt := .F., cLog := _SetGetLogFile()
 
    IF HB_ISCHAR(o)
       IF ( i := At("*", o) ) > 0
          c := o
-         o := upper(o)
-         b := subs(o+" ", i + 1)
+         o := Upper(o)
+         b := SubStr(o+" ", i + 1)
          
          IF left(o, i) $ "F*,FORM*,FORMS*"
             DEFAULT nLen := 12
             o := {}
-            b := iif( Empty(b), "", upper(alltrim(b)) )
+            b := iif( Empty(b), "", Upper(AllTrim(b)) )
             FOR EACH a IN HMG_GetForms( , .T. )
                 IF iif( Empty(b), .T., a:Type $ b )
                    AAdd(o, { a:Type, IsWindowVisible(a:Handle), ;
@@ -236,7 +245,7 @@ FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
                 ENDIF
             NEXT
             c := iif( Empty(b), "", "<"+c+">"+" " )
-            Default cMsg := "==> aForms: " + c
+            DEFAULT cMsg := "==> aForms: " + c
             k := 3
 
          ELSEIF left(o, i) $ "P*,PROC*,PROCNL*"       
@@ -245,13 +254,13 @@ FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
             i := 0
             o := oHmgData()
             WHILE ( ++i < 100 )
-               IF Empty( j := procname(i) ) ; EXIT
+               IF Empty( j := ProcName(i) ) ; EXIT
                ENDIF
-               o:Set(TR0(ProcFile(i), nLen-7)+str(procline(i), 7), j)
+               o:Set( TR0( ProcFile(i), nLen - 7 ) + Str( ProcLine(i), 7 ), j )
                IF b > 0 .and. i >= b ; EXIT
                ENDIF
             END
-            Default cMsg := "==> ProcNL: "
+            DEFAULT cMsg := "==> ProcNL: "
             k := 3
          ENDIF
       ENDIF
@@ -259,85 +268,93 @@ FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
 
    DEFAULT nLen := 19
 
-   IF k > 2 .and. HB_ISCHAR(cMsg) ; _LogFile({.T., cLog}, cMsg)
-   ELSEIF !Empty(cMsg)            ; _LogFile({.T., cLog}, Nil)
+   IF k > 2 .and. HB_ISCHAR(cMsg) ; _LogFile( {.T., cLog}, cMsg )
+   ELSEIF !Empty(cMsg)            ; _LogFile( {.T., cLog}, NIL )
    ENDIF
 
    IF HB_ISOBJECT( o )
-      _LogFile({.F., cLog}, "O:"+o:ClassName)
+      _LogFile( {.F., cLog}, "O:"+o:ClassName )
       IF o:ClassName $ "THMGDATA,TKEYDATA,TTHRDATA,TINIDATA"
-         _LogFile({.F., cLog}, o:GetAll())
+         _LogFile( {.F., cLog}, o:GetAll() )
          IF o:ClassName == "TINIDATA"
-            _LogFile({.F., cLog}, o:cIni)
+            _LogFile( {.F., cLog}, o:cIni )
          ENDIF
          FOR EACH a IN o:GetAll()
              i := hb_enumIndex( a )
-             b := iif( HB_ISCHAR( a[1] ), TR0(a[1], nLen), a[1] )
-             _LogFile({.T., cLog}, TR0(i, nLen-1)+".", b, "=")
+             b := iif( HB_ISCHAR( a[1] ), TR0( a[1], nLen ), a[1] )
+             _LogFile( {.T., cLog}, TR0( i, nLen - 1 ) + ".", b, "=" )
              IF    HB_ISOBJECT( a[2] )
                 IF lExt
                    _o2Log( a[2], nLen + 5, , , cLog )
                 ELSE
-                   _LogFile({.F., cLog}, "O:"+a[2]:ClassName)
+                   _LogFile( {.F., cLog}, "O:"+a[2]:ClassName )
                    IF a[2]:ClassName $ "THMGDATA,TKEYDATA,TTHRDATA,TINIDATA"
-                      _LogFile({.F., cLog}, a[2]:GetAll())
+                      _LogFile( {.F., cLog}, a[2]:GetAll() )
                       IF a[2]:ClassName == "TINIDATA"
-                         _LogFile({.F., cLog}, a[2]:cIni)
+                         _LogFile( {.F., cLog}, a[2]:cIni )
                       ENDIF
                    ELSEIF a[2]:ClassName == "TWNDDATA"
-                      _LogFile({.F., cLog}, a[2]:Name, a[2]:Type)
+                      _LogFile( {.F., cLog}, a[2]:Name, a[2]:Type )
                    ELSEIF a[2]:ClassName $ "TCNLDATA,TTSBDATA,TGETDATA,TSTBDATA"
-                      _LogFile({.F., cLog}, a[2]:Window, a[2]:Name, a[2]:Type)
+                      _LogFile( {.F., cLog}, a[2]:Window, a[2]:Name, a[2]:Type )
                    ELSEIF a[2]:ClassName == "TSBROWSE"
-                     _LogFile({.F., cLog}, a[2]:cControlName, a[2]:cParentWnd, a[2]:cAlias)
+                     _LogFile( {.F., cLog}, a[2]:cControlName, a[2]:cParentWnd, a[2]:cAlias )
                    ENDIF 
                 ENDIF 
              ELSEIF HB_ISARRAY( a[2] ) .and. lExt
-                 _LogFile({.F., cLog}, hb_valtoexp( a[2] ))
+                 _LogFile( {.F., cLog}, hb_valtoexp( a[2] ) )
              ELSE                 
-                _LogFile({.F., cLog}, a[2])
+                _LogFile( {.F., cLog}, a[2] )
              ENDIF
          NEXT
+
       ELSEIF o:ClassName == "TWNDDATA"
-         _LogFile({.F., cLog}, o:Name, o:Type)
+         _LogFile( {.F., cLog}, o:Name, o:Type )
+
       ELSEIF o:ClassName $ "TCNLDATA,TTSBDATA,TGETDATA,TSTBDATA"
-         _LogFile({.F., cLog}, o:Window, o:Name, o:Type)
+         _LogFile( {.F., cLog}, o:Window, o:Name, o:Type )
+
       ELSEIF o:ClassName == "TSBROWSE"
-         _LogFile({.F., cLog}, o:cControlName, o:cParentWnd, o:cAlias)
+         _LogFile( {.F., cLog}, o:cControlName, o:cParentWnd, o:cAlias )
       ENDIF
 
    ELSEIF HB_ISARRAY( o )
-      _LogFile({.F., cLog}, o)
+      _LogFile( {.F., cLog}, o )
+
       FOR EACH a IN o
           i := hb_enumIndex( a )
           IF HB_ISOBJECT( a )
              _o2Log( a, nLen, , lExt, cLog )
           ELSEIF HB_ISARRAY( a )
-             _LogFile({.T., cLog}, TR0(i, nLen-1)+".")
+             _LogFile( {.T., cLog}, TR0( i, nLen - 1 ) + "." )
              IF lExt
-                _LogFile({.F., cLog}, a)
+                _LogFile( {.F., cLog}, a )
                 FOR EACH j IN a
                     k := hb_enumIndex( j )
                     IF Valtype( j ) $ "AO"
                        _o2Log( j, nLen+5, , , cLog )
                     ELSE
-                       _LogFile({.T., cLog}, TR0(k, nLen-1+5)+".", hb_valtoexp( j ))
+                       _LogFile( {.T., cLog}, TR0( k, nLen - 1 + 5 ) + ".", hb_valtoexp( j ) )
                     ENDIF
                 NEXT
              ELSE
-                _LogFile({.F., cLog}, hb_valtoexp( a ))
+                _LogFile( {.F., cLog}, hb_valtoexp( a ) )
              ENDIF
           ELSE
-             _LogFile({.F., cLog}, a)
+             _LogFile( {.F., cLog}, a )
           ENDIF
       NEXT
 
    ELSE
-      _LogFile({.F., cLog}, o)
-
+      _LogFile( {.F., cLog}, o )
    ENDIF
 
-RETURN .T.
+   IF l .and. hb_FileExists( cLog )
+      xRet := hb_memoread( cLog )
+      hb_FileDelete( cLog )
+   ENDIF
+
+RETURN xRet
 
 *----------------------------------------------------------------------------*
 STATIC FUNCTION TR0( cTxt, nLen, cSim )

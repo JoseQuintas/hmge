@@ -43,7 +43,7 @@
 	"HWGUI"
   	Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
----------------------------------------------------------------------------*/
+ ---------------------------------------------------------------------------*/
 
 ////////////////////////////
 // MiniGUI pseudo-functions
@@ -106,17 +106,25 @@ GetSystemDir()
 => ;
 cFilePath( GetTempDir() )
 
+#xtranslate GetWindowsTempFolder () ;
+=> ;
+GetWindowsDir() + "\Temp"
+
 #xtranslate GetMyDocumentsFolder () ;
 => ;
-GetSpecialFolder ( CSIDL_PERSONAL )
+GetSpecialFolder( CSIDL_PERSONAL )
 
 #xtranslate GetDesktopFolder () ;
 => ;
-GetSpecialFolder ( CSIDL_DESKTOPDIRECTORY )
+GetSpecialFolder( CSIDL_DESKTOPDIRECTORY )
 
 #xtranslate GetApplicationDataFolder () ;
 => ;
 GetSpecialFolder( CSIDL_APPDATA )
+
+#xtranslate GetAppLocalDataFolder () ;
+=> ;
+GetSpecialFolder( CSIDL_LOCAL_APPDATA )
 
 #xtranslate GetUserProfileFolder () ;
 => ;
@@ -124,16 +132,16 @@ GetSpecialFolder( CSIDL_PROFILE )
 
 #xtranslate GetUserTempFolder () ;
 => ;
-iif( IsVistaOrLater(), GetUserProfileFolder() + "\AppData\Local\Temp", cFilePath( GetTempDir() ) )
+iif( IsVistaOrLater(), GetAppLocalDataFolder() + "\Temp", cFilePath( GetTempDir() ) )
 
 //#define __WIN98__
 
 #ifdef __WIN98__
-#  xtranslate GetProgramFilesFolder () ;
+#xtranslate GetProgramFilesFolder () ;
    => ;
    C_GetDllSpecialFolder( CSIDL_PROGRAM_FILES )
 #else
-#  xtranslate GetProgramFilesFolder () ;
+#xtranslate GetProgramFilesFolder () ;
    => ;
    GetSpecialFolder( CSIDL_PROGRAM_FILES )
 #endif
@@ -800,6 +808,8 @@ GetFontParam( <hFont> )\[ 10 ]
 => ;
 cFilePath( <cFile> ) + "\" + cFileNoExt( <cFile> ) + <cExt>
 
+#xtranslate hb_Ccompiler()                => Eval( {| c | iif( Empty( c := BorlandC() ), hb_Compiler(), c ) } )
+
 #ifndef __XHARBOUR__
 #  include "hbver.ch"
 //#define __WIN98__
@@ -834,8 +844,6 @@ cFilePath( <cFile> ) + "\" + cFileNoExt( <cFile> ) + <cExt>
 #define BLANK_DATE            hb_SToD()
 
 #translate HMG_TimeMS( <dTS1> [,<dTS2>] ) => LTrim( hb_TSToStr( ( hb_StrToTS( "" ) + ( hb_defaultValue( <dTS2>, hb_DateTime() ) - <dTS1> ) ), .T. ) )
-
-#xtranslate hb_Ccompiler()                => iif( Empty( BorlandC() ), hb_Compiler(), BorlandC() )
 
 #xtranslate HMG_SysWait( [ <nSeconds> ] ) => hb_idleSleep( hb_defaultValue( <nSeconds>, 0.105 ) )
 

@@ -53,10 +53,10 @@
 #endif
 
 #define MG_VER_MAJOR    3        /* Major version number */
-#define MG_VER_MINOR    2        /* Minor version number */
-#define MG_VER_RELEASE  8        /* Release number */
+#define MG_VER_MINOR    3        /* Minor version number */
+#define MG_VER_RELEASE  1        /* Release number */
 
-#define __HMG__         0x030208 /* Three bytes: Major + Minor + Build. */
+#define __HMG__         0x030301 /* Three bytes: Major + Minor + Build. */
 
 #define __RELEASE__
 

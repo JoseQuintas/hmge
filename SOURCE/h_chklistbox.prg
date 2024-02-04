@@ -134,7 +134,6 @@ FUNCTION _DefineChkListbox ( ControlName, ParentFormName, x, y, w, h, arows, val
          Style += LBS_SORT
       ENDIF
 
-
       IF lDialogInMemory         //Dialog Template
 
          //          {{'ID',k/hwnd,class,Style,ExStyle,x,y,w,h,caption,HelpId,tooltip,font,size, bold, italic, underline, strikeout}}  --->_HMG_aDialogItems
@@ -169,9 +168,9 @@ FUNCTION _DefineChkListbox ( ControlName, ParentFormName, x, y, w, h, arows, val
          IF i > 0
 
             IF multiselect
-               ControlHandle := InitMultiChkListBox ( _HMG_aFormReBarHandle [i], 0, x, y, w, h, fontname, fontsize, invisible, notabstop, sort, nItemHeight )
+               ControlHandle := InitMultiChkListBox ( _HMG_aFormReBarHandle [i], 0, x, y, w, h, fontname, fontsize, invisible, notabstop, sort, nItemHeight, fontcolor, backcolor )
             ELSE
-               ControlHandle := InitChkListBox ( _HMG_aFormReBarHandle [i] , 0 , 0 , 0 , w , h , '' , 0 , invisible , notabstop, sort, nItemHeight )
+               ControlHandle := InitChkListBox ( _HMG_aFormReBarHandle [i] , 0 , 0 , 0 , w , h , '' , 0 , invisible , notabstop, sort, nItemHeight, fontcolor, backcolor )
             ENDIF
 
             AddSplitBoxItem ( Controlhandle , _HMG_aFormReBarHandle [i] , w , break , , , , _HMG_ActiveSplitBoxInverted )
@@ -183,9 +182,9 @@ FUNCTION _DefineChkListbox ( ControlName, ParentFormName, x, y, w, h, arows, val
       ELSE
 
          IF multiselect
-            ControlHandle := InitMultiChkListBox ( ParentFormHandle, 0, x, y, w, h, fontname, fontsize, invisible, notabstop, sort, nItemHeight )
+            ControlHandle := InitMultiChkListBox ( ParentFormHandle, 0, x, y, w, h, fontname, fontsize, invisible, notabstop, sort, nItemHeight, fontcolor, backcolor )
          ELSE
-            ControlHandle := InitChkListBox ( ParentFormHandle , 0 , x , y , w , h , '' , 0 , invisible, notabstop, sort, nItemHeight )
+            ControlHandle := InitChkListBox ( ParentFormHandle , 0 , x , y , w , h , '' , 0 , invisible, notabstop, sort, nItemHeight, fontcolor, backcolor )
          ENDIF
 
       ENDIF

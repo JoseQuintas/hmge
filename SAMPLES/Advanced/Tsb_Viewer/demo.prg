@@ -29,15 +29,14 @@ FUNCTION Main(cMode)
 
    PUBLIC oMain
 
-   SET OOP ON
-
+   SET OOP ON              // ќЅя«ј“≈Ћ№Ќќ ! / NECESSARILY !
    SET EPOCH   TO 2000
    SET DATE    TO GERMAN
    SET CENTURY ON
    SET NAVIGATION EXTENDED
 
    RddSetDefault("DBFCDX")
-   SET AUTOPEN OFF   // не открывать автоматически индексные файлы
+   SET AUTOPEN OFF          // не открывать автоматически индексные файлы
    SET DELETED OFF
 
    SET FONT TO "DejaVu Sans Mono", 15
@@ -112,7 +111,7 @@ FUNCTION EventZero()
    cCodePage := hb_SetCodepage()
    //USE (cDbf) ALIAS (cAls) NEW EXCLUSIVE
    IF ! myUseArea( cDbf, cAls, .F., , , )   // ==>> TsbViewMisc.prg
-      cMsg := "ERROR opening database!;;" 
+      cMsg := "ERROR opening database!;;"
       cMsg += cDbf
       AlertStop( cMsg, "Result", "ZZZ_B_STOP64", 64 )
       Quit
@@ -122,8 +121,8 @@ FUNCTION EventZero()
 
    aTsbPar := { cAls, cCodePage, "Checkpoint (1) !" }
    aWinPar := { "NOWAIT", "", nY, nX, nW, nH, lCntr, { 0,176,240 } }
-   //TsbViewer( aTsbPar, aWinPar)  // окно с таблицей
-   TsbViewer()  // можно без параметров
+   TsbViewer( aTsbPar, aWinPar)  // окно с таблицей
+   //TsbViewer()  // можно без параметров - окно будет "WAIT"
 
    ? ProcNL(), Hb_LangSelect(), cCodePage
 
@@ -142,7 +141,7 @@ FUNCTION EventZero()
    aTsbPar := { cAls, cCodePage, "Checkpoint (2) !" }
    aWinPar := { "NOWAIT", "", nY, nX, nW, nH, lCntr, GRAY }
    TsbViewer( aTsbPar, aWinPar)  // окно с таблицей
-   // TsbViewer()  // можно без параметров
+   // TsbViewer()  // можно без параметров  - окно будет "WAIT"
 
    ? ProcNL(), Hb_LangSelect(), cCodePage
 
@@ -163,7 +162,7 @@ FUNCTION EventZero()
    aTsbPar := { cAls, cCodePage, "Checkpoint (3) !" }
    aWinPar := { "NOWAIT", "", nY, nX, nW, nH, lCntr, BLUE }
    TsbViewer( aTsbPar, aWinPar)  // окно с таблицей
-   // TsbViewer()  // можно без параметров
+   // TsbViewer()  // можно без параметров  - окно будет "WAIT"
 
    ? ProcNL(), Hb_LangSelect(), cCodePage
 
@@ -192,7 +191,7 @@ FUNCTION EventZero()
    aTsbPar := { cAls, cCodePage, "Checkpoint (4) !" }
    aWinPar := { "NOWAIT", "", , , , , , RED }
    TsbViewer( aTsbPar, aWinPar)  // окно с таблицей
-   // TsbViewer()  // можно без параметров
+   // TsbViewer()  // можно без параметров - окно будет "WAIT"
 
    ? ProcNL(), Hb_LangSelect(), cCodePage
 

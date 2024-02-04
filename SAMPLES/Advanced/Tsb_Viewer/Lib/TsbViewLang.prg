@@ -34,7 +34,7 @@ FUNCTION myLangeRes(nI, cPrgCP)
                    "Структура этой базы"       , "SEPARATOR"             ,;
                    "Выгрузить CSV"             , "Какой язык в окне ?"   ,;
                    "Инфо о фонтах в программе" , "Инфо о фонтах таблицы" ,;
-                   "Список открытых окон" ,; 
+                   "Список открытых окон" ,;
                    "SEPARATOR"                 , "О программе"              }
       ELSEIF cLang == "UA1251"
          xRet := { "Список відкритих БД "      , "Індекси цієї бази"     ,;
@@ -189,8 +189,20 @@ FUNCTION myLangeRes(nI, cPrgCP)
    ELSEIF nI == 13
 
       IF cLang == "RU1251"
+         xRet := { "Копировать в буфер" ,;
+                   "Вставить из буфера" ,;
+                   "Удалить"            ,;
+                   "Редактировать"   }
       ELSEIF cLang == "UA1251"
+         xRet := { "Копіювати в буфер" ,;
+                   "Вставити з буфера" ,;
+                   "Видалити"          ,;
+                   "Редагувати"   }
       ELSE
+         xRet := { "Copy to clipboard"    ,;
+                   "Paste from clipboard" ,;
+                   "Delete"               ,;
+                   "Edit" }
       ENDIF
 
    ENDIF

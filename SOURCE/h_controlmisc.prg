@@ -3180,7 +3180,7 @@ FUNCTION _GetControlAction ( ControlName , ParentForm , cEvent )
          bAction := _HMG_aControlLostFocusProcedure [i]
 
       CASE cEvent == 'ONDBLCLICK'
-         IF _HMG_aControlType [i] $ "BROWSE,GRID,LISTBOX,TREE"
+         IF _HMG_aControlType [i] $ "BROWSE,GRID,TREE,MULTILIST,MULTICHKLIST"
             bAction := _HMG_aControlDblClick [i]
          ELSEIF _HMG_aControlType [i] $ "LABEL,IMAGE"
             bAction := _HMG_aControlHeadClick [i]
@@ -3223,7 +3223,7 @@ STATIC FUNCTION _SetControlAction ( ControlName , ParentForm , Value , cEvent )
          _HMG_aControlLostFocusProcedure [i] := bBlock
 
       CASE cEvent == 'ONDBLCLICK'
-         IF _HMG_aControlType [i] $ "BROWSE,GRID,LISTBOX,TREE"
+         IF _HMG_aControlType [i] $ "BROWSE,GRID,TREE,MULTILIST,MULTICHKLIST"
             _HMG_aControlDblClick [i] := bBlock
          ELSEIF _HMG_aControlType [i] $ "LABEL,IMAGE"
             _HMG_aControlHeadClick [i] := bBlock
@@ -7734,7 +7734,7 @@ STATIC FUNCTION _SetFontColor ( ControlName , ParentForm , Value )
    DO CASE
 
    CASE 'GRID' $ t .OR. t == 'BROWSE'
-      ListView_SetTextColor ( c, value [1] , value [2] , value [3] )
+      ListView_SetTextColor ( c, value [1], value [2], value [3] )
       RedrawWindow ( c )
 
    CASE t == 'RICHEDIT'
@@ -7773,7 +7773,11 @@ STATIC FUNCTION _SetFontColor ( ControlName , ParentForm , Value )
 
    CASE t == 'CHECKLABEL'
       _HMG_aControlFontColor [i] := Value
-      RedrawWindowControlRect ( _HMG_aControlParentHandles [i] , _HMG_aControlRow [i] , _HMG_aControlCol [i] , _HMG_aControlRow [i] + _HMG_aControlHeight [i] , _HMG_aControlCol [i] + _HMG_aControlWidth [i] )
+      RedrawWindowControlRect ( _HMG_aControlParentHandles [i], _HMG_aControlRow [i], _HMG_aControlCol [i], _HMG_aControlRow [i] + _HMG_aControlHeight [i] , _HMG_aControlCol [i] + _HMG_aControlWidth [i] )
+
+   CASE 'CHKLIST' $ t
+      _HMG_aControlFontColor [i] := Value
+      ChkList_SetColor ( c, Value, _HMG_aControlBkColor [i] )
 
    OTHERWISE
       _HMG_aControlFontColor [i] := Value
@@ -7843,7 +7847,7 @@ STATIC FUNCTION _SetBackColor ( ControlName , ParentForm , Value )
    CASE t == 'TAB'
       IF IsArrayRGB ( Value ) .AND. Value [1] != -1
          IF ! ISARRAY ( _HMG_aControlBkColor [i] )
-            ChangeStyle ( c , TCS_OWNERDRAWFIXED )
+            ChangeStyle ( c, TCS_OWNERDRAWFIXED )
          ENDIF
          _HMG_aControlBkColor [i] := Value
          DeleteObject ( _HMG_aControlBrushHandle [i] )
@@ -7857,7 +7861,11 @@ STATIC FUNCTION _SetBackColor ( ControlName , ParentForm , Value )
 
    CASE t == 'IMAGE'
       _HMG_aControlSpacing [i] := iif( ISARRAY ( Value ), RGB ( Value [1], Value [2], Value [3] ), Value )
-      _SetPicture ( ControlName , ParentForm , _HMG_aControlPicture [i] )
+      _SetPicture ( ControlName, ParentForm, _HMG_aControlPicture [i] )
+
+   CASE 'CHKLIST' $ t
+      _HMG_aControlBkColor [i] := Value
+      ChkList_SetColor ( c, _HMG_aControlFontColor [i], Value )
 
    OTHERWISE
       _HMG_aControlBkColor [i] := Value

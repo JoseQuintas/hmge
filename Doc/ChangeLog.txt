@@ -1,3 +1,194 @@
+2024/01/22: HMG Extended Edition version 24.01.
+  * Fixed: Incorrect handling of the FontColor and BackColor properties in
+           the CHECKLISTBOX control.
+           You can set/get these properties with
+           - function syntax:
+             SetProperty ( Form, Control, 'BackColor', { n1 , n2 , n3 } )
+             GetProperty ( Form, Control, 'FontColor' ) --> aColor
+           - pseudo-OOP syntax:
+             Form.ChkListBox.FontColor := { n1 , n2 , n3 }
+             Form.ChkListBox.BackColor --> aColor
+           Bug was reported by Ivanil Marcelino.
+           Contributed by Grigory Filatov
+           (see demo.prg in folder \samples\Basic\CheckListBox)
+  * Enhanced: Added the optional second parameter in the HMG_Alert_MaxLines()
+           function for managing of the max width of the EditBox line in the
+           HMG_Alert() function.
+           Syntax:
+             HMG_Alert_MaxLines( <nLines> [, <nMaxWide>] ) => nPrevLines
+           Suggested and contributed by Sergej Kiselev
+           (see demo in folder \samples\Advanced\APP_OOPTEMPLATE)
+  * New: The GetAppLocalDataFolder() function returns an Application Data Folder
+           path for a local user.
+           The GetWindowsTempFolder() function returns the path to the Windows
+           temporary folder on the root drive.
+           Contributed by Grigory Filatov
+           (see demo in folder \samples\Basic\Misc)
+  * Updated: Harbour's SQLRDD library binary has been updated with the latest
+           fork modifications.
+           Revised for Minigui Extended by Grigory Filatov
+           (see SQLRDD Manual in folder \Doc)
+  * Updated: HbSQLite3 library:
+           - update for using SQLITE3 version 3.45.0 (from 3.44.2).
+           Contributed by Grigory Filatov
+  * New: 'Menu based on AVI and LABEL objects' sample.
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see in folder \samples\Advanced\ACHOICE_3)
+  * New: 'Explore sample databases bundled with MySQL via SQLRDD' samples:
+           * Sakila Database
+             (see in folder \samples\Advanced\SQLRDD\Sakila)
+           * World Database
+             (see in folder \samples\Advanced\SQLRDD\World)
+           Contributed by Grigory Filatov
+  * Updated: 'HMG Misc' sample:
+           - added function DirRemoveAllExceptParent( <cDir> ) -> <lResult>
+             This function recursively deletes entire directories along with
+             files without the root folder specified as a parameter.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\Misc)
+  * Updated: 'WAIT WINDOW with an expectation in a thread' sample:
+           - GIF processing has been moved to a separate file for ease of use.
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see in folder \samples\Basic\WAIT_WINDOW_3)
+  * Updated: 'Blank-an example of a finished program with timers' sample.
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see in folder \samples\Advanced\APP_OOPTEMPLATE)
+  * Updated: 'Five GUI libraries for testing' sample.
+           Contribution of Jose Quintas.
+           Revised for Minigui Extended by Grigory Filatov
+           (see in folder \samples\Advanced\FiveLibsTest)
+
+2023/12/18: HMG Extended Edition version 23.12.
+  * Modified: Adaptation of MiniGUI core is revised for compatibility with
+           Embarcadero C++ 7.70 (32-bit) compiler.
+           Contributed by Grigory Filatov.
+  * Updated: Harbour Compiler 3.2.0dev (SVN 2023-12-08 23:17):
+           * Updated: SddSqlt3 library source code
+             (see in folder \Source\HbSqlDD)
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+           (look at ReadMe.txt in folder \harbour)
+  * New: 'Windows with different languages' sample.
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see in folder \samples\Advanced\APP_OOPLANG)
+  * Updated: 'Blank-an example of a finished program with timers' sample.
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see in folder \samples\Advanced\APP_OOPTEMPLATE)
+  * Updated: 'TSBrowse Viewer' sample is based upon the function _TBrowse().
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see in folder \samples\Advanced\Tsb_Viewer)
+
+2023/11/27: HMG Extended Edition version 23.10 (Update 2).
+  * Modified: Adaptation of MiniGUI core is completed for compatibility with
+           Embarcadero C++ 7.70 (32-bit) compiler (packaged on 2023-10-28).
+           This is a Clang-enhanced compiler and comes with free C++Builder 11
+           Community Edition at
+           https://www.embarcadero.com/products/cbuilder/starter
+           Contributed by Grigory Filatov.
+  * Updated: HbSQLite3 library source code:
+           - a core C-code was borrowed from the Harbour fork 3.4.0;
+           - implemented SQLITE3_DB_FILENAME() on SQLite 3.7.10+;
+           - implemented SQLITE3_EXPANDED_SQL(), SQLITE3_TRACE_V2()
+             on SQLite 3.14.0+;
+           - update hbsqlit3.ch for using SQLite constants of version 3.44.0.
+           Contributed by Phil Krylov
+           (see in folder \Source\HbSQLite3)
+  * Updated: HbSQLite3 library:
+           - update for using SQLITE3 version 3.44.2 (from 3.44.0).
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+  * Updated: Harbour Compiler 3.2.0dev (SVN 2023-11-22 09:06):
+           * Updated: OpenSSL wrapper for using of the version 1.1.1w.
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+           (look at ReadMe.txt in folder \harbour)
+  * Updated: HMGS-IDE v.1.4.4.7 Project Manager and Two-Way Visual Form Designer:
+           - built with the lite version of MiniGUI 23.10.
+           Contributed by Grigory Filatov
+           (see in folder \Ide)
+  * New: 'Edit Extended Plus' sample by Cristobal Molla:
+           - see 'Edit Extended3 (en).pdf' for details.
+           Revised for Minigui Extended by Grigory Filatov
+           (see in folder \samples\Basic\EditexPlus)
+  * Updated: SQLite3 console examples:
+           * updated to use SQLITE3_TRACE_V2() on SQLite 3.14.0+.
+           Contributed by Phil Krylov.
+           Revised for Minigui Extended by Grigory Filatov
+           (see demos in folder \samples\Advanced\SQLITE)
+
+2023/11/14: HMG Extended Edition version 23.10 (Update 1).
+  * Updated: HbSQLite3 library:
+           - update for using SQLITE3 version 3.44.0 (from 3.43.2).
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+  * Updated: Harbour Compiler 3.2.0dev (SVN 2023-11-11 21:41):
+           * Updated pcre library to 8.45 (from 8.34).
+           Contributed by Phil Krylov
+           (look at ReadMe.txt in folder \harbour)
+  * New: 'Message Color' sample:
+           - use of custom settings in the user message window.
+           Contributed by Paolino Rappa
+           (see in folder \samples\Advanced\MessageColor)
+  * New: 'MySQL Basic for SQLRDD library' samples.
+           Based upon a contribution of Mitja Podgornik.
+           Revised to use SQLRDD by Grigory Filatov
+           (see in folder \samples\Advanced\SQLRDD\Basic)
+  * Updated: 'MySql Client with TMySQL class' sample.
+           Based upon a contribution of Pierpaolo Martinello
+           (see in folder \samples\Advanced\MySqlClient)
+  * Updated: 'MySql Client for SQLRDD library' sample.
+           Based upon a contribution of Pierpaolo Martinello
+           (see in folder \samples\Advanced\SQLRDD\mysqlcli)
+  * Updated: 'Charts for SQLRDD library' sample.
+           Based upon a contribution of Pierpaolo Martinello
+           (see in folder \samples\Advanced\SQLRDD\Charts)
+  * Updated: 'Sending mail with using CURL, CDO, TSMTP' sample:
+           - fixed sending email from the GMail server with application password
+             and the following parameters: smtp.gmail.com port 465 SSL.
+           Contributed by Pierpaolo Martinello <pier.martinello[at]alice.it>
+           (see in folder \samples\Applications\SendMail2)
+
+2023/10/31: HMG Extended Edition version 23.10.
+  * New: The SQLRDD library for Harbour has been added to the list of libraries.
+           The SQLRDD works with the following SQL servers:
+           MySQL, Postgres, Firebird, Oracle, MS SQL, etc.
+           The major features of SQLRDD are:
+           - transparent access to SQL databases using xBase commands and functions;
+           - creates the database components using xBase Data Definition syntax;
+           - easy migration from another RDDs;
+           - satisfactory performance even with huge tables;
+           - translates RELATIONS into JOINS or OUTER JOINS inside the database
+             server to have a better use of the SQL Engine features;
+           - the same application runs with all database systems without
+             modifications.
+           Note. You will need to have a fully working installation of one of
+           supported SQL systems to use SQLRDD.
+           (see SQLRDD Manual in folder \Doc)
+           Revised for Minigui Extended by Grigory Filatov
+           (see demos in folder \samples\Advanced\SQLRDD)
+  * Modified: The EDIT EXTENDED command is completed for compatibility with SQLRDD:
+           - updated index search;
+           - updated database filtering;
+           - updated exit procedure.
+           Contributed by Grigory Filatov.
+  * Modified: The BROWSE control is completed for compatibility with SQLRDD:
+           - updated assignment of value in the database with a filter installed;
+           - updated rows refreshing in the database with a filter installed;
+           - added automatic lock setting with forced data saving.
+           Contributed by Grigory Filatov
+           (see sqlrdd.prg in folder \samples\Advanced\SQLRDD\cdx2sql)
+  * Updated: HbSQLite3 library:
+           - update for using SQLITE3 version 3.43.2 (from 3.43.1).
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+  * New: 'Test examples for SQLRDD library' samples.
+           Contribution of Marcelo Lombardo.
+           Revised and tested with MySQL server by Grigory Filatov
+           (see in folder \samples\Advanced\SQLRDD)
+  * Updated: 'Five GUI libraries for testing' sample.
+           Contribution of Jose Quintas.
+           Revised for Minigui Extended by Grigory Filatov
+           (see in folder \samples\Advanced\FiveLibsTest)
+  * Updated: 'Read XLS' sample:
+           - fixed a runtime error when used on a system without Excel installed.
+           Contributed by Grigory Filatov.
+           (see in folder \samples\Advanced\ReadXLS)
+
 2023/09/26: HMG Extended Edition version 23.09 (Update 2).
   * Modified: Adaptation of MiniGUI core is completed for compatibility with
            Borland/Embarcadero C++ 7.60 32-bit compiler.

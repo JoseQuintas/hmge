@@ -1,8 +1,4 @@
 /*
- * $Id: sqlite3_test.prg 10694 2009-03-25 15:34:09Z vszakats $
- */
-
-/*
  * SQLite3 Demo
  *
  * Copyright 2007 P.Chornyj <myorg63@mail.ru>
@@ -18,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -46,16 +42,16 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
- * See COPYING for licensing terms.
- *
  */
 
 #include "hbsqlit3.ch"
 
+#include "fileio.ch"
+
 #define TRACE
 #define TABLE_SQL "CREATE TABLE t1( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER )"
 
-PROCEDURE main()
+PROCEDURE Main()
 
    ? sqlite3_libversion()
    sqlite3_sleep( 3000 )
@@ -66,41 +62,67 @@ PROCEDURE main()
 
    t1()
    t2()
-RETURN
+
+   RETURN
 
 /*
 */
 PROCEDURE t1()
-   LOCAL lCreateIfNotExist := .f.
+
+   LOCAL lCreateIfNotExist := .F.
    LOCAL db := sqlite3_open( "new.s3db", lCreateIfNotExist )
 
    IF ! Empty( db )
       sqlite3_exec( db, "DROP TABLE t1" )
    ENDIF
-RETURN
+
+   RETURN
 
 /*
 */
 PROCEDURE t2()
-   LOCAL lCreateIfNotExist := .t.
+
+   LOCAL lCreateIfNotExist := .T.
    LOCAL db := sqlite3_open( "new.s3db", lCreateIfNotExist )
    LOCAL stmt
    LOCAL nCCount, nCType, nI, nJ
    LOCAL aCType :=  { "SQLITE_INTEGER", "SQLITE_FLOAT", "SQLITE_TEXT", "SQLITE_BLOB", "SQLITE_NULL" }
    LOCAL aTable
+#ifdef TRACE
+   LOCAL hTraceFile, hProfileFile
+#endif
 
    IF ! Empty( db )
 
 #ifdef TRACE
-      sqlite3_profile( db, .t. )
-      sqlite3_trace( db, .t. )
+      IF sqlite3_libversion_number() < 3014000
+         sqlite3_profile( db, .T. )
+         sqlite3_trace( db, .T. )
+      ELSE
+         hTraceFile := FOpen( "hbsq3_tr.log", FO_READWRITE + HB_FO_CREAT )
+         FSeek( hTraceFile, 0, FS_END )
+         hProfileFile := FOpen( "hbsq3_pr.log", FO_READWRITE + HB_FO_CREAT )
+         FSeek( hProfileFile, 0, FS_END )
+         sqlite3_trace_v2( db, SQLITE_TRACE_STMT + SQLITE_TRACE_PROFILE, {| nMask, pStmt, x |
+            IF nMask == SQLITE_TRACE_STMT
+               IF hb_LeftEq( x, "--" )
+                  FWrite( hTraceFile, x + hb_eol() )
+               ELSE
+                  FWrite( hTraceFile, sqlite3_expanded_sql( pStmt ) + hb_eol() )
+               ENDIF
+            ELSEIF nMask == SQLITE_TRACE_PROFILE
+               FWrite( hProfileFile, sqlite3_expanded_sql( pStmt ) + " - " + hb_NToS( x ) + hb_eol() )
+            ENDIF
+            RETURN 0
+         } )
+      ENDIF
 #endif
       sqlite3_exec( db, "PRAGMA auto_vacuum=0" )
       sqlite3_exec( db, "PRAGMA page_size=4096" )
 
       IF sqlite3_exec( db, TABLE_SQL ) == SQLITE_OK
          ? "CREATE TABLE t1 - Ok"
-      END
+      ENDIF
 
       sqlite3_exec( db, ;
          "BEGIN TRANSACTION;" + ;
@@ -117,12 +139,12 @@ PROCEDURE t2()
       ? "INSERT INTO t1( name, age ) VALUES( 'Ivet', 28 )"
       ? "COMMIT"
 
-      ? "The number of database rows that were changed: " + ltrim( str( sqlite3_changes( db ) ) )
-      ? "Total changes: " + ltrim( str( sqlite3_total_changes( db ) ) )
+      ? "The number of database rows that were changed: " + hb_ntos( sqlite3_changes( db ) )
+      ? "Total changes: " + hb_ntos( sqlite3_total_changes( db ) )
 
       sqlite3_sleep( 3000 )
 
-      stmt := sqlite3_prepare( db, "INSERT INTO t1( name, age ) VALUES( :name, :age )")
+      stmt := sqlite3_prepare( db, "INSERT INTO t1( name, age ) VALUES( :name, :age )" )
       IF ! Empty( stmt )
          IF sqlite3_bind_text( stmt, 1, "Andy" ) == SQLITE_OK .AND. ;
             sqlite3_bind_int( stmt, 2, 17 ) == SQLITE_OK
@@ -142,12 +164,12 @@ PROCEDURE t2()
          sqlite3_finalize( stmt )
       ENDIF
 
-      ? "The number of database rows that were changed: " + ltrim( str( sqlite3_changes( db ) ) )
-      ? "Total changes: " + ltrim( str( sqlite3_total_changes( db ) ) )
-      ? "Last _ROWID_: " + str( sqlite3_last_insert_rowid( db ) )
+      ? "The number of database rows that were changed: " + hb_ntos( sqlite3_changes( db ) )
+      ? "Total changes: " + hb_ntos( sqlite3_total_changes( db ) )
+      ? "Last _ROWID_: " + Str( sqlite3_last_insert_rowid( db ) )
       ? ""
 
-      stmt := sqlite3_prepare( db, "SELECT * FROM t1 WHERE name == :name ")
+      stmt := sqlite3_prepare( db, "SELECT * FROM t1 WHERE name == :name " )
       sqlite3_bind_text( stmt, 1, "Andy" )
 
       ?
@@ -157,7 +179,7 @@ PROCEDURE t2()
       DO WHILE sqlite3_step( stmt ) == SQLITE_ROW
          nCCount := sqlite3_column_count( stmt )
          ++nJ
-         ? "Record # " + str( nJ )
+         ? "Record # " + Str( nJ )
 
          IF nCCount > 0
             FOR nI := 0 TO nCCount - 1
@@ -166,35 +188,35 @@ PROCEDURE t2()
                ? "Column type : " + aCType[ nCType ]
                ? "Column value: "
 
-            SWITCH nCType
-            CASE SQLITE_BLOB
-               ?? "BLOB" //sqlite3_column_blob( stmt, nI )
-               EXIT
+               SWITCH nCType
+               CASE SQLITE_BLOB
+                  ?? "BLOB" // sqlite3_column_blob( stmt, nI )
+                  EXIT
 
-            CASE SQLITE_INTEGER
-               ?? str ( sqlite3_column_int( stmt, nI ) )
-               EXIT
+               CASE SQLITE_INTEGER
+                  ?? Str( sqlite3_column_int( stmt, nI ) )
+                  EXIT
 
-            CASE SQLITE_NULL
-               ?? "NULL"
-               EXIT
+               CASE SQLITE_NULL
+                  ?? "NULL"
+                  EXIT
 
-            CASE SQLITE_TEXT
-               ?? sqlite3_column_text( stmt, nI )
-               EXIT
-            END SWITCH
+               CASE SQLITE_TEXT
+                  ?? sqlite3_column_text( stmt, nI )
+                  EXIT
+               ENDSWITCH
 
-            NEXT nI
+            NEXT
          ENDIF
       ENDDO
-      ? "Total records - " + str( nJ )
+      ? "Total records - " + Str( nJ )
 
       sqlite3_clear_bindings( stmt )
       sqlite3_finalize( stmt )
 
       sqlite3_sleep( 3000 )
 
-      stmt := sqlite3_prepare( db, "SELECT * FROM t1 WHERE age >= ?5")
+      stmt := sqlite3_prepare( db, "SELECT * FROM t1 WHERE age >= ?5" )
       sqlite3_bind_int( stmt, 5, 40 )
 
       ?
@@ -203,7 +225,7 @@ PROCEDURE t2()
       DO WHILE sqlite3_step( stmt ) == SQLITE_ROW
          nCCount := sqlite3_column_count( stmt )
          ++nJ
-         ? "Record # " + str( nJ )
+         ? "Record # " + Str( nJ )
 
          IF nCCount > 0
             FOR nI := 1 TO nCCount
@@ -211,28 +233,29 @@ PROCEDURE t2()
                ? "Column name : " + sqlite3_column_name( stmt, nI )
                ? "Column type : " + aCType[ nCType ]
                ? "Column value: "
-            SWITCH nCType
-            CASE SQLITE_BLOB
-               ?? "BLOB" //sqlite3_column_blob( stmt, nI )
-               EXIT
 
-            CASE SQLITE_INTEGER
-               ?? str( sqlite3_column_int( stmt, nI ) )
-               EXIT
+               SWITCH nCType
+               CASE SQLITE_BLOB
+                  ?? "BLOB" // sqlite3_column_blob( stmt, nI )
+                  EXIT
 
-            CASE SQLITE_NULL
-               ?? "NULL"
-               EXIT
+               CASE SQLITE_INTEGER
+                  ?? Str( sqlite3_column_int( stmt, nI ) )
+                  EXIT
 
-            CASE SQLITE_TEXT
-               ?? sqlite3_column_text( stmt, nI )
-               EXIT
-            END SWITCH
+               CASE SQLITE_NULL
+                  ?? "NULL"
+                  EXIT
 
-            NEXT nI
+               CASE SQLITE_TEXT
+                  ?? sqlite3_column_text( stmt, nI )
+                  EXIT
+               ENDSWITCH
+
+            NEXT
          ENDIF
       ENDDO
-      ? "Total records - " + str( nJ )
+      ? "Total records - " + Str( nJ )
       sqlite3_clear_bindings( stmt )
       sqlite3_finalize( stmt )
 
@@ -240,7 +263,7 @@ PROCEDURE t2()
 
       ?
       ? "SELECT id, name, age + 5 FROM t1"
-      stmt := sqlite3_prepare( db, "SELECT id, name, age + 5 FROM t1")
+      stmt := sqlite3_prepare( db, "SELECT id, name, age + 5 FROM t1" )
 
       ? sqlite3_column_name( stmt, 1 )
       ? sqlite3_column_name( stmt, 2 )
@@ -263,13 +286,13 @@ PROCEDURE t2()
       ?
       aTable := sqlite3_get_table( db, "SELECT name, age  FROM t1 WHERE age BETWEEN 10 AND 20" )
       FOR nI := 1 TO Len( aTable )
-         FOR nJ := 1 TO Len( aTable[nI] )
-            ?? aTable[nI][nJ], " "
-         NEXT nJ
+         FOR nJ := 1 TO Len( aTable[ nI ] )
+            ?? aTable[ nI ][ nJ ], " "
+         NEXT
          ?
-      NEXT nI
+      NEXT
 
       sqlite3_sleep( 3000 )
    ENDIF
 
-RETURN
+   RETURN

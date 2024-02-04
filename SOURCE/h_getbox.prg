@@ -106,6 +106,18 @@ FUNCTION _DefineGetBox ( ControlName, ParentFormName, x, y, w, h, Value, ;
    ow := oDlu2Pixel()
 #endif
 
+   // (IM) Get suggested default values
+   IF Empty( field ) .AND. Value == NIL
+      DO CASE
+      CASE ISLOGICAL( _HMG_ActiveControlNumeric ) .AND. _HMG_ActiveControlNumeric == .T.
+         Value := 0
+      CASE ISLOGICAL( _HMG_ActiveControlDateType ) .AND. _HMG_ActiveControlDateType == .T.
+         Value := BLANK_DATE
+      CASE _HMG_ActiveControlMaxLength != NIL .AND. ISNUMERIC( _HMG_ActiveControlMaxLength )
+         Value := Space( _HMG_ActiveControlMaxLength )
+      ENDCASE
+   ENDIF
+
    IF Empty( field ) .AND. Value == NIL
       MsgMiniGUIError( "GETBOX: Initial Value or Field must be specified." )
    ENDIF

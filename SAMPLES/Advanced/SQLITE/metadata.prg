@@ -1,8 +1,4 @@
 /*
- * $Id: metadata.prg 10733 2009-03-30 08:23:58Z petr_ch $
- */
-
-/*
  * SQLite3 Demo
  *
  * Copyright 2007 P.Chornyj <myorg63@mail.ru>
@@ -18,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -46,8 +42,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
- * See COPYING for licensing terms.
- *
  */
 
 #include "hbsqlit3.ch"
@@ -56,18 +50,21 @@
   #define SQLITE_ENABLE_COLUMN_METADATA
 #endif
 
-PROCEDURE main()
-   LOCAL lCreateIfNotExist := .f.
+PROCEDURE Main()
+
+   LOCAL lCreateIfNotExist := .F.
    LOCAL db := sqlite3_open( "new.s3db", lCreateIfNotExist )
 
    IF ! Empty( db )
       test( db )
    ENDIF
-RETURN
+
+   RETURN
 
 /*
 
 */
+
 PROCEDURE test( db )
 
    IF sqlite3_exec( db, "SELECT * FROM t1" ) == SQLITE_OK
@@ -75,20 +72,21 @@ PROCEDURE test( db )
 
 #ifdef SQLITE_ENABLE_COLUMN_METADATA
       ? "Column name :                id"
-      ? "Declared data type:         ", sqlite3_table_column_metadata( db, , "t1", "id" )[1]
-      ? "Collation sequence name:    ", sqlite3_table_column_metadata( db, , "t1", "id" )[2]
-      ? "NOT NULL constraint exists: ", sqlite3_table_column_metadata( db, , "t1", "id" )[3]
-      ? "Column is part of PK:       ", sqlite3_table_column_metadata( db, , "t1", "id" )[4]
-      ? "Column is auto-increment:   ", sqlite3_table_column_metadata( db, , "t1", "id" )[5]
+      ? "Declared data type:         ", sqlite3_table_column_metadata( db,, "t1", "id" )[ 1 ]
+      ? "Collation sequence name:    ", sqlite3_table_column_metadata( db,, "t1", "id" )[ 2 ]
+      ? "NOT NULL constraint exists: ", sqlite3_table_column_metadata( db,, "t1", "id" )[ 3 ]
+      ? "Column is part of PK:       ", sqlite3_table_column_metadata( db,, "t1", "id" )[ 4 ]
+      ? "Column is auto-increment:   ", sqlite3_table_column_metadata( db,, "t1", "id" )[ 5 ]
 
       ? "Column name :                name"
-      ? "Declared data type:         ", sqlite3_table_column_metadata( db, , "t1", "name" )[1]
-      ? "Collation sequence name:    ", sqlite3_table_column_metadata( db, , "t1", "name" )[2]
-      ? "NOT NULL constraint exists: ", sqlite3_table_column_metadata( db, , "t1", "name" )[3]
-      ? "Column is part of PK:       ", sqlite3_table_column_metadata( db, , "t1", "name" )[4]
-      ? "Column is auto-increment:   ", sqlite3_table_column_metadata( db, , "t1", "name" )[5]
+      ? "Declared data type:         ", sqlite3_table_column_metadata( db,, "t1", "name" )[ 1 ]
+      ? "Collation sequence name:    ", sqlite3_table_column_metadata( db,, "t1", "name" )[ 2 ]
+      ? "NOT NULL constraint exists: ", sqlite3_table_column_metadata( db,, "t1", "name" )[ 3 ]
+      ? "Column is part of PK:       ", sqlite3_table_column_metadata( db,, "t1", "name" )[ 4 ]
+      ? "Column is auto-increment:   ", sqlite3_table_column_metadata( db,, "t1", "name" )[ 5 ]
 #endif
 
       sqlite3_sleep( 3000 )
    ENDIF
-RETURN
+
+   RETURN

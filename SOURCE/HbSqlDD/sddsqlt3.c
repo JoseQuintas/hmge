@@ -299,8 +299,9 @@ static HB_ERRCODE sqlite3Disconnect( SQLDDCONNECTION * pConnection )
 {
    HB_ERRCODE errCode;
 
-   errCode = sqlite3_close( ( ( SDDCONN * ) pConnection->pSDDConn )->pDb ) ? HB_SUCCESS : HB_FAILURE;
-   hb_xfree( pConnection->pSDDConn );
+   errCode = sqlite3_close( ( ( SDDCONN * ) pConnection->pSDDConn )->pDb ) == SQLITE_OK ? HB_SUCCESS : HB_FAILURE;
+   if( errCode == HB_SUCCESS )
+      hb_xfree( pConnection->pSDDConn );
 
    return errCode;
 }

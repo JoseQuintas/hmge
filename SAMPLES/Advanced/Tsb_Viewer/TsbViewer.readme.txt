@@ -80,7 +80,8 @@ All rights reserved. Dmitrov, Russia.
    oMenu:aCaption  := { "Выход", "База", "Авторы" }
    ......
 
-
+10.11.23 - Дабавлено: Копировать/Вставить буфер обмена Windows, правая кнопка мышки на ячейке  
+  
 
 РАСПРОСТРАНЕНИЕ:
 ~~~~~~~~~~~~~
@@ -162,6 +163,8 @@ The location of the buttons is also set in CreateDateMenu (), something like thi
     oMenu: nVAlign: = DT_TOP // vertical buttons: 0-TOP, 1-CENTER, 2-BOTTOM
     oMenu: aCaption: = {"Exit", "Base", "Authors"}
     ......
+
+11/10/23 - Added: Copy/Paste Windows clipboard, right mouse button on cell
 
 SPREAD:
 ~~~~~~~~~~~~~

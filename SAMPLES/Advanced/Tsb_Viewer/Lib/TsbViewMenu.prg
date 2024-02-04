@@ -279,7 +279,7 @@ RETURN NIL
 
 ////////////////////////////////////////////////////////////////
 FUNCTION myGetLang(cTitle,cParRet)      // Какой язык в окне ?
-   LOCAL cMsg
+   LOCAL cMsg, nI
    DEFAULT cParRet := "SAY"
 
    cMsg := "hb_SetCodepage()= " + hb_SetCodepage() + ";"
@@ -288,7 +288,15 @@ FUNCTION myGetLang(cTitle,cParRet)      // Какой язык в окне ?
    cMsg += "hb_langName()   = " + hb_langName() + ";"
    cMsg += "hb_langMessage()= " + hb_langMessage() + ";"
    // #define EG_ARG          1
-   cMsg += "hb_langErrMsg(1)= " + hb_langErrMsg(1) + ";"
+   cMsg += "hb_langErrMsg(1)= " + hb_langErrMsg(1) + ";;"
+
+   FOR nI := 1 TO 12
+      cMsg += HB_NtoS(nI) +  ") " + LOWER( NTOCMONTH( nI ) ) + ";"
+   NEXT
+   cMsg +=  ";"
+   FOR nI := 1 TO 7
+      cMsg += HB_NtoS(nI) +  ") " + LOWER( NTOCDOW( nI ) ) + ";"
+   NEXT
 
    IF cParRet == "SAY"
       cMsg += REPL("; ",20)
@@ -343,23 +351,29 @@ RETURN Nil
 
 /////////////////////////////////////////////////////////////////////////////////
 FUNCTION MsgAbout_TsbViewer(cTitle)
-   LOCAL cMsg, cIco
+   LOCAL cMsg, cIco, aBClr, a2Clr, aFClr
    DEFAULT cTitle := "About the program"
 
-   cIco := Icon64TempCreate()      // -> TsbViewMisc.prg
-   cMsg := App.Cargo:cMsgAbout + App.Cargo:cVersion + ";;"
-   cMsg += "(c) 2021 Verchenko Andrey <verchenkoag@gmail.com>;"
-   cMsg += "(c) 2021 Sergej Kiselev <bilance@bilance.lv>;;"
-   cMsg += hb_compiler() + ";" + Version() + ";" + MiniGuiVersion() + ";"
-   cMsg += "(c) Grigory Filatov http://www.hmgextended.com;;"
-   cMsg += PadC( "This program is Freeware!", 60 ) + ";"
-   cMsg += PadC( "Copying is allowed!", 60 ) + ";"
+   cMsg  := MsgAboutThis() + ";;"
+   cMsg  += "(c) 2021-2023 Verchenko Andrey <verchenkoag@gmail.com>;"
+   cMsg  += "(c) 2021-2023 Sergej Kiselev <bilance@bilance.lv>;;"
+   cMsg  += hb_compiler() + ";" + Version() + ";" + MiniGuiVersion() + ";"
+   cMsg  += "(c) Grigory Filatov http://www.hmgextended.com;;"
+   cMsg  += PadC( "This program is Freeware!", 60 ) + ";"
+   cMsg  += PadC( "Copying is allowed!", 60 ) + ";"
+   cIco  := Icon64TempCreate()      // -> TsbViewMisc.prg
+   aBClr := { 242, 163, 167 }
+   aFClr := { 82,  0, 141 }
+   a2Clr := _SetMsgAlertColors(aBClr,aFClr)
 
-   SET MSGALERT BACKCOLOR TO { 242, 163, 167 }           // новый цвет для HMG_Alert()
+   SET MSGALERT BACKCOLOR TO aBClr                // новый цвет для HMG_Alert()
+   SET MSGALERT FONTCOLOR TO aFClr                // новый цвет для HMG_Alert()
+   //cMsg += HB_ValToExp(a2Clr)                   // проверка
 
    AlertInfo( cMsg, cTitle  , cIco, 64, {RED} )
 
-   SET MSGALERT BACKCOLOR TO App.Cargo:aClrInfo          // восстановить цвет HMG_Alert()
+   SET MSGALERT BACKCOLOR TO a2Clr[1]             // восстановить цвет HMG_Alert()
+   SET MSGALERT FONTCOLOR TO BLACK                // восстановить цвет HMG_Alert()
 
 RETURN NIL
 
@@ -1014,12 +1028,12 @@ FUNCTION ReopenDbase(oBrw, cCodePage)
    LOCAL lNew, nJ, lOpen, cOld, oError, cMsg
 
    BEGIN SEQUENCE  WITH { |e|break( e ) }
-      cOld := hb_cdpSelect(cCodePage) 
+      cOld := hb_cdpSelect(cCodePage)
       IF hb_cdpSelect() == cCodePage
          // есть такая кодовая страница
          // there is such a code page
       ENDIF
-      hb_cdpSelect(cOld) 
+      hb_cdpSelect(cOld)
       lOpen := .T.
    RECOVER USING oError
       cMsg := "Code page error!;"
@@ -1032,9 +1046,9 @@ FUNCTION ReopenDbase(oBrw, cCodePage)
    IF lOpen
 
       cAls  := oBrw:cAlias
+      DbSelectArea(cAls)
       nOrd  := ORDNAME()
       aIndx := {}
-      DbSelectArea(cAls)
       cDbf  := DBINFO( DBI_FULLPATH )
       cFltr := (cAls)->( DbFilter() )
       FOR nI := 1 TO 500

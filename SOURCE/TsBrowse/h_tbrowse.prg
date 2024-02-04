@@ -5263,7 +5263,7 @@ METHOD Edit( uVar, nCell, nKey, nKeyFlags, cPicture, bValid, nClrFore, nClrBack 
 
    uValue := uVar
    cType := iif( Empty( oCol:cDataType ), ValType( uValue ), oCol:cDataType )
-   IF ::lIsArr .AND. oCol:cDataType # ValType( uValue ) // GF 15/07/2009
+   IF cType != "M" .AND. ::lIsArr .AND. oCol:cDataType # ValType( uValue ) // GF 15/07/2009
       cType := ValType( uValue )
       oCol:cDataType := cType
    ENDIF

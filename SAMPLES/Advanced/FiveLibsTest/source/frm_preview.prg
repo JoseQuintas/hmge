@@ -9,7 +9,6 @@ FUNCTION frm_Preview( cFileMask )
 
    LOCAL aFileList, nIndex
    LOCAL oFrm, oEdit := "EditPreview"
-   LOCAL cCaption
 
    aFileList := Directory( cFileMask )
    nIndex := 1
@@ -17,10 +16,10 @@ FUNCTION frm_Preview( cFileMask )
    oFrm := frm_Class():New()
    oFrm:cOptions := ""
    oFrm:aOptionList := { ;
-      { "First",    { || Button_Click( cCaption, aFileList, @nIndex, oFrm:oDlg, oEdit ) } }, ;
-      { "Previous", { || Button_Click( cCaption, aFileList, @nIndex, oFrm:oDlg, oEdit ) } }, ;
-      { "Next",     { || Button_Click( cCaption, aFileList, @nIndex, oFrm:oDlg, oEdit ) } }, ;
-      { "Last",     { || Button_Click( cCaption, aFileList, @nIndex, oFrm:oDlg, oEdit ) } } }
+      { "First",    { || Button_Click( "First",    aFileList, @nIndex, oFrm:oDlg, oEdit ) } }, ;
+      { "Previous", { || Button_Click( "Previous", aFileList, @nIndex, oFrm:oDlg, oEdit ) } }, ;
+      { "Next",     { || Button_Click( "Next",     aFileList, @nIndex, oFrm:oDlg, oEdit ) } }, ;
+      { "Last",     { || Button_Click( "Last",     aFileList, @nIndex, oFrm:oDlg, oEdit ) } } }
 
    gui_DialogCreate( @oFrm:oDlg, 0, 0, oFrm:nDlgWidth, oFrm:nDlgHeight, "Preview", { || frm_SetText( oEdit, aFileList, nIndex, oFrm:oDlg ) } )
    frm_Buttons( oFrm, .F. )

@@ -43,12 +43,12 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
    "HWGUI"
    Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
- ----------------------------------------------------------------------------*/
+----------------------------------------------------------------------------*/
 
 #ifdef __XHARBOUR__
-# define __MINIPRINT__
+#define __MINIPRINT__
 #else
-  SET PROCEDURE TO alerts.prg
+ SET PROCEDURE TO alerts.prg
 #endif
 
 #include "hmg.ch"
@@ -83,7 +83,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
              bInit      -> optional initial block of code for additional tuning
 
-   Last Modified by Grigory Filatov at 19-08-2021
+   Last Modified by Grigory Filatov at 13-01-2024
 */
 
 #define MARGIN          32
@@ -93,7 +93,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #define SEP_BUTTON      10
 #define TAB             Chr( 9 )
 
-STATIC aBackColor, aFontColor
+STATIC aBackColor, aFontColor, nMaxLineLen := 79
 
 *-----------------------------------------------------------------------------*
 FUNCTION HMG_Alert( cMsg, aOptions, cTitle, nType, cIcoFile, nIcoSize, aBtnColors, bInit, lClosable, cFontName )
@@ -183,7 +183,11 @@ FUNCTION HMG_Alert( cMsg, aOptions, cTitle, nType, cIcoFile, nIcoSize, aBtnColor
       hb_default( @_HMG_ModalDialogReturn, 0 )
    ENDIF
 
-   DEFINE WINDOW ( cForm ) WIDTH 0 HEIGHT 0 TITLE cTitle MODAL NOSIZE BACKCOLOR aBackColor ;
+   DEFINE WINDOW ( cForm ) ;
+      WIDTH 0 HEIGHT 0 ;
+      TITLE cTitle ;
+      MODAL NOSIZE ;
+      BACKCOLOR aBackColor ;
       ON INTERACTIVECLOSE ( _SetGetGlobal( "_HMG_PressButton" ) .OR. lClosable ) ;
       ON RELEASE iif( ! _SetGetGlobal( "_HMG_PressButton" ) .AND. lClosable, _HMG_ModalDialogReturn := 0, NIL )
 
@@ -200,13 +204,17 @@ FUNCTION HMG_Alert( cMsg, aOptions, cTitle, nType, cIcoFile, nIcoSize, aBtnColor
 RETURN _HMG_ModalDialogReturn
 
 *-----------------------------------------------------------------------------*
-FUNCTION HMG_Alert_MaxLines( nLines )
+FUNCTION HMG_Alert_MaxLines( nLines, nWide )
 *-----------------------------------------------------------------------------*
    LOCAL cVarName := "_" + ProcName()
    LOCAL nOldLines := _AddNewGlobal( cVarName, 20 )
 
    IF HB_ISNUMERIC( nLines ) .AND. nLines > 0
       _SetGetGlobal( cVarName, nLines )
+   ENDIF
+
+   IF HB_ISNUMERIC( nWide ) .AND. nWide > 0 .AND. nWide < 255
+      nMaxLineLen := nWide
    ENDIF
 
 RETURN nOldLines
@@ -305,7 +313,7 @@ STATIC FUNCTION FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors
    ENDIF
 
    FOR n := 1 TO nLineas
-      nMaxLin := Max( nMaxLin, GetTextWidth( hDC, AllTrim( MemoLine( cMsg,, n ) ), hDlgFont ) )
+      nMaxLin := Max( nMaxLin, GetTextWidth( hDC, AllTrim( MemoLine( cMsg, nMaxLineLen, n ) ), hDlgFont ) )
    NEXT
 
    // calculate the maximum width of the buttons
@@ -343,7 +351,7 @@ STATIC FUNCTION FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors
    nHeightCli := ( Min( nMaxLines, nLineas ) + iif( nLineas == 1, 4, 3 ) ) * nChrHeight + nVMARGIN_BUTTON + nHeightBtn + GetBorderHeight()
    nHeightDlg := nHeightCli + GetTitleHeight() + SEP_BUTTON + GetBorderHeight() / iif( lIsWin10, 2.5, 1 )
 
-   IF ( MSC_VER() > 0 .OR. "7.60" $ hb_Ccompiler() ) .AND. _HMG_IsThemed
+   IF ( MSC_VER() > 0 .OR. _HMG_IsBcc77 ) .AND. _HMG_IsThemed
       nWidthDlg += 10
       nHeightDlg += 10
    ENDIF
@@ -383,7 +391,7 @@ STATIC FUNCTION FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors
             cLblName := "Say_" + StrZero( n, 2 )
 
             @ nRow * ( n + iif( nLineas == 1, .5, 0 ) ) + GetBorderHeight(), nCol ;
-               LABEL ( cLblName ) VALUE AllTrim( MemoLine( cMsg,, n ) ) OF ( cForm ) ;
+               LABEL ( cLblName ) VALUE AllTrim( MemoLine( cMsg, nMaxLineLen, n ) ) OF ( cForm ) ;
                FONT cFont WIDTH nWidthCli - nCol - GetBorderWidth() - MARGIN / 4 - nMaxWidth ;
                HEIGHT nChrHeight ;
                FONTCOLOR aFontColor BACKCOLOR aBackColor VCENTERALIGN
@@ -404,9 +412,15 @@ STATIC FUNCTION FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors
 
       IF ISNUMBER( cIcoFile )
 
-         DRAW SYSICON IN WINDOW ( cForm ) ;
-            AT nRow + GetBorderHeight(), MARGIN / 1.4 ;
-            ICON cIcoFile WIDTH nIcoSize HEIGHT nIcoSize TRANSPARENT
+         IF IsHIcon( cIcoFile )
+            DRAW ICON IN WINDOW ( cForm ) ;
+               AT nRow + GetBorderHeight(), MARGIN / iif( nIcoSize == 32, 1.4, iif( nIcoSize == 48, 1.7, 2 ) ) ;
+               HICON cIcoFile WIDTH nIcoSize HEIGHT nIcoSize TRANSPARENT
+         ELSE
+            DRAW SYSICON IN WINDOW ( cForm ) ;
+               AT nRow + GetBorderHeight(), MARGIN / 1.4 ;
+               ICON cIcoFile WIDTH nIcoSize HEIGHT nIcoSize TRANSPARENT
+         ENDIF
 
       ELSE
 
