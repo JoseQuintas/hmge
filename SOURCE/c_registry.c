@@ -49,7 +49,7 @@
 #include <commctrl.h>
 
 #if ( defined( __BORLANDC__ ) || defined( __POCC__ ) ) && defined( _WIN64 )
-#define PtrToLong( p )  ( ( LONG ) ( LONG_PTR ) ( p ) )
+   #define PtrToLong( p )  ( ( LONG ) ( LONG_PTR ) ( p ) )
 #endif
 
 HB_FUNC( REGCLOSEKEY )

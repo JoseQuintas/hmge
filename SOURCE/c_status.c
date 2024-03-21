@@ -383,7 +383,7 @@ HB_FUNC( SETSTATUSBARSIZE )
    LocalFree( hloc );
 }
 
-HB_FUNC( REFRESHPROGRESSITEM )   // RefreshProgressItem( HwndStatus, NrItem, hProgress )
+HB_FUNC( REFRESHPROGRESSITEM )     // RefreshProgressItem( HwndStatus, NrItem, hProgress )
 {
    HWND hwndStatus = hmg_par_raw_HWND( 1 );
    RECT rc;
@@ -392,7 +392,7 @@ HB_FUNC( REFRESHPROGRESSITEM )   // RefreshProgressItem( HwndStatus, NrItem, hPr
    SetWindowPos( hmg_par_raw_HWND( 3 ), 0, rc.left, rc.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE );
 }
 
-HB_FUNC( CREATEPROGRESSBARITEM ) // CreateProgressBarItem( HwndStatus, NrItem )
+HB_FUNC( CREATEPROGRESSBARITEM )   // CreateProgressBarItem( HwndStatus, NrItem )
 {
    HWND  hwndStatus = hmg_par_raw_HWND( 1 );
    HWND  hwndProgressBar;
@@ -417,10 +417,10 @@ HB_FUNC( CREATEPROGRESSBARITEM ) // CreateProgressBarItem( HwndStatus, NrItem )
             rc.top,
             rc.left,
             rc.right - rc.left,
-            rc.bottom - rc.top - 1,    // No size or position.
-            hwndStatus,                // Handle to the parent window.
-            ( HMENU ) NULL,            // ID for the progress window.
-            GetInstance(),             // Current instance.
+            rc.bottom - rc.top - 1,       // No size or position.
+            hwndStatus,                   // Handle to the parent window.
+            ( HMENU ) NULL,               // ID for the progress window.
+            GetInstance(),                // Current instance.
             ( LPVOID ) NULL
                            )
       ) != NULL
@@ -437,7 +437,7 @@ HB_FUNC( CREATEPROGRESSBARITEM ) // CreateProgressBarItem( HwndStatus, NrItem )
    }
 }
 
-HB_FUNC( SETPOSPROGRESSBARITEM ) // SetPosProgressBarItem( HwndProgressBar, nPos )
+HB_FUNC( SETPOSPROGRESSBARITEM )   // SetPosProgressBarItem( HwndProgressBar, nPos )
 {
    HWND hwndProgressBar = hmg_par_raw_HWND( 1 );
 

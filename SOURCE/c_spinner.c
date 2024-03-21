@@ -44,19 +44,19 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE  0x0501
+#define _WIN32_IE                0x0501
 
 #include <mgdefs.h>
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Edit Class Name
-#define WC_EDIT                "Edit"
+   #define WC_EDIT               "Edit"
 #endif
 #include "hbvm.h"
 
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 ) || defined( __XCC__ )
-#define ICC_STANDARD_CLASSES  0x00004000
+   #define ICC_STANDARD_CLASSES  0x00004000
 #endif
 LRESULT CALLBACK  OwnSpinProc( HWND hedit, UINT Msg, WPARAM wParam, LPARAM lParam );
 
@@ -100,7 +100,7 @@ HB_FUNC( INITSPINNER )
    }
 
    // Create the Buddy Window
-   i.dwICC  = ICC_STANDARD_CLASSES;
+   i.dwICC = ICC_STANDARD_CLASSES;
    InitCommonControlsEx( &i );
 
    hedit = CreateWindowEx
@@ -132,7 +132,7 @@ HB_FUNC( INITSPINNER )
       0,
       0,
       0,
-      0,    // Set to zero to automatically size to fit the buddy window.
+      0,       // Set to zero to automatically size to fit the buddy window.
       hwnd,
       ( HMENU ) NULL,
       GetInstance(),
@@ -195,7 +195,7 @@ LRESULT CALLBACK OwnSpinProc( HWND hedit, UINT Msg, WPARAM wParam, LPARAM lParam
             hb_vmDo( 4 );
          }
 
-         r = hmg_par_LRESULT( -1 );          /* P.Ch. 10.16. */
+         r = hmg_par_LRESULT( -1 );            /* P.Ch. 10.16. */
 
          return ( r != 0 ) ? r : CallWindowProc( OldWndProc, hedit, Msg, wParam, lParam );
    }

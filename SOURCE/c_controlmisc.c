@@ -56,12 +56,12 @@ LPWSTR      AnsiToWide( LPCSTR );
 void pascal DelResource( HANDLE hResource );
 
 #ifndef HMG_LEGACY_OFF
-#if ! defined( __MINGW32__ ) && ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x020000 ) && ( __HARBOUR__ - 0 < 0x030200 )
+   #if ! defined( __MINGW32__ ) && ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x020000 ) && ( __HARBOUR__ - 0 < 0x030200 )
 HB_FUNC_TRANSLATE( HB_SETCODEPAGE, HB_CDPSELECT )
-#endif
+   #endif
 #endif \
- \
-   /* HMG_LEGACY_OFF */
+\
+/* HMG_LEGACY_OFF */
 
 HB_FUNC( MAKELONG )
 {
@@ -133,7 +133,7 @@ HB_FUNC( SYSTEMPARAMETERSINFO )
    hb_retl( SystemParametersInfoA( hmg_par_UINT( 1 ), hmg_par_UINT( 2 ), ( VOID * ) hb_parc( 3 ), hmg_par_UINT( 4 ) ) );
 }
 
-HB_FUNC( GETTEXTWIDTH ) // returns the width of a string in pixels
+HB_FUNC( GETTEXTWIDTH )   // returns the width of a string in pixels
 {
    HDC   hDC        = hmg_par_raw_HDC( 1 );
    HWND  hWnd       = ( HWND ) NULL;
@@ -191,7 +191,7 @@ HB_FUNC( KEYBD_EVENT )
 
 HB_FUNC( INSERTVKEY )
 {
-   keybd_event( hmg_par_BYTE( 1 ), // virtual-key code
+   keybd_event( hmg_par_BYTE( 1 ),    // virtual-key code
                 0, 0, 0 );
 }
 
@@ -251,7 +251,7 @@ HB_FUNC( CHANGESTYLE )
    SetWindowPos( hWnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER );
 }
 
-HB_FUNC( MOVEBTNTEXTBOX )  //MoveBtnTextBox(hEdit, hBtn1, hBtn2, fBtn2, BtnWidth, width, height)
+HB_FUNC( MOVEBTNTEXTBOX )    //MoveBtnTextBox(hEdit, hBtn1, hBtn2, fBtn2, BtnWidth, width, height)
 {
    HWND hedit    = hmg_par_raw_HWND( 1 );
    HWND hBtn1    = hmg_par_raw_HWND( 2 );
@@ -291,7 +291,7 @@ HB_FUNC( HB_DATE )
 }
 
 #if ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 < 0x030200 )
-#define hb_cdppage  hb_vmCDP
+   #define hb_cdppage  hb_vmCDP
 #endif
 HB_FUNC( HB_LEFTEQI )
 {

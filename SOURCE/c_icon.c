@@ -115,23 +115,32 @@ HB_FUNC( LOADICON )
 // HICON ExtractIcon( HINSTANCE hInst, LPCTSTR lpszExeFileName, UINT nIconIndex )
 HB_FUNC( EXTRACTICON )
 {
-   HICON hIcon;
-
 #ifndef UNICODE
-   hIcon = ExtractIcon( GetInstance(), hb_parc( 1 ), hmg_par_UINT( 2 ) );
+   char * lpFileName = ( char * ) hb_parc( 1 );
 #else
-   LPWSTR pW = AnsiToWide( ( char * ) hb_parc( 1 ) );
-   hIcon = ExtractIcon( GetInstance(), pW, hmg_par_UINT( 2 ) );
+   LPWSTR lpFileName = AnsiToWide( ( char * ) hb_parc( 1 ) );
 #endif
-   RegisterResource( hIcon, "ICON" );
-   hmg_ret_raw_HANDLE( hIcon );
+   int nIconIndex = hmg_par_INT( 2 );
+
+   if( nIconIndex == -1 )
+   {
+      hmg_ret_raw_HANDLE( ExtractIcon( GetInstance(), lpFileName, nIconIndex ) );
+   }
+   else
+   {
+      HICON hIcon;
+
+      hIcon = ExtractIcon( GetInstance(), lpFileName, nIconIndex );
+      RegisterResource( hIcon, "ICON" );
+      hmg_ret_raw_HANDLE( hIcon );
+   }
 
 #ifdef UNICODE
-   hb_xfree( pW );
+   hb_xfree( lpFileName );
 #endif
 }
 
-// UINT ExtractIconEx( LPCTSTR lpszFile, int nIconIndex, HICON *phiconLarge, HICON *phiconSmall, UINT nIcons )
+// UINT ExtractIconEx( LPCTSTR lpszFile, int nIconIndex, int cxIcon, int cyIcon )
 HB_FUNC( EXTRACTICONEX )
 {
 #ifndef UNICODE
@@ -143,19 +152,33 @@ HB_FUNC( EXTRACTICONEX )
 
    if( nIconIndex == -1 )
    {
-      hb_retni( ExtractIconEx( lpFileName, -1, NULL, NULL, 0 ) );
+#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
+      hmg_ret_UINT( ExtractIconEx( lpFileName, nIconIndex, NULL, NULL, 0 ) );
+#else
+      hmg_ret_UINT( PrivateExtractIcons( lpFileName, nIconIndex, 0, 0, NULL, NULL, 0, 0 ) );
+#endif
    }
    else
    {
-      HICON hIconLarge, hIconSmall;
-      UINT  nIconCount = ExtractIconEx( lpFileName, nIconIndex, &hIconLarge, &hIconSmall, 1 );
-
+      HICON hIcon;
+#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
+      UINT nIconId = 0;
+      // UINT ExtractIconExA(LPCSTR lpszFile, int nIconIndex, HICON *phiconLarge, HICON *phiconSmall, UINT nIcons)
+      UINT nIconCount = ExtractIconEx( lpFileName, nIconIndex, &hIcon, NULL, 1 );
+#else
+      UINT nIconId;
+      int  cx = hb_parnidef( 3, GetSystemMetrics( SM_CXICON ) );
+      int  cy = hb_parnidef( 4, GetSystemMetrics( SM_CYICON ) );
+      // UINT PrivateExtractIcons( LPCTSTR lpszFile, int nIconIndex, int cxIcon, int cyIcon, HICON *phicon, UINT *piconid, UINT nIcons, UINT flags )
+      UINT nIconCount = PrivateExtractIcons( lpFileName, nIconIndex, cx, cy, &hIcon, &nIconId, 1, 0 );
+#endif
       if( nIconCount > 0 )
       {
          hb_reta( 2 );
 
-         hmg_storvnl_HANDLE( hIconLarge, -1, 1 );
-         hmg_storvnl_HANDLE( hIconSmall, -1, 2 );
+         RegisterResource( hIcon, "ICON" );
+         hmg_storvnl_HANDLE( hIcon, -1, 1 );
+         HB_STORNI( nIconId, -1, 2 );
       }
    }
 

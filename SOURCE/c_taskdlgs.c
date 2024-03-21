@@ -8,22 +8,22 @@
 
 #if ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x030000 )
 #undef _WIN32_WINNT
-#define _WIN32_WINNT     0x0600
+#define _WIN32_WINNT           0x0600
 
 #undef NTDDI_VERSION
-#define NTDDI_VERSION    0x06000000
+#define NTDDI_VERSION          0x06000000
 
 #define UNICODE
 
 #if defined( __MINGW32__ )
-#define MAKEINTRESOURCEA( i )  ( ( LPSTR ) ( ( ULONG_PTR ) ( ( WORD ) ( i ) ) ) )
-#define MAKEINTRESOURCEW( i )  ( ( LPWSTR ) ( ( ULONG_PTR ) ( ( WORD ) ( i ) ) ) )
-#ifdef UNICODE
-#define MAKEINTRESOURCE  MAKEINTRESOURCEW
-#else
-#define MAKEINTRESOURCE  MAKEINTRESOURCEA
-#endif /* UNICODE */
-#endif /* __MINGW32__ */
+   #define MAKEINTRESOURCEA( i )  ( ( LPSTR ) ( ( ULONG_PTR ) ( ( WORD ) ( i ) ) ) )
+   #define MAKEINTRESOURCEW( i )  ( ( LPWSTR ) ( ( ULONG_PTR ) ( ( WORD ) ( i ) ) ) )
+   #ifdef UNICODE
+      #define MAKEINTRESOURCE  MAKEINTRESOURCEW
+   #else
+      #define MAKEINTRESOURCE  MAKEINTRESOURCEA
+   #endif /* UNICODE */
+#endif    /* __MINGW32__ */
 
 #include <hbwinuni.h>
 
@@ -47,9 +47,8 @@ HRESULT TaskDialog
    PCWSTR pszContent,
    TASKDIALOG_COMMON_BUTTON_FLAGS dwCommonButtons,
    PCWSTR pszIcon,
-   int  * pnButton
+   int *   pnButton
 )
-
 {
    HMODULE hCommCtl = LoadLibraryEx( TEXT( "comctl32.dll" ), NULL, 0 );
 
@@ -631,7 +630,7 @@ HRESULT CALLBACK __ClsCBFunc( HWND hWnd, UINT uiNotification, WPARAM wParam, LPA
       // Get TimedOut property
       hb_objSendMsg( pObject, ( const char * ) "TIMEDOUT", 0 );
 
-      if( ! ( BOOL ) hb_parl( -1 ) ) // if FALSE - it's not the time yet
+      if( ! ( BOOL ) hb_parl( -1 ) )       // if FALSE - it's not the time yet
       {
          if( uiNotification == TDN_TIMER )
          {
@@ -642,7 +641,7 @@ HRESULT CALLBACK __ClsCBFunc( HWND hWnd, UINT uiNotification, WPARAM wParam, LPA
             nMilliSec = hb_parni( -1 );
 
             // Remember what wParam is the time in milliseconds since dialog created or timer reset
-            if( ( 0 != nMilliSec ) && ( nMilliSec < wParam ) ) // If the condition is met - the time out!
+            if( ( 0 != nMilliSec ) && ( nMilliSec < wParam ) )      // If the condition is met - the time out!
             {
                PHB_ITEM itmTimeOut = hb_itemPutL( NULL, HB_TRUE );
 

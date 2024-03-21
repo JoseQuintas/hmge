@@ -62,7 +62,7 @@ LPSTR       WideToAnsi( LPWSTR );
 HINSTANCE   GetResources( void );
 
 #if defined( __XHARBOUR__ )
-#define HB_LONGLONG  LONGLONG
+   #define HB_LONGLONG  LONGLONG
 #endif
 LRESULT CALLBACK HMG_DlgProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
@@ -205,9 +205,9 @@ HB_FUNC( SETDLGITEMINT )
 {
    SetDlgItemInt
    (
-      hmg_par_raw_HWND( 1 ),              // handle of dialog box
-      hb_parni( 2 ),                      // identifier of control
-      hmg_par_UINT( 3 ),                  // text to set
+      hmg_par_raw_HWND( 1 ),                // handle of dialog box
+      hb_parni( 2 ),                        // identifier of control
+      hmg_par_UINT( 3 ),                    // text to set
       ( hb_pcount() < 4 || HB_ISNIL( 4 ) || ! hb_parl( 4 ) ) ? 0 : 1
    );
 }
@@ -268,10 +268,10 @@ HB_FUNC( CHECKRADIOBUTTON )
 {
    CheckRadioButton
    (
-      hmg_par_raw_HWND( 1 ),              // handle of dialog box
-      hb_parni( 2 ),                      // identifier of first radio button in group
-      hb_parni( 3 ),                      // identifier of last radio button in group
-      hb_parni( 4 )                       // identifier of radio button to select
+      hmg_par_raw_HWND( 1 ),                // handle of dialog box
+      hb_parni( 2 ),                        // identifier of first radio button in group
+      hb_parni( 3 ),                        // identifier of last radio button in group
+      hb_parni( 4 )                         // identifier of radio button to select
    );
 }
 
@@ -328,11 +328,11 @@ HB_SIZE GetSizeDlgTemp( PHB_ITEM dArray, PHB_ITEM cArray )
 
    nItem = ( int ) hb_arrayLen( cArray );
 
-   ln = hb_arrayGetCLen( dArray, 10 );    //caption
+   ln = hb_arrayGetCLen( dArray, 10 );      //caption
    lTemplateSize += ln * 2;
    if( hb_arrayGetNI( dArray, 4 ) & DS_SETFONT )
    {
-      ln = hb_arrayGetCLen( dArray, 11 ); //fontname
+      ln = hb_arrayGetCLen( dArray, 11 );   //fontname
       lTemplateSize += ln * 2;
       lTemplateSize += 3;
    }
@@ -341,9 +341,9 @@ HB_SIZE GetSizeDlgTemp( PHB_ITEM dArray, PHB_ITEM cArray )
    {
       iArray         = ( PHB_ITEM ) hb_arrayGetItemPtr( cArray, s + 1 );
       lTemplateSize += 36;
-      ln = hb_arrayGetCLen( iArray, 3 );  //class
+      ln = hb_arrayGetCLen( iArray, 3 );    //class
       lTemplateSize += ln * 2;
-      ln = hb_arrayGetCLen( iArray, 10 ); //caption
+      ln = hb_arrayGetCLen( iArray, 10 );   //caption
       lTemplateSize += ln * 2;
    }
 
@@ -437,7 +437,7 @@ PWORD CreateDlgTemplate( long lTemplateSize, PHB_ITEM dArray, PHB_ITEM cArray )
       nchar   = nCopyAnsiToWideChar( pw, strtemp );
       pw     += nchar;
 
-      strtemp = ( char * ) hb_arrayGetCPtr( iArray, 10 );   //caption
+      strtemp = ( char * ) hb_arrayGetCPtr( iArray, 10 );        //caption
       nchar   = nCopyAnsiToWideChar( pw, strtemp );
       pw     += nchar;
       *pw++   = 0; // Advance pointer over nExtraStuff WORD.

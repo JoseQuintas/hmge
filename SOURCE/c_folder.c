@@ -52,7 +52,7 @@
 #include <mgdefs.h>
 
 #if defined( _MSC_VER )
-#pragma warning( disable : 4996 )
+   #pragma warning( disable : 4996 )
 #endif
 #include <commctrl.h>
 
@@ -481,9 +481,9 @@ HB_FUNC( CREATEDLGFOLDER )
    nIdFld  = ( int ) hb_parni( 1 );
    hWndDlg = ( HWND ) HB_PARNL( 2 );
 
-   sArray = hb_param( 3, HB_IT_ARRAY );      // aHwndFolderPages
-   pArray = hb_param( 4, HB_IT_ARRAY );      //_HMG_aFolderTemplate
-   cArray = hb_param( 5, HB_IT_ARRAY );      //_HMG_aDialogItems
+   sArray = hb_param( 3, HB_IT_ARRAY );        // aHwndFolderPages
+   pArray = hb_param( 4, HB_IT_ARRAY );        //_HMG_aFolderTemplate
+   cArray = hb_param( 5, HB_IT_ARRAY );        //_HMG_aDialogItems
 
    //  _HMG_aFolderTemplate := {0,ParentHandle,modal,style,styleEx ,x,y,w,h,caption,fontname,fontsize,bold,Italic,lApplyBtn,lCancelBtn}
    //  _HMG_aFolderTemplate -> {0,ParentHandle,modal,style,styleEx ,x,y,w,h,caption,fontname,fontsize,bold,Italic,lOkBtn,lApplyBtn,lCancelBtn, buttons , flat , hottrack , vertical , bottom, multiline}

@@ -99,8 +99,7 @@ RETURN hmg_GetWindowObject( h )
 *-----------------------------------------------------------------------------*
 FUNCTION _ControlObj( ControlName, FormName )
 *-----------------------------------------------------------------------------*
-   LOCAL h := iif( HB_ISNUMERIC( ControlName ), ControlName, ;
-      GetControlHandle( ControlName, FormName ) )
+   LOCAL h := iif( HB_ISNUMERIC( ControlName ), ControlName, GetControlHandle( ControlName, FormName ) )
 
    IF ISARRAY( h )
       h := h[ 1 ]
@@ -129,7 +128,9 @@ FUNCTION _oThis( oThis, lSets )      // Snapshot of current data This or Sets
    o:FocusedForm    := ""
    o:FocusedControl := ""
    o:FocusedControlIndex := 0
+
    DEFAULT o:FormName := "", o:ControlName := ""
+
    IF !Empty( c := GetFocus() )
       IF ( k := AScan( _HMG_aControlHandles, c ) ) > 0
          o:FocusedControlIndex := k
@@ -213,51 +214,53 @@ FUNCTION _oThis( oThis, lSets )      // Snapshot of current data This or Sets
 RETURN o
 
 #ifdef __XHARBOUR__
-   #xtranslate hb_ValToExp( [<x,...>] ) => ValToPrgExp( <x> )
+  #xtranslate hb_ValToExp( [<x,...>] ) => ValToPrgExp( <x> )
 #endif
 *----------------------------------------------------------------------------*
 FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
 *----------------------------------------------------------------------------*
-   LOCAL a, b, c, i, j, k := pCount(), l := .F., xRet := .T.
+   LOCAL a, b, c, i, j, k := pCount()
+   LOCAL aTmp, xTmp, cTmp, l := .F., xRet := .T.
+   LOCAL lLog := IsErrorLogActive()
 
-   IF Valtype(cLog) $ "LND"
+   IF ValType( cLog ) $ "LND"
       l := .T.
       cLog := hb_FNameDir( _SetGetLogFile() ) + "_" + hb_ntos( Seconds() )
+      _HMG_CreateErrorLog := .T.
    ENDIF
 
    DEFAULT lExt := .F., cLog := _SetGetLogFile()
 
-   IF HB_ISCHAR(o)
-      IF ( i := At("*", o) ) > 0
+   IF HB_ISCHAR( o )
+      IF ( i := At( "*", o ) ) > 0
          c := o
-         o := Upper(o)
-         b := SubStr(o+" ", i + 1)
+         o := Upper( o )
+         b := SubStr( o + " ", i + 1 )
          
-         IF left(o, i) $ "F*,FORM*,FORMS*"
+         IF Left( o, i ) $ "F*,FORM*,FORMS*"
             DEFAULT nLen := 12
             o := {}
-            b := iif( Empty(b), "", Upper(AllTrim(b)) )
+            b := iif( Empty( b ), "", Upper( AllTrim( b ) ) )
             FOR EACH a IN HMG_GetForms( , .T. )
-                IF iif( Empty(b), .T., a:Type $ b )
-                   AAdd(o, { a:Type, IsWindowVisible(a:Handle), ;
-                             a:Index, a:Name, a:Handle, a:Title, ;
-                             a:cProcFile, a:cProcName, a:nProcLine })
+                IF iif( Empty( b ), .T., a:Type $ b )
+                   AAdd( o, { a:Type, IsWindowVisible( a:Handle ), ;
+                              a:Index, a:Name, a:Handle, a:Title, ;
+                              a:cProcFile, a:cProcName, a:nProcLine } )
                 ENDIF
             NEXT
-            c := iif( Empty(b), "", "<"+c+">"+" " )
+            c := iif( Empty( b ), "", "<" + c + ">" + " " )
             DEFAULT cMsg := "==> aForms: " + c
             k := 3
-
-         ELSEIF left(o, i) $ "P*,PROC*,PROCNL*"       
+         ELSEIF Left( o, i ) $ "P*,PROC*,PROCNL*"       
             DEFAULT nLen := 25
             b := Val( b )
             i := 0
             o := oHmgData()
             WHILE ( ++i < 100 )
-               IF Empty( j := ProcName(i) ) ; EXIT
+               IF Empty( j := ProcName( i ) ) ; EXIT
                ENDIF
-               o:Set( TR0( ProcFile(i), nLen - 7 ) + Str( ProcLine(i), 7 ), j )
-               IF b > 0 .and. i >= b ; EXIT
+               o:Set( TR0( ProcFile( i ), nLen - 7 ) + Str( ProcLine( i ), 7 ), j )
+               IF b > 0 .AND. i >= b ; EXIT
                ENDIF
             END
             DEFAULT cMsg := "==> ProcNL: "
@@ -268,12 +271,12 @@ FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
 
    DEFAULT nLen := 19
 
-   IF k > 2 .and. HB_ISCHAR(cMsg) ; _LogFile( {.T., cLog}, cMsg )
-   ELSEIF !Empty(cMsg)            ; _LogFile( {.T., cLog}, NIL )
+   IF k > 2 .AND. HB_ISCHAR( cMsg ) ; _LogFile( {.T., cLog}, cMsg )
+   ELSEIF !Empty( cMsg )            ; _LogFile( {.T., cLog}, NIL )
    ENDIF
 
    IF HB_ISOBJECT( o )
-      _LogFile( {.F., cLog}, "O:"+o:ClassName )
+      _LogFile( {.F., cLog}, "O:" + o:ClassName )
       IF o:ClassName $ "THMGDATA,TKEYDATA,TTHRDATA,TINIDATA"
          _LogFile( {.F., cLog}, o:GetAll() )
          IF o:ClassName == "TINIDATA"
@@ -283,11 +286,11 @@ FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
              i := hb_enumIndex( a )
              b := iif( HB_ISCHAR( a[1] ), TR0( a[1], nLen ), a[1] )
              _LogFile( {.T., cLog}, TR0( i, nLen - 1 ) + ".", b, "=" )
-             IF    HB_ISOBJECT( a[2] )
+             IF HB_ISOBJECT( a[2] )
                 IF lExt
                    _o2Log( a[2], nLen + 5, , , cLog )
                 ELSE
-                   _LogFile( {.F., cLog}, "O:"+a[2]:ClassName )
+                   _LogFile( {.F., cLog}, "O:" + a[2]:ClassName )
                    IF a[2]:ClassName $ "THMGDATA,TKEYDATA,TTHRDATA,TINIDATA"
                       _LogFile( {.F., cLog}, a[2]:GetAll() )
                       IF a[2]:ClassName == "TINIDATA"
@@ -301,9 +304,30 @@ FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
                      _LogFile( {.F., cLog}, a[2]:cControlName, a[2]:cParentWnd, a[2]:cAlias )
                    ENDIF 
                 ENDIF 
-             ELSEIF HB_ISARRAY( a[2] ) .and. lExt
-                 _LogFile( {.F., cLog}, hb_valtoexp( a[2] ) )
-             ELSE                 
+             ELSEIF HB_ISARRAY( a[2] ) .AND. lExt
+                aTmp := {}
+                FOR EACH xTmp IN a[2]
+                    IF HB_ISOBJECT( xTmp )
+                       cTmp := "O:" + xTmp:ClassName
+                       IF xTmp:ClassName $ "THMGDATA,TKEYDATA,TTHRDATA,TINIDATA"
+                          cTmp += " "+"ARRAY["  + hb_ntos( xTmp:Len() ) + "]"
+                          IF xTmp:ClassName == "TINIDATA"
+                             cTmp += " "+xTmp:cIni
+                          ENDIF
+                       ELSEIF xTmp:ClassName == "TWNDDATA"
+                          cTmp += " "+xTmp:Name+" "+xTmp:Type
+                       ELSEIF xTmp:ClassName $ "TCNLDATA,TTSBDATA,TGETDATA,TSTBDATA"
+                          cTmp += " "+xTmp:Window+" "+xTmp:Name+" "+xTmp:Type
+                       ELSEIF xTmp:ClassName == "TSBROWSE"
+                          cTmp += " "+xTmp:cControlName+" "+xTmp:cParentWnd+" "+xTmp:cAlias
+                       ENDIF
+                       AAdd( aTmp, cTmp )
+                    ELSE
+                       AAdd( aTmp, xTmp )
+                    ENDIF
+                NEXT
+                _LogFile( {.F., cLog}, hb_valtoexp( aTmp ) )
+             ELSE
                 _LogFile( {.F., cLog}, a[2] )
              ENDIF
          NEXT
@@ -323,16 +347,20 @@ FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
 
       FOR EACH a IN o
           i := hb_enumIndex( a )
+          IF ! HB_ISARRAY( a )
+             j := TR0( i, nLen - 1 ) + "." + " " + '"' + ValType( a ) + '"'
+             _LogFile( {.T., cLog}, j + " -> " )
+          ENDIF
           IF HB_ISOBJECT( a )
-             _o2Log( a, nLen, , lExt, cLog )
+             _o2Log( a, nLen + 5, , lExt, cLog )
           ELSEIF HB_ISARRAY( a )
              _LogFile( {.T., cLog}, TR0( i, nLen - 1 ) + "." )
              IF lExt
                 _LogFile( {.F., cLog}, a )
                 FOR EACH j IN a
                     k := hb_enumIndex( j )
-                    IF Valtype( j ) $ "AO"
-                       _o2Log( j, nLen+5, , , cLog )
+                    IF ValType( j ) $ "AO"
+                       _o2Log( j, nLen + 5, , , cLog )
                     ELSE
                        _LogFile( {.T., cLog}, TR0( k, nLen - 1 + 5 ) + ".", hb_valtoexp( j ) )
                     ENDIF
@@ -349,9 +377,10 @@ FUNCTION _o2Log( o, nLen, cMsg, lExt, cLog )
       _LogFile( {.F., cLog}, o )
    ENDIF
 
-   IF l .and. hb_FileExists( cLog )
-      xRet := hb_memoread( cLog )
+   IF l .AND. hb_FileExists( cLog )
+      xRet := hb_MemoRead( cLog )
       hb_FileDelete( cLog )
+      _HMG_CreateErrorLog := lLog
    ENDIF
 
 RETURN xRet
@@ -359,9 +388,9 @@ RETURN xRet
 *----------------------------------------------------------------------------*
 STATIC FUNCTION TR0( cTxt, nLen, cSim )
 *----------------------------------------------------------------------------*
-   IF !HB_ISCHAR(cTxt) ; cTxt := cValToChar(cTxt)
+   IF !HB_ISCHAR( cTxt ) ; cTxt := cValToChar( cTxt )
    ENDIF
-   Default nLen := Len(cTxt)
+   DEFAULT nLen := Len( cTxt )
    IF cSim == Nil; cSim := " "
    ENDIF
 

@@ -2,7 +2,7 @@
 Harbour MiniGUI Extended Edition Library
 """"""""""""""""""""""""""""""""""""""""
 
-Copyright (c) 2005-2023 MiniGUI Team. All rights reserved.
+Copyright (c) 2005-2024 MiniGUI Team. All rights reserved.
 
 Harbour MiniGUI comprises these main components:
 
@@ -31,7 +31,7 @@ The parts of this project are based upon:
    Copyright 2001 Antonio Linares <alinares@fivetech.com>
 
    "Harbour Project"
-   Copyright 1999-2023 Contributors, https://harbour.github.io/
+   Copyright 1999-2024 Contributors, https://harbour.github.io/
 
    "WHAT32"
    Copyright 2002 AJ Wos <andrwos@aust1.net>
@@ -46,3 +46,4 @@ Jacek Kubica <kubica@wssk.wroc.pl>
 Janusz Pora <januszpora@onet.eu>
 Petr Chornyj <myorg63[at]gmail.com>
 Pierpaolo Martinello <pier.martinello[at]alice.it>
+Ivanil Marcelino <ivanil.marcelino[at]gmail.com>

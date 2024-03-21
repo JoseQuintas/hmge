@@ -1,16 +1,16 @@
 /*
  * MINIGUI - Harbour Win32 GUI library source code
  *
- * Copyright 2017-2022 Aleksandr Belov, Sergej Kiselev <bilance@bilance.lv>
- */
+ * Copyright 2017-2024 Aleksandr Belov, Sergej Kiselev <bilance@bilance.lv>
+*/
 
 #include "minigui.ch"
 
 #include "i_winuser.ch"
 #ifdef __XHARBOUR__
-#include "hbcompat.ch"
+# include "hbcompat.ch"
 #else
-#xtranslate hb_HSetCaseMatch( <x>[, <z>] ) => ( hb_HCaseMatch( <x>[, <z>] ), <x> )
+# xtranslate hb_HSetCaseMatch( <x>[, <z>] ) => ( hb_HCaseMatch( <x>[, <z>] ), <x> )
 #endif
 #include "hbclass.ch"
 
@@ -23,29 +23,32 @@ CLASS THmgData
 ///////////////////////////////////////////////////////////////////////////////
 
    PROTECTED:
-   VAR lUpp AS LOGICAL
-   VAR aKey INIT hb_Hash()
+   VAR l_l_Upp AS LOGICAL
+   VAR a_a_Key INIT hb_Hash()
 
    EXPORTED:
    VAR Cargo
 
-   METHOD New( lUpper ) INLINE ( ::lUpp := ! Empty( lUpper ), Self ) CONSTRUCTOR
+   METHOD New( lUpper ) INLINE ( ::l_l_Upp := ! Empty( lUpper ), Self ) CONSTRUCTOR
 
-   _METHOD Set( xKey, xVal )
-   METHOD Get( Key, Def ) INLINE iif( Key == NIL, ::aKey, hb_HGetDef( ::aKey, ::Upp( Key ), Def ) )
-   METHOD Del( Key ) INLINE ( iif( ::Pos( Key ) > 0, hb_HDel( ::aKey, ::Upp( Key ) ), Nil ), Self )
-   METHOD Pos( Key ) INLINE hb_HPos( ::aKey, ::Upp( Key ) )
-   METHOD Upp( Key ) INLINE iif( HB_ISCHAR( Key ) .AND. ::lUpp, Upper( Key ), Key )
-   METHOD Len() INLINE Len( ::aKey )
+  _METHOD Set( xKey, xVal, lJson )
+  _METHOD Get( xKey, xDef, lJson ) 
+  _METHOD Json( cJson, lMode )
+   METHOD Del( Key )  INLINE ( iif( ::Pos( Key ) > 0, hb_HDel( ::a_a_Key, ::Upp( Key ) ), Nil ), Self )
+   METHOD Pos( Key )  INLINE hb_HPos( ::a_a_Key, ::Upp( Key ) )
+   METHOD Upp( Key )  INLINE iif( HB_ISCHAR( Key ) .AND. ::l_l_Upp, Upper( Key ), Key )
+   METHOD Len()       INLINE Len( ::a_a_Key )
 
-   METHOD Keys() INLINE hb_HKeys( ::aKey )
-   METHOD Values() INLINE hb_HValues( ::aKey )
-   METHOD CloneHash() INLINE hb_HClone( ::aKey )
+   METHOD Keys()      INLINE hb_HKeys( ::a_a_Key )
+   METHOD Values()    INLINE hb_HValues( ::a_a_Key )
+   METHOD CloneHash() INLINE hb_HClone( ::a_a_Key )
+   METHOD Clone()     INLINE __objClone( Self )
+  _METHOD Do( xKey, xVal )
 
-   _METHOD GetAll( lAll )
-   _METHOD Eval( Block )
+  _METHOD GetAll( lAll )
+  _METHOD Eval( Block )
 #if 0
-   _METHOD Destroy()
+  _METHOD Destroy()
 #endif
 
    ERROR HANDLER ControlAssign
@@ -53,36 +56,118 @@ CLASS THmgData
 ENDCLASS
 ///////////////////////////////////////////////////////////////////////////////
 
-METHOD Set( xKey, xVal ) CLASS THmgData
+METHOD Set( xKey, xVal, lJson ) CLASS THmgData
 
    LOCAL k, v
 
-   IF PCount() > 0
-      IF HB_ISHASH( xKey )
-         IF HB_ISLOGICAL( xVal ) .AND. xVal
-            FOR EACH k, v IN hb_HKeys( xKey ), hb_HValues( xKey )
-               hb_HSet( ::aKey, ::Upp( k ), v )
-            NEXT
-         ELSE
-            ::aKey := xKey
-         ENDIF
-      ELSEIF HB_ISARRAY( xKey ) .AND. HB_ISARRAY( xVal )
-         FOR EACH k, v IN xKey, xVal
-            Default k := hb_enumIndex( k )
-            hb_HSet( ::aKey, ::Upp( k ), v )
-         NEXT
-      ELSEIF HB_ISARRAY( xKey )
-         FOR EACH v IN xKey
-            IF HB_ISARRAY( v ) .AND. Len( v ) > 1
-               hb_HSet( ::aKey, ::Upp( v[1] ), v[2] )
-            ENDIF
+   IF PCount() == 0 ; RETURN Self
+   ENDIF
+
+   IF !Empty( lJson ) 
+      IF HB_ISCHAR( xKey ) 
+         k := SubStr( xKey, At( "{", xKey ) )
+         k := Left( k, RAt( "}", k ) )
+         xKey := hb_jsonDecode( k )
+         DEFAULT xVal := .T.
+      ELSEIF HB_ISCHAR( xVal )
+         k := SubStr( xVal, At( "{", xVal ) )
+         k := Left( k, RAt( "}", k ) )
+         xVal := oHmgData()
+         xVal:Set( hb_jsonDecode( k ), .T.)
+      ENDIF
+      k := NIL
+   ENDIF
+
+   IF HB_ISHASH( xKey )
+      IF HB_ISLOGICAL( xVal ) .AND. xVal
+         FOR EACH k, v IN hb_HKeys( xKey ), hb_HValues( xKey )
+            hb_HSet( ::a_a_Key, ::Upp( k ), v )
          NEXT
       ELSE
-         hb_HSet( ::aKey, ::Upp( xKey ), xVal )
+         ::a_a_Key := xKey
       ENDIF
+   ELSEIF HB_ISARRAY( xKey ) .AND. HB_ISARRAY( xVal )
+      FOR EACH k, v IN xKey, xVal
+         DEFAULT k := hb_enumIndex( k )
+         hb_HSet( ::a_a_Key, ::Upp( k ), v )
+      NEXT
+   ELSEIF HB_ISARRAY( xKey )
+      FOR EACH v IN xKey
+         IF HB_ISARRAY( v ) .AND. Len( v ) > 1
+            hb_HSet( ::a_a_Key, ::Upp( v[1] ), v[2] )
+         ENDIF
+      NEXT
+   ELSE
+      hb_HSet( ::a_a_Key, ::Upp( xKey ), xVal )
    ENDIF
 
 RETURN Self
+
+METHOD Get( xKey, xDef, lJson ) CLASS THmgData
+   LOCAL x
+
+   IF xKey == NIL
+      RETURN ::a_a_Key
+   ELSEIF HB_ISLOGICAL( xKey ) .or. xKey == NIL
+      DEFAULT xDef := xKey
+      RETURN ::Json( ::a_a_Key, xDef )
+   ENDIF
+
+   IF !Empty(lJson) .and. ::Pos( xKey ) > 0
+      x := hb_HGetDef( ::a_a_Key, ::Upp( xKey ), NIL )
+      IF HB_ISOBJECT( x ) .and. ","+x:ClassName+"," $ ",THMGDATA,TKEYDATA,"
+         RETURN ::Json( x, xDef )
+      ENDIF
+   ENDIF
+
+RETURN hb_HGetDef( ::a_a_Key, ::Upp( xKey ), xDef )
+
+METHOD Json( cJson, lMode ) CLASS THmgData
+
+   IF cJson == NIL .or. HB_ISLOGICAL( cJson ) 
+      lMode := !Empty( cJson )
+      RETURN hb_jsonEncode( ::a_a_Key, lMode )
+
+   ELSEIF HB_ISOBJECT( cJson )
+      lMode := !Empty( lMode )
+      RETURN hb_jsonEncode( cJson:CloneHash(), lMode )
+
+   ELSEIF HB_ISHASH( cJson )
+      lMode := !Empty( lMode )
+      RETURN hb_jsonEncode( cJson, lMode )
+
+   ELSEIF HB_ISCHAR( cJson )
+      cJson := SubStr( cJson, At( "{", cJson ) )
+      cJson := Left ( cJson, RAt( "}", cJson ) )
+      ::Set( hb_jsonDecode( cJson ), !Empty( lMode ) )
+
+   ENDIF
+
+RETURN Self
+
+METHOD Do( xKey, xVal ) CLASS THmgData
+   LOCAL x, b := ::Get( xKey )
+
+   IF HB_ISARRAY( xVal ) 
+   ELSEIF xVal == NIL  ; xVal := {}
+   ELSE                ; xVal := { xVal }
+   ENDIF
+   
+   AAdd( xVal, Self )
+
+   IF HB_ISBLOCK( b )
+      x := EVal( b, xVal )
+   ELSEIF HB_ISCHAR( b )  // Can't be a static function
+      IF !Empty( b ) .and. hb_IsFunction( b )
+         x := hb_ExecFromArray( b, xVal )
+      ELSE
+         x := "#@" + b
+      ENDIF
+   ELSE
+      x := "#@" + cValToChar( b )
+   ENDIF
+
+RETURN x
 
 METHOD GetAll( lAll ) CLASS THmgData
 
@@ -103,9 +188,9 @@ METHOD Eval( Block ) CLASS THmgData
    LOCAL a := iif( b, NIL, Array( 0 ) )
 
    FOR i := 1 TO ::Len()
-      IF b ; Eval( Block, hb_HValueAt( ::aKey, i ), hb_HKeyAt( ::aKey, i ), i )
-      ELSEIF l ; AAdd( a, hb_HValueAt( ::aKey, i ) )
-      ELSE ; AAdd( a, { hb_HValueAt( ::aKey, i ), hb_HKeyAt( ::aKey, i ), i } )
+      IF b ; Eval( Block, hb_HValueAt( ::a_a_Key, i ), hb_HKeyAt( ::a_a_Key, i ), i )
+      ELSEIF l ; AAdd( a, hb_HValueAt( ::a_a_Key, i ) )
+      ELSE ; AAdd( a, { hb_HValueAt( ::a_a_Key, i ), hb_HKeyAt( ::a_a_Key, i ), i } )
       ENDIF
    NEXT
 
@@ -116,21 +201,21 @@ METHOD Destroy() CLASS THmgData
 
    LOCAL i, k, o
 
-   IF HB_ISHASH( ::aKey )
-      FOR i := 1 TO Len( ::aKey )
-         k := hb_HKeyAt( ::aKey, i )
-         hb_HSet( ::aKey, k, Nil )
-         hb_HDel( ::aKey, k )
+   IF HB_ISHASH( ::a_a_Key )
+      FOR i := 1 TO Len( ::a_a_Key )
+         k := hb_HKeyAt( ::a_a_Key, i )
+         hb_HSet( ::a_a_Key, k, Nil )
+         hb_HDel( ::a_a_Key, k )
       NEXT
    ENDIF
 
    IF HB_ISOBJECT( ::Cargo ) .AND. ::Cargo:ClassName == ::ClassName
       o := ::Cargo
-      IF HB_ISHASH( o:aKey )
-         FOR i := 1 TO Len( o:aKey )
-            k := hb_HKeyAt( o:aKey, i )
-            hb_HSet( o:aKey, k, Nil )
-            hb_HDel( o:aKey, k )
+      IF HB_ISHASH( o:a_a_Key )
+         FOR i := 1 TO Len( o:a_a_Key )
+            k := hb_HKeyAt( o:a_a_Key, i )
+            hb_HSet( o:a_a_Key, k, Nil )
+            hb_HDel( o:a_a_Key, k )
          NEXT
       ENDIF
    ENDIF
@@ -172,25 +257,30 @@ CLASS TIniData INHERIT THmgData
    VAR oIni
    VAR hKeys                     INIT { => }
    VAR hLens                     INIT { => }
-   VAR cBOM      AS STRING  INIT hb_utf8Chr( 0xFEFF )
+   VAR hSect                     INIT { => }
+   VAR cBOM          AS STRING   INIT hb_utf8Chr( 0xFEFF )
    VAR cData         AS STRING   INIT ""
    VAR lData         AS LOGICAL  INIT .F.
-   VAR cIni      AS STRING  INIT ""
-   VAR lIni      AS LOGICAL  INIT .F.
-   VAR lUtf      AS LOGICAL  INIT .F.
+   VAR cIni          AS STRING   INIT ""
+   VAR lIni          AS LOGICAL  INIT .F.
+   VAR lUtf          AS LOGICAL  INIT .F.
    VAR lUtf8         AS LOGICAL  INIT .F.
    VAR cCommentChar  AS STRING   INIT ";"
    VAR cCommentBegin AS STRING   INIT ""
    VAR cCommentEnd   AS STRING   INIT ""
-   VAR lAutoMain   AS LOGICAL  INIT .F.
-   VAR lMacro      AS LOGICAL  INIT .F.
-   VAR lYesNo      AS LOGICAL  INIT .F.
-   VAR aYesNo      AS ARRAY   INIT { "Yes", "No" }
+   VAR lAutoMain     AS LOGICAL  INIT .F.
+   VAR lMacro        AS LOGICAL  INIT .F.
+   VAR lYesNo        AS LOGICAL  INIT .F.
+   VAR aYesNo        AS ARRAY    INIT { "Yes", "No" }
+   VAR nMinKey       AS NUMERIC  INIT 10      // Min. length for keys 
+   VAR nMaxVal       AS NUMERIC  INIT 20      // Max. length Value for note
+   VAR cSrcReplChar  AS STRING   INIT ""      // Original replacement character
+   VAR cOutReplChar  AS STRING   INIT ""      // Replacement by output symbol
 
-   METHOD New( cIni, lMacro, lUtf8, cChar, cData ) INLINE ( ::Super:New( .T. ), ;
-          ::Def( cIni, lMacro, lUtf8, cChar, cData ), Self ) CONSTRUCTOR
+   METHOD New( cIni, lMacro, lUtf8, cChar, cData, cSrcChar, cOutChar ) INLINE ( ::Super:New( .T. ), ;
+          ::Def( cIni, lMacro, lUtf8, cChar, cData, cSrcChar, cOutChar ), Self ) CONSTRUCTOR
 
-  _METHOD Def( cIni, lMacro, lUtf8, cChar, cData )
+  _METHOD Def( cIni, lMacro, lUtf8, cChar, cData, cSrcChar, cOutChar )
   _METHOD Read( cIniNew )
   _METHOD Write( cFile, lUtf8 )
   _METHOD ToValue( cStr )
@@ -198,7 +288,7 @@ CLASS TIniData INHERIT THmgData
 
 END CLASS
 
-METHOD Def( cIni, lMacro, lUtf8, cChar, cData ) CLASS TIniData
+METHOD Def( cIni, lMacro, lUtf8, cChar, cData, cSrcChar, cOutChar ) CLASS TIniData
 
    ::cData  := hb_defaultValue( cData, ::cData )
    ::lData  := ! Empty( ::cData ) .AND. HB_ISCHAR( ::cData )
@@ -207,6 +297,11 @@ METHOD Def( cIni, lMacro, lUtf8, cChar, cData ) CLASS TIniData
    ::lUtf8  := ! Empty( lUtf8 )
    ::lUtf   := ( Set( _SET_CODEPAGE ) == "UTF8" )
    ::cCommentChar := hb_defaultValue( cChar, ::cCommentChar )
+
+   IF HB_ISCHAR( cSrcChar ) .and. HB_ISCHAR( cOutChar )
+      ::cSrcReplChar := cSrcChar
+      ::cOutReplChar := cOutChar
+   ENDIF
 
    IF ! Empty( ::cIni ) .AND. ! ::lData
       IF ! hb_FileExists( ::cIni )
@@ -308,6 +403,7 @@ METHOD Read( cIniNew ) CLASS TIniData
       IF ! ::lUtf .AND. ::lUtf8
          cSec := hb_UTF8ToStr( cSec )
       ENDIF
+      hb_HSet( ::hSect, Upper( cSec ), cSec )
       oSec := oHmgData()
       nKey := 0
       hKey := { => }
@@ -336,6 +432,7 @@ METHOD Read( cIniNew ) CLASS TIniData
          ENDIF
       NEXT
 
+      cSec := Upper( cSec )
       ::Set( cSec, oSec )
       hb_HSet( ::hKeys, cSec, hKey )
       hb_HSet( ::hLens, cSec, nKey )
@@ -352,6 +449,10 @@ METHOD ToValue( cStr ) CLASS TIniData
    IF Empty( cStr ) ; RETURN cStr
    ENDIF
 
+   IF !Empty( ::cSrcReplChar )
+      cStr := StrTran( cStr, ::cSrcReplChar, ::cOutReplChar )
+   ENDIF
+
    IF Left(cStr, 1) == "{"  .AND. Right(cStr, 1) == "}" .or. ;
       Left(cStr, 1) == "'"  .AND. Right(cStr, 1) == "'" .or. ;
       Left(cStr, 1) == '"'  .AND. Right(cStr, 1) == '"' .or. ;
@@ -365,6 +466,13 @@ METHOD ToValue( cStr ) CLASS TIniData
          Valtype(xVal) == "T" .AND. Len( SubStr(cStr, 3) ) == 11
          xVal := hb_TtoD( xVal )
       ENDIF
+   ELSEIF Left(cStr, 2) $ "j{J{" .AND. Right(cStr, 1) == "}" // json
+      IF "<" $ cStr .and. ">" $ cStr
+         cStr := StrTran(cStr, "<", "[")
+         cStr := StrTran(cStr, ">", "]")
+      ENDIF
+      xVal := oHmgData()
+      xVal:Set(cStr, .T., .T.)
    ELSEIF hb_ntos(Val(cStr)) == cStr
       xVal := Val(cStr)
    ELSEIF cStr == "T" .OR. cStr == ".T." .OR. cStr == ".t." .OR. ;
@@ -404,6 +512,16 @@ METHOD ToString( xVal ) CLASS TIniData
       ENDIF
    ELSEIF HB_ISLOGICAL( xVal ) .AND. ::lYesNo
       cStr := ::aYesNo[ iif( xVal, 1, 2 ) ]
+   ELSEIF HB_ISOBJECT( xVal )
+      IF "," + xVal:ClassName + "," $ ",THMGDATA,TKEYDATA,"
+         cStr := "j" + xVal:Get(.F.)
+         IF "[" $ cStr .and. "]" $ cStr
+            cStr := StrTran(cStr, "[", "<")
+            cStr := StrTran(cStr, "]", ">")
+         ENDIF
+      ELSE
+         cStr := "O:" + xVal:ClassName 
+      ENDIF
    ELSE
       cStr := hb_valtoexp( xVal )
    ENDIF
@@ -416,14 +534,17 @@ METHOD Write( cFile, lUtf8 ) CLASS TIniData
    LOCAL hIni := { => }, cKey, cVal, xVal, cStr, lBlk
    LOCAL cIni := "_" + DtoS( Date() ) + "_" + StrTran( hb_ntos( Seconds() ), ".", "" ) + "_" + ".ini"
    LOCAL cBegin := "", cEnd := ""
+   LOCAL cSek
 
    DEFAULT cFile := ::cIni, lUtf8 := ::lUtf8
 
    FOR EACH cSec IN ::Keys()
+       cSek := hb_HGetDef( ::hSect, Upper( cSec ), cSec )
        oSec := ::Get( cSec )
        hSec := { => }
        hKey := hb_hSetCaseMatch( hb_HGetDef( ::hKeys, cSec, { => } ), .T. )
-       nLen := hb_HGetDef( hb_hSetCaseMatch( ::hLens, .T. ), cSec,   11 ) + 1
+       nLen := hb_HGetDef( hb_hSetCaseMatch( ::hLens, .T. ), cSec,   11 ) 
+       nLen := Max( nLen, ::nMinKey ) + 1
        FOR EACH aSec IN oSec:GetAll()
            cKey := aSec[1]
            xVal := aSec[2]
@@ -440,6 +561,9 @@ METHOD Write( cFile, lUtf8 ) CLASS TIniData
                  IF lBlk
                     cVal := iif( ! ::lUtf .AND. lUtf8, hb_StrToUtf8( cStr[2] ), cStr[2] )
                  ELSE
+                    IF Len( cVal ) <= ::nMaxVal
+                       cVal := Left( cVal + Space( ::nMaxVal ), ::nMaxVal )
+                    ENDIF
                     cVal += space(3) + iif( ! ::lUtf .AND. lUtf8, hb_StrToUtf8( cStr[2] ), cStr[2] )
                  ENDIF
               ENDIF
@@ -448,7 +572,7 @@ METHOD Write( cFile, lUtf8 ) CLASS TIniData
            ENDIF
            hb_HSet( hSec, cKey, " " + cVal )
        NEXT
-       hb_HSet( hIni, cSec, hSec )
+       hb_HSet( hIni, cSek, hSec )
    NEXT
 
    IF ! Empty( ::cCommentBegin )
@@ -489,9 +613,9 @@ RETURN lRet
 #endif
 
 *-----------------------------------------------------------------------------*
-FUNCTION oDlu4Font( nFontSize, lDlu2Pix )
+FUNCTION oDlu4Font( nFontSize, lDlu2Pix, nPrcW, nPrcH )
 *-----------------------------------------------------------------------------*
-   LOCAL nPrcW, nPrcH, aDim
+   LOCAL nProcW, nProcH, aDim
    LOCAL aScale := { {  8,  85,  75}, ;
                      {  9,  90,  85}, ;
                      { 10,  95,  85}, ;
@@ -513,19 +637,22 @@ FUNCTION oDlu4Font( nFontSize, lDlu2Pix )
                      { 26, 210, 180}  ;
                    }
 
-   DEFAULT lDlu2Pix := .T., nFontSize := 11, nPrcW := 100, nPrcH := 100
+   DEFAULT lDlu2Pix := .T., nFontSize := 11
 
-   IF nFontSize < aScale[ 1 ][ 1 ]    ; nFontSize := aScale[ 1 ][ 1 ]
+   IF nFontSize < aScale[ 1 ][ 1 ]         ; nFontSize := aScale[ 1 ][ 1 ]
    ELSEIF nFontSize > ATail( aScale )[ 1 ] ; nFontSize := ATail( aScale )[ 1 ]
    ENDIF
 
    FOR EACH aDim IN aScale
       IF nFontSize == aDim[ 1 ]
-         nPrcW := aDim[ 2 ]
-         nPrcH := aDim[ 3 ]
+         nProcW := aDim[ 2 ]
+         nProcH := aDim[ 3 ]
          EXIT
       ENDIF
    NEXT
+
+   DEFAULT nProcW := 100   , nProcH := 100
+   DEFAULT nPrcW  := nProcW, nPrcH  := nProcH
 
    IF lDlu2Pix
       RETURN TDlu2Pix():New( nPrcW, nPrcH, nFontSize )
@@ -892,15 +1019,24 @@ RETURN ( ::LTRB )
 
 METHOD TextWidth( cText, nSize, cFont, lBold, cChar ) CLASS TDlu2Pix
 
-   LOCAL hFont, nWidth
+   LOCAL hFont, nWidth, cTxt := "", cTmp
 
+   IF HB_ISARRAY( cText )
+      FOR EACH cTmp IN cText
+         IF !HB_ISCHAR( cTmp ) ; cTmp := cValToChar( cTmp )
+         ENDIF
+         IF Len( cTmp ) > Len( cTxt ) ; cTxt := cTmp
+         ENDIF
+      NEXT
+      cText := cTxt
+   ELSEIF HB_ISNUMERIC( cText ) ; cText := Replicate( cChar, cText )
+   ENDIF
    cChar := hb_defaultValue( cChar, 'A' )
    cText := hb_defaultValue( cText, Replicate( cChar, 2 ) )
    lBold := hb_defaultValue( lBold, .F. )
    cFont := hb_defaultValue( cFont, _HMG_DefaultFontName )
    nSize := hb_defaultValue( nSize, iif( Empty( ::nSize ), _HMG_DefaultFontSize, ::nSize ) )
-   IF ValType( cText ) == 'N' ; cText := Replicate( cChar, cText )
-   ENDIF
+
    hFont := InitFont( cFont, nSize, lBold )
    nWidth := GetTextWidth( Nil, cText, hFont )
    DeleteObject( hFont )
@@ -909,9 +1045,16 @@ RETURN nWidth
 
 METHOD Breadth( nW, k ) CLASS TDlu2Pix
 
-   LOCAL nWidth := 0
+   LOCAL nWidth := 0, cW := "", cTmp
 
-   IF HB_ISCHAR( nW ) ; nW := ::TextWidth( nW )
+   IF HB_ISARRAY( nW )
+      FOR EACH cTmp IN nW
+          IF Len( cTmp ) > Len( cW ) ; cW := cTmp
+          ENDIF
+      NEXT
+      nW := ::TextWidth( cW )
+   ELSEIF HB_ISCHAR( nW )
+      nW := ::TextWidth( nW )
    ENDIF
 
    WHILE nW > ( nWidth += ::W( hb_defaultValue( k, 0.5 ) ) )

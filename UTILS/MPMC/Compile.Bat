@@ -1,1 +1,0 @@
-call ..\..\batch\compile.bat mpmc /c /nx /l hbnulrdd %1 %2 %3 %4 %5 %6 %7 %8 %9

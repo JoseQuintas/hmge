@@ -53,7 +53,7 @@
 #include <mgdefs.h>
 
 #if defined( _MSC_VER )
-#pragma warning( disable : 4996 )
+   #pragma warning( disable : 4996 )
 #endif
 #include <commctrl.h>
 
@@ -61,7 +61,7 @@
 
 extern HBITMAP    HMG_LoadPicture
 (
-   const char  * FileName,
+   const char *   FileName,
    int New_Width,
    int New_Height,
    HWND hWnd,
@@ -680,7 +680,7 @@ HB_FUNC( MAXTEXTBTNTOOLBAR )
       SendMessage( hwndTB, TB_SETBUTTONWIDTH, 0, ( LPARAM ) MAKELONG( hb_parni( 2 ), hb_parni( 2 ) + 2 ) );
    }
 
-   SendMessage( hwndTB, TB_AUTOSIZE, 0, 0 ); //JP62
+   SendMessage( hwndTB, TB_AUTOSIZE, 0, 0 );   //JP62
 }
 
 HB_FUNC( ISBUTTONBARCHECKED )

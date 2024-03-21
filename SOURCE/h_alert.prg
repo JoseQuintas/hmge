@@ -191,6 +191,9 @@ FUNCTION HMG_Alert( cMsg, aOptions, cTitle, nType, cIcoFile, nIcoSize, aBtnColor
       ON INTERACTIVECLOSE ( _SetGetGlobal( "_HMG_PressButton" ) .OR. lClosable ) ;
       ON RELEASE iif( ! _SetGetGlobal( "_HMG_PressButton" ) .AND. lClosable, _HMG_ModalDialogReturn := 0, NIL )
 
+#ifdef _OBJECT_
+      This.Cargo := oHmgData()
+#endif
       FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors, bInit, lClosable, cFontName, nMaxLen )
 
    END WINDOW
@@ -260,6 +263,9 @@ STATIC FUNCTION FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors
    LOCAL n
    LOCAL lIsWin10 := _SetGetGlobal( "_HMG_IsWin10" )
    LOCAL lExt
+#ifdef _OBJECT_
+   LOCAL nY, nX, cIco
+#endif
 
 #ifdef _HMG_COMPAT_
    CHECK TYPE cMsg AS CHARACTER, ;
@@ -274,14 +280,13 @@ STATIC FUNCTION FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors
       nMaxLen AS NUMERIC
 #endif
    IF ISNUMERIC( aOptions )
-
       nSeconds := aOptions
       aOptions := { "&OK" }
-
       DEFINE TIMER oTimer OF ( cForm ) INTERVAL nSeconds * 1000 ACTION ( _SetGetGlobal( "_HMG_PressButton", .T. ), ThisWindow.Release() )
-
+#ifdef _OBJECT_
+      This.Cargo:oTimer := "TIMER"
+#endif
       This.oTimer.Enabled := .F.
-
    ENDIF
 
    nLenaOp := iif( ISARRAY( aOptions ), Len( aOptions ), 1 )
@@ -384,6 +389,9 @@ STATIC FUNCTION FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors
             FONT cFont WIDTH nWidthCli - nCol + iif( nLineas < nMaxLines + 5, 0.9, 1 ) * MARGIN - nMaxWidth ;
             HEIGHT nChrHeight * nMaxLines + GetBorderHeight() ;
             FONTCOLOR aFontColor BACKCOLOR aBackColor READONLY NOHSCROLL
+#ifdef _OBJECT_
+         This.Cargo:Set( cLblName, This.(cLblName).Type )
+#endif
       ELSE
 
          FOR n := 1 TO nLineas
@@ -395,43 +403,67 @@ STATIC FUNCTION FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors
                FONT cFont WIDTH nWidthCli - nCol - GetBorderWidth() - MARGIN / 4 - nMaxWidth ;
                HEIGHT nChrHeight ;
                FONTCOLOR aFontColor BACKCOLOR aBackColor VCENTERALIGN
-
+#ifdef _OBJECT_
+            This.Cargo:Set( cLblName, This.(cLblName).Type )
+#endif
          NEXT n
 
       ENDIF
 
    ELSE
 
-      @ nRow + GetBorderHeight(), nCol LABEL Say_01 VALUE AllTrim( cMsg ) OF ( cForm ) ;
+      cLblName := "Say_01"
+
+      @ nRow + GetBorderHeight(), nCol LABEL ( cLblName ) VALUE AllTrim( cMsg ) OF ( cForm ) ;
          FONT cFont WIDTH nWidthCli - nCol - GetBorderWidth() - MARGIN / 4 HEIGHT Max( nChrHeight, nIcoSize ) ;
          FONTCOLOR aFontColor BACKCOLOR aBackColor VCENTERALIGN
-
+#ifdef _OBJECT_
+      This.Cargo:Set( cLblName, This.(cLblName).Type )
+#endif
    ENDIF
 
    IF nIcoSize > 0
 
+#ifdef _OBJECT_
+      nY   := nRow + GetBorderHeight()
+      cIco := "ICON"
+#endif
       IF ISNUMBER( cIcoFile )
 
          IF IsHIcon( cIcoFile )
+#ifdef _OBJECT_
+            nX := MARGIN / iif( nIcoSize == 32, 1.4, iif( nIcoSize == 48, 1.7, 2 ) )
+#endif
             DRAW ICON IN WINDOW ( cForm ) ;
                AT nRow + GetBorderHeight(), MARGIN / iif( nIcoSize == 32, 1.4, iif( nIcoSize == 48, 1.7, 2 ) ) ;
                HICON cIcoFile WIDTH nIcoSize HEIGHT nIcoSize TRANSPARENT
          ELSE
+#ifdef _OBJECT_
+            nX := MARGIN / 1.4
+            cIco := "SYSICON " + hb_ntos( cIcoFile )
+#endif
             DRAW SYSICON IN WINDOW ( cForm ) ;
                AT nRow + GetBorderHeight(), MARGIN / 1.4 ;
                ICON cIcoFile WIDTH nIcoSize HEIGHT nIcoSize TRANSPARENT
          ENDIF
-
       ELSE
-
+#ifdef _OBJECT_
+         nX := MARGIN / iif( nIcoSize == 32, 1.4, iif( nIcoSize == 48, 1.7, 2 ) )
+#endif
          DRAW ICON IN WINDOW ( cForm ) ;
             AT nRow + GetBorderHeight(), MARGIN / iif( nIcoSize == 32, 1.4, iif( nIcoSize == 48, 1.7, 2 ) ) ;
             PICTURE cIcoFile WIDTH nIcoSize HEIGHT nIcoSize TRANSPARENT
 
       ENDIF
 
+#ifdef _OBJECT_
+      This.Cargo:Draw := { cIco, nY, nX, cIcoFile, nIcoSize }
+#endif
    ENDIF
 
+#ifdef _OBJECT_
+   This.Cargo:lExtButton := lExt
+#endif
    FOR n := 1 TO nLenaOp
 
       cBtnName := "Btn_" + StrZero( n, 2 )
@@ -444,13 +476,17 @@ STATIC FUNCTION FillDlg( cMsg, aOptions, nLineas, cIcoFile, nIcoSize, aBtnColors
             FONTCOLOR aFontColor BACKCOLOR aBtnColors[ n ] NOXPSTYLE HANDCURSOR ;
             FONT cFont WIDTH nMaxBoton HEIGHT nVMARGIN_BUTTON + nChrHeight + nVMARGIN_BUTTON ;
             ACTION ( _HMG_ModalDialogReturn := This.Cargo, _SetGetGlobal( "_HMG_PressButton", .T. ), ThisWindow.Release() )
-
+#ifdef _OBJECT_
+         This.Cargo:Set( cBtnName, This.(cBtnName).Type )
+#endif
       ELSE
 
          @ 0, 0 BUTTON ( cBtnName ) OF ( cForm ) CAPTION aOptions[ n ] ;
             FONT cFont WIDTH nMaxBoton HEIGHT nVMARGIN_BUTTON + nChrHeight + nVMARGIN_BUTTON ;
             ACTION ( _HMG_ModalDialogReturn := This.Cargo, _SetGetGlobal( "_HMG_PressButton", .T. ), ThisWindow.Release() )
-
+#ifdef _OBJECT_
+         This.Cargo:Set( cBtnName, This.(cBtnName).Type )
+#endif
       ENDIF
 
       This.( aBut[ nOpc ] ).Cargo := nOpc++

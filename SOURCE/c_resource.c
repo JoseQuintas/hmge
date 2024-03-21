@@ -274,12 +274,12 @@ HB_FUNC( RCDATATOFILE )
 
       if( NULL == hResData )
       {
-         dwResult = ( HB_SIZE ) -2;          // can't load
+         dwResult = ( HB_SIZE ) -2;           // can't load
       }
    }
    else
    {
-      dwResult = ( HB_SIZE ) -1;             // can't find
+      dwResult = ( HB_SIZE ) -1;              // can't find
    }
 
    if( 0 == dwResult )
@@ -299,19 +299,19 @@ HB_FUNC( RCDATATOFILE )
 
             if( dwResult != dwSize )
             {
-               dwResult = ( HB_SIZE ) -5;    // can't write
+               dwResult = ( HB_SIZE ) -5;     // can't write
             }
 
             hb_fileClose( pFile );
          }
          else
          {
-            dwResult = ( HB_SIZE ) -4;       // can't open
+            dwResult = ( HB_SIZE ) -4;        // can't open
          }
       }
       else
       {
-         dwResult = ( HB_SIZE ) -3;          // can't lock
+         dwResult = ( HB_SIZE ) -3;           // can't lock
       }
 
       FreeResource( hResData );

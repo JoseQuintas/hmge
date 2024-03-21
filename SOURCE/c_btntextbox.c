@@ -52,14 +52,14 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Button Class Name
-#define WC_BUTTON              "Button"
+   #define WC_BUTTON  "Button"
 // Edit Class Name
-#define WC_EDIT                "Edit"
+   #define WC_EDIT    "Edit"
 #endif
 #include "hbvm.h"
 
-#define TBB1  2
-#define TBB2  3
+#define TBB1          2
+#define TBB2          3
 
 LRESULT CALLBACK  OwnBtnTextProc( HWND hbutton, UINT msg, WPARAM wParam, LPARAM lParam );
 
@@ -90,24 +90,28 @@ HB_FUNC( INITBTNTEXTBOX )
    iStyle = WS_CHILD | ES_AUTOHSCROLL | WS_CLIPCHILDREN;
 
    if( hb_parl( 12 ) )
-   {     // if <lNumeric> is TRUE, then ES_NUMBER style is added.
+   {
+      // if <lNumeric> is TRUE, then ES_NUMBER style is added.
       iStyle |= ES_NUMBER;
    }
    else
    {
       if( hb_parl( 10 ) )
-      {  // if <lUpper> is TRUE, then ES_UPPERCASE style is added.
+      {
+         // if <lUpper> is TRUE, then ES_UPPERCASE style is added.
          iStyle |= ES_UPPERCASE;
       }
 
       if( hb_parl( 11 ) )
-      {  // if <lLower> is TRUE, then ES_LOWERCASE style is added.
+      {
+         // if <lLower> is TRUE, then ES_LOWERCASE style is added.
          iStyle |= ES_LOWERCASE;
       }
    }
 
    if( hb_parl( 13 ) )
-   {     // if <lPassword> is TRUE, then ES_PASSWORD style is added.
+   {
+      // if <lPassword> is TRUE, then ES_PASSWORD style is added.
       iStyle |= ES_PASSWORD;
    }
 
@@ -493,7 +497,7 @@ HB_FUNC( REDEFBTNTEXTBOX )
    hmg_storvnl_HANDLE( himage2, -1, 5 );
 }
 
-HB_FUNC( SETTBBTNMARGIN )  //SetTbBtnMargin(hEdit, BtnWidth, fBtns, fBtn2)
+HB_FUNC( SETTBBTNMARGIN )    //SetTbBtnMargin(hEdit, BtnWidth, fBtns, fBtn2)
 {
    HWND hedit    = hmg_par_raw_HWND( 1 );
    int  BtnWidth = ( int ) hb_parni( 2 );

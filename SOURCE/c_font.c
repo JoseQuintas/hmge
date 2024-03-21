@@ -52,9 +52,9 @@
 #include "hbapierr.h"
 
 #if ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x030000 )
-#include "hbwinuni.h"
+   #include "hbwinuni.h"
 #else
-#define HB_STRNCPY  hb_strncpy
+   #define HB_STRNCPY  hb_strncpy
 #endif
 #ifdef UNICODE
 LPWSTR   AnsiToWide( LPCSTR );
@@ -65,7 +65,7 @@ LPSTR    WideToAnsi( LPWSTR );
 void     RegisterResource( HANDLE hResource, LPCSTR szType );
 
 #ifdef __XCC__
-#define HB_ISBLOCK  ISBLOCK
+   #define HB_ISBLOCK  ISBLOCK
 #endif
 
 HFONT PrepareFont( TCHAR * FontName, int FontSize, int Weight, DWORD Italic, DWORD Underline, DWORD StrikeOut, DWORD Angle, DWORD charset )

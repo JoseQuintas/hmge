@@ -49,18 +49,18 @@
    Copyright 2007-2017 (C) P.Chornyj <myorg63@mail.ru>
    ----------------------------------------------------------------------*/
 #if ! defined( __WINNT__ )
-#define __WINNT__
+   #define __WINNT__
 #endif
 #include <mgdefs.h>
 #include "hbapierr.h"
 #include "hbapiitm.h"
 
 #if ! defined( __XHARBOUR__ )
-#include "hbwinuni.h"
+   #include "hbwinuni.h"
 #endif
 #if defined( __XHARBOUR__ ) || ( __HARBOUR__ - 0 < 0x030200 )
-#define HB_STRNLEN     hb_strnlen
-#define HB_STRNDUP     hb_strndup
+   #define HB_STRNLEN  hb_strnlen
+   #define HB_STRNDUP  hb_strndup
 #endif
 #define MAX_ITEM_TEXT  256
 
@@ -77,7 +77,7 @@ extern BOOL    SetAcceleratorTable( HWND, HACCEL );
 
 HBITMAP        HMG_LoadPicture
 (
-   const char  * FileName,
+   const char *   FileName,
    int New_Width,
    int New_Height,
    HWND hWnd,
@@ -307,13 +307,13 @@ HB_FUNC( TRACKPOPUPMENU )
 {
    HWND hwnd = hmg_par_raw_HWND( 4 );
 
-   SetForegroundWindow( hwnd );           /* hack for Microsoft "feature" */
+   SetForegroundWindow( hwnd );             /* hack for Microsoft "feature" */
 
    TrackPopupMenu( hmg_par_raw_HMENU( 1 ), 0, hb_parni( 2 ), hb_parni( 3 ), 0, hwnd, NULL );
 
    if( hb_pcount() > 4 && HB_ISLOG( 5 ) && hb_parl( 5 ) )
    {
-      PostMessage( hwnd, WM_NULL, 0, 0 ); /* hack for tray menu closing */
+      PostMessage( hwnd, WM_NULL, 0, 0 );   /* hack for tray menu closing */
    }
 }
 

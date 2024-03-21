@@ -1,1 +1,0 @@
-call ..\..\..\batch\compile.bat presa /lg winreport /l hbzebra %1 %2 %3 %4 %5 %6 %7 %8 %9

@@ -51,34 +51,34 @@
         "HWGUI"
         Copyright 2001-2008 Alexander S.Kresin <alex@kresin.ru>
 
-  ---------------------------------------------------------------------------*/
+   ---------------------------------------------------------------------------*/
 #include <mgdefs.h>
 #include <commdlg.h>
 #include <commctrl.h>
 
 #if defined( _MSC_VER )
-#pragma warning( push )
-#pragma warning( disable : 4201 )   /* warning C4201: nonstandard extension used: nameless struct/union */
+   #pragma warning( push )
+   #pragma warning( disable : 4201 )   /* warning C4201: nonstandard extension used: nameless struct/union */
 #endif
 #include <richedit.h>
 #if defined( _MSC_VER )
-#pragma warning( pop )
+   #pragma warning( pop )
 #endif
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
-#define PFNS_NEWNUMBER	0x8000	    // Start new number with wNumberingStart
+   #define PFNS_NEWNUMBER  0x8000       // Start new number with wNumberingStart
 #endif
 #include <shlwapi.h>
 
 #ifdef __POCC__
-#define PFNS_NEWNUMBER  0x8000
+   #define PFNS_NEWNUMBER  0x8000
 #endif
 #if defined( __WATCOMC__ )
-#define SF_USECODEPAGE  0x0020      /* CodePage given by high word */
+   #define SF_USECODEPAGE  0x0020      /* CodePage given by high word */
 #endif
 
 // by Dr. Claudio Soto, January 2014
 #ifndef CP_UNICODE
-#define CP_UNICODE      1200        // The text is UTF-16 (the WCHAR data type)
+   #define CP_UNICODE      1200        // The text is UTF-16 (the WCHAR data type)
 #endif
 #ifdef UNICODE
 LPWSTR            AnsiToWide( LPCSTR );
@@ -439,14 +439,14 @@ HB_FUNC( RICHEDITBOX_SETBKGNDCOLOR )
    }
    else
    {
-      SendMessage( hWndControl, EM_SETBKGNDCOLOR, ( WPARAM ) 1, 0 ); // Set to the window background system color
+      SendMessage( hWndControl, EM_SETBKGNDCOLOR, ( WPARAM ) 1, 0 );     // Set to the window background system color
    }
 }
 
 //        RichEditBox_SetZoom ( hWndControl, nNumerator, nDenominator )
-HB_FUNC( RICHEDITBOX_SETZOOM )                                                                           // ZoomRatio = nNumerator / nDenominator
+HB_FUNC( RICHEDITBOX_SETZOOM )                                                                             // ZoomRatio = nNumerator / nDenominator
 {
-   SendMessage( hmg_par_raw_HWND( 1 ), EM_SETZOOM, ( WPARAM ) hb_parni( 2 ), ( LPARAM ) hb_parni( 3 ) ); // 1/64 < ZoomRatio < 64
+   SendMessage( hmg_par_raw_HWND( 1 ), EM_SETZOOM, ( WPARAM ) hb_parni( 2 ), ( LPARAM ) hb_parni( 3 ) );   // 1/64 < ZoomRatio < 64
 }
 
 //        RichEditBox_GetZoom ( hWndControl, @nNumerator, @nDenominator )
@@ -492,7 +492,7 @@ HB_FUNC( RICHEDITBOX_SETFONT )
    if( HB_ISNUM( 3 ) && hb_parnl( 3 ) )
    {
       Mask = Mask | CFM_SIZE;
-      CharFormat2.yHeight = hb_parnl( 3 ) * 20 / 1;               // yHeight (character height) is in twips (1/1440 of an inch or 1/20 of a printer point)
+      CharFormat2.yHeight = hb_parnl( 3 ) * 20 / 1;                 // yHeight (character height) is in twips (1/1440 of an inch or 1/20 of a printer point)
    }
 
    if( HB_ISLOG( 4 ) )
@@ -614,7 +614,7 @@ HB_FUNC( RICHEDITBOX_GETFONT )
 
    if( HB_ISBYREF( 3 ) )
    {
-      hb_stornl( ( LONG ) ( CharFormat2.yHeight * 1 / 20 ), 3 );  // yHeight (character height) is in twips (1/1440 of an inch or 1/20 of a printer point)
+      hb_stornl( ( LONG ) ( CharFormat2.yHeight * 1 / 20 ), 3 );         // yHeight (character height) is in twips (1/1440 of an inch or 1/20 of a printer point)
    }
 
    if( HB_ISBYREF( 4 ) )
@@ -1017,7 +1017,7 @@ HB_FUNC( RICHEDITBOX_SETPARAFORMAT )
    if( HB_ISNUM( 6 ) )
    {
       Mask = Mask | PFM_OFFSET;
-      ParaFormat2.dxOffset = ( LONG ) ( ( double ) ( Offset * 1440.0 / 25.4 ) ); // Offset is in millimeters ( 1 inch = 25.4 mm = 1440 twips )
+      ParaFormat2.dxOffset = ( LONG ) ( ( double ) ( Offset * 1440.0 / 25.4 ) );           // Offset is in millimeters ( 1 inch = 25.4 mm = 1440 twips )
    }
 
    if( LineSpacing > 0.0 )
@@ -1030,7 +1030,7 @@ HB_FUNC( RICHEDITBOX_SETPARAFORMAT )
    if( HB_ISNUM( 8 ) )
    {
       Mask = Mask | PFM_STARTINDENT;
-      ParaFormat2.dxStartIndent = ( LONG ) ( ( double ) ( StartIndent * 1440.0 / 25.4 ) );   // StartIndent is in millimeters ( 1 inch = 25.4 mm = 1440 twips )
+      ParaFormat2.dxStartIndent = ( LONG ) ( ( double ) ( StartIndent * 1440.0 / 25.4 ) );             // StartIndent is in millimeters ( 1 inch = 25.4 mm = 1440 twips )
    }
 
    ParaFormat2.dwMask = Mask;
@@ -1180,11 +1180,11 @@ HB_FUNC( RICHEDITBOX_GETPARAFORMAT )
       }
       else if( ParaFormat2.bLineSpacingRule == 3 )
       {
-         LineSpacing = ( ( double ) ParaFormat2.dyLineSpacing ) * -1.0;          // if < 0 is in twips
+         LineSpacing = ( ( double ) ParaFormat2.dyLineSpacing ) * -1.0;              // if < 0 is in twips
       }
       else if( ParaFormat2.bLineSpacingRule == 4 )
       {
-         LineSpacing = ( ( double ) ParaFormat2.dyLineSpacing ) * -1.0;          // if < 0 is in twips
+         LineSpacing = ( ( double ) ParaFormat2.dyLineSpacing ) * -1.0;              // if < 0 is in twips
       }
       else if( ParaFormat2.bLineSpacingRule == 5 )
       {
@@ -1203,24 +1203,24 @@ HB_FUNC( RICHEDITBOX_GETPARAFORMAT )
 
 HB_FUNC( RICHEDITBOX_SELCOPY )
 {
-   SendMessage( hmg_par_raw_HWND( 1 ), WM_COPY, 0, 0 );  // copy the current selection to the clipboard in CF_TEXT format
+   SendMessage( hmg_par_raw_HWND( 1 ), WM_COPY, 0, 0 );      // copy the current selection to the clipboard in CF_TEXT format
 }
 
 HB_FUNC( RICHEDITBOX_SELPASTE )
 {
-   SendMessage( hmg_par_raw_HWND( 1 ), WM_PASTE, 0, 0 ); // copy the current content of the clipboard at the current caret position,
+   SendMessage( hmg_par_raw_HWND( 1 ), WM_PASTE, 0, 0 );     // copy the current content of the clipboard at the current caret position,
 }
 
 // data is inserted only if the clipboard contains data in CF_TEXT format
 
 HB_FUNC( RICHEDITBOX_SELCUT )
 {
-   SendMessage( hmg_par_raw_HWND( 1 ), WM_CUT, 0, 0 );   // delete (cut) the current selection and place the deleted content on the clipboard
+   SendMessage( hmg_par_raw_HWND( 1 ), WM_CUT, 0, 0 );       // delete (cut) the current selection and place the deleted content on the clipboard
 }
 
 HB_FUNC( RICHEDITBOX_SELCLEAR )
 {
-   SendMessage( hmg_par_raw_HWND( 1 ), WM_CLEAR, 0, 0 ); // delete (cut) the current selection
+   SendMessage( hmg_par_raw_HWND( 1 ), WM_CLEAR, 0, 0 );     // delete (cut) the current selection
 }
 
 HB_FUNC( RICHEDITBOX_CHANGEUNDO )
@@ -1281,7 +1281,7 @@ HB_FUNC( RICHEDITBOX_SETRECT )
 }
 
 //        RichEditBox_PastEspecial ( hWndControl , ClipboardFormat )
-HB_FUNC( RICHEDITBOX_PASTESPECIAL ) // Paste a specific clipboard format in a rich edit control
+HB_FUNC( RICHEDITBOX_PASTESPECIAL )   // Paste a specific clipboard format in a rich edit control
 {
    if( HB_ISCHAR( 2 ) )
    {
@@ -1341,7 +1341,7 @@ HB_FUNC( RICHEDITBOX_POSFROMCHAR )
    POINTL PointL;
    POINT  Point;
 
-   SendMessage( hWndControl, EM_POSFROMCHAR, ( WPARAM ) &PointL, ( LPARAM ) nPosChar );   // Retrieves the client area coordinates of
+   SendMessage( hWndControl, EM_POSFROMCHAR, ( WPARAM ) &PointL, ( LPARAM ) nPosChar );         // Retrieves the client area coordinates of
 
    // a specified character in an edit control
    hb_reta( 2 );

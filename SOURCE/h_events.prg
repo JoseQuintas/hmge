@@ -231,35 +231,27 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
                IF IsWindowEnabled( _HMG_aControlHandles [i] )
 
                   IF _HMG_aControlFontColor [i] != Nil
-
                      IF ValType( _HMG_aControlFontColor [ i, 2 ] ) == "A" .AND. Len( _HMG_aControlFontColor [ i, 2 ] ) == 3
                         SetTextColor( wParam, _HMG_aControlFontColor [ i, 2, 1 ], _HMG_aControlFontColor [ i, 2, 2 ], _HMG_aControlFontColor [ i, 2, 3 ] )
                      ELSEIF ValType( _HMG_aControlFontColor [ i, 2 ] ) == "N" .AND. Len( _HMG_aControlFontColor [ i ] ) == 3
                         SetTextColor( wParam, _HMG_aControlFontColor [ i, 1 ], _HMG_aControlFontColor [ i, 2 ], _HMG_aControlFontColor [ i, 3 ] )
                      ENDIF
-
                   ENDIF
 
                   IF _HMG_aControlBkColor [i] != Nil
 
                      IF ValType( _HMG_aControlBkColor [ i, 2 ] ) == "A" .AND. Len( _HMG_aControlBkColor [ i, 2 ] ) == 3
-
                         SetBkColor( wParam , _HMG_aControlBkColor [ i, 2, 1 ] , _HMG_aControlBkColor [ i, 2, 2 ] , _HMG_aControlBkColor [ i, 2, 3 ] )
                         DeleteObject ( _HMG_aControlBrushHandle [ i ] )
                         _HMG_aControlBrushHandle [ i ] := CreateSolidBrush( _HMG_aControlBkColor [ i, 2, 1 ] , _HMG_aControlBkColor [ i, 2, 2 ] , _HMG_aControlBkColor [ i, 2, 3 ] )
                         RETURN ( _HMG_aControlBrushHandle [i] )
-
                      ELSE
-
                         IF ValType( _HMG_aControlBkColor [ i, 2 ] ) == "N" .AND. Len( _HMG_aControlBkColor [ i ] ) == 3
-
                            SetBkColor( wParam , _HMG_aControlBkColor [ i, 1 ] , _HMG_aControlBkColor [ i, 2 ] , _HMG_aControlBkColor [ i, 3 ] )
                            DeleteObject ( _HMG_aControlBrushHandle [ i ] )
                            _HMG_aControlBrushHandle [i] := CreateSolidBrush( _HMG_aControlBkColor [ i, 1 ] , _HMG_aControlBkColor [ i, 2 ] , _HMG_aControlBkColor [ i, 3 ] )
                            RETURN _HMG_aControlBrushHandle [i]
-
                         ENDIF
-
                      ENDIF
 
                   ELSE
@@ -354,9 +346,7 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
                ENDIF
 
                IF ISLOGICAL ( _HMG_aControlInputMask [i] )
-                  IF _HMG_aControlInputMask [i] == .T. .AND. ;
-                     ( _HMG_aFormBkColor [ x := AScan ( _HMG_aFormHandles , _HMG_aControlParentHandles [i] ) ] [1] != -1 .OR. ;
-                     Len ( HMG_GetFormControls ( _HMG_aFormNames [x] , "IMAGE" ) ) > 0 )
+                  IF _HMG_aControlInputMask [i] == .T.
                      SetBkMode( wParam , TRANSPARENT )
                      RETURN GetStockObject ( NULL_BRUSH )
                   ENDIF
@@ -439,13 +429,10 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
                         IF IsXPThemed .AND. _HMG_aControlContainerRow [i] <> -1 .AND. _HMG_aControlContainerCol [i] <> -1
 
                            IF ( a := _GetBackColor ( _HMG_aControlRangeMin [i] , _HMG_aControlRangeMax [i] ) ) != Nil
-
                               IF lvc
                                  _HMG_aControlBkColor [i] := a
                               ENDIF
-
                            ELSE
-
 #if defined( _PANEL_ ) .AND. defined( _HMG_COMPAT_ )
                               IF GetFormNameByHandle ( _HMG_aControlParentHandles [i] , @z ) > 0 .AND. GetWindowType ( z ) == 'P'
                               ELSEIF _HMG_aControlDblClick [i] == .F. .AND. ( !lOpaque .OR. lvc ) .AND. _HMG_aControlBkColor [i] == Nil
@@ -458,7 +445,6 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
                                  _HMG_aControlBrushHandle [r] := GetTabBrush( z )
                                  RETURN GetTabbedControlBrush ( wParam , lParam , z , _HMG_aControlBrushHandle [r] )
                               ENDIF
-
                            ENDIF
 
                         ENDIF
@@ -466,14 +452,12 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
                         IF ISLOGICAL ( _HMG_aControlInputMask [i] )
 
                            IF _HMG_aControlInputMask [i] == .T. .AND. _HMG_aControlBkColor [i] == Nil
-
                               IF IsXPThemed .AND. ( a := _HMG_aFormBkColor [AScan ( _HMG_aFormHandles , _HMG_aControlParentHandles [i] )] ) [1] != -1
                                  _HMG_aControlBkColor [i] := a
                               ELSE
                                  SetBkMode( wParam , TRANSPARENT )
                                  RETURN GetStockObject( NULL_BRUSH )
                               ENDIF
-
                            ENDIF
 
                         ENDIF

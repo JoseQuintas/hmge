@@ -1,1 +1,0 @@
-call ..\..\..\batch\compile.bat PassGen %1 /l hbnulrdd %2 %3 %4 %5 %6 %7 %8 %9

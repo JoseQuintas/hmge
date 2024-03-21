@@ -87,7 +87,8 @@ void InterpretHotKey( UINT setting, TCHAR * szKeyName )
    WorkKey = MapVirtualKey( uVKey, 0 );
 
    if( uCode & 0x00000008 )
-   {  // extended key
+   {
+      // extended key
       WorkKey = 0x03000000 | ( WorkKey << 16 );
    }
    else

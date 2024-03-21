@@ -50,7 +50,7 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Button Class Name
-#define WC_BUTTON              "Button"
+   #define WC_BUTTON  "Button"
 #endif
 #include "hbapierr.h"
 

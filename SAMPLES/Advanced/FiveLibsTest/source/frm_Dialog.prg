@@ -14,12 +14,19 @@ FUNCTION frm_Dialog( Self )
    IF hb_ASCan( ::aEditList, { | e | e[ CFG_ISKEY ] } ) != 0
       SET INDEX TO ( ::cFileDBF )
    ENDIF
-   // dbfs for code validation
    FOR EACH aItem IN ::aEditList
       IF ! Empty( aItem[ CFG_VTABLE ] ) .AND. Select( aItem[ CFG_VTABLE ] ) == 0
+         // dbfs for code validation
          SELECT 0
          USE ( aItem[ CFG_VTABLE ] )
          SET INDEX TO ( aItem[ CFG_VTABLE ] )
+         SET ORDER TO 1
+      ENDIF
+      IF ! Empty( aItem[ CFG_BTABLE ] ) .AND. Select( aItem[ CFG_BTABLE ] ) == 0
+         // dbfs for browse
+         SELECT 0
+         USE ( aItem[ CFG_BTABLE ] )
+         SET INDEX TO ( aItem[ CFG_BTABLE ] )
          SET ORDER TO 1
       ENDIF
    NEXT
@@ -37,9 +44,9 @@ FUNCTION frm_Dialog( Self )
 
    SELECT ( Select( ::cFileDbf ) )
 
-   gui_DialogCreate( @::oDlg, 0, 0, ::nDlgWidth, ::nDlgHeight, ::cTitle )
+   gui_DialogCreate( @::xDlg, 0, 0, ::nDlgWidth, ::nDlgHeight, ::cTitle )
    ::CreateControls()
-   gui_DialogActivate( ::oDlg, { || ::EditOff(), ::UpdateEdit() } )
+   gui_DialogActivate( ::xDlg, { || ::EditOff(), ::UpdateEdit() } )
 
 #ifdef HBMK_HAS_GTWVG
    DO WHILE Inkey(1) != K_ESC

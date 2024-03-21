@@ -324,7 +324,7 @@ RETURN NIL
 FUNCTION SBrowse_Record( oBrw, cTitle, bSetUp, aHead, nWidth, nHeight, lNoCrLf, lModal )
 
    LOCAL oCol, aArr := {}, cHdr
-DEFAULT cTitle := "Record View", bSetUp := .T., aHead := { "Key", "Value" }, lNoCrLf := .F.
+   DEFAULT cTitle := "Record View", bSetUp := .T., aHead := { "Key", "Value" }, lNoCrLf := .F.
 
    FOR EACH oCol IN oBrw:aColumns
       IF oCol:cName == "SELECTOR" ; LOOP
@@ -350,16 +350,17 @@ FUNCTION _TBrowse( oParam, uAlias, cBrw, nY, nX, nW, nH )
    LOCAL cForm := _HMG_ThisFormName, lSpecHd, bInit, bEnd
    LOCAL hForm := GetFormHandle( cForm )
    LOCAL i, j
-DEFAULT oParam := oHmgData()
 
-DEFAULT cBrw := oParam:cBrw, uAlias := oParam:uAlias
-DEFAULT cBrw := "oBrw", uAlias := Alias()
-DEFAULT nY := oParam:nRow, nX := oParam:nCol, nW := oParam:nWidth, nH := oParam:nHeight
-DEFAULT nY := oParam:nY, nX := oParam:nX, nW := oParam:nW, nH := oParam:nH
-DEFAULT lSpecHd := oParam:lSpecHd
-DEFAULT lSpecHd := oParam:lSpecHeader
-DEFAULT lSpecHd := oParam:lDrawSpecHd
-DEFAULT lSpecHd := .F.
+   DEFAULT oParam := oHmgData()
+
+   DEFAULT cBrw := oParam:cBrw, uAlias := oParam:uAlias
+   DEFAULT cBrw := "oBrw", uAlias := Alias()
+   DEFAULT nY := oParam:nRow, nX := oParam:nCol, nW := oParam:nWidth, nH := oParam:nHeight
+   DEFAULT nY := oParam:nY, nX := oParam:nX, nW := oParam:nW, nH := oParam:nH
+   DEFAULT lSpecHd := oParam:lSpecHd
+   DEFAULT lSpecHd := oParam:lSpecHeader
+   DEFAULT lSpecHd := oParam:lDrawSpecHd
+   DEFAULT lSpecHd := .F.
 
    IF HB_ISCHAR( uAlias ) ; dbSelectArea( uAlias )
    ENDIF
@@ -405,7 +406,7 @@ DEFAULT lSpecHd := .F.
       nY := 0, ;
       nX := 0, ;
       nW := _GetClientRect( hForm )[ 3 ] - nX * 2, ; // GetClientWidth
-   nH := _GetClientRect( hForm )[ 4 ] - nY - 1 - ;     // GetClientHeight
+      nH := _GetClientRect( hForm )[ 4 ] - nY - 1 - ;     // GetClientHeight
       iif( _IsControlDefined( "StatusBar", cForm ), GetProperty( cForm, "StatusBar", "Height" ), 0 )
 
    DEFAULT aColor := { ;

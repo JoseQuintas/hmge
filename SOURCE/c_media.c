@@ -50,15 +50,15 @@
 #include <mmsystem.h>
 
 #if defined( __BORLANDC__ )
-#pragma warn -use /* unused var */
-#if defined( _WIN64 )
-#ifndef UNICODE
+   #pragma warn -use /* unused var */
+   #if defined( _WIN64 )
+      #ifndef UNICODE
 extern HWND _MCIWndCreate( HWND, HINSTANCE, DWORD, LPCSTR );
-#else
+      #else
 extern HWND _MCIWndCreate( HWND, HINSTANCE, DWORD, LPCWSTR );
-#endif
-#endif /* _WIN64 */
-#endif /* __BORLANDC__ */
+      #endif
+   #endif /* _WIN64 */
+#endif    /* __BORLANDC__ */
 
 #include <vfw.h>
 

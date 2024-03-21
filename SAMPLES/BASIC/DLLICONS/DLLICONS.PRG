@@ -346,13 +346,24 @@ RETURN NIL
 *+
 FUNCTION SaveIcon( cIconName, cIconSrc, nItem )
 
-   LOCAL aIcons := ExtractIconEx( cIconSrc, nItem )
+   LOCAL aIcons := {}, aSizes := { 32, 16 }, n
+   LOCAL lRet
 
-   IF ".ICO" $ Upper( cIconName )
+   IF ".ico" $ Lower( cIconName )
    ELSE
-      cIconName := Trim( cIconName ) + ".ICO"
+      cIconName := Trim( cIconName ) + ".ico"
    ENDIF
 
-RETURN C_SaveHIconToFile( cIconName, aIcons )
+   FOR n := 1 TO Len( aSizes )
+      AAdd( aIcons, ExtractIconEx( cIconSrc, nItem, aSizes[n], aSizes[n] )[1] )
+   NEXT
+
+   lRet := C_SaveHIconToFile( cIconName, aIcons )
+
+   FOR n := 1 TO Len( aIcons )
+      DestroyIcon( aIcons[n] )
+   NEXT
+
+RETURN lRet
 
 *+ EOF: DLLICONS.PRG

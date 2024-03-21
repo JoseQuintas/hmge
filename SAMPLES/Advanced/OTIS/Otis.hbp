@@ -11,6 +11,6 @@
 
 -Ic:/minigui/include
 
--w2 -es2 -q0
+-w -es2 -q0
 
 Otis.prg

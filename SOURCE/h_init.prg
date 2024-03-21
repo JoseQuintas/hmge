@@ -95,7 +95,7 @@ PROCEDURE Init
    _HMG_IsXP := os_isWinXP()
    _HMG_IsXPorLater := IsWinXPorLater ()
    _HMG_IsThemed := IsThemed ()
-   _HMG_IsBcc77 := ( "7.7" $ hb_compiler() )
+   _HMG_IsBcc77 := iif( IsExe64(), ( "7.7" $ hb_Ccompiler() ), ( "7.7" $ hb_compiler() ) )
 
    _HMG_LANG_ID := ''
 
@@ -262,8 +262,11 @@ PROCEDURE Init
 
    _HMG_MainWindowFirst := .T.
    _HMG_MainActive      := .F.
-   _HMG_MainCargo	:= hmg_Version()
    _HMG_MainHandle      := 0
+#ifdef _OBJECT_
+   _HMG_MainCargo	:= oHmgData()
+   _HMG_MainCargo:Version := hmg_Version()
+#endif
 
    _HMG_MouseRow        := 0
    _HMG_MouseCol        := 0

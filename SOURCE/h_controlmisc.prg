@@ -522,17 +522,17 @@ FUNCTION _SetValue ( ControlName, ParentForm, Value, index )
       _DoControlEventProcedure ( _HMG_aControlChangeProcedure [ix] , ix , 'CONTROL_ONCHANGE' )
 
    CASE T == "GRID"
-      aPos := iif( ISARRAY ( Value ), value [1], value )
+      x := iif( ISARRAY ( Value ), value [1], value )
 
       IF _HMG_aControlFontColor [ix] == .F.
-         ListView_SetCursel ( c, aPos )
-         ListView_EnsureVisible ( c , aPos )
+         ListView_SetCursel ( c, x )
+         ListView_EnsureVisible ( c , x )
       ELSE
-         x := ( ISARRAY ( Value ) .AND. ( _HMG_aControlMiscData1 [ix] [ 1 ] <> value [1] .OR. ;
-            _HMG_aControlMiscData1 [ix] [ 17 ] <> value [2] ) )
-         _HMG_aControlMiscData1 [ix] [ 1 ]  := aPos
+         xPreviousValue := ( ISARRAY ( Value ) .AND. ;
+            ( _HMG_aControlMiscData1 [ix] [ 1 ] <> value [1] .OR. _HMG_aControlMiscData1 [ix] [ 17 ] <> value [2] ) )
+         _HMG_aControlMiscData1 [ix] [ 1 ]  := x
          _HMG_aControlMiscData1 [ix] [ 17 ] := iif( ISARRAY ( Value ), value [2], 1 )
-
+#ifdef _HMG_COMPAT_
          IF ISARRAY ( Value )
             DO CASE
                CASE ListViewGetItemCount ( c ) == 0
@@ -551,12 +551,13 @@ FUNCTION _SetValue ( ControlName, ParentForm, Value, index )
                   ENDIF
             ENDCASE
          ENDIF
-
+#endif
          ListView_SetCursel ( c, _HMG_aControlMiscData1 [ix] [ 1 ] )
          ListView_EnsureVisible ( c , _HMG_aControlMiscData1 [ix] [ 1 ] )
 
-         IF ISARRAY ( Value ) .AND. ( _HMG_aControlMiscData1 [ix] [ 1 ] <> value [1] .OR. ;
-            _HMG_aControlMiscData1 [ix] [ 17 ] <> value [2] ) .OR. x .OR. ! ISARRAY ( Value )
+         IF ISARRAY ( Value ) .AND. ;
+            ( _HMG_aControlMiscData1 [ix] [ 1 ] <> value [1] .OR. _HMG_aControlMiscData1 [ix] [ 17 ] <> value [2] ) .OR. ;
+            xPreviousValue .OR. ! ISARRAY ( Value )
             _DoControlEventProcedure ( _HMG_aControlChangeProcedure [ix] , ix , 'CONTROL_ONCHANGE' )
          ENDIF
 
@@ -5886,11 +5887,7 @@ FUNCTION DoMethod ( Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9
 
       CASE Arg2 == "ACTIVATE"
 
-         IF ! ISARRAY ( Arg1 )
-            Arg1 := { Arg1 }
-         ENDIF
-
-         _ActivateWindow ( Arg1 )
+         _ActivateWindow ( iif ( ISARRAY ( Arg1 ), Arg1, { Arg1 } ) )
 
       CASE Arg2 == "CENTER"
 
@@ -8675,6 +8672,44 @@ FUNCTION HMG_GetFormControls ( cFormName, cUserType )
    NEXT
 
 RETURN ASort ( aRetVal )
+
+*----------------------------------------------------------------------------*
+FUNCTION HMG_GetAllFonts( lObj )
+*----------------------------------------------------------------------------*
+   LOCAL oFonts := NIL
+   LOCAL aFonts := {}, cName
+   LOCAL aFont := {}, cFont, hFont
+
+   FOR EACH cFont IN _HMG_aControlType
+      IF cFont == "FONT"
+         AAdd( aFonts, _HMG_aControlNames[ hb_enumindex( cFont ) ] )
+      ENDIF
+   NEXT
+
+   IF lObj == NIL ; RETURN aFonts
+   ENDIF
+#ifdef _OBJECT_
+   oFonts := oHmgData()
+#endif
+
+   FOR EACH cName IN aFonts
+      hFont := GetFontHandle( cName )
+      cFont := GetFontParam ( hFont )
+      hb_AIns( cFont, 1, cName, .T. )
+      hb_ADel( cFont, Len( cFont ), .T. )
+      IF Empty( lObj )
+         AAdd( aFont, AClone( cFont ) )
+#ifdef _OBJECT_
+      ELSE
+         oFonts:Set( cName, AClone( cFont ) )
+#endif
+      ENDIF
+   NEXT
+
+   IF Empty( lObj ) ; RETURN aFont
+   ENDIF
+
+RETURN oFonts
 
 *-----------------------------------------------------------------------------*
 STATIC FUNCTION GetUserControlType ( ControlName, ParentForm )

@@ -90,52 +90,52 @@ HB_FUNC( GETNONCLIENTFONT )
    switch( hb_parni( 1 ) )
    {
       case 1:
-   #ifndef UNICODE
+#ifndef UNICODE
          HB_STORC( ncm.lfCaptionFont.lfFaceName, -1, 1 );
-   #else
+#else
          pStr = WideToAnsi( ncm.lfCaptionFont.lfFaceName );
          HB_STORC( pStr, -1, 1 );
          hb_xfree( pStr );
-   #endif
+#endif
          HB_STORNI( ( int ) -0.75 * ncm.lfCaptionFont.lfHeight, -1, 2 );
          HB_STORL( ncm.lfCaptionFont.lfWeight == 700 ? TRUE : FALSE, -1, 3 );
          HB_STORNI( ncm.lfCaptionFont.lfCharSet, -1, 4 );
          break;
 
       case 2:
-   #ifndef UNICODE
+#ifndef UNICODE
          HB_STORC( ncm.lfMenuFont.lfFaceName, -1, 1 );
-   #else
+#else
          pStr = WideToAnsi( ncm.lfMenuFont.lfFaceName );
          HB_STORC( pStr, -1, 1 );
          hb_xfree( pStr );
-   #endif
+#endif
          HB_STORNI( ( int ) -0.75 * ncm.lfMenuFont.lfHeight, -1, 2 );
          HB_STORL( ncm.lfMenuFont.lfWeight == 700 ? TRUE : FALSE, -1, 3 );
          HB_STORNI( ncm.lfMenuFont.lfCharSet, -1, 4 );
          break;
 
       case 3:
-   #ifndef UNICODE
+#ifndef UNICODE
          HB_STORC( ncm.lfStatusFont.lfFaceName, -1, 1 );
-   #else
+#else
          pStr = WideToAnsi( ncm.lfStatusFont.lfFaceName );
          HB_STORC( pStr, -1, 1 );
          hb_xfree( pStr );
-   #endif
+#endif
          HB_STORNI( ( int ) -0.75 * ncm.lfStatusFont.lfHeight, -1, 2 );
          HB_STORL( ncm.lfStatusFont.lfWeight == 700 ? TRUE : FALSE, -1, 3 );
          HB_STORNI( ncm.lfStatusFont.lfCharSet, -1, 4 );
          break;
 
       case 4:
-   #ifndef UNICODE
+#ifndef UNICODE
          HB_STORC( ncm.lfMessageFont.lfFaceName, -1, 1 );
-   #else
+#else
          pStr = WideToAnsi( ncm.lfMessageFont.lfFaceName );
          HB_STORC( pStr, -1, 1 );
          hb_xfree( pStr );
-   #endif
+#endif
          HB_STORNI( ( int ) -0.75 * ncm.lfMessageFont.lfHeight, -1, 2 );
          HB_STORL( ncm.lfMessageFont.lfWeight == 700 ? TRUE : FALSE, -1, 3 );
          HB_STORNI( ncm.lfMessageFont.lfCharSet, -1, 4 );

@@ -325,7 +325,7 @@ FUNCTION MsgMenu( cMensaje , aCaptions , aPictures , cBitmap , cTitulo , nFocusB
 
     END WINDOW
 
-    CENTER WINDOW (Form_MenuOp)
+    CENTER WINDOW &Form_MenuOp
 
     cBtnFocus := '_Msg_Btn' + LTRIM( STR( nFocusBtn ) )
     DoMethod(Form_MenuOp,cBtnFocus,'SetFocus')
@@ -337,7 +337,7 @@ FUNCTION MsgMenu( cMensaje , aCaptions , aPictures , cBitmap , cTitulo , nFocusB
        NEXT
     ENDIF
 
-    ACTIVATE WINDOW (Form_MenuOp)
+    ACTIVATE WINDOW &Form_MenuOp
 
     IF GetObjectType( nFontHandle ) == OBJ_FONT
        DeleteObject( nFontHandle )

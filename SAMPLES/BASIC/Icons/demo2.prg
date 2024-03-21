@@ -54,8 +54,6 @@ procedure main()
 
       define main menu
          define popup "&File" 
-            menuitem "&Save multipages icon" action MsgInfo( SaveIcon( "myicon.ico", cIcon, { 16, 24, 32, 128 } ), "Result" )
-            separator
             menuitem "E&xit" action ThisWindow.Release
          end popup
       end menu
@@ -69,18 +67,3 @@ procedure main()
    Form_Main.Activate()
 
 return
-
-///////////////////////////////////////////////////////////////////////////////
-Function SaveIcon( cIconName, cIcon, aSizes )
-   local hLib
-   local aIcons := {}, i
-
-   hLib := LoadLibraryEx( 'myicons.dll', 0, LOAD_LIBRARY_AS_DATAFILE )
-
-   For i = 1 To Len( aSizes )
-         AAdd( aIcons, LoadIconByName( cIcon, aSizes[i], aSizes[i], hLib ) )
-   Next
-
-   FreeLibrary( hLib )
-
-Return C_SaveHIconToFile( cIconName, aIcons )

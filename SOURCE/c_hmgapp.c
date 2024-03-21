@@ -69,12 +69,12 @@ HINSTANCE         GetInstance( void );
 HMODULE           hmg_LoadLibrarySystem( LPCTSTR pFileName );
 
 // auxiliary functions
-TCHAR             * hmg_tstrdup( const TCHAR * pszText );
-TCHAR             * hmg_tstrncat( TCHAR * pDest, const TCHAR * pSource, HB_SIZE nLen );
+TCHAR *              hmg_tstrdup( const TCHAR * pszText );
+TCHAR *              hmg_tstrncat( TCHAR * pDest, const TCHAR * pSource, HB_SIZE nLen );
 HB_SIZE           hmg_tstrlen( const TCHAR * pText );
 
 static DWORD      DllGetVersion( LPCTSTR lpszDllName );
-static TCHAR      * hmg_FileNameAtSystemDir( const TCHAR * pFileName );
+static TCHAR *       hmg_FileNameAtSystemDir( const TCHAR * pFileName );
 
 typedef HRESULT ( CALLBACK * _DLLGETVERSIONPROC )( DLLVERSIONINFO2 * );
 
@@ -116,10 +116,10 @@ hb_vmAtInit( hmg_init, NULL );
 HB_CALL_ON_STARTUP_END( _hmg_init_ )
 #endif
 #if defined( HB_PRAGMA_STARTUP )
-#pragma startup _hmg_init_
+   #pragma startup _hmg_init_
 #elif defined( HB_DATASEG_STARTUP )
-#define HB_DATASEG_BODY  HB_DATASEG_FUNC( _hmg_init_ )
-#include "hbiniseg.h"
+   #define HB_DATASEG_BODY  HB_DATASEG_FUNC( _hmg_init_ )
+   #include "hbiniseg.h"
 #endif
 
 HINSTANCE GetInstance( void )
@@ -183,7 +183,7 @@ HB_FUNC( OLEDATARELEASE )
 
 // borrowed from hbwapi.lib [vszakats]
 #ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
-#define LOAD_LIBRARY_SEARCH_SYSTEM32  0x00000800
+   #define LOAD_LIBRARY_SEARCH_SYSTEM32  0x00000800
 #endif
 static HB_BOOL win_has_search_system32( void )
 {
@@ -191,7 +191,7 @@ static HB_BOOL win_has_search_system32( void )
 
    if( hKernel32 )
    {
-      return GetProcAddress( hKernel32, "AddDllDirectory" ) != NULL; /* Detect KB2533623 */
+      return GetProcAddress( hKernel32, "AddDllDirectory" ) != NULL;   /* Detect KB2533623 */
    }
 
    return HB_FALSE;

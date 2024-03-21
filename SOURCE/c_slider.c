@@ -94,7 +94,7 @@ HB_FUNC( INITSLIDER )
       Style |= WS_TABSTOP;
    }
 
-   if( hb_parl( 16 ) )  /* P.Ch. 16.10 */
+   if( hb_parl( 16 ) )     /* P.Ch. 16.10 */
    {
       Style  |= TBS_ENABLESELRANGE;
       iSelMin = HB_MIN( hb_parnidef( 17, 0 ), hb_parnidef( 18, 0 ) );
@@ -120,7 +120,7 @@ HB_FUNC( INITSLIDER )
 
    if( ( hb_parl( 16 ) ) && ( iSelMin != iSelMax ) )
    {
-      SendMessage( hTrackBar, TBM_SETSEL, ( WPARAM ) TRUE, MAKELONG( iSelMin, iSelMax ) );   /* P.Ch. 16.10 */
+      SendMessage( hTrackBar, TBM_SETSEL, ( WPARAM ) TRUE, MAKELONG( iSelMin, iSelMax ) );         /* P.Ch. 16.10 */
    }
 
    hmg_ret_raw_HWND( hTrackBar );

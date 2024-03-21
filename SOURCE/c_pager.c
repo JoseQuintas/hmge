@@ -50,36 +50,36 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #ifdef __XCC__
-#include "unknwn.h"
+   #include "unknwn.h"
 #endif
 #if defined( __MINGW32__ ) && defined( __MINGW32_VERSION )
-#define Pager_ForwardMouse( hwnd, bForward )  ( void ) SendMessage( ( hwnd ), PGM_FORWARDMOUSE, ( WPARAM ) ( bForward ), 0 )
-#define Pager_SetBorder( hwnd, iBorder )      ( int ) SendMessage( ( hwnd ), PGM_SETBORDER, 0, ( LPARAM ) ( iBorder ) )
-#define Pager_GetBorder( hwnd )               ( int ) SendMessage( ( hwnd ), PGM_GETBORDER, 0, 0 )
-#define Pager_SetPos( hwnd, iPos )            ( int ) SendMessage( ( hwnd ), PGM_SETPOS, 0, ( LPARAM ) ( iPos ) )
-#define Pager_GetPos( hwnd )                  ( int ) SendMessage( ( hwnd ), PGM_GETPOS, 0, 0 )
-#define Pager_SetButtonSize( hwnd, iSize )    ( int ) SendMessage( ( hwnd ), PGM_SETBUTTONSIZE, 0, ( LPARAM ) ( iSize ) )
-#define Pager_GetButtonSize( hwnd )           ( int ) SendMessage( ( hwnd ), PGM_GETBUTTONSIZE, 0, 0 )
+   #define Pager_ForwardMouse( hwnd, bForward )  ( void ) SendMessage( ( hwnd ), PGM_FORWARDMOUSE, ( WPARAM ) ( bForward ), 0 )
+   #define Pager_SetBorder( hwnd, iBorder )      ( int ) SendMessage( ( hwnd ), PGM_SETBORDER, 0, ( LPARAM ) ( iBorder ) )
+   #define Pager_GetBorder( hwnd )               ( int ) SendMessage( ( hwnd ), PGM_GETBORDER, 0, 0 )
+   #define Pager_SetPos( hwnd, iPos )            ( int ) SendMessage( ( hwnd ), PGM_SETPOS, 0, ( LPARAM ) ( iPos ) )
+   #define Pager_GetPos( hwnd )                  ( int ) SendMessage( ( hwnd ), PGM_GETPOS, 0, 0 )
+   #define Pager_SetButtonSize( hwnd, iSize )    ( int ) SendMessage( ( hwnd ), PGM_SETBUTTONSIZE, 0, ( LPARAM ) ( iSize ) )
+   #define Pager_GetButtonSize( hwnd )           ( int ) SendMessage( ( hwnd ), PGM_GETBUTTONSIZE, 0, 0 )
 #endif
 
 /* missing constants in Watcom */
 #if defined( __WATCOMC__ )
-#define PGF_CALCWIDTH   1
-#define PGF_CALCHEIGHT  2
+   #define PGF_CALCWIDTH   1
+   #define PGF_CALCHEIGHT  2
 #endif
 #ifdef UNICODE
 LPWSTR      AnsiToWide( LPCSTR );
 #endif
 HINSTANCE   GetInstance( void );
 
-HB_FUNC( GETHANDLEREBAR )  // GetHandleRebar(hPager)
+HB_FUNC( GETHANDLEREBAR )    // GetHandleRebar(hPager)
 {
    HWND hRebar = ( HWND ) GetWindowLongPtr( hmg_par_raw_HWND( 1 ), GWLP_USERDATA );
 
    hmg_ret_raw_HWND( hRebar );
 }
 
-HB_FUNC( ADDTOPAGER )      // AdToPager (hwndPG , hToolBar)
+HB_FUNC( ADDTOPAGER )        // AdToPager (hwndPG , hToolBar)
 {
    HWND hPager = hmg_par_raw_HWND( 1 );
    HWND hTool  = hmg_par_raw_HWND( 2 );
@@ -88,12 +88,12 @@ HB_FUNC( ADDTOPAGER )      // AdToPager (hwndPG , hToolBar)
    SendMessage( hPager, PGM_RECALCSIZE, 0, 0 );
 }
 
-HB_FUNC( SETBKCOLORPAGER ) // SetBkColorPager(hwndPG , COLOR[])
+HB_FUNC( SETBKCOLORPAGER )   // SetBkColorPager(hwndPG , COLOR[])
 {
    SendMessage( hmg_par_raw_HWND( 1 ), PGM_SETBKCOLOR, 0, ( LPARAM ) RGB( hb_parni( 2 ), hb_parni( 3 ), hb_parni( 4 ) ) );
 }
 
-HB_FUNC( PAGERCALCSIZE )   // PagerCalcSize(lParam , nWidth)
+HB_FUNC( PAGERCALCSIZE )     // PagerCalcSize(lParam , nWidth)
 {
    NMPGCALCSIZE * lpCalcSize;
 
@@ -109,7 +109,7 @@ HB_FUNC( PAGERCALCSIZE )   // PagerCalcSize(lParam , nWidth)
    }
 }
 
-HB_FUNC( PAGERSCROLL )     // PagerScroll(lParam , nScroll)
+HB_FUNC( PAGERSCROLL )       // PagerScroll(lParam , nScroll)
 {
    NMPGSCROLL * lpScroll;
 
@@ -117,7 +117,7 @@ HB_FUNC( PAGERSCROLL )     // PagerScroll(lParam , nScroll)
    lpScroll->iScroll = hmg_par_INT( 2 );
 }
 
-HB_FUNC( INITPAGER )       // InitPager ( ParentForm, hRebar, nWidth, nHeight, vertical, autoscroll )
+HB_FUNC( INITPAGER )         // InitPager ( ParentForm, hRebar, nWidth, nHeight, vertical, autoscroll )
 {
    HWND  hPager;
    DWORD Style = WS_CHILD | WS_VISIBLE;

@@ -50,6 +50,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #endif
 #include "minigui.ch"
 #include "error.ch"
+#include "hbver.ch"
 
 *-----------------------------------------------------------------------------*
 INIT PROCEDURE ClipInit()
@@ -110,8 +111,8 @@ STATIC FUNCTION HMG_GenError( cMsg )
 
 RETURN oError
 
-#define MG_VERSION "Harbour MiniGUI Extended Edition 24.01 ("
-#include "hbver.ch"
+#define MG_VERSION "Harbour MiniGUI Extended Edition 24.03 ("
+
 *-----------------------------------------------------------------------------*
 FUNCTION MiniGuiVersion( nVer )
 *-----------------------------------------------------------------------------*

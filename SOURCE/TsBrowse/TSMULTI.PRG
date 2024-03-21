@@ -97,7 +97,7 @@ RETURN Self
 
 METHOD Default() CLASS TSMulti
 
-   LOCAL VALUE := Eval( ::bSetGet )
+   LOCAL Value := Eval( ::bSetGet )
 
    If ! Empty( Value )
       SetWindowText( ::hWnd, Value )

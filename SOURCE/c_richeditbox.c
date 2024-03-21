@@ -48,25 +48,25 @@
 
 #include <commctrl.h>
 #if defined( _MSC_VER )
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+   #pragma warning( push )
+   #pragma warning( disable : 4201 )
 #endif
 #include <richedit.h>
 #if defined( _MSC_VER )
-#pragma warning( pop )
+   #pragma warning( pop )
 #endif
 
 #if defined( __MINGW32__ ) && defined( __MINGW32_VERSION )
-#define IMF_AUTOFONT      0x0002
+   #define IMF_AUTOFONT      0x0002
 #endif
 #if defined( __WATCOMC__ )
-#define ENM_DRAGDROPDONE  0x00000010
-#define SF_USECODEPAGE    0x0020    /* CodePage given by high word */
+   #define ENM_DRAGDROPDONE  0x00000010
+   #define SF_USECODEPAGE    0x0020    /* CodePage given by high word */
 #endif
 #if defined( MSFTEDIT_CLASS )
-#undef MSFTEDIT_CLASS
+   #undef MSFTEDIT_CLASS
 #endif
-#define MSFTEDIT_CLASS    TEXT( "RICHEDIT50W" )
+#define MSFTEDIT_CLASS       TEXT( "RICHEDIT50W" )
 
 static BOOL       IsWinxpSp1Min( void );
 
@@ -181,7 +181,7 @@ DWORD CALLBACK EditStreamCallbackW( DWORD_PTR dwCookie, LPBYTE lpbBuff, LONG cb,
    return 0;
 }
 
-HB_FUNC( STREAMIN )                 //StreamIn(HWND hwndCtrl, LPCTSTR lpszPath, int typ )
+HB_FUNC( STREAMIN )                   //StreamIn(HWND hwndCtrl, LPCTSTR lpszPath, int typ )
 {
    HWND   hwnd = hmg_par_raw_HWND( 1 );
    HANDLE hFile;
@@ -257,7 +257,7 @@ HB_FUNC( STREAMIN )                 //StreamIn(HWND hwndCtrl, LPCTSTR lpszPath, 
    hmg_ret_L( ! ( es.dwError ) );
 }
 
-HB_FUNC( STREAMOUT )                //StreamOut(HWND hwndCtrl, LPCTSTR lpszPath, int Typ )
+HB_FUNC( STREAMOUT )                  //StreamOut(HWND hwndCtrl, LPCTSTR lpszPath, int Typ )
 {
    HWND   hwnd = hmg_par_raw_HWND( 1 );
    HANDLE hFile;
@@ -325,7 +325,7 @@ HB_FUNC( STREAMOUT )                //StreamOut(HWND hwndCtrl, LPCTSTR lpszPath,
    hmg_ret_L( ! ( es.dwError ) );
 }
 
-HB_FUNC( GETAUTOFONTRTF )           // GetAutoFont(HWND hwnd)
+HB_FUNC( GETAUTOFONTRTF )             // GetAutoFont(HWND hwnd)
 {
    LRESULT lAuto;
 
@@ -334,7 +334,7 @@ HB_FUNC( GETAUTOFONTRTF )           // GetAutoFont(HWND hwnd)
    hmg_ret_L( lAuto );
 }
 
-HB_FUNC( SETAUTOFONTRTF )           // SetAutoFont(HWND hwnd, lAutoFont)
+HB_FUNC( SETAUTOFONTRTF )             // SetAutoFont(HWND hwnd, lAutoFont)
 {
    HWND    hwnd = hmg_par_raw_HWND( 1 );
    LRESULT lOpt, lResult;
@@ -355,7 +355,7 @@ HB_FUNC( SETAUTOFONTRTF )           // SetAutoFont(HWND hwnd, lAutoFont)
    hmg_ret_L( lResult );
 }
 
-HB_FUNC( SETBKGNDCOLOR )            // SetBkgndColor(HWND hwnd, lSyscol, nRed, nGreen, nBlue)
+HB_FUNC( SETBKGNDCOLOR )              // SetBkgndColor(HWND hwnd, lSyscol, nRed, nGreen, nBlue)
 {
    LRESULT  lResult;
    INT      syscol   = hb_parl( 2 ) ? 0 : 1;
@@ -488,7 +488,7 @@ HB_FUNC( SETFONTRTF )
 }
 
 #if defined( _MSC_VER )
-#pragma warning( disable : 4996 )
+   #pragma warning( disable : 4996 )
 #endif
 static BOOL IsWinxpSp1Min( void )
 {

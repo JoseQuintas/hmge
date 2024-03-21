@@ -418,7 +418,7 @@ WORD GetDIBColors( LPSTR lpDIB )
    return wBitCount;
 }
 
-HB_FUNC( C_HASALPHA )   // hBitmap --> lYesNo
+HB_FUNC( C_HASALPHA )     // hBitmap --> lYesNo
 {
    HANDLE hDib;
    BOOL   bAlphaChannel = FALSE;
@@ -575,11 +575,13 @@ HB_FUNC( DRAWGLYPH )
       else
       {
          if( ! stretched )
-         {                // convert icon to bitmap mask.
+         {
+            // convert icon to bitmap mask.
             hBmp = IconMask2Bmp( ( HICON ) hBmp );
          }
          else
-         {                // convert icon to bitmap.
+         {
+            // convert icon to bitmap.
             hBmp = Icon2Bmp( ( HICON ) hBmp );
          }
 
@@ -618,8 +620,8 @@ HB_FUNC( DRAWGLYPH )
    hBmpNoBlink    = CreateCompatibleBitmap( hDC, dx, dy );
    hBmpNoBlinkOld = ( HBITMAP ) SelectObject( hDCNoBlink, hBmpNoBlink );
    BitBlt( hDCNoBlink, 0, 0, dx, dy, hDC, x, y, SRCCOPY );
-   SetBkColor( hDCNoBlink, RGB( 255, 255, 255 ) );  //White
-   SetTextColor( hDCNoBlink, RGB( 0, 0, 0 ) );      //Black
+   SetBkColor( hDCNoBlink, RGB( 255, 255, 255 ) );      //White
+   SetTextColor( hDCNoBlink, RGB( 0, 0, 0 ) );          //Black
 
    // was background colour given?
    // no? get the color automatically
@@ -700,8 +702,8 @@ HB_FUNC( DRAWGLYPHMASK )
 
    GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) &bitmap );
 
-   SetBkColor( hDC, RGB( 255, 255, 255 ) );        //White
-   SetTextColor( hDC, RGB( 0, 0, 0 ) );            //Black
+   SetBkColor( hDC, RGB( 255, 255, 255 ) );            //White
+   SetTextColor( hDC, RGB( 0, 0, 0 ) );                //Black
    hDCMem = CreateCompatibleDC( hDC );
 
    dx = ( dx > 0 ? HB_MIN( dx, bitmap.bmWidth ) : bitmap.bmWidth );
@@ -811,11 +813,13 @@ VOID DrawGlyph( HDC hDC, int x, int y, int dx, int dy, HBITMAP hBmp, COLORREF rg
       else
       {
          if( ! stretched )
-         {                // convert icon to bitmap mask.
+         {
+            // convert icon to bitmap mask.
             hBmp = IconMask2Bmp( ( HICON ) hBmp );
          }
          else
-         {                // convert icon to bitmap.
+         {
+            // convert icon to bitmap.
             hBmp = Icon2Bmp( ( HICON ) hBmp );
          }
 

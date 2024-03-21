@@ -2,7 +2,7 @@
 # miniprint2.hbp
 #
 
-#{bcc}-env:DEBUG=yes
+{bcc}-env:DEBUG=yes
 
 -hblib
 -inc

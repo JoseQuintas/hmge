@@ -44,19 +44,19 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE       0x0501
+#define _WIN32_IE          0x0501
 
 #ifdef __XCC__
-#define _WIN32_WINDOWS  0x0410
+   #define _WIN32_WINDOWS  0x0410
 #endif
 #include <mgdefs.h>
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Scrollbar Class Name
-#define WC_SCROLLBAR           "ScrollBar"
+   #define WC_SCROLLBAR    "ScrollBar"
 // Static Class Name
-#define WC_STATIC              "Static"
+   #define WC_STATIC       "Static"
 #endif
 
 LRESULT APIENTRY  SubClassFunc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );

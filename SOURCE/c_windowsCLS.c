@@ -54,7 +54,7 @@
 #include "hbapistr.h"
 
 #ifdef __XHARBOUR__
-#define hb_storclen_buffer  hb_storclenAdopt
+   #define hb_storclen_buffer  hb_storclenAdopt
 #endif
 #ifdef UNICODE
 BOOL  _isValidCtrlClassW( HWND hwndTip, LPWSTR ClassName );
@@ -148,7 +148,7 @@ HB_FUNC( GETCLASSNAME )
 HB_FUNC( GETCLASSNAMEBYREF )
 {
    HWND    hwnd = hmg_par_raw_HWND( 1 );
-   HB_SIZE nLen = hb_parcsiz( 2 );  // fixed P.Ch. 16.12.
+   HB_SIZE nLen = hb_parcsiz( 2 );    // fixed P.Ch. 16.12.
 
    hb_retni( 0 );
 

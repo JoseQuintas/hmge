@@ -1,7 +1,7 @@
-// ------------------------------------------------------------ //
+****************************************************************
 #include "hmg.ch"
 #include "i_winuser.ch"
-// ------------------------------------------------------------ //
+****************************************************************
 REQUEST DBFNSX
 
 FUNCTION Main()
@@ -46,7 +46,7 @@ FUNCTION Main()
    wndMainForm.Activate()
 
 RETURN NIL
-// ------------------------------------------------------------ //
+****************************************************************
 FUNCTION BrowseQuickIndexSearch( hWnd, nMsg, wParam, lParam )
 
    LOCAL cWindowName, cBrowseName
@@ -111,14 +111,14 @@ FUNCTION BrowseQuickIndexSearch( hWnd, nMsg, wParam, lParam )
    ENDIF
 
 RETURN NIL
-// ------------------------------------------------------------ //
+****************************************************************
 STATIC FUNCTION ClearSearch( cWindowName, cBrowseName )
 
    SetProperty( cWindowName, cBrowseName, "Cargo", "" )
    SetProperty( cWindowName, "StatusBar", "Item", 1, "" )
 
 RETURN 1
-// ------------------------------------------------------------ //
+****************************************************************
 STATIC FUNCTION IncrementalSearch( cWindowName, cBrowseName, cKey, nKey )
 
    LOCAL cSearchString

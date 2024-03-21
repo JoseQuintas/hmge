@@ -554,7 +554,7 @@ FUNCTION _DefineTBrowse( ControlName, ParentFormName, nCol, nRow, nWidth, nHeigh
    _HMG_aControlIds[ k ] := oBrw
    _HMG_aControlProcedures[ k ] := bDblclick
    _HMG_aControlPageMap[ k ] := aHeaders
-   _HMG_aControlValue[ k ] := VALUE
+   _HMG_aControlValue[ k ] := value
    _HMG_aControlInputMask[ k ] := Lock
    _HMG_aControllostFocusProcedure[ k ] := lostfocus
    _HMG_aControlGotFocusProcedure[ k ] := gotfocus

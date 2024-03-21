@@ -43,11 +43,11 @@
     "HWGUI"
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
-  ---------------------------------------------------------------------------*/
+   ---------------------------------------------------------------------------*/
 #include <mgdefs.h>
 
 #if defined( _MSC_VER )
-#pragma warning( disable : 4996 )
+   #pragma warning( disable : 4996 )
 #endif
 #include <commctrl.h>
 #include <lmcons.h>
@@ -59,23 +59,23 @@
 #include "hbapiitm.h"
 
 #if defined( __XHARBOUR__ )
-#define HB_FILE_TYPE_MAX  128
+   #define HB_FILE_TYPE_MAX  128
 #else
 
 /* this has to be declared before hbapifs.h is included */
-#define _HB_FILE_INTERNAL_
+   #define _HB_FILE_INTERNAL_
 #endif
 #include "hbapifs.h"
 #include "inkey.ch"
 
 #ifdef __XCC__
-char                       * itoa( int __value, char * __string, int __radix );
+char *                        itoa( int __value, char * __string, int __radix );
 #endif
 #if defined( _MSC_VER ) && ! defined( __POCC__ )
-#define itoa( __value, __string, __radix )  _itoa( __value, __string, __radix )
+   #define itoa( __value, __string, __radix )  _itoa( __value, __string, __radix )
 #endif
 #if defined( __XHARBOUR__ )
-#define HB_LONGLONG  LONGLONG
+   #define HB_LONGLONG  LONGLONG
 extern HB_EXPORT void      hb_evalBlock0( PHB_ITEM pCodeBlock );
 #endif
 extern HB_EXPORT BOOL      Array2Rect( PHB_ITEM aRect, RECT * rc );
@@ -167,7 +167,7 @@ HB_FUNC( WAITRUNPIPE )
    }
 
    Data = ( char * ) hb_xgrab( 1024 );
-   for( ;; )
+   for(;; )
    {
       DWORD BytesRead;
       DWORD TotalBytes;
@@ -210,7 +210,7 @@ HB_FUNC( WAITRUNPIPE )
    hb_xfree( Data );
 }
 
-HB_FUNC( COPYRTFTOCLIPBOARD ) // CopyRtfToClipboard(cRtfText) store cRTFText in Windows clipboard
+HB_FUNC( COPYRTFTOCLIPBOARD )   // CopyRtfToClipboard(cRtfText) store cRTFText in Windows clipboard
 {
    HGLOBAL      hglbCopy;
    char *       lptstrCopy;
@@ -237,14 +237,14 @@ HB_FUNC( COPYRTFTOCLIPBOARD ) // CopyRtfToClipboard(cRtfText) store cRTFText in 
 
    lptstrCopy = ( char * ) GlobalLock( hglbCopy );
    memcpy( lptstrCopy, cStr, nLen * sizeof( TCHAR ) );
-   lptstrCopy[ nLen ] = ( TCHAR ) 0;  // NULL character
+   lptstrCopy[ nLen ] = ( TCHAR ) 0;    // NULL character
    GlobalUnlock( hglbCopy );
 
    SetClipboardData( cf, hglbCopy );
    CloseClipboard();
 }
 
-HB_FUNC( COPYTOCLIPBOARD ) // CopyToClipboard(cText) store cText in Windows clipboard
+HB_FUNC( COPYTOCLIPBOARD )   // CopyToClipboard(cText) store cText in Windows clipboard
 {
    HGLOBAL hglbCopy;
    char *  lptstrCopy;
@@ -268,7 +268,7 @@ HB_FUNC( COPYTOCLIPBOARD ) // CopyToClipboard(cText) store cText in Windows clip
 
    lptstrCopy = ( char * ) GlobalLock( hglbCopy );
    memcpy( lptstrCopy, cStr, nLen * sizeof( TCHAR ) );
-   lptstrCopy[ nLen ] = ( TCHAR ) 0;  // null character
+   lptstrCopy[ nLen ] = ( TCHAR ) 0;    // null character
    GlobalUnlock( hglbCopy );
 
    SetClipboardData( HB_ISNUM( 2 ) ? hmg_par_UINT( 2 ) : CF_TEXT, hglbCopy );
@@ -363,10 +363,10 @@ HB_FUNC( HMG_MOUSECLEARBUFFER )
 }
 
 #ifndef USER_TIMER_MINIMUM
-#define USER_TIMER_MINIMUM  0x0000000A
+   #define USER_TIMER_MINIMUM  0x0000000A
 #endif
 #ifndef USER_TIMER_MAXIMUM
-#define USER_TIMER_MAXIMUM  0x7FFFFFFF
+   #define USER_TIMER_MAXIMUM  0x7FFFFFFF
 #endif
 HB_FUNC( INKEYGUI )
 {
@@ -420,8 +420,8 @@ HB_FUNC( INKEYGUI )
       }
       else
       {
-         TranslateMessage( &Msg );  // Translates virtual key codes
-         DispatchMessage( &Msg );   // Dispatches message to window
+         TranslateMessage( &Msg );    // Translates virtual key codes
+         DispatchMessage( &Msg );     // Dispatches message to window
       }
    }
 
@@ -448,7 +448,7 @@ HB_FUNC( LOWORD )
    hmg_ret_WORD( LOWORD( hmg_par_DWORD( 1 ) ) );
 }
 
-HB_FUNC( C_GETSPECIALFOLDER ) // Contributed By Ryszard Ryüko
+HB_FUNC( C_GETSPECIALFOLDER )   // Contributed By Ryszard Ryüko
 {
 #ifdef UNICODE
    LPSTR pStr;
@@ -993,7 +993,7 @@ HB_FUNC( WAITRUNTERM )
    hmg_ret_DWORD( dwExitCode );
 }
 
-HB_FUNC( ISEXERUNNING ) // ( cExeNameCaseSensitive ) --> lResult
+HB_FUNC( ISEXERUNNING )   // ( cExeNameCaseSensitive ) --> lResult
 {
    HANDLE hMutex = CreateMutex( NULL, FALSE, ( LPTSTR ) hb_parc( 1 ) );
 
@@ -1426,7 +1426,7 @@ HB_FUNC( WINVERSION )
 }
 
 #if defined( __XHARBOUR__ )
-HB_FUNC( ISEXE64 )      // Check if our app is 64 bits
+HB_FUNC( ISEXE64 )        // Check if our app is 64 bits
 {
    hb_retl( ( sizeof( void * ) == 8 ) );
 }
@@ -1536,15 +1536,15 @@ HB_FUNC( FILLRECT )
 }
 
 #if defined( __MINGW32__ )
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+   #pragma GCC diagnostic push
+   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif /* __MINGW32__ */
 
 #if ( defined( __POCC__ ) && __POCC__ >= 900 )
-#ifndef _NO_W32_PSEUDO_MODIFIERS
-#define IN
-#define OUT
-#endif
+   #ifndef _NO_W32_PSEUDO_MODIFIERS
+      #define IN
+      #define OUT
+   #endif
 #endif
 BOOL IsAppHung( IN HWND hWnd, OUT PBOOL pbHung )
 {
@@ -1566,7 +1566,7 @@ BOOL IsAppHung( IN HWND hWnd, OUT PBOOL pbHung )
 
    if( osvi.dwPlatformId == VER_PLATFORM_WIN32_NT )
    {
-      BOOL( WINAPI * _IsHungAppWindow ) ( HWND );
+      BOOL( WINAPI * _IsHungAppWindow )( HWND );
 
       // found the function IsHungAppWindow
       *( FARPROC * )&_IsHungAppWindow = GetProcAddress( hUser, "IsHungAppWindow" );
@@ -1582,7 +1582,7 @@ BOOL IsAppHung( IN HWND hWnd, OUT PBOOL pbHung )
    {
       DWORD dwThreadId = GetWindowThreadProcessId( hWnd, NULL );
 
-      BOOL( WINAPI * _IsHungThread ) ( DWORD );
+      BOOL( WINAPI * _IsHungThread )( DWORD );
 
       // found the function IsHungThread
       *( FARPROC * )&_IsHungThread = GetProcAddress( hUser, "IsHungThread" );
@@ -1599,10 +1599,10 @@ BOOL IsAppHung( IN HWND hWnd, OUT PBOOL pbHung )
 }
 
 #if defined( __MINGW32__ )
-#pragma GCC diagnostic pop
+   #pragma GCC diagnostic pop
 #endif \
- \
-   /* __MINGW32__ */
+\
+/* __MINGW32__ */
 
 HB_FUNC( ISAPPHUNG )
 {
@@ -1624,7 +1624,7 @@ HB_FUNC( ISAPPHUNG )
 }
 
 #ifndef PROCESS_QUERY_LIMITED_INFORMATION
-#define PROCESS_QUERY_LIMITED_INFORMATION  ( 0x1000 )
+   #define PROCESS_QUERY_LIMITED_INFORMATION  ( 0x1000 )
 #endif
 
 // EmptyWorkingSet( [ ProcessID ] ) ---> lBoolean
@@ -2026,11 +2026,11 @@ static HRESULT CreateShortCut
    {
       hRes = CoCreateInstance
              (
-         &CLSID_ShellLink,        /* pre-defined CLSID of the IShellLink object */
-         NULL,                    /* pointer to parent interface if part of aggregate */
-         CLSCTX_INPROC_SERVER,    /* caller and called code are in same process */
-         &IID_IShellLink,         /* pre-defined interface of the IShellLink object */
-         ( LPVOID * ) &pShellLink /* Returns a pointer to the IShellLink object */
+         &CLSID_ShellLink,           /* pre-defined CLSID of the IShellLink object */
+         NULL,                       /* pointer to parent interface if part of aggregate */
+         CLSCTX_INPROC_SERVER,       /* caller and called code are in same process */
+         &IID_IShellLink,            /* pre-defined interface of the IShellLink object */
+         ( LPVOID * ) &pShellLink    /* Returns a pointer to the IShellLink object */
              );
       if( SUCCEEDED( hRes ) )
       {
@@ -2059,9 +2059,9 @@ static HRESULT CreateShortCut
          }
 
          /* Use the IPersistFile object to save the shell link */
-         hRes = pShellLink->lpVtbl->QueryInterface( pShellLink, /* existing IShellLink object */
-                                             &IID_IPersistFile, /* pre-defined interface of the IPersistFile object */
-                                  ( LPVOID * ) &pPersistFile ); /* returns a pointer to the IPersistFile object */
+         hRes = pShellLink->lpVtbl->QueryInterface( pShellLink,                   /* existing IShellLink object */
+                                                    &IID_IPersistFile,            /* pre-defined interface of the IPersistFile object */
+                                                    ( LPVOID * ) &pPersistFile ); /* returns a pointer to the IPersistFile object */
          if( SUCCEEDED( hRes ) )
          {
 #ifndef UNICODE
@@ -2080,7 +2080,7 @@ static HRESULT CreateShortCut
 
 /***************************************************************************/
 #if defined( __BORLANDC__ )
-#pragma warn -prc /* suggest parentheses to clarify precedence */
+   #pragma warn -prc /* suggest parentheses to clarify precedence */
 #endif
 
 HB_FUNC( C_CREATELINK )
@@ -2131,15 +2131,15 @@ HB_FUNC( C_CREATELINK )
    {
       hRes = CreateShortCut
              (
-         szTargetfile,     /* Target file */
-         szTargetargs,     /* Target arguments */
-         szLinkfile,       /* Short-cut filename */
-         szDescription,    /* Short-cut description */
-         iShowmode,        /* Showmode constant */
-         szCurdir,         /* Working directory for linked file */
-         szIconfile,       /* Icon file shown for the link */
-         iIconindex,       /* Index of icon in the file */
-         wHotKey           /* Virtual key code */
+         szTargetfile,        /* Target file */
+         szTargetargs,        /* Target arguments */
+         szLinkfile,          /* Short-cut filename */
+         szDescription,       /* Short-cut description */
+         iShowmode,           /* Showmode constant */
+         szCurdir,            /* Working directory for linked file */
+         szIconfile,          /* Icon file shown for the link */
+         iIconindex,          /* Index of icon in the file */
+         wHotKey              /* Virtual key code */
              );
       if( SUCCEEDED( hRes ) )
       {

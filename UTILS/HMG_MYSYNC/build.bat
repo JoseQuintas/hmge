@@ -1,1 +1,0 @@
-\Minigui\Batch\hbmk2.bat %* Hmg_MySync.Prg Kform3.Prg -lrddleto

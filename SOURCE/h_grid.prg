@@ -441,14 +441,12 @@ FUNCTION InitDialogGrid ( ParentName, ControlHandle, k )
    IF ISNUMERIC( autosizeH ) .OR. autosizeW
 
       IF ListView_CalculateSize ( ControlHandle , autosizeH , @z , @row ) > 49
-
          IF ISNUMERIC( autosizeH )
             SetProperty( ParentName, ControlName, 'Height', row )
          ENDIF
          IF autosizeW
             SetProperty( ParentName, ControlName, 'Width', z )
          ENDIF
-
       ENDIF
 
    ENDIF
@@ -462,21 +460,19 @@ FUNCTION InitDialogGrid ( ParentName, ControlHandle, k )
    ENDIF
 
    IF multiselect
-
       IF ISARRAY ( Value )
          ListViewSetMultiSel ( ControlHandle, Value )
       ENDIF
-
    ELSE
-
       row := iif( ISARRAY ( value ), value [1], value )
       IF row <> 0
          _SetValue ( , , Value , k )
       ENDIF
-
    ENDIF
+   // Add to browselist array to update on window activation
+   AAdd ( _HMG_aFormBrowseList [ GetFormIndex ( ParentName ) ] , k )
    // JP 62
-   IF Len( _HMG_aDialogTemplate ) != 0 .AND. _HMG_aDialogTemplate[3]  // Modal
+   IF Len( _HMG_aDialogTemplate ) != 0 .AND. _HMG_aDialogTemplate [3]  // Modal
       _HMG_aControlDeleted [k] := .T.
    ENDIF
 

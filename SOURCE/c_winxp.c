@@ -60,7 +60,7 @@ BOOL              Array2Point( PHB_ITEM aPoint, POINT * pt );
 BOOL              Array2ColorRef( PHB_ITEM aCRef, COLORREF * cr );
 
 #if ( defined( _MSC_VER ) && ! defined( __POCC__ ) ) || defined( __MINGW32__ ) || ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
-#include "uxtheme.h"
+   #include "uxtheme.h"
 #endif
 #ifndef _UXTHEME_H_
 #define _UXTHEME_H_
@@ -68,13 +68,13 @@ BOOL              Array2ColorRef( PHB_ITEM aCRef, COLORREF * cr );
 #include <commctrl.h>
 
 #if defined( __XCC__ ) || ( defined( __POCC__ ) && __POCC__ >= 900 )
-#ifndef _NO_W32_PSEUDO_MODIFIERS
-#define IN
-#define OUT
-#ifndef OPTIONAL
-#define OPTIONAL
-#endif
-#endif
+   #ifndef _NO_W32_PSEUDO_MODIFIERS
+      #define IN
+      #define OUT
+      #ifndef OPTIONAL
+         #define OPTIONAL
+      #endif
+   #endif
 #endif
 typedef HANDLE HTHEME;
 
@@ -161,10 +161,11 @@ typedef enum
    TS_DRAW
 } THEMESIZE;
 #else
-enum THEMESIZE {
-    TS_MIN,
-    TS_TRUE,
-    TS_DRAW,
+enum THEMESIZE
+{
+   TS_MIN,
+   TS_TRUE,
+   TS_DRAW,
 };
 #endif
 

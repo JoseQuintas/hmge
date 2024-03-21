@@ -1,9 +1,0 @@
-
-
-02/03/2022  * Added possibility of retaining new coordinates when moving application 
-              window to secondary monitor in a dual monitor configuration.
-            * Automatically and temporarelly reposition application window to 
-              primary monitor in single monitor configuration while retaining
-              original coordinates.
-            * Added possibility of resetting coordinates to recenter application
-              window to primary monitor using hotkey «Ctrl+Alt+Home».

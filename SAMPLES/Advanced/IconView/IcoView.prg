@@ -71,7 +71,7 @@ Return
  *	IconShow()
  */
 FUNCTION IconShow()
-Local i, y, z, x, bb, IcoL, s_, w
+Local i, y, z, x, bb, IcoL, w
 
 	Win_1.Btn_Open.Setfocus
 
@@ -82,7 +82,7 @@ Local i, y, z, x, bb, IcoL, s_, w
 		Win_1.Height := GetDesktopRectHeight()
 		z := -32
 		bb := -1
-		x := ExtractIconEx(cFileName, -1, s_, IcoL, 1)
+		x := ExtractIconEx(cFileName, -1)
 		if x == 0
 			lOpened := .f.
 			MsgStop('Icons is missing!', 'Warning', , .f.)
@@ -187,19 +187,6 @@ HB_FUNC ( GETDESKTOPRECTHEIGHT )
 	hb_retni(rect.bottom - rect.top);
 }
 
-HB_FUNC ( EXTRACTICONEX )
-{
-	HICON iLarge;
-	HICON iSmall;
-	UINT  nIcons=hb_parni(5);
-
-	hb_retni( ExtractIconEx( (LPCSTR) hb_parc( 1 ),
-					hb_parni( 2 )     ,
-					&iLarge           ,
-					&iSmall           ,
-					nIcons	) );
-}
-
 HB_FUNC ( DRAWICON )
 {
 	HWND hwnd;
@@ -210,11 +197,6 @@ HB_FUNC ( DRAWICON )
  
 	hb_retl( DrawIcon( (HDC) hdc , hb_parni( 2 ) , hb_parni( 3 ) , (HICON) hb_parnl( 4 ) ) ) ;
 	ReleaseDC( hwnd, hdc ) ;
-}
-
-HB_FUNC ( DESTROYICON )
-{
-	DestroyIcon( (HICON) hb_parnl( 1 ) );
 }
 
 #pragma ENDDUMP

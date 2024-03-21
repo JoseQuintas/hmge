@@ -125,8 +125,7 @@ FUNCTION OwnButtonPaint( pdis )
    LOCAL nCRLF, lXPThemeActive := .F.
 
    LOCAL iButStyle, nnnn, aFill1, aFill2
-
-   MEMVAR aButMisc, aButStyles
+   LOCAL o, aButStyles, aButMisc
 
    hDC := GETOWNBTNDC( pdis )
 
@@ -182,11 +181,18 @@ FUNCTION OwnButtonPaint( pdis )
    aMetr := GetTextMetric( hDC )
    oldBkMode := SetBkMode( hDC, TRANSPARENT )
 
+   o := _HMG_aControlMiscData2[ i ]
+   IF !HB_ISOBJECT( o ) ; o := oHmgData()
+   ENDIF
+   aButStyles := o:aButStyles       
+   DEFAULT aButStyles := App.Cargo:aButStyles
+
    iButStyle := 1
    aButMisc := { 1, '' }
-   IF !Empty( _HMG_aControlMiscData2[i ] )
-      aButMisc := { Val ( Token( _HMG_aControlMiscData2[i ], ',', 1 ) ), AllTrim( Token( _HMG_aControlMiscData2[i ], ',',2 ) ) }
-      iButStyle := AScan( aButStyles, {| ax| ax[ 1 ] = aButMisc[ 1 ] } )
+
+   IF !Empty( o:cButMisc )
+      aButMisc   := { Val ( Token( o:cButMisc, ',', 1 ) ), AllTrim( Token( o:cButMisc, ',', 2 ) ) }
+      iButStyle  := AScan( aButStyles, {| ax| ax[ 1 ] = aButMisc[ 1 ] } )
    ENDIF
 
    IF lSelected

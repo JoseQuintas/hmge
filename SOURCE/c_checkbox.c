@@ -43,19 +43,19 @@
     "HWGUI"
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
-  ---------------------------------------------------------------------------*/
+   ---------------------------------------------------------------------------*/
 #include <mgdefs.h>
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Button Class Name
-#define WC_BUTTON              "Button"
-#define BUTTON_IMAGELIST_ALIGN_CENTER   4
+   #define WC_BUTTON                      "Button"
+   #define BUTTON_IMAGELIST_ALIGN_CENTER  4
 #endif
 
 HBITMAP     HMG_LoadPicture
 (
-   const char  * FileName,
+   const char *   FileName,
    int New_Width,
    int New_Height,
    HWND hWnd,

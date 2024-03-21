@@ -49,7 +49,7 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Static Class Name
-#define WC_STATIC              "Static"
+   #define WC_STATIC  "Static"
 #endif
 #include "hbapiitm.h"
 #include "hbvm.h"
@@ -59,7 +59,7 @@ static WNDPROC LabelOldWndProc;
 
 extern HBITMAP    HMG_LoadPicture
 (
-   const char  * FileName,
+   const char *   FileName,
    int New_Width,
    int New_Height,
    HWND hWnd,

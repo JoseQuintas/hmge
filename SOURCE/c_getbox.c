@@ -53,17 +53,17 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Button Class Name
-#define WC_BUTTON              "Button"
+   #define WC_BUTTON  "Button"
 // Edit Class Name
-#define WC_EDIT                "Edit"
+   #define WC_EDIT    "Edit"
 #endif
 #if defined( _MSC_VER )
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+   #pragma warning( push )
+   #pragma warning( disable : 4201 )
 #endif
 #include "richedit.h"
 #if defined( _MSC_VER )
-#pragma warning( pop )
+   #pragma warning( pop )
 #endif
 
 #include "hbvm.h"
@@ -104,25 +104,29 @@ HB_FUNC( INITGETBOX )
    iStyle = WS_CHILD | ES_AUTOHSCROLL | WS_CLIPCHILDREN;
 
    if( hb_parl( 12 ) )
-   {     // if <lNumeric> is TRUE, then ES_NUMBER style is added.
+   {
+      // if <lNumeric> is TRUE, then ES_NUMBER style is added.
       iStyle |= ES_NUMBER;
    }
    // Set to a numeric TEXTBOX, so don't worry about other "textual" styles.
    else
    {
       if( hb_parl( 10 ) )
-      {  // if <lUpper> is TRUE, then ES_UPPERCASE style is added.
+      {
+         // if <lUpper> is TRUE, then ES_UPPERCASE style is added.
          iStyle |= ES_UPPERCASE;
       }
 
       if( hb_parl( 11 ) )
-      {  // if <lLower> is TRUE, then ES_LOWERCASE style is added.
+      {
+         // if <lLower> is TRUE, then ES_LOWERCASE style is added.
          iStyle |= ES_LOWERCASE;
       }
    }
 
    if( hb_parl( 13 ) )
-   {     // if <lPassword> is TRUE, then ES_PASSWORD style is added.
+   {
+      // if <lPassword> is TRUE, then ES_PASSWORD style is added.
       iStyle |= ES_PASSWORD;
    }
 
@@ -352,7 +356,7 @@ HB_FUNC( CHECKBIT )
    hb_retl( hb_parnl( 1 ) & ( 1 << ( hb_parni( 2 ) - 1 ) ) );
 }
 
-HB_FUNC( GETTEXTHEIGHT )   // returns the height of a string in pixels
+HB_FUNC( GETTEXTHEIGHT )     // returns the height of a string in pixels
 {
    HDC   hDC        = hmg_par_raw_HDC( 1 );
    HWND  hWnd       = ( HWND ) NULL;

@@ -59,10 +59,10 @@
 #include <commctrl.h>
 
 #ifndef TTS_CLOSE
-#define TTS_CLOSE  0x80
+   #define TTS_CLOSE  0x80
 #endif
 #ifndef TTM_POPUP
-#define TTM_POPUP  ( WM_USER + 34 )
+   #define TTM_POPUP  ( WM_USER + 34 )
 #endif
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 typedef struct _tagEDITBALLOONTIP
@@ -81,10 +81,10 @@ EDITBALLOONTIP, * PEDITBALLOONTIP;
 #define Edit_HideBalloonTip( hwnd )                   ( BOOL ) SNDMSG( ( hwnd ), EM_HIDEBALLOONTIP, 0, 0 )
 #endif
 #ifndef __XHARBOUR__
-#define HB_cdpGetU16( cdp, fCtrl, ch )                hb_cdpGetU16( cdp, ch )
+   #define HB_cdpGetU16( cdp, fCtrl, ch )             hb_cdpGetU16( cdp, ch )
 #else
-#define HB_cdpGetU16( cdp, fCtrl, ch )                hb_cdpGetU16( cdp, fCtrl, ch )
-#define hb_vmCDP()                                    hb_cdppage()
+   #define HB_cdpGetU16( cdp, fCtrl, ch )             hb_cdpGetU16( cdp, fCtrl, ch )
+   #define hb_vmCDP()                                 hb_cdppage()
 #endif
 extern BOOL _isValidCtrlClass( HWND, LPCTSTR );
 
@@ -148,7 +148,7 @@ HB_FUNC( INITTOOLTIP )
 {
    HWND hwndParent = HB_ISNUM( 1 ) ? hmg_par_raw_HWND( 1 ) : ( HWND ) NULL;
 
-   if( HB_ISNIL( 1 ) ? TRUE : IsWindow( hwndParent ) )                  // hack for ModalWindow
+   if( HB_ISNIL( 1 ) ? TRUE : IsWindow( hwndParent ) )                       // hack for ModalWindow
    {
       DWORD dwStyle = WS_POPUP | TTS_ALWAYSTIP;
       INITCOMMONCONTROLSEX icex = { sizeof( INITCOMMONCONTROLSEX ), ICC_BAR_CLASSES };
@@ -859,7 +859,7 @@ HB_FUNC( TTM_UPDATE )
 /*
    TTM_UPDATETIPTEXT - sets the tooltip text for a tool
  */
-HB_FUNC( TTM_UPDATETIPTEXT )  //old HB_FUNC( UPDATETOOLTIPTEXT )
+HB_FUNC( TTM_UPDATETIPTEXT )    //old HB_FUNC( UPDATETOOLTIPTEXT )
 {
    HWND hwndToolTip = hmg_par_raw_HWND( 1 );
    HWND hwndTool    = hmg_par_raw_HWND( 2 );

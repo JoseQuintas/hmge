@@ -7,121 +7,172 @@
 
 #include "minigui.ch"
 
+STATIC lBorder := .F.
 
-Procedure Main
-	Local aCaptions := { "Add a local printer", ;
-                             "Add a network, wireless or Bluetooth printer" }
-	Local aNotes := { "Use this option only if you don't have a USB printer. (Windows automatically installs USB printers when you plug them in.)", ;
-                             "Make sure that your computer is connected to the network, or that your Bluetooth or wireless printer is turned on." }, ;
-		i, cImage, cLabel, cLabel2, nPos := 94
+PROCEDURE Main()
 
-	DEFINE WINDOW Win_1 ;
-		AT 0,0 ;
-		WIDTH 615 + iif(ISVISTAORLATER(), 1, 2) * GetBorderWidth() ;
-		HEIGHT GetTitleHeight() + 416 + GetBorderHeight() ;
-		TITLE "Add Printer" ;
-                ICON "zzz_PrintIcon" ;
-		MAIN NOMINIMIZE NOMAXIMIZE NOSIZE ;
-		BACKCOLOR iif(ISVISTAORLATER(), {233, 236, 216}, Nil) ;
-		FONT "MS Sans Serif" SIZE 9
+   LOCAL aCaptions := { "Add a local printer", ;
+                        "Add a network, wireless or Bluetooth printer" }
+   LOCAL aNotes := { "Use this option only if you don't have a USB printer. (Windows automatically installs USB printers when you plug them in.)", ;
+                     "Make sure that your computer is connected to the network, or that your Bluetooth or wireless printer is turned on." }, ;
+      i, cImage, cLabel, cLabel2, nPos := 94
 
-		DRAW ICON IN WINDOW Win_1 AT 4, 12 ;
-			PICTURE "ZZZ_PRINTICON"
+   DEFINE WINDOW Win_1 ;
+         AT 0, 0 ;
+         WIDTH 615 + iif( ISVISTAORLATER(), 1, 2 ) * GetBorderWidth() ;
+         HEIGHT GetTitleHeight() + 416 + GetBorderHeight() ;
+         TITLE "Add Printer" ;
+         ICON "zzz_PrintIcon" ;
+         MAIN NOMINIMIZE NOMAXIMIZE NOSIZE ;
+         BACKCOLOR iif( ISVISTAORLATER(), { 233, 236, 216 }, Nil ) ;
+         FONT "MS Sans Serif" SIZE 9
 
-		@ 8, 40 LABEL Label_Title VALUE ThisWindow.Title ;
-			AUTOSIZE ;
-			BOLD ;
-			TRANSPARENT
+      DRAW ICON IN WINDOW Win_1 AT 4, 12 ;
+         PICTURE "ZZZ_PRINTICON"
 
-		@ 32, GetBorderWidth() / 2 FRAME Frame_1 Caption "" WIDTH Win_1.Width - 2 * GetBorderWidth() HEIGHT Win_1.Height - 78 - GetTitleHeight()
+      @ 8, 40 LABEL Label_Title VALUE ThisWindow.TITLE ;
+         AUTOSIZE ;
+         BOLD ;
+         TRANSPARENT
 
-		@ 50, 36 LABEL Label_Title_2 VALUE "What type of printer do you want to install?" ;
-			AUTOSIZE ;
-			BOLD ;
-			TRANSPARENT
+      @ 32, GetBorderWidth() / 2 FRAME Frame_1 CAPTION "" WIDTH Win_1.WIDTH - 2 * GetBorderWidth() HEIGHT Win_1.HEIGHT - 78 - GetTitleHeight()
 
-		For i := 1 To Len(aCaptions)
+      @ 50, 36 LABEL Label_Title_2 VALUE "What type of printer do you want to install?" ;
+         AUTOSIZE ;
+         BOLD ;
+         TRANSPARENT
 
-			cImage := "Image_" + Str(i, 1)
-			@ nPos, 48 IMAGE &cImage ;
-				PICTURE "arrow.bmp" ;
-				WIDTH 16 ;
-				HEIGHT 16 ;
-				TRANSPARENT ;
-				ACTION DoAction( Val(Right(this.name, 1)) )
+      FOR i := 1 TO Len( aCaptions )
 
-			cLabel := "Button_" + Str(i, 1)
-			@ nPos, 70 LABEL &cLabel VALUE aCaptions[i] ;
-				WIDTH 500 ;
-				HEIGHT 18 ;
-				BOLD ;
-				TRANSPARENT ;
-				ACTION DoAction( Val(Right(this.name, 1)) ) ;
-				ON MOUSEHOVER createbtnborder("Win_1",this.row-12,this.col-38,this.row+this.height+42,this.col+this.width+14) ;
-				ON MOUSELEAVE ( erasewindow("Win_1"), hmg_drawicon("Win_1","ZZZ_PRINTICON",4,12,,,,.F.) )
+         cImage := "Image_" + Str( i, 1 )
+         @ nPos, 48 IMAGE &cImage ;
+            PICTURE "arrow.bmp" ;
+            WIDTH 16 ;
+            HEIGHT 16 ;
+            TRANSPARENT ;
+            ACTION DoAction( Val( Right( This.NAME, 1 ) ) )
 
-			cLabel2 := "Note_" + Str(i, 1)
-			@ nPos + 18, 70 LABEL &cLabel2 VALUE aNotes[i] ;
-				WIDTH 500 ;
-				HEIGHT 46 ;
-				TRANSPARENT ;
-				ACTION DoAction( Val(Right(this.name, 1)) ) ;
-				ON MOUSEHOVER createbtnborder("Win_1",this.row-12-18,this.col-38,this.row-4+this.height,this.col+this.width+14) ;
-				ON MOUSELEAVE ( erasewindow("Win_1"), hmg_drawicon("Win_1","ZZZ_PRINTICON",4,12,,,,.F.) )
+         cLabel := "Button_" + Str( i, 1 )
+         @ nPos, 70 LABEL &cLabel VALUE aCaptions[ i ] ;
+            WIDTH 500 ;
+            HEIGHT 18 ;
+            BOLD ;
+            TRANSPARENT ;
+            ACTION DoAction( Val( Right( This.NAME, 1 ) ) ) ;
+            ON MOUSEHOVER iif( lBorder, , CreateBtnBorder( "Win_1", This.ROW - 12, This.COL - 38, This.ROW + This.HEIGHT + 42, This.COL + This.WIDTH + 14 ) ) ;
+            ON MOUSELEAVE ( lBorder := .F., AddDelGraph( "Win_1", "D" ), AddDelGraph( "Win_1", "R" ) )
 
-			nPos += 98
+         cLabel2 := "Note_" + Str( i, 1 )
+         @ nPos + 18, 70 LABEL &cLabel2 VALUE aNotes[ i ] ;
+            WIDTH 500 ;
+            HEIGHT 46 ;
+            TRANSPARENT ;
+            ACTION DoAction( Val( Right( This.NAME, 1 ) ) ) ;
+            ON MOUSEHOVER iif( lBorder, , CreateBtnBorder( "Win_1", This.ROW - 12 - 18, This.COL - 38, This.ROW - 4 + This.HEIGHT, This.COL + This.WIDTH + 14 ) ) ;
+            ON MOUSELEAVE ( lBorder := .F., AddDelGraph( "Win_1", "D" ), AddDelGraph( "Win_1", "R" ) )
 
-		Next
+         nPos += 98
 
-		SetWindowCursor( GetControlHandle( "Image_1", "Win_1" ), "MINIGUI_FINGER" )
+      NEXT
 
-		@ Win_1.Height - 38 - GetTitleHeight(),Win_1.Width - 152 BUTTON Button_3 ;
-			CAPTION '&Next' ;
-			ACTION _dummy() ;
-			WIDTH 64 ;
-			HEIGHT 23
+      SetWindowCursor( GetControlHandle( "Image_1", "Win_1" ), "MINIGUI_FINGER" )
 
-		Win_1.Button_3.Enabled := .F.
+      @ Win_1.HEIGHT - 38 - GetTitleHeight(), Win_1.WIDTH - 152 BUTTON Button_3 ;
+         CAPTION '&Next' ;
+         ACTION _dummy() ;
+         WIDTH 64 ;
+         HEIGHT 23
 
-		@ Win_1.Height - 38 - GetTitleHeight(),Win_1.Width - 82 BUTTON Button_4 ;
-			CAPTION '&Cancel' ;
-			ACTION thiswindow.release ;
-			WIDTH 64 ;
-			HEIGHT 23
+      Win_1.Button_3.Enabled := .F.
 
-	END WINDOW
+      @ Win_1.HEIGHT - 38 - GetTitleHeight(), Win_1.WIDTH - 82 BUTTON Button_4 ;
+         CAPTION '&Cancel' ;
+         ACTION ThisWindow.RELEASE ;
+         WIDTH 64 ;
+         HEIGHT 23
 
-	Center Window Win_1
+   END WINDOW
 
-	Activate Window Win_1
+   CENTER WINDOW Win_1
 
-Return
+   ACTIVATE WINDOW Win_1
 
-
-function CreateBtnBorder( cWin,t,l,b,r )
-
-	Rc_Cursor( "MINIGUI_FINGER" )
-
-	DRAW PANEL		;
-		IN WINDOW &cWin	;
-		AT t,l		;
-		TO b,r
-
-return nil
+RETURN
 
 
-function DoAction( nMode )
+FUNCTION CreateBtnBorder( cWin, t, l, b, r )
 
-	switch nMode
+   lBorder := .T.
 
-	case 1
-		MsgInfo("Click 1")
-		exit
+   Rc_Cursor( "MINIGUI_FINGER" )
 
-	case 2
+   DRAW PANEL ;
+      IN WINDOW &cWin ;
+      AT t, l ;
+      TO b, r
 
-		MsgInfo("Click 2")
+   AddDelGraph( cWin )
 
-	end switch
+RETURN NIL
 
-return nil
+
+FUNCTION DoAction( nMode )
+
+   switch nMode
+
+   CASE 1
+      MsgInfo( "Click 1" )
+      EXIT
+
+   CASE 2
+
+      MsgInfo( "Click 2" )
+
+   END switch
+
+RETURN NIL
+
+
+FUNCTION AddDelGraph( window, cAction )
+
+   LOCAL w := GetFormIndex ( window )
+   LOCAL nLast := Len( _HMG_aFormGraphTasks[ w ] )
+   LOCAL i
+
+   STATIC myGraph := {}
+
+   IF cAction == NIL
+      cAction := "A"
+   ELSE
+      cAction := Upper( Left( cAction, 1 ) )
+   ENDIF
+
+   IF _HMG_aFormDeleted[ w ] == .F.
+
+      IF cAction == "A" // add position and identy my graph
+         AAdd( myGraph, { nLast, __vmItemID( _HMG_aFormGraphTasks[ w, nLast ] ) } )
+
+      ELSEIF cAction == "R" // redraw all graph
+         FOR i := 1 TO Len( _HMG_aFormGraphTasks[ w ] )
+            Eval( _HMG_aFormGraphTasks[ w, i ] )
+         NEXT
+
+      ELSEIF cAction == "D" // delete my graph from MiniGUI list
+         ASort( myGraph,,, {| x, y | ( x[ 1 ] > y[ 1 ] ) } )
+         FOR i := 1 TO Len( myGraph )
+            IF myGraph[ i, 1 ] <= Len( _HMG_aFormGraphTasks[ w ] )
+               IF __vmItemID( _HMG_aFormGraphTasks[ w, myGraph[ i, 1 ] ] ) == myGraph[ i, 2 ]
+                  ADel( _HMG_aFormGraphTasks[ w ], myGraph[ i, 1 ], .T. )
+               ENDIF
+            ENDIF
+         NEXT
+         ASize( myGraph, 0 )
+         RedrawWindow( GetFormHandle( window ) )
+
+      ENDIF
+
+      RETURN .T.
+
+   ENDIF
+
+RETURN .F.

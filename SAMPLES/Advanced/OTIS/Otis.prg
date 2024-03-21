@@ -39,8 +39,8 @@
 //****************************************************************************************************************
 
 // Version info
-#define  Version        "V1.40"
-#define  Versiondate    "01/09/2023"
+#define  Version        "V1.50"
+#define  Versiondate    "26/02/2024"
 #define  Versionbuild   "B01"
 
 // aOtables array offsets   (array used in tbrowse in main form)
@@ -76,8 +76,8 @@
 #define OI_TAG           2
 #define OI_KEY           3
 #define OI_FOR           4
-#define OI_UNI           5          // unique
-#define OI_AD            6          // ascending, descending
+#define OI_UNIQUE        5          // unique
+#define OI_ASCDESC       6          // ascending, descending
 
 // default settings
 // Some tables areas are reserved
@@ -177,6 +177,11 @@ MEMVAR th_bt_bgcol
 MEMVAR th_bt_ohfontcol
 MEMVAR th_bt_ohbgcol
 
+MEMVAR th_fctb_leven
+MEMVAR th_bgtb_leven
+MEMVAR th_fctb_lodd
+MEMVAR th_bgtb_lodd
+
 MEMVAR ini_lOpen_Exclusive, ;          // default is open files in shared mode.
        ini_default_rdd, ;
        ini_default_mem, ;
@@ -260,6 +265,8 @@ MEMVAR HMG_ModalDialogReturn
 MEMVAR cInfo
 MEMVAR BRW_2, aStruct
 
+MEMVAR lAbort_export
+
 //******************************************************************************
 
 //
@@ -302,6 +309,9 @@ Function OTIS()
    Public th_bt_bgcol                           // font bg color
    Public th_bt_ohfontcol                       // on hover font color
    Public th_bt_ohbgcol                         // on hover bg color
+
+   // color settings for tbrowse() line colors
+   public th_fctb_leven, th_bgtb_leven, th_bgtb_lodd,  th_fctb_lodd
 
    //******************************************************************************
    // otis.ini file vars
@@ -594,8 +604,9 @@ Function OTIS()
 
       // fill combobox array with all codepages in running program
       aCodepage := hb_cdpList()
+
       // and set current table codepage
-      ini_dbf_codepage := hb_cdpSelect()
+      //ini_dbf_codepage := hb_cdpSelect()
 
    ENDIF
 
@@ -619,9 +630,6 @@ Function OTIS()
    // load ini file, it overwrites public vars declared above.
    //
    FREADINI( fn_ini )
-
-   // set to saved codepage with setting from ini file
-   hb_cdpSelect( ini_dbf_codepage )
 
    // set rdddefault with setting from ini file
    RDDSETDEFAULT( ini_default_rdd )
@@ -684,7 +692,7 @@ Function OTIS()
    //******************************************************************************
 
    // Create header font for Tbrowse controls
-   IF ! _IsControlDefined ("FontBold","Main")
+   IF ! _IsControlDefined("FontBold","Main")
       cFontname := _HMG_DefaultFontName     // current font name
       nFontsize := _HMG_DefaultFontSize     // current font size
       DEFINE FONT FontBold FONTNAME cFontname SIZE nFontsize BOLD // ITALIC
@@ -701,7 +709,7 @@ Function OTIS()
    //   called by a hotkey or a Control Action event.
    IF !lStandalone
 
-      // init flag, files where openend by the running program
+      // init flag, files where opened by the running program
       lFlgopen := .F.
 
       // Set autoOpen to .F. temporary, gives a better control below
@@ -726,12 +734,12 @@ Function OTIS()
 
             // reopen it again in a new area = is current area + offset
             select (i + ini_area_pi_reopen_start)
-            //msgstop(cUseName + hb_eol() + cAlias+'_'+hb_ntos(i + ini_area_pi_reopen_start))
+            //msgstop(cUseName + crlf + cAlias+'_'+hb_ntos(i + ini_area_pi_reopen_start))
 
             // open table in a new area with
             // alias name the current alias + suffix area nr.
             Try
-               USE (cUseName) ALIAS ( cAlias+'_'+hb_ntos(i + ini_area_pi_reopen_start))
+               USE (cUseName) ALIAS ( cAlias+'_'+hb_ntos(i + ini_area_pi_reopen_start)) CODEPAGE ini_dbf_codepage
 
                // set filter if a filter was set in the original alias
                if !empty(cFilter)
@@ -831,7 +839,7 @@ Function OTIS()
 
                // open table
                // We use the table name as alias but first remove unallowed chars. in a alias name.
-               USE (aTokens[i]) alias (charrem( "-#%&{}<>*?/*!@"+"'"+'"', hb_FNameName(aTokens[i])))
+               USE (aTokens[i]) alias (charrem( "-#%&{}<>*?/*!@"+"'"+'"', hb_FNameName(aTokens[i]))) CODEPAGE ini_dbf_codepage
 
                // next area
                pi_area_cnt++
@@ -873,20 +881,41 @@ Function OTIS()
 
       // define as MAIN window in STANDALONE mode
       IF lStandalone .or. lSimul_PlugIn_mode
-         DEFINE WINDOW form_otis ;
-            at 0,0 ;
-            clientarea th_w_width, th_w_height ;
-            TITLE temp ;
-            WINDOWTYPE MAIN ;
-            NOMAXIMIZE ;
-            NOSIZE ;
-            ON INTERACTIVECLOSE otis_release() ;
-            ON GOTFOCUS {|| if( !empty(cCmdline) .and. !lDsChanged .and. cWhoSetFocustoMain =="DV", otis_release(), nil) }  ;
-            BACKCOLOR th_w_bgcolor ;
-            ;// Open Inspector IMMEDIATELY if there is any table has been opened at startup of Otis
-            ;//   usefull when double clicking on a dbf file
-            ;//   or when the command line option is used.
-            ON INIT { || if( !empty(aOtables[ 1, ATI_ALIAS ]), otis_dv(), nil ) }
+
+         // show main window
+         if empty(cCmdline)
+            DEFINE WINDOW form_otis ;
+               at 0,0 ;
+               clientarea th_w_width, th_w_height ;
+               TITLE temp ;
+               WINDOWTYPE MAIN ;
+               NOMAXIMIZE ;
+               NOSIZE ;
+               ON INTERACTIVECLOSE otis_release() ;
+               ;//ON GOTFOCUS {|| if( !empty(cCmdline) .and. !lDsChanged .and. cWhoSetFocustoMain =="DV", otis_release(), nil) }  ;
+               BACKCOLOR th_w_bgcolor ;
+               ;// Open Inspector IMMEDIATELY if there is any table has been opened at startup of Otis
+               ;//   usefull when double clicking on a dbf file
+               ;//   or when the command line option is used.
+               ON INIT { || if( !empty(aOtables[ 1, ATI_ALIAS ]), otis_dv(), nil ) }
+
+         // Hide main window on double click
+         else
+            DEFINE WINDOW form_otis ;
+               at 0,0 ;
+               clientarea th_w_width, th_w_height ;
+               TITLE temp ;
+               WINDOWTYPE MAIN NOSHOW ;
+               NOMAXIMIZE ;
+               NOSIZE ;
+               ON INTERACTIVECLOSE otis_release() ;
+               ON GOTFOCUS {|| if( !empty(cCmdline) .and. !lDsChanged .and. cWhoSetFocustoMain =="DV", otis_release(), nil) }  ;
+               BACKCOLOR th_w_bgcolor ;
+               ;// Open Inspector IMMEDIATELY if there is any table has been opened at startup of Otis
+               ;//   usefull when double clicking on a dbf file
+               ;//   or when the command line option is used.
+               ON INIT { || if( !empty(aOtables[ 1, ATI_ALIAS ]), otis_dv(), nil ) }
+         endif
 
       // define as STANDARD window if otis.prg is INCLUDED in your program.
       ELSE
@@ -1012,7 +1041,6 @@ Function OTIS()
             DISPLAYEDIT .T.
             ONCHANGE { || ini_dbf_codepage := aCodepage[ getproperty(ThisWindow.name,"cb_codepage","Value") ],;
                         SET( _SET_DBCODEPAGE, ini_dbf_codepage ),;
-                        HB_CDPSELECT(ini_dbf_codepage),;
                         tb_Otis:SetFocus();
                      }
             //ONINIT This.Value :=
@@ -1132,10 +1160,8 @@ Function OTIS()
             // cell margins, add one space left and right
             :nCellMarginLR := 1
 
-            // set bg color header
-            //:SetColor( {3,4}, { CLR_WHITE, CLR_NBLUE } )
-            // set cell color
-            //:SetColor( {5,6}, {CLR_WHITE,CLR_MAGENTA})
+            // Row Colors, fontcolor en/disabled, bg odd or even
+            :SetColor( { 1, 2 }, { th_fctb_leven, {|nRow, nCol, oBrw| iif( nRow%2==0, th_bgtb_leven, th_bgtb_lodd )}} )
 
             // open dbfviewer on double click
             :bLDblClick := { || otis_dv() }
@@ -1372,8 +1398,7 @@ static function otis_add_table(oBrowse)
 
       // if RDD LetoDbf
       else
-         //aSelected := {'TPS\MOVART.DBF'}
-        aSelected := leto_Getfile({ {'Dbf Files','*.DBF'}, {'All Files','*.*'} }, "Open table", , .T.)
+        aSelected := leto_Getfile({ {'Dbf Files','*.DBF'}, {'All Files','*.*'} }, "Open LetoDbf table", , .T.)
         //msgstop(len(aSelected))
       endif
 
@@ -1419,7 +1444,7 @@ static function otis_add_table(oBrowse)
                //msgstop(pi_area_cnt)
 
                // open table
-               USE (aSelected[i]) alias (cAlias)
+               USE (aSelected[i]) alias (cAlias) CODEPAGE ini_dbf_codepage
 
                // next area
                pi_area_cnt++
@@ -1526,15 +1551,13 @@ static function otis_add_index(oBrowse)
    // if RDDxxx
    if cRdd <> 'LETO'
 
-      // open a file on disk,
+      // open a index file on disk,
       // you can select more files at once by using the usual shift and control keys.
       aSelected := Getfile( { {cOrdBagExt + ' files','*'+cOrdBagExt}, {'All Files','*.*'} } , 'Open index file(s)' , ini_lu_folder, .t. , .t. )
 
-   // if RDD LetoDbf
+   // if RDD LetoDbf index file
    else
-      //aSelected := {'TPS\MOVART.DBF'}
-     aSelected := leto_Getfile({ {'Cdx Files','*.CDX'}, {'All Files','*.*'} }, , , .T.)
-
+     aSelected := leto_Getfile({ {'Cdx Files','*.CDX'}, {'All Files','*.*'} }, "Open LetoDbf index file" , , .T.)
    endif
 
    // open all selected tables
@@ -1646,7 +1669,6 @@ static function otis_rem_index()
             backcolor th_w_bgcolor ;
             WINDOWTYPE MODAL ;
             ON SIZE otis_rem_index_resize()
-            //ON RELEASE
 
             // set min, max width
             ThisWindow.MinWidth := th_w_ctrlgap * 3 + th_bt_width * 2 + GetBorderWidth() * 2
@@ -1702,6 +1724,9 @@ static function otis_rem_index()
                :nHeightCell += 3
                // Header in BOLD
                MODIFY TBROWSE tb_delindex HEADER FONT TO FontBold
+
+               // Row Colors, fontcolor en/disabled, bg odd or even
+               :SetColor( { 1, 2 }, { th_fctb_leven, {|nRow, nCol, oBrw| iif( nRow%2==0, th_bgtb_leven, th_bgtb_lodd )}} )
 
                // cell margins, add one space left and right
                :nCellMarginLR := 1
@@ -1870,7 +1895,7 @@ static function otis_get_area_info()
    aTblInfo := {}
    x := 0
 
-   // scan areas fro open tables
+   // scan areas for open tables
    FOR i := 1 TO 65534        // dont use 65535 and 65536 result in errors
 
       // only area nr between min and max or between reopen and reopen +
@@ -1949,7 +1974,10 @@ return aTblInfo
 
 
 // Refresh checkbox 'Dataset' has been changed
-static function otis_Ds_changed(lStatus)
+static function otis_Ds_changed(lStatus, lClearCmdLine)
+
+   // defaults
+   default lClearCmdLine := .T.
 
    lDsChanged := lStatus
    setproperty("form_otis", "cb_ds_changed", "Value", lDsChanged )
@@ -1960,7 +1988,9 @@ static function otis_Ds_changed(lStatus)
    // we don't want to AUTO CLOSE in that case the 'DS manager'
    // when closing the 'Inspector'.
    //
-   cCmdline := ""
+   if  lClearCmdLine
+      cCmdline := ""
+   endif
 
 return nil
 
@@ -2601,11 +2631,12 @@ static function otset_helpls()
                   "  HB64      %T2 5  %T1 Harbour hyper locking scheme for 64-bit file API, table size no limit |" + ;
                   "  CLIPPER2  %T1 6  %T1 extended Clipper locking scheme NTXLOCK2.OBJ |" + ;
                   "  |" + ;
+                  "  Function  SET(_SET_DBFLOCKSCHEME, 0...6 )|" + ;
                   "  |" + ;
                   "  |"
 
    // show it
-   show_help(cInfo)
+   show_help(cInfo, 580, 275)
 
 return nil
 
@@ -2816,7 +2847,7 @@ static function table_prop(cWinname)
          Value "Quit"
          VCENTERALIGN .T.
          CENTERALIGN .T.
-         ACTION ThisWindow.Release
+         ACTION { || ThisWindow.Release, domethod(cWinname, "SETFOCUS") }
          FONTCOLOR th_bt_ohfontcol
          BACKCOLOR th_bt_ohbgcol
          /*
@@ -2830,10 +2861,10 @@ static function table_prop(cWinname)
          */
       END label
 
-   END WINDOW
+      // Escape key Quits
+      ON KEY ESCAPE OF &(f_tabprop) ACTION {|| domethod(ThisWindow.name, "RELEASE"), domethod(cWinname, "SETFOCUS")}
 
-   // Escape key Quits
-   ON KEY ESCAPE OF &(f_tabprop) ACTION domethod(ThisWindow.name, "RELEASE")
+   END WINDOW
 
    // activate
    //CENTER WINDOW w_struct
@@ -3035,83 +3066,49 @@ static function table_export( cTablename, cAlias, aColVis, cType )
 
 return nil
 
-      /* TODO : add excel export of data
-      *--------------------------------------------------------*
-      Static Procedure SaveToXls( cAlias, cFile )
-      *--------------------------------------------------------*
-         Local oExcel,  oSheet, oBook, aColumns, nCell := 1
-
-         oExcel := CreateObject( "Excel.Application" )
-         if oExcel == NIL
-            MsgStop('Excel is not available!', PROGRAM )
-            RETURN
-         endif
-         oExcel:Visible := .F.
-         oExcel:WorkBooks:Add()
-         oSheet := oExcel:ActiveSheet()
-
-         Aeval( (cAlias)->( DBstruct(cAlias) ), { |e,i| oSheet:Cells( nCell, i ):Value := e[DBS_NAME] } )
-         do while !(cAlias)->( EoF() )
-            nCell++
-            aColumns := (cAlias)->( Scatter() )
-            aEval( aColumns, { |e,i| oSheet:Cells( nCell, i ):Value := e } )
-            (cAlias)->( DBskip() )
-         enddo
-
-         oSheet:Columns( "A:Z" ):AutoFit()
-
-         oBook := oExcel:ActiveWorkBook()
-         oBook:Title   := cAlias
-         oBook:Subject := cAlias
-         oBook:SaveAs( cFile )
-
-         oExcel:Quit()
-
-      Return
-
-      */
-
 // Collect Table info
 static function show_table_info(cTablename, cAlias)
 
    local i, temp, cInfo := ""
 
-   // get all kind of info
+   // Get all kind of info
+   //   see dbinfo.ch for all defined vars.
    Local aInfo := { ;
                     {   0, "" },;
-                    {  10, "Data file full name & path"+repl(chr(9),3) },;
-                    {  33, "Alias for this workarea"+repl(chr(9),3) },;
-                    {  -1, "Area select number"+repl(chr(9),3), "SELECT()"},;
+                    { DBI_FULLPATH,       "Full name & path"+repl(chr(9),4) },;
+                    { DBI_ALIAS,          "Alias for this workarea"+repl(chr(9),3) },;
+                    {  -1,                "Area select number"+repl(chr(9),3), "SELECT()"},;
                     {   0, "" },;
-                    {  -1, "Dbf driver used"+repl(chr(9),4), "RDDNAME()" },;
-                    { 128, "Locking scheme used by RDD"+repl(chr(9),2) },;
-                    { 147, "Codepage used"+repl(chr(9),4) },;
+                    {  -1,                "Dbf driver used"+repl(chr(9),4), "RDDNAME()" },;
+                    { DBI_LOCKSCHEME,     "Locking scheme used by RDD"+repl(chr(9),2) },;
+                    { DBI_CODEPAGE,       "Codepage used"+repl(chr(9),4) },;
+                    { DBI_ISENCRYPTED,    "Is encrypted"+repl(chr(9),4) },;
                     {   0, "" },;
-                    {   4, "Last modification date"+repl(chr(9),3) },;
+                    { DBI_LASTUPDATE,     "Last modification date"+repl(chr(9),3) },;
                     {   0, "" },;
-                    {  36, "Was the file opened shared?"+repl(chr(9),2) },;
-                    { 129, "Was the file opened readonly?"+repl(chr(9),2) },;
+                    { DBI_SHARED,         "Was the file opened shared?"+repl(chr(9),2) },;
+                    { DBI_ISREADONLY,     "Was the file opened readonly?"+repl(chr(9),2) },;
                     {   0, "" },;
-                    {   3, "Data file's header size"+repl(chr(9),3) },;
-                    {   7, "The size of 1 record in the file"+repl(chr(9),2) },;
-                    {  30, "Number of fields in a record"+repl(chr(9),2) },;
-                    {  -1, "Number of records"+repl(chr(9),3), "RECCOUNT()"},;
+                    { DBI_GETHEADERSIZE,  "Data file's header size"+repl(chr(9),3) },;
+                    { DBI_GETRECSIZE,     "The size of 1 record in the file"+repl(chr(9),2) },;
+                    { DBI_FCOUNT,         "Number of fields in a record"+repl(chr(9),2) },;
+                    {  -1,                "Number of records"+repl(chr(9),3), "RECCOUNT()"},;
                     {   0, "" },;
-                    {  28, "Current Filter setting"+repl(chr(9),3) },;
+                    { DBI_DBFILTER,       "Current Filter setting"+repl(chr(9),3) },;
                     {   0, "" },;
-                    {  20, "Is there a file lock active?"+repl(chr(9),3) },;
-                    {  31, "Number of record locks"+repl(chr(9),3) },;
-                    {   8, "An array of locked records numbers"+repl(chr(9),2) },;
+                    { DBI_ISFLOCK,        "Is there a file lock active?"+repl(chr(9),3) },;
+                    { DBI_LOCKCOUNT,      "Number of record locks"+repl(chr(9),3) },;
+                    { DBI_GETLOCKARRAY,   "An array of locked records numbers"+repl(chr(9),2) },;
                     {   0, "" },;
-                    {  22, "Number of child relations set"+repl(chr(9),2) },;
+                    { DBI_CHILDCOUNT,     "Number of child relations set"+repl(chr(9),2) },;
                     {   0, "" },;
-                    {  29, "Same as Found()"+repl(chr(9),4) },;
-                    {  26, "Same as Bof()"+repl(chr(9),4) },;
-                    {  27, "Same as Eof()"+repl(chr(9),4) },;
+                    { DBI_FOUND,          "Same as Found()"+repl(chr(9),4) },;
+                    { DBI_BOF,            "Same as Bof()"+repl(chr(9),4) },;
+                    { DBI_EOF,            "Same as Eof()"+repl(chr(9),4) },;
                     {   0, "" },;
-                    { 133, "Type of MEMO file: DBT, SMT, FPT"+repl(chr(9),2) },;
-                    {  37, "The memo file's file extension"+repl(chr(9),2) },;
-                    {  39, "Memo File's block size"+repl(chr(9),3) };
+                    { DBI_MEMOTYPE,       "Type of MEMO file: DBT, SMT, FPT"+repl(chr(9),2) },;
+                    { DBI_MEMOEXT,        "The memo file's file extension"+repl(chr(9),2) },;
+                    { DBI_MEMOBLOCKSIZE,  "Memo File's block size"+repl(chr(9),3) };
                   }
 
    // put info in a string
@@ -3185,8 +3182,8 @@ static function show_Active_index_info(cAlias, nCurrentIndexNbr)
       cInfo += "//          Tag "   + chr(9) + ": " + aIndexInfo[nCurrentIndexNbr, OI_TAG] + crlf
       cInfo += "//          Key "   + chr(9) + ": " + aIndexInfo[nCurrentIndexNbr, OI_KEY] + crlf
       cInfo += "//          For "   + chr(9) + ": " + aIndexInfo[nCurrentIndexNbr, OI_FOR] + crlf
-      cInfo += "//          Unique" + chr(9) + ": " + if(aIndexInfo[nCurrentIndexNbr, OI_UNI],".T.",".F.") + crlf
-      cInfo += "//          Descending" + chr(9) + ": " + if(aIndexInfo[nCurrentIndexNbr, OI_AD],".T.",".F.") + crlf
+      cInfo += "//          Unique" + chr(9) + ": " + if(aIndexInfo[nCurrentIndexNbr, OI_UNIQUE],".T.",".F.") + crlf
+      cInfo += "//          Descending" + chr(9) + ": " + if(aIndexInfo[nCurrentIndexNbr, OI_ASCDESC],".T.",".F.") + crlf
       cInfo += "//" + crlf
       cInfo := strtran(cInfo, "//","")
 
@@ -3262,8 +3259,8 @@ static function collect_index_info(cAlias)
                             ORDNAME( x, cBagName),;                  // "OI_TAG"
                             ORDKEY( x, cBagName), ;                  // "OI_KEY"
                             ORDFOR( x, cBagName), ;                  // "OI_FOR"
-                            ORDISUNIQUE( x, cBagName), ;             // "OI_UNI"
-                            ORDDESCEND(x, cBagName) ;                // "OI_AD"
+                            ORDISUNIQUE( x, cBagName), ;             // "OI_UNIQUE"
+                            ORDDESCEND(x, cBagName) ;                // "OI_ASCDESC"
                           };
              )
 
@@ -3272,8 +3269,8 @@ static function collect_index_info(cAlias)
          cInfo += "//          Tag "   + chr(9) + ": " + aIndexInfo[x, OI_TAG] + crlf
          cInfo += "//          Key "   + chr(9) + ": " + aIndexInfo[x, OI_KEY] + crlf
          cInfo += "//          For "   + chr(9) + ": " + aIndexInfo[x, OI_FOR] + crlf
-         cInfo += "//          Unique" + chr(9) + ": " + if(aIndexInfo[x, OI_UNI],".T.",".F.") + crlf
-         cInfo += "//          Descending" + chr(9) + ": " + if(aIndexInfo[x, OI_AD],".T.",".F.") + crlf
+         cInfo += "//          Unique" + chr(9) + ": " + if(aIndexInfo[x, OI_UNIQUE],".T.",".F.") + crlf
+         cInfo += "//          Descending" + chr(9) + ": " + if(aIndexInfo[x, OI_ASCDESC],".T.",".F.") + crlf
          cInfo += "//" + crlf
 
          // prg code
@@ -3281,8 +3278,8 @@ static function collect_index_info(cAlias)
                      "        TAG " + aIndexInfo[x, OI_TAG] + " ;" + crlf + ;
                      "        TO  " + aIndexInfo[x, OI_BAGNAME] + ;
                                if( !empty(aIndexInfo[x, OI_FOR]),  " ;" + crlf + "        FOR " + aIndexInfo[x,4], "" ) + ;
-                               if( aIndexInfo[x, OI_UNI], " ;" + crlf +          "        UNIQUE","" ) + ;
-                               if( aIndexInfo[x, OI_AD],  " ;" + crlf +          "        DESCENDING","" ) + ;
+                               if( aIndexInfo[x, OI_UNIQUE], " ;" + crlf +          "        UNIQUE","" ) + ;
+                               if( aIndexInfo[x, OI_ASCDESC],  " ;" + crlf +          "        DESCENDING","" ) + ;
                                crlf + crlf
       next x
 
@@ -3352,7 +3349,7 @@ static function index_mng(cWinname)
       if len(temp) <> 0
          for i := 1 to len(temp)
             aadd(aIndexInfo, { temp[i, OI_BAGNAME], ;
-                               'Tag   : ' + temp[i, OI_TAG] + space(10) + if(temp[i, OI_UNI],"Unique","") + space(10)+ if(temp[i, OI_AD],"Descending","Ascending") + crlf + ;
+                               'Tag   : ' + temp[i, OI_TAG] + space(10) + if(temp[i, OI_UNIQUE],"Unique","") + space(10)+ if(temp[i, OI_ASCDESC],"Descending","Ascending") + crlf + ;
                                'Key   : ' + temp[i, OI_KEY] + crlf + ;
                                'For    : ' + temp[i, OI_FOR] ;
                              } )
@@ -3375,7 +3372,6 @@ static function index_mng(cWinname)
          ON RELEASE o_Browse:SetFocus() ;
          ON SIZE index_mng_resize(ThisWindow.name) ;
          ON MAXIMIZE index_mng_resize(ThisWindow.name)
-         //ON RELEASE
 
          // set min, max
          //ThisWindow.MaxWidth := getproperty(ThisWindow.name, "WIDTH")
@@ -3402,7 +3398,7 @@ static function index_mng(cWinname)
 
             // add column with index nr and "*" if the row is the active index
             ADD COLUMN TO tb_delindex  ;
-               HEADER "#" ;
+               HEADER '('+hb_ntos(len(aIndexInfo))+')' ;
                DATA hb_ntos(tb_delindex:nLogicPos) + if( nIndexOrd == tb_delindex:nLogicPos, " *", "") ;
                SIZE 30 PIXELS ;
                3DLOOK TRUE,TRUE,FALSE ;                  // cels, header, footer
@@ -3425,11 +3421,17 @@ static function index_mng(cWinname)
                ALIGN DT_LEFT
             */
 
+            // Row Colors, fontcolor en/disabled, bg odd or even
+            :SetColor( { 1, 2 }, { th_fctb_leven, {|nRow, nCol, oBrw| iif( nRow%2==0, th_bgtb_leven, th_bgtb_lodd )}} )
+
             // header is a little bit heigher than the data rows
             :nHeightHead += 6
             :nHeightCell += 3
             // Header in BOLD
             MODIFY TBROWSE tb_delindex HEADER FONT TO FontBold
+
+            // Row Colors, fontcolor en/disabled, bg odd or even
+            :SetColor( { 1, 2 }, { th_fctb_leven, {|nRow, nCol, oBrw| iif( nRow%2==0, th_bgtb_leven, th_bgtb_lodd )}} )
 
             // cell margins, add one space left and right
             :nCellMarginLR := 1
@@ -3454,7 +3456,9 @@ static function index_mng(cWinname)
          //              "Value Label"      "menu_keyword" (used by dispatcher)
          aButtons := {}
          aadd( aButtons, { "New"          , "im_new"   } )
+         aadd( aButtons, { "Modify"       , "im_mod"   } )
          aadd( aButtons, { "Delete"       , "im_del"   } )
+         aadd( aButtons, { "-"            , ""   } )
          aadd( aButtons, { "Reindex"      , "im_reind" } )
          aadd( aButtons, { "-"            , ""         } )
          aadd( aButtons, { "Index info"   , "im_info"  } )
@@ -3514,7 +3518,7 @@ static function index_mng_resize(cWinname)
 return nil
 
 
-// delete index from table and  dataset table
+// delete index from table and dataset table
 static function index_mng_del( cWinname, cWinnamecaller )
 
    local temp, i, fn_index
@@ -3556,14 +3560,14 @@ static function index_mng_del( cWinname, cWinnamecaller )
          // set flag close index allowed
          temp := .T.
 
-         // If the controlling index == the one that you want to close
+         // If the actif index == the one that you want to delete
          //  and if it is not the last one
          if (cAlias)->(IndexOrd()) == i .and. i > 1
 
             // ask confirmation
             PlayExclamation()
             temp := MsgOkCancel("WARNING"+crlf+crlf + ;
-                                "You have chosen to destroy the active order." + crlf + ;
+                                "You have chosen to DELETE the active order TAG." + crlf + ;
                                 "If you confirm the order focus will be set to the first order." + crlf + crlf +;
                                 "The file will be deleted from disk if this is the last order left." + crlf + crlf + ;
                                 "Please confirm.")
@@ -3593,30 +3597,50 @@ return nil
 
 
 // index manager : new / modif index
-static function index_mng_new(cWinname)
+static function index_mng_newmod(cWinname, cMode, cWinnamecaller)
 
-   local r, c, c1
+   local r, c, c1, aIndexInfo, nSelected_IndexNbr := 0
 
    // index vars
-   local cTag   := ""
-   local cKey   := ""
-   local cFor   := ""
+   local cTag      := ""
+   local cKey      := ""
+   local cFor      := ""
+   local lUnique   := .F.
+   local nAscDesc  := 1
    local cFilename := sx_indexname( tb_delindex:nAt )
-
 
    // get tbrowse object from caller form (remember we can open multiple viewers)
    local o_Browse := GetBrowseObj( "tb_Dv_Browse", cWinname )
    // get alias name from tbrowse object
    local cAlias := o_Browse:cAlias
+   // get from index manager tbrowse table object
+   local o_browse_indexlist := GetBrowseObj( "tb_delindex", cWinnamecaller )
 
    // construct at each entry a unique form id name so that multiple forms can be opened.
    LOCAL f_indnew := 'f_indnew_' + cWinname       // cWinname is already a unique form ID
 
+   // prefill if modif of a existing index
+   if cMode == "mod"
+      // fill temp array with all orderindex info
+      aIndexInfo := collect_index_info(cAlias)[3]
+      nSelected_IndexNbr := o_browse_indexlist:nAt
+      //msgdebug(i)
+      // and fill
+      cTag      := aIndexInfo[nSelected_IndexNbr, OI_TAG]
+      cKey      := aIndexInfo[nSelected_IndexNbr, OI_KEY]
+      cFor      := aIndexInfo[nSelected_IndexNbr, OI_FOR]
+      lUnique   := aIndexInfo[nSelected_IndexNbr, OI_UNIQUE]
+      nAscDesc  := if( !aIndexInfo[nSelected_IndexNbr, OI_ASCDESC], 1, 2 )
+      cFilename := aIndexInfo[nSelected_IndexNbr, OI_BAGNAME]
+                  *sx_indexname( tb_delindex:nAt )
+
    // Propose the same order filename as the table
    //   if cFIlename is still empty because there are no order defined at all.
    //   It will be opened automatically later on with the AutoOpen feature.
-   if empty(cFilename)
-      cFilename := hb_FNameExtSet(DBINFO(DBI_FULLPATH), ORDBAGEXT() )
+   else
+      if empty(cFilename)
+         cFilename := hb_FNameExtSet(DBINFO(DBI_FULLPATH), ORDBAGEXT() )
+      endif
    endif
 
    // Set focus back to this form if it is already open
@@ -3627,14 +3651,16 @@ static function index_mng_new(cWinname)
 
    // define form
    DEFINE WINDOW &f_indnew ;
-      AT getproperty(cWinname,"Row")+150, getproperty(cWinname,"Col")+300 ;
+      row getproperty(cWinname,"Row")+150 ;
+      col getproperty(cWinname,"Col")+300 ;
       clientarea 750, 280 ;
-      TITLE 'OTIS - Create new index for alias : ' + cAlias ;
+      TITLE 'OTIS - '+ if(cMode=="new",'Create new','Modify') + ' index for alias : ' + cAlias ;
       BACKCOLOR th_w_bgcolor ;
-      NOSIZE ;
-      NOMAXIMIZE ;
-      ;//NOMINIMIZE ;
-      WINDOWTYPE STANDARD
+      WINDOWTYPE MODAL ;
+      NOSIZE
+      ;//NOMAXIMIZE ;
+      ;//NOMINIMIZE
+
 
       // background controls
       DEFINE LABEL bg_sere
@@ -3695,8 +3721,8 @@ static function index_mng_new(cWinname)
          height 23
          //width 250
          width getproperty(ThisWindow.name,"ClientWidth") - c1 - th_w_ctrlgap * 2
-         ONCHANGE { || cFilename := AllTrim( getproperty(ThisWindow.name,"tb_filename","Value" ) )  }
          VALUE cFilename
+         READONLY if(cMode == "new", .F., .T.)     // readonly if modify
       end textbox
 
       // Tag ordername
@@ -3713,9 +3739,9 @@ static function index_mng_new(cWinname)
          col c1
          height 23
          width 100
-         ONCHANGE { || cTag := AllTrim( getproperty(ThisWindow.name,"tb_tag","Value" ) ) }
          VALUE cTag
          MAXLENGTH 10
+         READONLY if(cMode == "new", .F., .T.)     // readonly if modify
       end textbox
 
       // check box UNIQUE
@@ -3729,17 +3755,17 @@ static function index_mng_new(cWinname)
          //BACKCOLOR th_bt_ohbgcol
          Caption ' Unique'
          LEFTJUSTIFY .T.
-         VALUE .F.
+         VALUE lUnique
       END Checkbox
 
       // radio button Ascending / Descending
       DEFINE RADIOGROUP Rd_AscDes
          ROW   r - 2
          COL   getproperty(ThisWindow.name,"cb_unique","Col" ) + getproperty(ThisWindow.name,"cb_unique","Width" ) + th_w_ctrlgap * 6
-         WIDTH 100
+         WIDTH th_bt_width // 100
          HORIZONTAL .T.
          OPTIONS { "Ascending", "Descending" }
-         VALUE 1
+         VALUE nAscDesc
          TABSTOP .T.
       END RADIOGROUP
 
@@ -3759,7 +3785,6 @@ static function index_mng_new(cWinname)
           HEIGHT    65
           VALUE     cKey
           NOHSCROLLBAR .T.
-          ONCHANGE  { || cKey := AllTrim( getproperty(ThisWindow.name,"edtKey","Value" ) ) }
       END EDITBOX
 
       // For
@@ -3778,24 +3803,28 @@ static function index_mng_new(cWinname)
           HEIGHT    65
           VALUE     cFor
           NOHSCROLLBAR .T.
-          ONCHANGE  ( cFor := AllTrim( getproperty(ThisWindow.name,"edtFor","Value" ) ) )
       END EDITBOX
 
-      // button : Create
+      // button : Create new / Apply modif
       DEFINE label lb_create
          ROW th_w_ctrlgap
          COL th_w_ctrlgap
          WIDTH th_bt_width
          HEIGHT th_bt_height
          FONTBOLD .T.
-         Value " Create"
+         Value if(cMode == "new", " Create", " Apply")
          VCENTERALIGN .T.
          //CENTERALIGN .T.
          VISIBLE .T.
-         ACTION index_mng_new2( cWinname, cFilename, cTag, cKey, cFor, ;
-                                getproperty(ThisWindow.name,"cb_unique","Value" ), ;
-                                getproperty(ThisWindow.name,"Rd_AscDes","Value" ) ;
-                              )
+         ACTION { || cFilename := AllTrim( getproperty(ThisWindow.name,"tb_filename","Value")),;
+                     cTag      := AllTrim( getproperty(ThisWindow.name,"tb_tag","Value") ), ;
+                     lUnique   := getproperty(ThisWindow.name,"cb_unique","Value"), ;
+                     nAscDesc  := getproperty(ThisWindow.name,"Rd_AscDes","Value"), ;
+                     cKey      := AllTrim( getproperty(ThisWindow.name,"edtKey","Value" ) ),;
+                     cFor      := AllTrim( getproperty(ThisWindow.name,"edtFor","Value" ) ),;
+                     ;
+                     index_mng_newmod2( cWinname, cMode, aIndexInfo, nSelected_IndexNbr, cFilename, cTag, cKey, cFor, lUnique, nAscDesc) ;
+                }
          FONTCOLOR th_bt_fontcol
          BACKCOLOR th_bt_bgcol
          ONMOUSEHOVER { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_ohbgcol),;
@@ -3815,13 +3844,13 @@ static function index_mng_new(cWinname)
          VCENTERALIGN .T.
          CENTERALIGN .T.
          VISIBLE .T.
-         ACTION ThisWindow.Release
+         ACTION { || ThisWindow.Release, domethod(cWinnamecaller, "setfocus") }
          FONTCOLOR th_bt_ohfontcol
          BACKCOLOR th_bt_ohbgcol
       END label
 
       // escape key action
-      ON KEY ESCAPE ACTION This.bt_Quit.OnClick
+      ON KEY ESCAPE ACTION { || ThisWindow.Release, domethod(cWinnamecaller, "setfocus") }
 
    end window
 
@@ -3831,9 +3860,9 @@ return nil
 
 
 // create / add a new order
-static function index_mng_new2( cWinname, cFilename, cTag, cKey, cFor, lUnique, nAscDes )
+static function index_mng_newmod2( cWinname, cMode, aIndexInfo, nSelected_IndexNbr, cFilename, cTag, cKey, cFor, lUnique, nAscDesc )
 
-   local lOk := .T.
+   local i, lOk := .T., nSeconds := seconds()
 
    // get tbrowse object from caller form (remember we can open multiple viewers)
    local o_Browse := GetBrowseObj( "tb_Dv_Browse", cWinname )
@@ -3841,20 +3870,22 @@ static function index_mng_new2( cWinname, cFilename, cTag, cKey, cFor, lUnique, 
 
    // save current area
    Local nOldsel := select()
-   // and current active order
-   //Local nOldOrdName := (cAlias)->(OrderName(0))
+   Local nOldOrdNbr
 
    // Asc/Desc
-   local lAscDes := if( nAscDes == 1, .F., .T. )
+   local lAscDes := if( nAscDesc == 1, .F., .T. )
 
    // ADDITIVE
    local lAdditive := .T.
 
    // select area used in dv
    select(cAlias)
+   // and current active order
+   nOldOrdNbr := INDEXORD()
 
    // debug
    //msgstop(cFilename + crlf + cTag + crlf + cKey +crlf + cFor )
+   //msgdebug(collect_index_info(cAlias)[3])
 
    // Filename
    if empty(cFilename)
@@ -3889,7 +3920,7 @@ static function index_mng_new2( cWinname, cFilename, cTag, cKey, cFor, lUnique, 
       END
    endif
 
-   // FOR expression cleanup, it could be that the user the 'enter' key key after entering the FOR expr.
+   // FOR expression cleanup, it could be that the user used 'enter' after entering the FOR expr.
    //  delete crlf pairs and white space
    cFor := alltrim(strtran(cFor, crlf, ""))
    // verify FOR expression by evaluation
@@ -3910,7 +3941,7 @@ static function index_mng_new2( cWinname, cFilename, cTag, cKey, cFor, lUnique, 
       if empty(cTag)
          PlayExclamation()
          lOk := msgokCancel("WARNING"+crlf+crlf +;
-                            "No TAG name is specified. A single order bag"+crlf + ;
+                            "No TAG name is specified. A 'single order' bag"+crlf + ;
                             "will be created and all other TAGS contained in"+crlf+ ;
                             "this orderbag file will be LOST."+crlf+crlf + ;
                             "Please confirm to continue.", "Otis - Create a new order")
@@ -3921,41 +3952,16 @@ static function index_mng_new2( cWinname, cFilename, cTag, cKey, cFor, lUnique, 
 
          // debug
          //msgstop(Alias())
+         //msgdebug("before create / modif index")
 
          // create index
          try
             // wait message
-            WAIT WINDOW ("Create new order is in progress for alias : " + cAlias) NOWAIT
+            WAIT WINDOW ("Update orders is in progress for alias : " + cAlias) NOWAIT
             CursorWait()
             do events
 
-            /*
-            // THIS PART IS REPLACED BY THE CODE BELOW WITH ORDCONDSET() and ORDCREATE()
-            // I leave it only for documentation purposes.
-            //
-            // index WITHOUT a "TAG" name (single order index file)
-            if empty(cTag)
-               // index without a "FOR" clause
-               IF EMPTY(cFor)
-                  INDEX ON &cKey TO (cFilename) &cUnique &cAscDes ADDITIVE
-               // index with a "FOR" clause
-               ELSE
-                  INDEX ON &cKey TO (cFilename) FOR &cFor &cUnique &cAscDes ADDITIVE
-               ENDIF
-
-            // index WITH a TAG name (compound index file, not supported by DBFNTX rdd)
-            else
-               // index without a "FOR" clause
-               IF EMPTY(cFor)
-                  INDEX ON &cKey TAG &cTag TO (cFilename) &cUnique &cAscDes ADDITIVE
-               // index with a "FOR" clause
-               ELSE
-                  INDEX ON &cKey TAG &cTag TO (cFilename) FOR &cFor &cUnique &cAscDes ADDITIVE
-               ENDIF
-            endif
-            */
-
-            /*
+            /* Some Info
             // analysis create order command syntax to ppo
             //
             #command INDEX ON <key> [TAG <(tag)>] TO <(bag)> ;
@@ -3973,7 +3979,7 @@ static function index_mng_new2( cWinname, cFilename, cTag, cKey, cFor, lUnique, 
                      <"while">, [<.mem.>], [<.filter.>], [<.ex.>] ) ;;
                ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>] )
 
-               // some examples so we can see what is needed for ordcondset() and ordcreate()
+               // some examples of ppo code ordcondset() and ordcreate()
                //
                INDEX ON REFER TO (cfilename) ASCENDING ADDITIVE
                   ordCondSet(,,,,,, RecNo(),,,,,, .T.,,,,,,, )
@@ -3997,9 +4003,43 @@ static function index_mng_new2( cWinname, cFilename, cTag, cKey, cFor, lUnique, 
 
             */
 
-            // In Otis i use
-            ordCondSet( cFor, "{||"+cFor+"}",,,,, RecNo(),,,, lAscDes,, lAdditive,,,,,,, )
-            ordCreate( (cFilename), ctag, ckey, "{||"+ cKey+"}", lUnique)
+            // create a new index
+            if cMode == "new"
+
+               // Thus .....
+               ordCondSet( cFor, "{||"+cFor+"}",,,,, RecNo(),,,, lAscDes,, lAdditive,,,,,,, )
+               ordCreate( (cFilename), ctag, ckey, "{||"+ cKey+"}", lUnique)
+
+
+            // If a order is modified .....
+            //   You can not simply recreate a modified tag as we did for a new tag
+            //   In Harbour using ordcreate() will destroy the existing TAG and append
+            //   the modified order as a new last order tag. It should not.
+            //
+            //   If someone use order numbers and not tag names it can create HUGE PROBLEMS
+            //   because order tag names and order numbers are out of synch.
+            //   So we have to rebuild all tags with result that previous tags and corresponding
+            //   order number are respected.
+            else
+               //msgdebug(nSelected_IndexNbr)
+               //cWinname, cMode, aIndexInfo, nSelected_IndexNbr, cFilename, cTag, cKey, cFor, lUnique, nAscDesc
+
+               // store first new info of the modified entry in the array
+               aIndexInfo[nSelected_IndexNbr, OI_TAG]     := cTag
+               aIndexInfo[nSelected_IndexNbr, OI_KEY]     := cKey
+               aIndexInfo[nSelected_IndexNbr, OI_FOR]     := cFor
+               aIndexInfo[nSelected_IndexNbr, OI_UNIQUE]  := lUnique
+               aIndexInfo[nSelected_IndexNbr, OI_ASCDESC] := if( nAscDesc == 1, .F., .T.)
+               aIndexInfo[nSelected_IndexNbr, OI_BAGNAME] := cFilename
+               //msgdebug(aIndexInfo)
+
+               // and rebuild all index 'one after the other' to keep the tag name and order number synchronised as before.
+               for i := 1 to len(aIndexInfo)
+                  ordCondSet( aIndexInfo[i, OI_FOR], "{||"+aIndexInfo[i, OI_FOR]+"}",,,,, RecNo(),,,, aIndexInfo[i, OI_ASCDESC],, lAdditive,,,,,,, )
+                  ordCreate( (aIndexInfo[i, OI_BAGNAME]), aIndexInfo[i, OI_TAG], aIndexInfo[i, OI_KEY], "{||"+ aIndexInfo[i, OI_KEY]+"}", aIndexInfo[i, OI_UNIQUE])
+               next i
+
+            endif
 
             // flush to disk
             COMMIT
@@ -4010,14 +4050,26 @@ static function index_mng_new2( cWinname, cFilename, cTag, cKey, cFor, lUnique, 
             do events
 
             // message finished
-            msgstop("Index update is finished.")
+            msginfo("Index update has finished in " + hb_ntos(seconds() - nSeconds), 'Otis')
 
-            // update index combobox in Dataset viewer and dataset array
+            // restore order if "modify"
+            if cMode == "mod"
+               ORDSETFOCUS(nOldOrdNbr)
+            endif
+
+            // rebuild index info table and combobox in Dataset viewer and dataset array
+            // and set order to the last created order
             index_ds_update(cWinname, cAlias, 1 )
 
+            // reset flag Dataset has changed if in cmdline mode
+            // so that the hidden main window is closed also.
+            if !empty(cCmdline)
+               Otis_Ds_changed(.F., .F.)
+            endif
+
          catch oError
-            MsgStop( "Order create error probably caused" + crlf + ;
-                     "of a invalid KEY or FOR expression." + crlf + crlf + ;
+            MsgStop( "Order create failed probably caused by" + crlf + ;
+                     "using a invalid KEY or FOR expression." + crlf + crlf + ;
                      ErrorMessage(oError) ;
                    )
             lOk := .F.
@@ -4315,7 +4367,7 @@ function mn_dispatch( cButton_id, cWinname )
          exit
 
       case 'ot_dvse'
-         Struct_editor("DV")
+         Struct_editor(cWinname, "DV")
          exit
 
       case "dv_up"
@@ -4330,6 +4382,10 @@ function mn_dispatch( cButton_id, cWinname )
          dv_save(cWinname)
          exit
 
+      case "dv_export"
+         dv_export(cWinname)
+         exit
+
       // dispatch menu for index_mng()
       //------------------------------
       case "im_del"
@@ -4337,7 +4393,11 @@ function mn_dispatch( cButton_id, cWinname )
          exit
 
       case "im_new"
-         index_mng_new(cWinname)
+         index_mng_newmod(cWinname, "new", ThisWindow.name)
+         exit
+
+      case "im_mod"
+         index_mng_newmod(cWinname, "mod", ThisWindow.name)
          exit
 
       case "im_reind"
@@ -4393,7 +4453,7 @@ function mn_dispatch( cButton_id, cWinname )
       // unknown keyword or not yet implemented.
       //----------------------------------------
       otherwise
-         msgstop("Menu button : " + cButton_id + " is not yet implemented.")
+         msgstop("Menu : " + cButton_id + " is not yet implemented.")
 
    end
 
@@ -4504,6 +4564,9 @@ static function ds_manager(keyword)
             // cell margins, add one space left and right
             :nCellMarginLR := 1
 
+            // Row Colors, fontcolor en/disabled, bg odd or even
+            :SetColor( { 1, 2 }, { th_fctb_leven, {|nRow, nCol, oBrw| iif( nRow%2==0, th_bgtb_leven, th_bgtb_lodd )}} )
+
          end tbrowse
 
          // Dataset name label and getbox
@@ -4599,7 +4662,6 @@ static function ds_manager(keyword)
          ON KEY ESCAPE ACTION ThisWindow.Release
 
       end window
-
 
       // init getbox for dsname with passed dataset name
       setproperty( "form_dsmng", "gb_ds_name", "Value", getproperty("form_otis", "cb_dataset", "Item", getproperty("form_otis", "cb_dataset", "Value" )))
@@ -4819,7 +4881,7 @@ static function ds_manager_load( ds_name )
 
                            // open table
                            select (nArea)
-                           use (ds_table->FILENAME) ALIAS (cAlias) VIA (cRdd)
+                           use (ds_table->FILENAME) ALIAS (cAlias) VIA (cRdd) CODEPAGE ini_dbf_codepage
 
                            // save the highest area number because we can add other tables
                            //   to a already loaded dataset and the added must have a unique area nbr.
@@ -4829,7 +4891,7 @@ static function ds_manager_load( ds_name )
                         // Open always in a new area if
                         // no area nr was stored in the DS (because of a error or a user manipulation)
                         else
-                           use (ds_table->FILENAME) ALIAS (cAlias) NEW VIA (cRdd)
+                           use (ds_table->FILENAME) ALIAS (cAlias) NEW VIA (cRdd) CODEPAGE ini_dbf_codepage
                         endif
 
                         // get record number that was stored in the dataset table
@@ -5236,7 +5298,8 @@ return lOk
 //
 static function dv_viewer(nSelect)
 
-   Local i, temp, r, c, gap
+   Local i, temp, r, c
+   local gap := 28
    Local cFontname, nFontsize
    Local cAlias
    Local aIndexinfo, aButtons
@@ -5291,17 +5354,14 @@ static function dv_viewer(nSelect)
    // define window
    define window &cDvWinname ;
       AT GetDesktopHeight()/2 - int(GetDesktopHeight() * 0.85)/2, GetDesktopWidth()/2 - int(GetDesktopWidth() * 0.70)/2 ;
-      CLIENTAREA max(1168, int(GetDesktopWidth() * 0.80)), max(668, int(GetDesktopHeight() * 0.80)) ;
-      TITLE 'OTIS - Open Table InSpector         File : ' + alltrim(Sx_Tablename()) + "         Alias : "+ Alias() + "         Area : "+hb_ntos(select()) ;
+      clientarea max(1200, int(GetDesktopWidth() * 0.80)), max(680, int(GetDesktopHeight() * 0.80)) ;
+      TITLE 'OTIS - Open Table InSpector         File : ' + alltrim(Sx_Tablename()) + "         Alias : "+ Alias() + "         Area : "+hb_ntos(select()) + "         Cp : "+ (cAlias)->(DBINFO(147)) ;
       BACKCOLOR th_w_bgcolor ;
       WINDOWTYPE STANDARD ;
-      ;//ON GOTFOCUS dv_F5Refresh(cDvWinname) ;
       ON SIZE     dv_mw_resize( cDvWinname ) ;
       ON MAXIMIZE dv_mw_resize( cDvWinname ) ;
       ON MINIMIZE dv_mw_resize( cDvWinname ) ;
       ON RELEASE  dv_mw_release( cDvWinname )
-      ;//ON RELEASE select (oldsel) ;
-      ;//NOSIZE
 
       // save current area properties in the window CARGO property
       //  they are used to restore area properties when releasing this window.
@@ -5317,7 +5377,6 @@ static function dv_viewer(nSelect)
       // Init row pos and gap
       // For all controls defined below
       r   := th_w_ctrlgap * 2
-      gap := 28
 
       // Index button (label) and index select combobox
       DEFINE LABEL lb_sel_index
@@ -5328,117 +5387,78 @@ static function dv_viewer(nSelect)
          FONTBOLD .T.
          FONTCOLOR th_bt_ohfontcol
          BACKCOLOR th_bt_ohbgcol
-         //Value ' Index    (' + hb_ntos(nOpenindexfiles) + "+"+ hb_ntos(nTempindexcnt)  +')'
-         Value ' Orders   (' + hb_ntos(DBORDERINFO(DBOI_ORDERCOUNT)) + ')'
+         Value ' Order info  (' + hb_ntos(DBORDERINFO(DBOI_ORDERCOUNT)) + ')'
          VCENTERALIGN .T.
+         Action show_Active_index_info(cAlias, getproperty(ThisWindow.name, "cb_sel_index","VALUE"))
       END label
 
       // Select index combobox
       Define COMBOBOX cb_sel_index
          row r
-         col th_w_ctrlgap * 2 + getproperty(ThisWindow.name, "lb_sel_index","width") + 2
+         COL col_right_off( ThisWindow.name, "lb_sel_index" ) + th_w_ctrlgap
          width  600
          height 250
          ITEMS aIndexinfo
          VALUE (cAlias)->(INDEXORD()) + 1             // +1 because the first entry is '0 - no order'
          ONCHANGE dv_change_order( cDvWinname )
       end combobox
-      // index info button "?" (label)
-      DEFINE LABEL lb_info_index
-         ROW r
-         COL getproperty(ThisWindow.name, "cb_sel_index","col") + getproperty(ThisWindow.name, "cb_sel_index","width") + th_w_ctrlgap - 2
-         WIDTH 20
-         HEIGHT 23
-         FONTBOLD .T.
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-         Value '?'
-         TOOLTIP "Index info"
-         VCENTERALIGN .T.
-         CENTERALIGN .T.
-         Action show_Active_index_info(cAlias, getproperty(ThisWindow.name, "cb_sel_index","VALUE"))
-      END label
 
-     // tbrowse refresh button (same as F5)
-      DEFINE LABEL lb_refresh
-         ROW r
-         COL getproperty(ThisWindow.name, "lb_info_index","col") + getproperty(ThisWindow.name, "lb_info_index","width") + th_w_ctrlgap - 2
-         WIDTH 60 - getproperty(ThisWindow.name, "lb_info_index","width") - 2
-         HEIGHT 23
-         FONTBOLD .T.
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-         Value '  F5  '
-         TOOLTIP "Refresh browse"
-         VCENTERALIGN .T.
-         CENTERALIGN .T.
-         Action dv_F5Refresh(cDvWinname)
-      END label
-
-      // Filter button (label), checkbox, editbox
-      r := r + gap
-      DEFINE LABEL lb_filter
-         ROW r
-         COL th_w_ctrlgap
-         WIDTH th_bt_width
-         HEIGHT 23
-         FONTBOLD .T.
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-         Value " Filter"
-         VCENTERALIGN .T.
-         ACTION { || if( empty( getproperty(ThisWindow.name,"tb_filter","Value")), ;
-                         dv_setfilter(ThisWindow.name), ;
-                         setproperty(ThisWindow.name,"tb_filter","Value", "") ;
-                       ), ;
-                     dv_setfilter(cDvWinname, .T.) ;
-                }
-         // font and background color when onhover / onleave
-         ONMOUSELEAVE { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_ohbgcol),;
-                           setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_ohfontcol)}
-         ONMOUSEHOVER { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_bgcol),;
-                           setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_fontcol)}
-      END label
-      * editbox
-      define TEXTBOX tb_filter
+      // Order Scope, checkbox and label
+      * small empty label left of checkbox to obtain a visual centered checkbox
+      Define label lb_cv_dumos
          row r
-         col th_w_ctrlgap * 2 + getproperty(ThisWindow.name, "lb_sel_index","width") + 2
-         height 23
-         width 600
-         ONINIT This.Value := cFilter
-         ONCHANGE { || setproperty(ThisWindow.name,"lb_filter","Value", if( empty( getproperty(ThisWindow.name,"tb_filter","Value")), " Filter", " Filter clear")) }
-         VALUE nil
-      end textbox
-      * small empty label right of checkbox to obtain a visual centered checkbox
-      Define label lb_dummy
-         row r
-         col getproperty(ThisWindow.name, "tb_filter","col") + getproperty(ThisWindow.name, "tb_filter","width") + th_w_ctrlgap - 2
+         col col_right_off( ThisWindow.name, "cb_sel_index" )  + th_w_ctrlgap
          height 23
          width 4
-         BACKCOLOR th_bt_ohbgcol
-         ON INIT This.tb_filter.Onchange
-      end label
-      * checkbox filter On/Off
-      Define Checkbox cb_filter
-         row r
-         col getproperty(ThisWindow.name, "lb_dummy","col") + getproperty(ThisWindow.name, "lb_dummy","width")
-         height 23
-         width 60
          FONTCOLOR th_bt_ohfontcol
          BACKCOLOR th_bt_ohbgcol
-         caption "On/Off"
+      end label
+      // checkbox Order Scope
+      DEFINE Checkbox cb_ordscope_yn
+         ROW r
+         COL col_right_off( ThisWindow.name, "lb_cv_dumos" )
+         WIDTH th_bt_width - 4
+         HEIGHT 23
+         //FONTBOLD .T.
+         FONTCOLOR th_bt_ohfontcol
+         BACKCOLOR th_bt_ohbgcol
+         Caption " Order Scope"
          LEFTJUSTIFY .F.
-         ON INIT This.Value := if( !empty( getproperty(ThisWindow.name, "tb_filter","Value")  ), .T., .F. )
-         ON CHANGE dv_setfilter(cDvWinname, .T.)
-         value .F.
-      end checkbox
+         ON CHANGE dv_scope(cDvWinname, "ONOFF" )
+         ON INIT This.Enabled := if( getproperty(ThisWindow.name, "cb_sel_index", "Value") - 1 == 0, .F., .T. )
+      END Checkbox
+
+
+      // checkbox "EDIT on/off"
+      DEFINE Checkbox cb_edit_yn
+         ROW r
+         COL col_right_off( ThisWindow.name, "cb_ordscope_yn" ) + th_w_ctrlgap
+         WIDTH th_bt_width - 4
+         HEIGHT 23
+         //FONTBOLD .T.
+         FONTCOLOR th_bt_ohfontcol
+         BACKCOLOR th_bt_ohbgcol
+         Caption ' F2 Allow Edit'
+         ToolTip "Allow edit of a field with 'Enter' or a 'Double click'."
+         LEFTJUSTIFY .T.
+         ON CHANGE dv_cb_edit_yn(cDvWinname)
+      END Checkbox
+      * small empty label right of checkbox to obtain a visual centered checkbox
+      Define label lb_dummy3
+         row r
+         col col_right_off( ThisWindow.name, "cb_edit_yn" )
+         height 23
+         width 4
+         FONTCOLOR th_bt_ohfontcol
+         BACKCOLOR th_bt_ohbgcol
+      end label
+
 
       // Checkbox "Hide deleted : on/off"
-      r = r - gap
       DEFINE Checkbox cb_deleted_yn
          ROW r
-         COL getproperty(ThisWindow.name, "tb_filter","col") + getproperty(ThisWindow.name, "tb_filter","width") + getproperty(ThisWindow.name, "cb_filter","width") + th_w_ctrlgap * 2
-         WIDTH 100
+         COL col_right_off( ThisWindow.name, "lb_dummy3" ) + th_w_ctrlgap
+         WIDTH th_bt_width
          HEIGHT 23
          //FONTBOLD .T.
          FONTCOLOR th_bt_ohfontcol
@@ -5455,19 +5475,137 @@ static function dv_viewer(nSelect)
       * small empty label right of checkbox to obtain a visual centered checkbox
       Define label lb_dummy1
          row r
-         col getproperty(ThisWindow.name, "cb_deleted_yn","col") + getproperty(ThisWindow.name, "cb_deleted_yn","width")
+         COL col_right_off( ThisWindow.name, "cb_deleted_yn" )
          height 23
          width 4
          BACKCOLOR th_bt_ohbgcol
       end label
+
+
+      // checkbox "lock columns"
+      * checkbox
+      DEFINE Checkbox cb_lockcols_yn
+         ROW r
+         col col_right_off( ThisWindow.name, "lb_dummy1" ) + th_w_ctrlgap
+         WIDTH th_bt_width - 5
+         HEIGHT 23
+         //FONTBOLD .T.
+         FONTCOLOR th_bt_ohfontcol
+         BACKCOLOR th_bt_ohbgcol
+         Caption ' Lock columns'
+         LEFTJUSTIFY .T.
+         ON CHANGE dv_change_lockcols( cDvWinname, "CB")
+      END Checkbox
+      * small empty label right of checkbox to obtain a visual centered checkbox
+      Define label lb_dummy5
+         row r
+         col col_right_off( ThisWindow.name, "cb_lockcols_yn" )
+         height 23
+         width 4
+         FONTCOLOR th_bt_ohfontcol
+         BACKCOLOR th_bt_ohbgcol
+      end label
+      * spinner
+      DEFINE SPINNER sp_lockcols
+         ROW r
+         col col_right_off( ThisWindow.name, "lb_dummy5" ) + 3
+         WIDTH 40
+         HEIGHT 23
+         RANGEMIN 0
+         RANGEMAX 20
+         HORIZONTAL .F.
+         //FONTBOLD .T.
+         FONTCOLOR th_bt_ohfontcol
+         BACKCOLOR th_bt_ohbgcol
+         VALUE 0
+         ON CHANGE dv_change_lockcols( cDvWinname, "SP")
+      END SPINNER
+
+
+      // Filter button (label), checkbox, editbox
+      r := row_below_off(ThisWindow.name, "lb_sel_index") + th_w_ctrlgap
+      DEFINE LABEL lb_filter
+         ROW r
+         COL th_w_ctrlgap
+         WIDTH th_bt_width
+         HEIGHT 23
+         FONTBOLD .T.
+         FONTCOLOR th_bt_ohfontcol
+         BACKCOLOR th_bt_ohbgcol
+         Value " Filter    -->"
+         VCENTERALIGN .T.
+         ACTION { || if( empty( getproperty(ThisWindow.name,"tb_filter","Value")), ;
+                         dv_setfilter(ThisWindow.name), ;
+                         setproperty(ThisWindow.name,"tb_filter","Value", "") ;
+                       ), ;
+                     dv_setfilter(cDvWinname, .T.) ;
+                }
+         // font and background color when onhover / onleave
+         ONMOUSELEAVE { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_ohbgcol),;
+                           setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_ohfontcol)}
+         ONMOUSEHOVER { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_bgcol),;
+                           setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_fontcol)}
+      END label
+
+      // Filter Textbox
+      define TEXTBOX tb_filter
+         row r
+         col col_right_off( ThisWindow.name, "lb_filter" ) + th_w_ctrlgap
+         height 23
+         width 600
+         ONINIT This.Value := cFilter
+         ONCHANGE { || setproperty(ThisWindow.name,"lb_filter","Value", if( empty( getproperty(ThisWindow.name,"tb_filter","Value")), " Filter    -->", " Filter clear")) }
+         VALUE nil
+      end textbox
+      // checkbox Filter small empty label right of checkbox to obtain a visual centered checkbox
+      Define label lb_dummy
+         row r
+         col col_right_off( ThisWindow.name, "tb_filter" ) + th_w_ctrlgap
+         height 23
+         width 4
+         BACKCOLOR th_bt_ohbgcol
+         ON INIT This.tb_filter.Onchange
+      end label
+      // checkbox filter On/Off
+      Define Checkbox cb_filter
+         row r
+         col col_right_off( ThisWindow.name, "lb_dummy" )
+         height 23
+         width th_bt_width - 4
+         FONTCOLOR th_bt_ohfontcol
+         BACKCOLOR th_bt_ohbgcol
+         caption "On/Off"
+         LEFTJUSTIFY .F.
+         ON INIT This.Value := if( !empty( getproperty(ThisWindow.name, "tb_filter","Value")  ), .T., .F. )
+         ON CHANGE dv_setfilter(cDvWinname, .T.)
+         value .F.
+      end checkbox
+
+
+      // tbrowse refresh button (same as F5)
+      DEFINE LABEL lb_refresh
+         ROW r
+         col col_right_off( ThisWindow.name, "cb_filter" ) + th_w_ctrlgap
+         WIDTH th_bt_width
+         HEIGHT 23
+         FONTBOLD .F.
+         FONTCOLOR th_bt_ohfontcol
+         BACKCOLOR th_bt_ohbgcol
+         Value ' F5 Refresh'
+         TOOLTIP "Refresh browse"
+         VCENTERALIGN .T.
+         CENTERALIGN .F.
+         Action dv_F5Refresh(cDvWinname)
+      END label
+
 
       // Checkbox "File lock : on/off"
       //    can be set only if exclusive mode is off
       //    this permits to temporary lockout modifications in other instances or parts in the program when in Otis plugin-mode.
       DEFINE Checkbox cb_filelock_yn
          ROW r
-         COL getproperty(ThisWindow.name, "lb_dummy1","col") + getproperty(ThisWindow.name, "lb_dummy1","width") + th_w_ctrlgap
-         WIDTH 100
+         col col_right_off( ThisWindow.name, "lb_refresh" ) + th_w_ctrlgap
+         WIDTH th_bt_width
          HEIGHT 23
          //FONTBOLD .T.
          FONTCOLOR th_bt_ohfontcol
@@ -5481,123 +5619,17 @@ static function dv_viewer(nSelect)
       * small empty label right of checkbox to obtain a visual centered checkbox
       Define label lb_dummyfl
          row r
-         col getproperty(ThisWindow.name, "cb_filelock_yn","col") + getproperty(ThisWindow.name, "cb_filelock_yn","width")
+         col col_right_off( ThisWindow.name, "cb_filelock_yn" )
          height 23
          width 4
          BACKCOLOR th_bt_ohbgcol
       end label
 
-      // checkbox "lock columns"
-      * checkbox
-      DEFINE Checkbox cb_lockcols_yn
-         ROW r
-         col getproperty(ThisWindow.name, "lb_dummyfl","col") + getproperty(ThisWindow.name, "lb_dummyfl","width") + th_w_ctrlgap
-         WIDTH 95
-         HEIGHT 23
-         //FONTBOLD .T.
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-         Caption ' Lock columns'
-         LEFTJUSTIFY .T.
-         ON CHANGE dv_change_lockcols( cDvWinname, "CB")
-      END Checkbox
-      * small empty label right of checkbox to obtain a visual centered checkbox
-      Define label lb_dummy5
-         row r
-         col getproperty(ThisWindow.name, "cb_lockcols_yn","col") + getproperty(ThisWindow.name, "cb_lockcols_yn","width")
-         height 23
-         width 4
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-      end label
-      * spinner
-      DEFINE SPINNER sp_lockcols
-         ROW r
-         COL getproperty(ThisWindow.name, "lb_dummy5","col") + getproperty(ThisWindow.name, "lb_dummy5","width") + 3
-         WIDTH 40
-         HEIGHT 23
-         RANGEMIN 0
-         RANGEMAX 20
-         HORIZONTAL .F.
-         //FONTBOLD .T.
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-         VALUE 0
-         ON CHANGE dv_change_lockcols( cDvWinname, "SP")
-      END SPINNER
 
-      // checkbox "EDIT on/off"
-      r = r + gap
-      DEFINE Checkbox cb_edit_yn
-         ROW r
-         COL getproperty(ThisWindow.name, "cb_deleted_yn","col")
-         WIDTH 100
-         HEIGHT 23
-         //FONTBOLD .T.
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-         Caption ' F2 Allow Edit'
-         ToolTip "Allow edit of a field with 'Enter' or a 'Double click'."
-         LEFTJUSTIFY .T.
-         ON CHANGE dv_cb_edit_yn(cDvWinname)
-      END Checkbox
-      * small empty label right of checkbox to obtain a visual centered checkbox
-      Define label lb_dummy3
-         row r
-         col getproperty(ThisWindow.name, "cb_edit_yn","col") + getproperty(ThisWindow.name, "cb_edit_yn","width")
-         height 23
-         width 4
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-      end label
-
-      // Button : Order Scope
-      DEFINE LABEL lb_ordscope
-         ROW getproperty(ThisWindow.name, "cb_edit_yn","row")
-         COL getproperty(ThisWindow.name, "cb_filelock_yn","col")
-         WIDTH th_bt_width - 16
-         HEIGHT 23
-         //FONTBOLD .T.
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-         Value " Order Scope"
-         VCENTERALIGN .T.
-         ACTION dv_scope(cDvWinname, 'SET')
-         ON INIT This.Enabled := if( getproperty(ThisWindow.name, "cb_sel_index", "Value") - 1 == 0, .F., .T. )
-         // font and background color when onhover / onleave
-         ONMOUSELEAVE { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_ohbgcol),;
-                           setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_ohfontcol)}
-         ONMOUSEHOVER { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_bgcol),;
-                           setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_fontcol)}
-      END label
-      // checkbox Order Scope
-      DEFINE Checkbox cb_ordscope_yn
-         ROW r
-         COL getproperty(ThisWindow.name, "lb_ordscope","col") + getproperty(ThisWindow.name, "lb_ordscope","width" )
-         WIDTH 16
-         HEIGHT 23
-         //FONTBOLD .T.
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-         Caption ' '
-         LEFTJUSTIFY .T.
-         ON CHANGE dv_scope(cDvWinname, "ONOFF" )
-         ON INIT This.Enabled := if( getproperty(ThisWindow.name, "cb_sel_index", "Value") - 1 == 0, .F., .T. )
-      END Checkbox
-      * small empty label right of checkbox to obtain a visual centered checkbox
-      Define label lb_cv_dumos
-         row r
-         col getproperty(ThisWindow.name, "cb_ordscope_yn","col") + getproperty(ThisWindow.name, "cb_ordscope_yn","width")
-         height 23
-         width 4
-         FONTCOLOR th_bt_ohfontcol
-         BACKCOLOR th_bt_ohbgcol
-      end label
-
-      // Button : column visibiliy
+      // Button : Hide columns
       DEFINE LABEL lb_colvis
-         ROW getproperty(ThisWindow.name, "cb_edit_yn","row")
-         COL getproperty(ThisWindow.name, "cb_lockcols_yn","col")
+         ROW r
+         col col_right_off( ThisWindow.name, "lb_dummyfl" ) + th_w_ctrlgap
          WIDTH th_bt_width - 21
          HEIGHT 23
          //FONTBOLD .T.
@@ -5607,16 +5639,18 @@ static function dv_viewer(nSelect)
          Value " Hide Columns"
          VCENTERALIGN .T.
          ACTION { || dv_ColumnVis(cDvWinname, aColVis) }
+         /*
          // font and background color when onhover / onleave
          ONMOUSELEAVE { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_ohbgcol),;
                            setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_ohfontcol)}
          ONMOUSEHOVER { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_bgcol),;
                            setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_fontcol)}
+         */
       END label
       // checkbox col vis
       DEFINE Checkbox cb_colvis_yn
          ROW r
-         COL getproperty(ThisWindow.name, "lb_colvis","col") + getproperty(ThisWindow.name, "lb_colvis","width" )
+         col col_right_off( ThisWindow.name, "lb_colvis" )
          WIDTH 16
          HEIGHT 23
          //FONTBOLD .T.
@@ -5636,11 +5670,14 @@ static function dv_viewer(nSelect)
          BACKCOLOR th_bt_ohbgcol
       end label
 
+
+*********************************************
+
       // Tbrowse
       DEFINE TBROWSE tb_Dv_Browse  ;
          AT getproperty(ThisWindow.name, "lb_filter","row")+getproperty(ThisWindow.name, "lb_filter","height")+th_w_ctrlgap, th_bt_width * 1 + th_w_ctrlgap * 2 ;
-         WIDTH getproperty(ThisWindow.name,"ClientWidth") - th_bt_width * 1 - th_w_ctrlgap * 3 ;
-         HEIGHT getproperty(ThisWindow.name,"ClientHeight") - (getproperty(ThisWindow.name, "lb_filter","row")+getproperty(ThisWindow.name, "lb_filter","height")) - th_w_ctrlgap*2 + 2 ;
+         WIDTH getproperty(ThisWindow.name,"ClientWidth") - th_bt_width * 1 -  th_w_ctrlgap * 3 ;
+         HEIGHT getproperty(ThisWindow.name,"ClientHeight") - ( getproperty(ThisWindow.name, "lb_filter","row")+getproperty(ThisWindow.name, "lb_filter","height")) - th_w_ctrlgap*2  + 2 ;
          COLORS {CLR_BLACK, CLR_WHITE} ;
          SIZE 10 ;
          ALIAS cAlias ;
@@ -5715,6 +5752,9 @@ static function dv_viewer(nSelect)
          // freeze the 2 first columns
          :nFreeze := 2
 
+         // Row Colors, fontcolor en/disabled, bg odd or even
+         :SetColor( { 1, 2 }, { th_fctb_leven, {|nRow, nCol, oBrw| iif( nRow%2==0, th_bgtb_leven, th_bgtb_lodd )}} )
+
          // enable freeze
          :lLockFreeze := .T.
          :SetNoHoles()
@@ -5757,10 +5797,11 @@ static function dv_viewer(nSelect)
                      { "Append file"                   , "dv_af" } , ;
                      { "-"                             , ""      } , ;
                      { "Index manager"                 , "dv_im" } , ;
+                     { "-"                             , ""      } , ;
                      { "Prop. / Struct."               , "dv_st" } , ;
                      { "Struct. Editor"                , "ot_dvse" } , ;
                      { "-"                             , ""      } , ;
-                     { "Export xlsx / csv"             , "dv_export" } , ;
+                     { "Export -> csv"                 , "dv_export" } , ;
                      { "Save (as)"                     , "dv_save" } , ;
                      { "-"                             , ""      } ;
                    }
@@ -5771,24 +5812,27 @@ static function dv_viewer(nSelect)
       // draw menu buttons
       draw_menu( r, c, aButtons, cDvWinname )
 
-      // Back to dataset manager button WITHOUT closing this 'Inspector'
-      DEFINE Label mb_backtods
-         ROW  getproperty(ThisWindow.name,"ClientHeight") - 2 * th_bt_height - th_w_ctrlgap * 2
-         COL  th_w_ctrlgap
-         WIDTH th_bt_width
-         HEIGHT th_bt_height
-         FONTBOLD .T.
-         FONTCOLOR th_bt_fontcol
-         BACKCOLOR th_bt_bgcol
-         Value " Dataset mng"
-         VCENTERALIGN .T.
-         CENTERALIGN .T.
-         ACTION { || domethod("form_otis", "SETFOCUS"), domethod("form_otis", "tb_Otis", "SETFOCUS")}
-         ONMOUSEHOVER { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_ohbgcol),;
-                           setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_ohfontcol)}
-         ONMOUSELEAVE { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_bgcol),;
-                           setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_fontcol)}
-      END label
+      // Button : Set focus to the Dataset Manager WITHOUT closing this 'Inspector'
+      // Only if main windows is not hidden.
+      if getproperty("form_otis", "VISIBLE")
+         DEFINE Label mb_backtods
+            ROW  getproperty(ThisWindow.name,"ClientHeight") - 2 * th_bt_height - th_w_ctrlgap * 2
+            COL  th_w_ctrlgap
+            WIDTH th_bt_width
+            HEIGHT th_bt_height
+            FONTBOLD .T.
+            FONTCOLOR th_bt_fontcol
+            BACKCOLOR th_bt_bgcol
+            Value " Dataset mng"
+            VCENTERALIGN .T.
+            CENTERALIGN .T.
+            ACTION { || domethod("form_otis", "SETFOCUS"), domethod("form_otis", "tb_Otis", "SETFOCUS")}
+            ONMOUSEHOVER { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_ohbgcol),;
+                              setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_ohfontcol)}
+            ONMOUSELEAVE { || setproperty(ThisWindow.name, This.name, "BACKCOLOR", th_bt_bgcol),;
+                              setproperty(ThisWindow.name, This.name, "FONTCOLOR", th_bt_fontcol)}
+         END label
+      endif
 
       // Quit button, always on the bottom
       DEFINE Label mb_Quit
@@ -5914,7 +5958,12 @@ static function dv_mw_resize( cWinname )
 
    // repos menu & Ds mng button
    setproperty(ThisWindow.name, "mb_Quit","Row", getproperty(ThisWindow.name,"ClientHeight") - th_bt_height - th_w_ctrlgap * 1 )
-   setproperty(ThisWindow.name, "mb_backtods","Row", getproperty(ThisWindow.name,"ClientHeight") - th_bt_height * 2 - th_w_ctrlgap * 2 )
+
+   // if _IsControlDefined("mb_backtods", "form_otis")
+   // Can't get working previous line with _IsControlDefined() so i test it with next line.
+   if getproperty("form_otis", "VISIBLE")
+      setproperty(ThisWindow.name, "mb_backtods","Row", getproperty(ThisWindow.name,"ClientHeight") - th_bt_height * 2 - th_w_ctrlgap * 2 )
+   endif
 
    // refresh tbrowse is necessary, if not used display of cols could be disturbed.
    o_Browse:refresh()
@@ -5939,7 +5988,7 @@ static function dv_change_order( cWinname )
 
    // If no order disable scope checkbox
    setproperty(cWinname,"cb_ordscope_yn","Enabled", if(temp == 0, .F., .T.) )
-   setproperty(cWinname,"lb_ordscope","Enabled", if(temp == 0, .F., .T.) )
+   //setproperty(cWinname,"lb_ordscope","Enabled", if(temp == 0, .F., .T.) )
 
    // get orderscope if any
    //   it could be set when you selected this order before and defined a scope for it.
@@ -9704,6 +9753,9 @@ Static Function dv_ColumnVis( cWinname, aColVis )
          :ResetVScroll( .T. )
          :GoPos( 1, 5 )
 
+         // Row Colors, fontcolor en/disabled, bg odd or even
+         :SetColor( { 1, 2 }, { th_fctb_leven, {|nRow, nCol, oBrw| iif( nRow%2==0, th_bgtb_leven, th_bgtb_lodd )}} )
+
       end TBROWSE
 
       /*
@@ -9866,19 +9918,33 @@ Static Function dv_Apply_AllVis( cWinname, aColVis )
 return nil
 
 
-// Only when in command line or on file double click mode
-// Reopen a table in EXCLUSIVE mode
+// Reopen a table :
+//   Only when in command line or on file double click mode or when
+//   we want to change a codepage of a table that is already open.
+//
+//   in Shared / EXCLUSIVE (default) mode
+//   and with Codepage (default is dataset setting)
+//
 //   used in cases where a operation like PACK,ZAP,... needs this mode
-//   and the file was opened in a shared mode.
-static function dv_reopen_excl( cWinname )
+//   and the file was opened in a shared mode,
+//   or when we want to change a codepage.
+//    (i found no function to change codepage if table is already opened)
+//    (only solution : close and reopen with new codepage.)
+//
+static function dv_reopen_excl( cWinname, lExclusive, cCodepg )
 
    local lReturn := .F.
-   local cUsename, nRecno, cFilter, nOrdernr, nArea
+   local nArea, cUsename, nRecno, cFilter, nOrdernr
 
    // get tbrowse object from caller form (remember we can open multiple viewers)
    local o_Browse := GetBrowseObj( "tb_Dv_Browse", cWinname )
    // get alias name from tbrowse object
    local cAlias := o_Browse:cAlias
+
+   // defaults
+   Default lExclusive := .T.
+   Default cCodepg := ini_dbf_codepage
+
 
    // test if in standalone and command line mode
    if lStandalone .and. !empty(cCmdline)
@@ -9897,7 +9963,11 @@ static function dv_reopen_excl( cWinname )
          TRY
             // reopen in exclusive mode
             select (nArea)
-            USE (cUseName) ALIAS (cAlias) EXCLUSIVE
+            if lExclusive
+               USE (cUseName) ALIAS (cAlias) EXCLUSIVE CODEPAGE cCodepg
+            else
+               USE (cUseName) ALIAS (cAlias)           CODEPAGE cCodepg
+            endif
             // set flag
             lReturn := .T.
             // restore order, recno, ....
@@ -9945,7 +10015,8 @@ static function dv_save(cWinname)
    // if RDDxxx
    if cRdd <> 'LETO'
       //                        acFilter ,                                    cTitle,          cDefaultPath
-      cFilename := Putfile( { {'Dbf Files','*.DBF'}, {'All Files','*.*'} } , 'Save DBF file' , ini_lu_folder )
+      cFilename := Putfile( { {'Dbf Files','*.DBF'}, {'All Files','*.*'} } , 'Save DBF file' , hb_FNameDir(Sx_Tablename()) )
+
       // debug
       //msgstop(cFilename)
 
@@ -9971,23 +10042,7 @@ static function dv_save(cWinname)
       if lOk
 
          // message if control Deleted, Filter or Hide Columns is / are used
-         if getproperty(cWinname, "cb_filter", "Value") ;
-            .or. ;
-            getproperty(cWinname, "cb_deleted_yn", "Value") ;
-            .or. ;
-            getproperty(cWinname, "cb_colvis_yn", "Value") ;
-            .or. ;
-            getproperty(cWinname, "cb_ordscope_yn", "Value")
-
-            msginfo("Warning, one or more option(s) :"+crlf+crlf+;
-                    "   Hide Deleted"+crlf+;
-                    "   Filter"+crlf+;
-                    "   Hide Columns" + crlf + ;
-                    "   Order Scope" + crlf + crlf + ;
-                    "are activated." +crlf+crlf+;
-                    "Only records and or fields that are visible are saved.")
-
-         endif
+         show_msg_filters_used(cWinname)
 
          // build field list if option is activated
          if getproperty(cWinname, "cb_colvis_yn", "Value")
@@ -10010,16 +10065,20 @@ static function dv_save(cWinname)
 
          endif
 
-         // copy to
+         // copy to 'ppo code'
+         //   copy to TEST.DBF CODEPAGE ini_dbf_codepage
+         //    __dbCopy( "TEST.DBF", { }           ,        ,          ,       ,      , .F.     ,      , , FR850 )
+         //    __dbCopy( <(f)>     , { <(fields)> }, <{for}>, <{while}>, <next>, <rec>, <.rest.>, <rdd>, , <cp> )
          try
             // with ALL fields
             if cFieldlist == "All"
 
                // if RDDxxx
                if cRdd <> 'LETO'
-                  __DBCOPY(cFilename)
+               // __dbCopy( "TEST.DBF", { }, , , , , .F., , , FR850 )
+                  __DBCOPY( cFilename ,    , , , , ,    , , , ini_dbf_codepage)
                else
-                  leto_DbCopy(cFilename)
+                  leto_DbCopy(cFilename,   , , , , ,    , , ,ini_dbf_codepage)
                endif
 
             // only with VISIBLE columns (=fields)
@@ -10028,9 +10087,10 @@ static function dv_save(cWinname)
 
                // if RDDxxx
                if cRdd <> 'LETO'
-                  __DBCOPY(cFilename, hb_atokens( cFieldlist, ",") )
+               // __dbCopy( "TEST.DBF", { }                        , , , , , .F., , , FR850 )
+                  __DBCOPY( cFilename, hb_atokens( cFieldlist, ","), , , , ,    , , , ini_dbf_codepage )
                else
-                  leto_dbcopy(cFilename, hb_atokens( cFieldlist, ",") )
+                  leto_dbcopy(cFilename, hb_atokens( cFieldlist, ","), , , , ,    , , , ini_dbf_codepage )
                endif
 
             // message, fieldlist is empty
@@ -10049,6 +10109,275 @@ static function dv_save(cWinname)
 
 return nil
 
+
+//
+// Export DBf to a Csv file
+//
+static function dv_export(cWinname)
+
+   // get tbrowse object from caller form (remember we can open multiple viewers)
+   local o_Browse := GetBrowseObj( "tb_Dv_Browse", cWinname )
+   // get alias name from tbrowse object
+   local cAlias := o_Browse:cAlias
+
+   // get rdd to use
+   local cRdd := getproperty("form_otis", "cb_defrdd","Item", getproperty( "form_otis", "cb_defrdd", "Value") )
+
+   local i, cFilename, lOk := .T., aFieldList
+
+   // Get destination filename
+   //                        acFilter ,                                      cTitle,        cDefaultPath              nochdir  def fn                                , nIndex, lOverwr
+   cFilename := Putfile( { {'Csv Files','*.csv'}, {'All Files','*.*'} } , 'Save as CSV' , hb_FNameDir(Sx_Tablename()),        , hb_FNameExtSet(Sx_Tablename())+'.csv' )
+
+   // if a filename is specified
+   if !empty(cFilename)
+
+      // if the file exist, ask confirmation to overwrite
+      if file(cFilename)
+         PlayExclamation()
+         lOk := MsgYesNo("This file exists already."+crlf + crlf + ;
+                         "Do you want to overwrite it ?","Save as")
+      endif
+
+      // if ok
+      if lOk
+
+         // message if control Deleted, Filter or Hide Columns is / are used
+         show_msg_filters_used(cWinname)
+
+         // build limited field list if option is activated
+         if getproperty(cWinname, "cb_colvis_yn", "Value")
+
+            aFieldlist := {}
+            for i := 4 to o_browse:nColCount()   // from 4 because 3 first cols are no fieldnames
+               if o_browse:aColumns[i]:lVisible
+                  // dont use fieldname because cols in tbrowse can be moved/reordered by the user
+                  // get col object fieldname
+                  aadd(aFieldlist, o_browse:aColumns[i]:cField )
+               endif
+            next i
+
+         endif
+
+         // Export to a csv file
+         SaveToCsv( cAlias, aFieldlist, cFilename )
+
+      endif
+
+   endif
+
+return nil
+
+
+// show message, filters are actif
+static function show_msg_filters_used(cWinname)
+
+   if getproperty(cWinname, "cb_filter", "Value") ;
+      .or. ;
+      getproperty(cWinname, "cb_deleted_yn", "Value") ;
+      .or. ;
+      getproperty(cWinname, "cb_colvis_yn", "Value") ;
+      .or. ;
+      getproperty(cWinname, "cb_ordscope_yn", "Value")
+
+      msginfo("Warning, one or more option(s) :"+crlf+crlf+;
+              "   Hide Deleted"+crlf+;
+              "   Filter"+crlf+;
+              "   Hide Columns" + crlf + ;
+              "   Order Scope" + crlf + crlf + ;
+              "are activated." +crlf+crlf+;
+              "Only records and or fields that are visible are saved.")
+   endif
+
+return nil
+
+//
+// Export a dbf to a csv file
+//
+// Args : cAlias         dbf alias name
+//        aColumns       array with column names to export, default all columns if not passed
+//        cFile          Destination filename
+//        cDelim         Csv delimiter, default ';'
+//        lFromTop       set to .F. if to export from the current record position
+//
+// Rem  : 1. This function export data from top or from a certain recno(). (see arg. lFromTop)
+//           The caller must thus keep care of the record position before calling this function.
+//
+//        2. MEMO FIELDS ARE REMOVED for export because they have no fixed structure.
+//
+// Example :
+//        use C:\MiniGUI\SAMPLES\minigui_mysamples\Dbf2Csv\factven
+//
+//        all fields
+//           SaveToCsv( Alias(), , hb_FNameExtSet(Sx_Tablename(), 'csv') )
+//
+//        some fields only
+//           SaveToCsv( Alias(), {"NRFACT","JNLFACT","REFERCL"} , hb_FNameExtSet(Sx_Tablename(), 'csv') )
+//
+//        Some fields only and starting from record and another delimiter
+//          goto 32000
+//          SaveToCsv( Alias(), {"NRFACT","JNLFACT","REFERCL"} , hb_FNameExtSet(Sx_Tablename(), 'csv'), ':' , .F. )
+//
+Static function SaveToCsv( cAlias, aColumns, cFile, cDelim, lFromTop )
+
+   local cWinName := "wn_export"
+
+   private lAbort_export := .F.
+
+   // form
+   DEFINE WINDOW &cWinName ;
+      row 0 ;
+      col 0 ;
+      clientarea 350, 75 ;
+      TITLE 'Export : ' + _GetCompactPath(sx_tablename() + '.csv', 45) ;
+      WINDOWTYPE MODAL ;
+      NOSIZE ;
+      NOSYSMENU ;
+      on init SaveToCsv_run(cWinName, cAlias, aColumns, cFile, cDelim, lFromTop ) ;
+      ON RELEASE SaveToCsv_close()
+
+      // progressbar
+      @ 20, 25 PROGRESSBAR csv_PgBar ;
+               RANGE 0, 100 ;
+               WIDTH 300 HEIGHT 26 ;
+               TOOLTIP "Progress"
+
+      // escape to abort
+      ON KEY ESCAPE ACTION ThisWindow.Release
+
+   end window
+
+   // activate window
+   CENTER WINDOW &cWinName
+   ACTIVATE WINDOW &cWinName
+
+return .T.
+
+// release export win
+static function SaveToCsv_close()
+   lAbort_export := .T.
+   //msgdebug("stopped " , lAbort_export )
+return .T.
+
+
+// function : on init
+Static function SaveToCsv_run(cWinname, cAlias, aColumns, cFile, cDelim, lFromTop )
+
+   Local aTemp,;
+         nFhandle, ;
+         lReturn := .F.,;
+         cBuffer := "",;
+         nSeconds := seconds(), ;
+         nPg_Barr_Step_Cnt, nPgbarr_refresh_cnt,;
+         nExport_cnt := 0
+
+   // save area
+   local nOldSel := select()
+   local nOldrecno := recno()
+
+   // defaults
+   default aColumns := {}
+   default cDelim   := ";"
+   default lFromTop := .T.
+
+   // Create a new csv file
+   // msgdebug(cFile)
+
+   // if handle obtained
+   if (nFhandle := FCreate(cFile)) > 0
+
+      // select area
+      select (cAlias)
+
+      // from current record position or from top
+      if lFromTop
+         dbgotop()
+      endif
+
+      // progressbar step value
+      nPg_Barr_Step_Cnt := ( reccount() - recno()) / 100
+      nPgbarr_refresh_cnt := nPg_Barr_Step_Cnt
+
+      // If no field list passed create array with all columns names
+      if len(aColumns) == 0
+         aColumns := DBstruct()
+         //msgdebug(aColumns)
+         // remove memo fields and keep only fieldnames
+         aTemp := {}
+         AEval( aColumns, { |a| if( a[2] <> "M", aadd(aTemp, a[1]), nil )  })
+         aColumns := aTemp
+      endif
+      //msgdebug(aColumns)
+
+      // write 'columns names' header on first line
+      cBuffer := ""
+      AEval( aColumns, { |a| cBuffer += a + cDelim } )
+      cBuffer := remright(cBuffer, cDelim) + crlf
+      FWRITE( nFhandle, cBuffer )
+
+      // write data in function of columns list to export
+      do while !eof() .and. !lAbort_export
+
+         // export a record
+         cBuffer := ""
+
+         // no trimm
+         //AEval( aColumns, { |a| cBuffer += hb_ValToStr(hb_fieldget(a)) + cDelim } )
+         // alltrimm
+         AEval( aColumns, { |a| cBuffer += alltrim(hb_ValToStr(hb_fieldget(a))) + cDelim } )
+
+         cBuffer := remright( cBuffer, cDelim) + crlf
+         FWRITE( nFhandle, cBuffer )
+
+         // next record
+         nExport_cnt++
+         dbskip()
+
+         // refresh progressbar
+         nPgbarr_refresh_cnt--
+         if nPgbarr_refresh_cnt <= 0
+            setproperty(cWinname,"csv_PgBar","value", getproperty(cWinname,"csv_PgBar","value") + 1 )
+            nPgbarr_refresh_cnt := nPg_Barr_Step_Cnt
+            do events
+         endif
+
+      enddo
+
+      //msgdebug("end loop")
+
+      // close destination file
+      FCLOSE(nFhandle)
+
+      // restore area
+      select (nOldSel)
+      goto nOldrecno
+
+      // set flag
+      lReturn := .T.
+
+   ENDIF
+
+   // release main window
+   if !lAbort_export
+
+      // hide main window
+      domethod( cWinname,"hide")
+
+      // message end in xx sec.
+      if lReturn
+         msginfo("Exported " + hb_ntos(nExport_cnt) +  " records in " + hb_ntos(seconds() - nSeconds) + " sec.", "Export to csv")
+      endif
+
+      // close
+      domethod( cWinname,"release")
+
+   else
+      msginfo("Export aborted", "Export to csv")
+
+   endif
+
+Return lReturn
+
 //***********************************************************************************************************************************
 //
 // Some parts and idees of the structure editor below is borrowed from "MGDBU" from "Grigory Filatov".
@@ -10066,7 +10395,7 @@ return nil
 // Mode  : If called from the 'Inspector' keyword "DV" is passed
 //         In that case the structure of the current table under edit is loaded in the structure editor
 //
-Static function Struct_Editor(mode)
+Static function Struct_Editor(cWinname, mode)
 
    Local aButtons, r, c, i
    LOCAL aNames := { "Field Name", "Type", "Len", "Dec" }
@@ -10074,11 +10403,12 @@ Static function Struct_Editor(mode)
    PUBLIC aStruct := {}
 
    // defaults
+   Default cWinname := ""
    Default mode := ""
 
    // Set focus back to this form if it is already open
-   if ISWINDOWDEFINED("frmTableNew")
-      domethod( "frmTableNew", "SETFOCUS")
+   if ISWINDOWDEFINED("frmStructEdit")
+      domethod( "frmStructEdit", "SETFOCUS")
       return nil
    endif
 
@@ -10090,7 +10420,7 @@ Static function Struct_Editor(mode)
    else
 
       // define form
-      DEFINE WINDOW frmTableNew;
+      DEFINE WINDOW frmStructEdit;
          AT 0, 0 ;
          CLIENTAREA 370 + th_bt_width + th_w_ctrlgap * 2, 600;
          TITLE "OTIS - Structure Editor";
@@ -10108,8 +10438,8 @@ Static function Struct_Editor(mode)
          // define browse to fill with structure data
          DEFINE TBROWSE BRW_2 ;
             AT th_bt_height + th_w_ctrlgap * 2, th_bt_width + th_w_ctrlgap * 2 ;
-            WIDTH  frmTableNew.ClientWidth - th_bt_width - th_w_ctrlgap * 3 ;
-            HEIGHT frmTableNew.ClientHeight - th_bt_height - th_w_ctrlgap * 3 ;
+            WIDTH  frmStructEdit.ClientWidth - th_bt_width - th_w_ctrlgap * 3 ;
+            HEIGHT frmStructEdit.ClientHeight - th_bt_height - th_w_ctrlgap * 3 ;
             SELECTOR .T. ;
             ARRAY aStruct ;
             HEADERS aNames
@@ -10164,6 +10494,9 @@ Static function Struct_Editor(mode)
             // cell margins, add one space left and right
             :nCellMarginLR := 1
 
+            // Row Colors, fontcolor en/disabled, bg odd or even
+            :SetColor( { 1, 2 }, { th_fctb_leven, {|nRow, nCol, oBrw| iif( nRow%2==0, th_bgtb_leven, th_bgtb_lodd )}} )
+
          END TBROWSE
 
          // label "Struct. of"
@@ -10184,7 +10517,7 @@ Static function Struct_Editor(mode)
          DEFINE TEXTBOX tb_tbname
             ROW       th_w_ctrlgap
             COL       th_w_ctrlgap * 2 + th_bt_width
-            WIDTH     frmTableNew.ClientWidth - th_bt_width - th_w_ctrlgap * 3
+            WIDTH     frmStructEdit.ClientWidth - th_bt_width - th_w_ctrlgap * 3
             HEIGHT    23
             VALUE     "<no name>"
             READONLY .T.
@@ -10212,7 +10545,7 @@ Static function Struct_Editor(mode)
          r := th_w_ctrlgap * 2 + th_bt_height
          c := th_w_ctrlgap
          // draw menu buttons
-         draw_menu( r, c, aButtons, "frmTableNew" )
+         draw_menu( r, c, aButtons, "frmStructEdit" )
 
          // Button Save (as)
          DEFINE Label bt_save
@@ -10226,7 +10559,7 @@ Static function Struct_Editor(mode)
             Value "Save (as)"
             VCENTERALIGN .T.
             CENTERALIGN .T.
-            ACTION se_saveas(BRW_2:aArray)
+            ACTION se_saveas(BRW_2:aArray, cWinname)
             // font and background color when onhover / onleave
             ONMOUSEHOVER { || setproperty( ThisWindow.name, This.name, "BACKCOLOR", th_bt_ohbgcol ),;
                               setproperty( ThisWindow.name, This.name, "FONTCOLOR", th_bt_ohfontcol ) }
@@ -10252,7 +10585,7 @@ Static function Struct_Editor(mode)
          END label
 
          // escape key = quit
-         ON KEY ESCAPE ACTION This.bt_Quit.OnClick  // ThisWindow.Release
+         ON KEY ESCAPE ACTION { || This.bt_Quit.OnClick, domethod(cWinname, "SETFOCUS")}  // ThisWindow.Release
 
       END WINDOW
 
@@ -10265,15 +10598,15 @@ Static function Struct_Editor(mode)
          // set new browse array
          se_init_browse(aStruct)
          // set name in textbox
-         frmTableNew.tb_tbname.value := alltrim(Sx_Tablename())
+         frmStructEdit.tb_tbname.value := alltrim(Sx_Tablename())
       endif
 
-      //CENTER WINDOW frmTableNew
-      setproperty( "frmTableNew","Row", GetDesktopHeight()/2 - getproperty("frmTableNew", "Height")/2 )
-      setproperty( "frmTableNew","Col", GetDesktopWidth()/2  - getproperty("frmTableNew", "Width")/2 )
+      //CENTER WINDOW frmStructEdit
+      setproperty( "frmStructEdit","Row", GetDesktopHeight()/2 - getproperty("frmStructEdit", "Height")/2 )
+      setproperty( "frmStructEdit","Col", GetDesktopWidth()/2  - getproperty("frmStructEdit", "Width")/2 )
 
       // activate
-      ACTIVATE WINDOW frmTableNew
+      ACTIVATE WINDOW frmStructEdit
 
    Endif
 
@@ -10281,20 +10614,22 @@ RETURN NIL
 
 
 // 'Save as' structure
-static function se_saveas(aStruct)
+static function se_saveas(aStruct, cWinname)
 
    local i, cTemp
    local lOk := .T.
    local cSaveToDbf, cTempFn
    local nArea, cUnderEditDbfName
+   local lError := .F.
 
    local cHasFocus := FocusedWindow.Name
-   LOCAL oBrw := GetBrowseObj( "BRW_2", "frmTableNew" )
+   LOCAL oBrw := GetBrowseObj( "BRW_2", "frmStructEdit" )
+   Local oDvBrowse := GetBrowseObj( "tb_Dv_Browse", cWinname )
 
    // get alias name
    local cAlias := Alias()
 
-   // fill array with all possible extensions
+   // fill array with all possible extensions for a table and the related files
    local aExtensions := { ".dbf", ".cdx", ".ntx", ".nsx", ".dbt", ".fpt", ".smt" }
 
    // save autopen status and active it for cdx management
@@ -10302,11 +10637,12 @@ static function se_saveas(aStruct)
 
    // debug
    //msgdebug(aStruct)
+   //msgdebug(Cwinname)
 
    // if minimum 1 field defined
    IF BRW_2:nLen > 0 .and. !empty(BRW_2:aArray[1,1])
 
-      // get filename to save to
+      // get from user filename to save to
       cSaveToDbf := PutFile( { {"File DBF (*.DBF)", "*.DBF"}, {'All Files','*.*'} }, 'New table...', GetCurrentFolder() )
 
       // If a file is selected or a new name is entered
@@ -10323,10 +10659,12 @@ static function se_saveas(aStruct)
                         "You choose to change the structure of the file that is currently open." + crlf + crlf + ;
                         "Do you want to close, change the structure, append data and reopen this file ?" )
 
-               // create temp filename
-               cTempFn := "NewStruct"
+               // create temp filename, is the same but with a random nbr in it.
+               // Att. without extension, reason see below.
+               cTempFn := Sx_Tablename()
+               cTempFn := hb_FNameDir(cTempFn) + hb_FNameName(cTempFn) + '_' + hb_ntos(random())
 
-               // save properties of table under edit
+               // save properties of table that is undergoing a structure change.
                nArea  := SELECT()
                cUnderEditDbfName := cFileNoExt( (cAlias)->( Sx_Tablename() ) )
                //msgdebug(cUnderEditDbfName)
@@ -10343,7 +10681,7 @@ static function se_saveas(aStruct)
 
                // open temp (new struct) and append from original (old struct)
                select(nArea)
-               use (cTempFn) EXCLUSIVE
+               use (cTempFn) EXCLUSIVE CODEPAGE ini_dbf_codepage
 
                // Append data from old structure
                //  append without any index opened because this takes a huge time for large files
@@ -10354,7 +10692,7 @@ static function se_saveas(aStruct)
                   CursorWait()
                   do events
 
-                  APPEND from (cUnderEditDbfName)
+                  APPEND from (cUnderEditDbfName) CODEPAGE ini_dbf_codepage
 
                   CursorArrow()
                   WAIT CLEAR
@@ -10362,6 +10700,9 @@ static function se_saveas(aStruct)
 
                // reindex error message
                Catch oError
+                  // set flag
+                  lError := .T.
+                  // msg
                   MsgStop("Append data from old structure failed :" + crlf + crlf + ;
                            ErrorMessage(oError) )
 
@@ -10378,16 +10719,17 @@ static function se_saveas(aStruct)
                // we leave index names as they are so it is not necessary to recreate all tags
                // they are opened again when we reopen the new table.
                // The table is reindexed after opening.
-
-               // delete first previous .bak files if any
+               //
+               // delete first all previous .bak files if any
                for i := 1 to len(aExtensions)
                   hb_FileDelete(cUnderEditDbfName + aExtensions[i] + ".bak")
                next i
-               // rename table and all other extensions under edit (was closed before)
+               // create a .bak of dbf under edit and related files
                for i := 1 to len(aExtensions)
                   FRENAME( cUnderEditDbfName + aExtensions[i], cUnderEditDbfName + aExtensions[i] + ".bak" )
                next i
-               // rename the new structure temp name to the original name idem for memo files and index files
+
+               // rename the new structure temp names to the original name idem for memo files and index files
                for i := 1 to len(aExtensions)
                   FRENAME( cTempFn + aExtensions[i], cUnderEditDbfName + aExtensions[i])
                next i
@@ -10400,7 +10742,9 @@ static function se_saveas(aStruct)
 
                // reopen the file that has now a new structure
                // the cdx file will be opened also if there is one with the same name.
-               use (cSaveToDbf) ALIAS (cAlias) EXCLUSIVE
+               // the cdx is the old version renamed cdx file
+               // so we have to reindex
+               use (cSaveToDbf) ALIAS (cAlias) EXCLUSIVE CODEPAGE ini_dbf_codepage
 
                // reindex if any index open
                TRY
@@ -10419,21 +10763,51 @@ static function se_saveas(aStruct)
                Catch oError
                   MsgStop("Reindex failed after a structure modification :" + crlf + crlf + ;
                            ErrorMessage(oError) )
-
                end
 
-               // refresh and set focus
-               domethod(cHasFocus, "setfocus")
+               // reset struct. modified flag
+               oBrw:lHasChanged := .F.
 
                // reset flag, saving is done
                lOk := .F.
 
-               // update tbrowse flag changes are saved
-               oBrw:lHasChanged := .F.
-
                // msg structure is updated
                PlayExclamation()
                msginfo("The structure update has finished.")
+
+               // If in cmdline mode
+               //  Close this dv_viewer window and restart viewer with the new structure.
+               //  Don't forget to setup Otis.exe as the default program to use for dbf file.
+               //   (didn't find a method to reload the modified structure in the current)
+               //   (tbrowse() so the simplest methode is to reopen Otis.)
+               if !empty(cCmdline)
+
+                  // close file with new structure
+                  close all
+                  // reopen by execute default application defined in windows
+                  execute file (cSaveToDbf)
+
+                  // Close Otis by closing this dv_viewer window.
+                  // remember we are in cmdline mode
+                  domethod(cWinname, "release")
+
+               // dbf is opened via dataset manager
+               // close and reopen it with new structure
+               else
+                  // close current area
+                  cTemp := { sx_tablename(), alias() }
+                  use
+                  // reopen the modified table with the same alias and area number
+                  USE (cTemp[1]) ALIAS (cTemp[2]) CODEPAGE ini_dbf_codepage
+
+                  // Exit the struct editor and this dv_viewer window
+                  domethod("frmStructEdit", "release")
+                  domethod(cWinname, "release")
+
+                  // and reopen with new structure
+                  otis_dv()
+
+               endif
 
             // save is annulated
             else
@@ -10514,12 +10888,12 @@ static function se_release()
    If BRW_2:lHasChanged
       PlayExclamation()
       IF msgOkCancel( "Do you want to discard the changes ?" )
-         domethod( "frmTableNew","release")
+         domethod( "frmStructEdit","release")
       else
          lReturn := .F.
       endif
    else
-      domethod( "frmTableNew","release")
+      domethod( "frmStructEdit","release")
    endif
 
 return lReturn
@@ -10696,8 +11070,8 @@ static function se_aim_field( nMode, cFormName )
    endif
 
   DEFINE WINDOW FieldNew;
-      row getproperty("frmTableNew", "row") + 200 ;
-      col getproperty("frmTableNew", "col") + 200 ;
+      row getproperty("frmStructEdit", "row") + 200 ;
+      col getproperty("frmStructEdit", "col") + 200 ;
       CLIENTAREA 345 + th_w_ctrlgap * 2 ,100 +th_w_ctrlgap * 2 ;
       TITLE "OTIS - New Table - " + {"Append","Insert","Modify"}[nMode] + " field";
       backcolor th_w_bgcolor ;
@@ -10876,24 +11250,59 @@ RETURN nil
 
 
 // Struct. Edit DELETE a field def.
+//  but display a warnig it is used in a index KEY or FOR expression.
 static function se_del_field(cFormName)
 
-   local temp
+   local i, nPos, cWarning, cFieldname
+
+   // load index info
+   local aIndexInfo := collect_index_info(Alias())[3]
+
+   // get tbrowse object
    LOCAL oBrw := GetBrowseObj( "BRW_2", cFormName )
 
    // get row pos.
-   temp := oBrw:nAT
-   // delete row
-   oBrw:Del()
-   *// minimum 1 empty entry
-   *if oBrw:nLen == 0
-   *   oBrw:AddItem(  )
-   *endif
-   // set new row pos.
-   oBrw:GoPos( if( temp > oBrw:nLen, oBrw:nLen, oBrw:nAT ) )
-   oBrw:SetFocus()
+   nPos := oBrw:nAT
 
-   oBrw:lHasChanged := .T.
+   // and fieldname from table
+   cFieldname := alltrim( oBrw:aArray[ oBrw:nAT ][ 1 ] )
+
+   // check if used in a KEY or FOR expression
+   cWarning := ""
+   for i := 1 to len(aIndexInfo)
+      if cFieldname $ aIndexInfo[i, OI_KEY] + "," + aIndexInfo[i, OI_FOR]
+         // add warning to text display below in the msgOkCancel() dialog
+         cWarning := "ATTENTION" + crlf + crlf + "Field '"+ cFieldname +"' is used in the Key" + crlf + ;
+                     "or FOR expression in order number " + hb_ntos(i) + "." + crlf + crlf
+
+      endif
+   next i
+
+   // Ask confirmation
+   PlayExclamation()
+   if MsgOkCancel( cWarning + "Do you want to delete field '" + cFieldname + "'.", "Otis" )
+
+      // position
+      oBrw:GoPos(nPos)           // this positioning should not be necessary but for one reason or another
+                                 // the first call of :del() is deleting always the first entry in the tbrowse array.
+                                 // Even the cursor is placed on line 1 in the tbrowse array. BUG ????
+                                 // it is no longer necessary when we delete others afterwards.
+                                 // :nAT position is respected.
+      // delete row
+      oBrw:Del(nPos)
+
+      *// minimum 1 empty entry
+      *if oBrw:nLen == 0
+      *   oBrw:AddItem(  )
+      *endif
+
+      oBrw:lHasChanged := .T.
+
+   endif
+
+   // set new row pos.
+   oBrw:GoPos( if( nPos > oBrw:nLen, oBrw:nLen, oBrw:nAT ) )
+   oBrw:SetFocus()
 
 return nil
 
@@ -10960,7 +11369,7 @@ RETURN nil
 static function se_field_ud( cSense )
 
    Local temp, i
-   LOCAL oBrw := GetBrowseObj( "BRW_2", "frmTableNew" )
+   LOCAL oBrw := GetBrowseObj( "BRW_2", "frmStructEdit" )
    Local nSense
 
    // check if on top or bottom and set sense
@@ -11019,7 +11428,7 @@ static function se_load_struct(cFormName)
 
       Try
          // open table
-         use (cFn) ALIAS IMPSTRUCT READONLY NEW VIA(cRdd)
+         use (cFn) ALIAS IMPSTRUCT READONLY NEW VIA(cRdd) CODEPAGE ini_dbf_codepage
          // get structure
          aStruct := DBSTRUCT()
          // close
@@ -11048,7 +11457,7 @@ static function se_load_struct(cFormName)
       select (nOldsel)
 
       // set name in textbox
-      frmTableNew.tb_tbname.value := cFn
+      frmStructEdit.tb_tbname.value := cFn
 
    endif
 
@@ -11096,7 +11505,7 @@ static function se_clear_struct()
       se_init_browse({ {"","","",""} })
 
       // clear textbox with table name of loaded structure
-      setproperty("frmTableNew", "tb_tbname","Value", "")
+      setproperty("frmStructEdit", "tb_tbname","Value", "")
    endif
 
 return nil
@@ -11108,7 +11517,7 @@ static function se_init_browse(aStruct)
    local oBrw
 
    // set a empty browse array and refresh display
-   oBrw := GetBrowseObj( "BRW_2", "frmTableNew" )
+   oBrw := GetBrowseObj( "BRW_2", "frmStructEdit" )
    oBrw:lHasChanged := .F.
    oBrw:SetArray(aStruct)
    oBrw:refresh()
@@ -11866,7 +12275,7 @@ static function Open_dstable()
    // open it
    TRY
       select (ini_Otisdb_area_nr)
-      USE (fn_ds_table) ALIAS ds_table EXCLUSIVE VIA 'DBFCDX'
+      USE (fn_ds_table) ALIAS ds_table EXCLUSIVE VIA 'DBFCDX'   // no codepage option used, default program/system codepage is used if not passed.
 
       //msgstop('Otis_ds.dbf is opened in select : ' + hb_ntos(select()) )
 
@@ -11894,6 +12303,33 @@ static FUNCTION Gather( paRecord )
 RETURN AEval( paRecord, {|x,n| FieldPut( n, x ) } )
 */
 
+
+//
+// calc COL right uppper corner of a control in function
+// of width of passed control
+//
+static function col_right_off( Windowname, cControlname )
+
+   local nNewCol
+
+   nNewCol := getproperty(Windowname, cControlname ,"col") + getproperty(Windowname, cControlname,"width")
+
+return nNewCol
+
+
+//
+// calc Row left down corner of a control in function
+// of height of passed controlname
+//
+static function row_below_off( Windowname, cControlname )
+
+   local nNewRow
+
+   nNewRow := getproperty(Windowname, cControlname ,"row") + getproperty(Windowname, cControlname,"height")
+
+return nNewRow
+
+
 // Show table info form
 static function show_info(cTablename, cInfo, lModal)
 
@@ -11908,7 +12344,7 @@ static function show_info(cTablename, cInfo, lModal)
       // modal win type
       define window &form_tii ;
          row 200 ;
-         col 300 ;
+         col 350 ;
          Clientarea 500, MIN(th_w_ctrlgap * 2 + th_bt_height + mlcount(cInfo) * 14 + 60, GetDesktopHeight() - 350 ) ;   // 14 = fontsize + spacing (defined by test), 50 window borders
          TITLE cTablename ;
          BACKCOLOR th_w_bgcolor ;
@@ -11922,7 +12358,7 @@ static function show_info(cTablename, cInfo, lModal)
    // standard win type
    else
       define window &form_tii ;
-         AT 200, 300 ;
+         AT 200, 350 ;
          Clientarea 500, MIN(th_w_ctrlgap * 2 + th_bt_height + mlcount(cInfo) * 14 + 60, GetDesktopHeight() - 350 ) ;   // 14 = fontsize + spacing (defined by test), 50 window borders
          TITLE cTablename ;
          BACKCOLOR th_w_bgcolor ;
@@ -12052,14 +12488,14 @@ static function show_help(cInfo, nWidth, nHeight)
    nLinecnt := NumToken( cInfo, "|" )
 
    // replace | with crlf and %T. with tabs
-   cInfo := strtran(cInfo, "|", hb_eol())
+   cInfo := strtran(cInfo, "|", crlf)
    cInfo := strtran(cInfo, " %T1 ", chr(9))
    cInfo := strtran(cInfo, " %T2 ", repl(chr(9),2))
 
    // get maximum len of all lines
    for i := 1 to nLinecnt
-      cLine := memoline(cInfo, 254, i)
-      if ( temp := len(alltrim(cLine)) ) > nMaxLen
+      cLine := alltrim(memoline(cInfo, 254, i))
+      if ( temp := len(cLine) ) > nMaxLen
          nMaxLen := temp
       endif
    next i
@@ -12161,6 +12597,12 @@ static function set_theme(cThemeId)
          th_bt_ohfontcol := {000,000,000}            // on hover font color
          th_bt_ohbgcol   := {083,184,225}            // on hover bg color
 
+         // colors tbrowse font and line even/odd
+         th_fctb_leven  := rgb(000,000,000)
+         th_bgtb_leven  := rgb(255,255,255)
+         th_fctb_lodd   := rgb(000,000,000)
+         th_bgtb_lodd   := rgb(245,245,245)
+
       case cThemeId == "2"
 
          th_w_width      := 1000                     // OTIS main window width
@@ -12178,6 +12620,12 @@ static function set_theme(cThemeId)
          th_bt_bgcol     := {004,099,128}            // bg color
          th_bt_ohfontcol := {000,000,000}            // on hover font color
          th_bt_ohbgcol   := {247,122,084}            // on hover bg color
+
+         // colors tbrowse font and line even/odd
+         th_fctb_leven  := rgb(000,000,000)
+         th_bgtb_leven  := rgb(255,255,255)
+         th_fctb_lodd   := rgb(000,000,000)
+         th_bgtb_lodd   := rgb(245,245,245)
 
       // default theme "1", blue, orange
       Otherwise
@@ -12197,6 +12645,12 @@ static function set_theme(cThemeId)
          th_bt_bgcol     :=  {21, 113, 173}          // TEST bg color
          th_bt_ohfontcol :=  {000,000,000}           // on hover font color
          th_bt_ohbgcol   :=  {240, 169, 0}           // on hover bg color
+
+         // colors tbrowse font and line even/odd
+         th_fctb_leven  := rgb(000,000,000)
+         th_bgtb_leven  := rgb(255,255,255)
+         th_fctb_lodd   := rgb(000,000,000)
+         th_bgtb_lodd   := rgb(245,245,245)
 
          // reset theme to 1 because a invalid value is used in the ini file.
          ini_theme := "1"

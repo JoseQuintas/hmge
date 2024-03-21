@@ -71,7 +71,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 #ifndef __XHARBOUR__
   SET PROCEDURE TO tget\tget.prg
-  SET PROCEDURE TO tget\tgetint.prg
 #endif
 #if defined( __XHARBOUR__ ) .OR. ( __HARBOUR__ - 0 < 0x030200 )
   #xtranslate hb_asciiUpper( <c> ) => Upper( <c> )
@@ -286,7 +285,11 @@ FUNCTION _DefineGetBox ( ControlName, ParentFormName, x, y, w, h, Value, ;
 
    ENDIF
 
+#ifdef __XHARBOUR__
    oget := Get()
+#else
+   oget := HMG_Get()
+#endif
    oget:New( -1, -1, { | x | iif( x == NIL, oget:cargo, oget:cargo := x ) }, '', cPicture )
    oget:cargo     := Value
    oget:preblock  := when

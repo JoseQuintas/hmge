@@ -86,13 +86,22 @@ Function SaveThisIcon( cSrcName, nI )
    LOCAL cFileName := PutFile ( {{"Icon Files (*.ico)" ,"*.ico"}} ,"Save Icon" ,  , .T. )
 
    IF !Empty( cFileName ) .AND. SaveIcon( cFileName, cSrcName, nI )
-	MsgInfo( "Icon was saved successfully", "Result" )
+      MsgInfo( "Icon was saved successfully", "Result" )
    ENDIF
 
 Return NIL
 
 /////////////////////////////////////////////////////////////////////////////////
 Function SaveIcon( cIconName, cIconSrc, nItem )
-LOCAL aIcons := ExtractIconEx( cIconSrc, nItem )
+   LOCAL aIcons := {}, lRet, hIcon
 
-Return C_SaveHIconToFile( cIconName, aIcons )
+   AAdd( aIcons, ExtractIconEx( cIconSrc, nItem )[1] )
+   AAdd( aIcons, ExtractIconEx( cIconSrc, nItem, 16, 16 )[1] )
+
+   lRet := C_SaveHIconToFile( cIconName, aIcons )
+
+   FOR EACH hIcon IN aIcons
+      DestroyIcon( hIcon )
+   NEXT
+
+Return lRet

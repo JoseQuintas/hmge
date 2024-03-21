@@ -1,12 +1,9 @@
 /* --------------------------------------------------------------------
- * NOTE: Following comments are control commands for the generator.
- *       Do not edit them unless you know what you are doing.
+ * NOTE: You can add manual override which functions to include or
+ *       exclude from automatically generated EXTERNAL/DYNAMIC list.
  *          Syntax: // HB_FUNC_INCLUDE <func>
  *                  // HB_FUNC_EXCLUDE <func>
  */
-
-// HB_FUNC_EXCLUDE __GET
-// HB_FUNC_EXCLUDE __GETA
 
 /* --------------------------------------------------------------------
  * WARNING: Automatically generated code below. DO NOT EDIT! (except casing)
@@ -307,7 +304,6 @@ DYNAMIC GDIPCREATEBITMAPFROMFILE
 DYNAMIC GDIPCREATEHBITMAPFROMBITMAP
 DYNAMIC GDIPDISPOSEIMAGE
 DYNAMIC GDIPLUSSHUTDOWN
-DYNAMIC GET
 DYNAMIC GETACTIVEMDIHANDLE
 DYNAMIC GETACTIVEWINDOW
 DYNAMIC GETACTIVEXOBJECT
@@ -427,7 +423,6 @@ DYNAMIC GETMONTHRANGE
 DYNAMIC GETMSKTEXTLPARAM
 DYNAMIC GETMSKTEXTMESSAGE
 DYNAMIC GETMSKTEXTWPARAM
-DYNAMIC GETNEW
 DYNAMIC GETNEXTDLGTABITEM
 DYNAMIC GETNONCLIENT
 DYNAMIC GETNONCLIENTFONT
@@ -522,6 +517,8 @@ DYNAMIC HMG_DRAWICON
 DYNAMIC HMG_DRAWSYSICON
 DYNAMIC HMG_EDITCONTROLGETCHAR
 DYNAMIC HMG_FILECOPY
+DYNAMIC HMG_GET
+DYNAMIC HMG_GETALLFONTS
 DYNAMIC HMG_GETCHARWIDTH
 DYNAMIC HMG_GETFORMCONTROLS
 DYNAMIC HMG_GETFORMS

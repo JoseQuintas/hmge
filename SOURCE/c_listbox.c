@@ -50,10 +50,10 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Listbox Class Name
-#define WC_LISTBOX             "ListBox"
+   #define WC_LISTBOX  "ListBox"
 #endif
 
-#define TOTAL_TABS  10
+#define TOTAL_TABS     10
 
 #ifdef UNICODE
 LPWSTR      AnsiToWide( LPCSTR );

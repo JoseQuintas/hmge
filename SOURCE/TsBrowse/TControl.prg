@@ -28,8 +28,8 @@ CLASS TControl
    DATA   bSetGet, bChange
    DATA   cCaption
    DATA   nLastRow, nLastCol
-   DATA   nAlign AS NUMERIC
-   DATA   nStatusItem INIT 1
+   DATA   nAlign        AS NUMERIC
+   DATA   nStatusItem   INIT 1
 
    DATA   bLClicked                                  // TControl
    DATA   bLDblClick                                 // TControl
@@ -64,7 +64,7 @@ CLASS TControl
    DATA   nHelpId                                    // TWindow
    DATA   nChrHeight                                 // TWindow
 
-   DATA   oWnd          AS OBJECT                    // TWindow
+   DATA   oWnd            AS OBJECT                  // TWindow
    DATA   oCursor                                    // TWindow
    DATA   hCursor                                    // JP
    DATA   oFont                                      // TWindow
@@ -78,9 +78,9 @@ CLASS TControl
    DATA   oVScroll                                   // TWindow
    DATA   oHScroll                                   // TWindow
 
-   DATA   hWndParent                                 // New
-   DATA   aControls   INIT {}                        // New
-   DATA   oWndlAppendMode INIT .F.                   // New
+   DATA   hWndParent
+   DATA   aControls       INIT {}
+   DATA   oWndlAppendMode INIT .F.
 
    DATA   oBrw
    DATA   oCol
@@ -375,15 +375,15 @@ METHOD Create( cClsName )  CLASS TControl
 
    if ::nBottom != CW_USEDEFAULT
 
-     ::hWnd := _CreateWindowEx( xStyle, cClsName, ::cCaption, ::nStyle, ::nLeft, ::nTop,;
+     ::hWnd := _CreateWindowEx( xStyle, cClsName, ::cCaption, ::nStyle, ::nLeft, ::nTop, ;
                                ::nRight - ::nLeft + 1, ::nBottom - ::nTop + 1, ;
-                               ::hWndParent, 0, GetInstance() , ::nId )
+                               ::hWndParent, 0, GetInstance(), ::nId )
 
    else
 
-     ::hWnd := _CreateWindowEx( xStyle, cClsName, ::cCaption, ::nStyle, ::nLeft, ::nTop,;
-                               ::nRight , ::nBottom , ;
-                               ::hWndParent, 0, GetInstance() , ::nId )
+     ::hWnd := _CreateWindowEx( xStyle, cClsName, ::cCaption, ::nStyle, ::nLeft, ::nTop, ;
+                               ::nRight, ::nBottom, ;
+                               ::hWndParent, 0, GetInstance(), ::nId )
    endif
 
    if ::hWnd == 0

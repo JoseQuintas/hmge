@@ -8,8 +8,9 @@ lib_hmge - HMG Extended source selected by lib.prg
 FUNCTION gui_Init()
 
    SET NAVIGATION EXTENDED
-   SET BROWSESYNC ON
-   SET WINDOW MODAL PARENT HANDLE ON  
+   //SET OOP ON
+   SET WINDOW MAIN OFF
+   //SET WINDOW MODAL PARENT HANDLE ON
 
    RETURN Nil
 
@@ -70,7 +71,8 @@ FUNCTION gui_ButtonEnable( xDlg, xControl, lEnable )
 
    RETURN Nil
 
-FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, cField, xValue, workarea )
+FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, ;
+   cField, xValue, workarea, aKeyCodeList, aDlgKeyCodeList )
 
    LOCAL aHeaderList := {}, aWidthList := {}, aFieldList := {}, aItem
 
@@ -80,7 +82,8 @@ FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, cFie
    FOR EACH aItem IN oTbrowse
       AAdd( aHeaderList, aItem[1] )
       AAdd( aFieldList, aItem[2] )
-      AAdd( aWidthList, Max( Len( aItem[3] ), Len( Transform(FieldGet(FieldNum(aItem[1] ) ), "" ) ) ) * 10 + 10 )
+      AAdd( aWidthList, ( 1 + Max( Len( aItem[3] ), ;
+         Len( Transform( &( workarea )->( FieldGet( FieldNum( aItem[ 1 ] ) ) ), "" ) ) ) ) * 13 )
    NEXT
 
    DEFINE BROWSE ( xControl )
@@ -89,20 +92,49 @@ FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, cFie
       COL nCol
       WIDTH nWidth - 20
       HEIGHT nHeight - 20
-      ONDBLCLICK gui_BrowseDblClick( xDlg, xControl, workarea, cField, @xValue )
+      IF ValType( aKeyCodeList ) != "A"
+         aKeyCodeList := {}
+         ONDBLCLICK gui_BrowseDblClick( xDlg, xControl, workarea, cField, @xValue )
+      ENDIF
       HEADERS aHeaderList
       WIDTHS aWidthList
       WORKAREA ( workarea )
       FIELDS aFieldList
+      SET BROWSESYNC ON
    END BROWSE
+   FOR EACH aItem IN aKeyCodeList
+      AAdd( aDlgKeyCodeList, { xControl, aItem[ 1 ], aItem[ 2 ] } )
+      _DefineHotKey( xDlg, 0, aItem[ 1 ], ;
+         { || gui_DlgKeyDown( xDlg, xControl, aItem[ 1 ], workarea, cField, xValue, aDlgKeyCodeList ) } )
+   NEXT
 
-   (xDlg);(cField);(xValue);(workarea)
+   (xDlg);(cField);(xValue);(workarea);(aKeyCodeList)
 
    RETURN Nil
+
+STATIC FUNCTION gui_DlgKeyDown( xDlg, xControl, nKey, workarea, cField, xValue, aDlgKeyCodeList )
+
+   LOCAL nPos, cType
+
+   nPos := hb_AScan( aDlgKeyCodeList, { | e | GetProperty( xDlg, "FOCUSEDCONTROL" ) == e[1] .AND. nKey == e[ 2 ] } )
+   IF nPos != 0
+      Eval( aDlgKeyCodeList[ nPos ][ 3 ], cField, @xValue, xDlg, xControl )
+   ENDIF
+   IF nKey == VK_RETURN .AND. hb_ASCan( aDlgKeyCodeList, { | e | e[ 2 ] == VK_RETURN } ) != 0
+      cType := GetProperty( xDlg, GetProperty( xDlg, "FOCUSEDCONTROL" ), "TYPE" )
+      IF hb_AScan( { "GETBOX", "MASKEDTEXT", "TEXT" }, { | e | e == cType } ) != 0
+         _SetNextFocus()
+      ENDIF
+   ENDIF
+   (xControl); (workarea)
+
+   RETURN .T.
 
 FUNCTION gui_BrowseDblClick( xDlg, xControl, workarea, cField, xValue )
 
    IF ! Empty( cField )
+      // without browsesync ON
+      // &(workarea)->( dbGoto( GetProperty( xDlg, xControl, "VALUE" ) ) )
       xValue := &(workarea)->( FieldGet( FieldNum( cField ) ) )
    ENDIF
    (xControl)
@@ -110,11 +142,24 @@ FUNCTION gui_BrowseDblClick( xDlg, xControl, workarea, cField, xValue )
 
    RETURN Nil
 
+FUNCTION gui_BrowseRefresh( xDlg, xControl )
+
+   SetProperty( xDlg, xControl, "VALUE", RecNo() )
+   DoMethod( xDlg, xControl, "REFRESH" )
+   (xDlg)
+
+   RETURN Nil
+
 FUNCTION gui_DialogActivate( xDlg, bCode )
+
+   //LOCAL xControl
 
    IF ! Empty( bCode )
       Eval( bCode )
    ENDIF
+   //FOR EACH xControl IN HMG_GetFormControls( xDlg, "BUTTONEX" )
+   //   SetHandCursor( GetControlHandle( xControl, xDlg ) )
+   //NEXT
    DoMethod( xDlg, "CENTER" )
    DoMethod( xDlg, "ACTIVATE" )
 
@@ -126,7 +171,7 @@ FUNCTION gui_DialogClose( xDlg )
 
    RETURN Nil
 
-FUNCTION gui_DialogCreate( xDlg, nRow, nCol, nWidth, nHeight, cTitle, bInit )
+FUNCTION gui_DialogCreate( xDlg, nRow, nCol, nWidth, nHeight, cTitle, bInit, xOldDlg )
 
    IF Empty( xDlg )
       xDlg := gui_newctlname( "DIALOG" )
@@ -135,30 +180,23 @@ FUNCTION gui_DialogCreate( xDlg, nRow, nCol, nWidth, nHeight, cTitle, bInit )
    IF Empty( bInit )
       bInit := { || Nil }
    ENDIF
-   IF xDlg == "Main"
-      DEFINE WINDOW ( xDlg ) ;
-        AT nCol, nRow ;
-        WIDTH nWidth ;
-        HEIGHT nHeight ;
-        TITLE cTitle ;
-        MAIN ;
-        ON INIT Eval( bInit )
-   ELSE
-      DEFINE WINDOW ( xDlg ) ;
-        AT nCol, nRow ;
-        WIDTH nWidth ;
-        HEIGHT nHeight ;
-        TITLE cTitle ;
-        MODAL ;
-        ON INIT Eval( bInit )
-   ENDIF
+   DEFINE WINDOW ( xDlg ) ;
+      AT nCol, nRow ;
+      WIDTH nWidth ;
+      HEIGHT nHeight ;
+      TITLE cTitle ;
+      ON INIT Eval( bInit ) ;
+      ON RELEASE iif( Empty( xOldDlg ), Nil, DoMethod( xOldDlg, "SETFOCUS" ) )
+      IF ! Empty( xOldDlg )
+         ON KEY ALT+F4 ACTION doMethod( xOldDlg, "SETFOCUS" )
+      ENDIF
    END WINDOW
 
    RETURN Nil
 
 FUNCTION gui_IsCurrentFocus( xDlg, xControl )
 
-   RETURN _GetFocusedControl( xDlg ) == xControl
+      RETURN GetProperty( xDlg, "FOCUSEDCONTROL" )  == xControl
 
 FUNCTION gui_LabelCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, xValue, lBorder )
 
@@ -166,23 +204,19 @@ FUNCTION gui_LabelCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, xValue, l
       xControl := gui_newctlname( "LABEL" )
    ENDIF
    // não mostra borda
-   //DEFINE LABEL ( xControl )
-   //   PARENT ( xDlg )
-   //   COL nCol
-   //   ROW nRow
-   //   WIDTH nWidth
-   //   HEIGHT nHeight
-   //   VALUE xValue
-   //   BORDER lBorder
-   //END LABEL
+   DEFINE LABEL ( xControl )
+      PARENT ( xDlg )
+      COL nCol
+      ROW nRow
+      WIDTH nWidth
+      HEIGHT nHeight
+      VALUE xValue
+      IF lBorder
+         BORDER lBorder
+         BACKCOLOR HMG_n2RGB( COLOR_GREEN )
+      ENDIF
+   END LABEL
 
-   IF lBorder
-      @ nRow, nCol LABEL ( xControl ) PARENT ( xDlg ) ;
-         VALUE xValue WIDTH nWidth HEIGHT nHeight BORDER BACKCOLOR HMG_n2RGB( COLOR_GREEN )
-   ELSE
-      @ nRow, nCol LABEL ( xControl ) PARENT ( xDlg ) ;
-         VALUE xValue WIDTH nWidth HEIGHT nHeight
-   ENDIF
 
    RETURN Nil
 
@@ -284,12 +318,12 @@ FUNCTION gui_TextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, ;
    IF Empty( xControl )
       xControl := gui_newctlname( "TEXT" )
    ENDIF
-   DEFINE TEXTBOX ( xControl )
+   DEFINE GETBOX ( xControl )
       PARENT ( xDlg )
       ROW nRow
       COL nCol
-      HEIGHT    nHeight
-      WIDTH     nWidth
+      HEIGHT nHeight
+      WIDTH nWidth
       FONTNAME DEFAULT_FONTNAME
       IF ValType( xValue ) == "N"
          NUMERIC .T.
@@ -297,12 +331,14 @@ FUNCTION gui_TextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, ;
       ELSEIF ValType( xValue ) == "D"
          DATE .T.
          DATEFORMAT cPicture
-      ELSE
+      ELSEIF ValType( xValue ) == "L" // workaround to do not get error
+         xValue := " "
+      ELSEIF ValType( xValue ) == "C"
          MAXLENGTH nMaxLength
       ENDIF
-      VALUE     xValue
+      VALUE xValue
       ON LOSTFOCUS Eval( bValid )
-   END TEXTBOX
+   END GETBOX
    (bValid)
 
    RETURN Nil
@@ -315,14 +351,17 @@ FUNCTION gui_TextEnable( xDlg, xControl, lEnable )
 
 FUNCTION gui_TextGetValue( xDlg, xControl )
 
+   LOCAL xValue
+
+   xValue := GetProperty( xDlg, xControl, "VALUE" )
    (xDlg)
 
-   RETURN GetProperty( xDlg, xControl, "VALUE" )
+   RETURN xValue
 
 FUNCTION gui_TextSetValue( xDlg, xControl, xValue )
 
-   // NOTE: string value, except if declared different on textbox creation
-   SetProperty( xDlg, xControl, "VALUE", iif( ValType( xValue ) == "D", hb_Dtoc( xValue ), xValue ) )
+   // NOTE: textbox string value, except if declared different on textbox creation
+   SetProperty( xDlg, xControl, "VALUE", xValue )
 
    RETURN Nil
 

@@ -44,6 +44,15 @@ RETURN
 
 FUNCTION SaveIcon( cIconName, cIconSrc, nItem )
 
-   LOCAL aIcons := ExtractIconEx( cIconSrc, nItem )
+   LOCAL aIcons := {}, lRet, hIcon
 
-RETURN C_SaveHIconToFile( cIconName, aIcons )
+   AAdd( aIcons, ExtractIconEx( cIconSrc, nItem )[1] )
+   AAdd( aIcons, ExtractIconEx( cIconSrc, nItem, 16, 16 )[1] )
+
+   lRet := C_SaveHIconToFile( cIconName, aIcons )
+
+   FOR EACH hIcon IN aIcons
+      DestroyIcon( hIcon )
+   NEXT
+
+RETURN lRet

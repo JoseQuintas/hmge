@@ -131,7 +131,8 @@ HB_FUNC( SETPROP )
       nLen   = sizeof( double );
    }
    else
-   {                             // unsupported type
+   {
+      // unsupported type
       return;
    }
 

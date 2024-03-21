@@ -1232,6 +1232,16 @@ STATIC FUNCTION ABM2EditarGuardar( lNuevo )
    // ------- Guarda el registro.-------------------------------------------------
    IF _bGuardar == NIL
 
+      IF IS_SQLRDD
+         FOR i := 1 TO Len( _aControl )
+            lResultado := _aEditable[ i ]
+         NEXT
+         IF ! lResultado
+            wndABM2EditNuevo.RELEASE
+            RETURN NIL
+         ENDIF
+      ENDIF
+
       // No hay bloque de código del usuario.
       IF lNuevo
          ( _cArea )->( dbAppend() )

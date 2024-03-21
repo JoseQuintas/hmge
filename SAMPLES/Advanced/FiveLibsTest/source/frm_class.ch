@@ -16,8 +16,15 @@
 #define CFG_CCONTROL  16                    // app control for caption
 #define CFG_VCONTROL  17                    // app control for VSHOW
 #define CFG_ACTION    18                    // app action for button
+#define CFG_BTABLE    19                    // browse table
+#define CFG_BKEYFROM  20                    // browse field from main
+#define CFG_BINDEXORD 21                    // browse index order
+#define CFG_BKEYTO    22                    // browse field to
+#define CFG_BKEYTO2   23                    // browse field2 to
+#define CFG_BVALUE    24                    // browse key value
+#define CFG_BEDIT     25                    // can edit browse values
 
-#define CFG_EMPTY { "", "C", 1, 0, .F., "", "", .T., "", "", "", Nil, 0, TYPE_EDIT, Nil, Nil, Nil, Nil }
+#define CFG_EMPTY { "", "C", 1, 0, .F., "", "", {}, "", "", "", Nil, 0, TYPE_EDIT, Nil, Nil, Nil, Nil, Nil, Nil, 1, Nil, Nil, Nil, Nil }
 
 #define TYPE_BUTTON   1
 #define TYPE_EDIT     2
@@ -25,6 +32,7 @@
 #define TYPE_TABPAGE  4
 #define TYPE_PANEL    5
 #define TYPE_BROWSE   6
+#define TYPE_HWGUIBUG 7
 
 #ifdef HBMK_HAS_HWGUI
    #include "hwgui.ch"
@@ -33,7 +41,6 @@
 #ifdef HBMK_HAS_HMG3
    #include "hmg.ch"
    #include "i_altsyntax.ch"
-   //MEMVAR _HMG_SYSDATA
 #endif
 
 #ifdef HBMK_HAS_HMGE

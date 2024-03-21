@@ -1721,10 +1721,12 @@ PROCEDURE _RefreshDataControls ( i )
 
    FOR EACH ControlIndex IN _HMG_aFormBrowseList [ i ]
 
-      v := _HMG_aControlValue [ ControlIndex ]
+      v := _HMG_aControlValue [ControlIndex]
       _Refresh ( ControlIndex )
 
-      IF _HMG_aControlType [ControlIndex ] $ 'COMBO,BROWSE'
+      IF _HMG_aControlType [ControlIndex] $ 'COMBO,BROWSE' .OR. ;
+         _HMG_aControlType [ControlIndex] == "GRID" .AND. _HMG_aControlFontColor [ControlIndex] == .T. .AND. ;
+         ISARRAY ( v )
          _SetValue ( , , v, ControlIndex )
       ENDIF
 

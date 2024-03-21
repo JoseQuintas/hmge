@@ -49,7 +49,7 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Edit Class Name
-#define WC_EDIT                "Edit"
+   #define WC_EDIT  "Edit"
 #endif
 
 extern LRESULT CALLBACK OwnEditProc( HWND hbutton, UINT msg, WPARAM wParam, LPARAM lParam );

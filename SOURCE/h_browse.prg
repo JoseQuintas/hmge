@@ -1187,7 +1187,7 @@ PROCEDURE _BrowseRefresh ( ControlName , ParentForm , z )
       ENDIF
 
       IF IndexOrd() != 0
-         IF ordKeyVal() == Nil
+         IF ordKeyVal() == Nil .OR. ! Empty( ordScope() )
             GO TOP
          ENDIF
       ENDIF
@@ -1214,7 +1214,7 @@ PROCEDURE _BrowseRefresh ( ControlName , ParentForm , z )
    _BrowseVscrollUpdate( i )
 
    IF s != 0
-      Skip - s + 1
+      SKIP - s + 1
    ENDIF
 
    _BrowseUpdate( '', '', i )

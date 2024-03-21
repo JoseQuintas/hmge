@@ -1,3 +1,118 @@
+2024/03/18: HMG Extended Edition version 24.03.
+  * Enhanced: The internal OOP class THmgData was improved for Json support:
+           - added the new method Json( cJson, lMode );
+           - modified the method Set( xKey, xVal, lJson );
+           - modified the method Get( xKey, xDef, lJson ).
+           The modified TIniData class can process json for the Read\Write
+           methods when the string contains the identification characters
+           "j{" or "J{", i.e.
+             j{"FORMNAME":"wMain","TITLE":"Demo","BACKCOLOR":<192,192,192>,
+               "MAIN":true,"WIDTH":640,"HEIGHT":480}
+           Suggested and contributed by Sergej Kiselev
+           (see demo in folder \samples\Basic\ini_json)
+  * Updated: HMG Oficial changes to the _SetValue() function for handling celled
+           Grid were guarded by the constant _HMG_COMPAT_ in the source code.
+           Requested of Jose Quintas.
+  * Updated: Harbour's SQLRDD library binary has been updated with the latest
+           fork modifications: fixed access to internal string elements.
+           Revised for Minigui Extended by Grigory Filatov
+           (see SQLRDD Manual in folder \Doc) [PRO VERSION]
+  * Updated: HbSQLite3 library:
+           - update for using SQLITE3 version 3.45.2 (from 3.45.1).
+           Contributed by Grigory Filatov
+  * Updated: Harbour Compiler 3.2.0dev (SVN 2024-03-07 13:41):
+           * Updated zlib library to 1.3.1 (from 1.3.0);
+           * Updated libpng library to 1.6.43 (from 1.6.40).
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+           (look at ReadMe.txt in folder \harbour) [PRO VERSION]
+  * New: 'Explore the Payroll dataset with MySQL via SQLRDD' sample.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Advanced\SQLRDD\Payroll) [PRO VERSION]
+  * Updated: 'Incremental Search in Grid' sample.
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+           (see in folder \samples\Basic\IncrementalSearch_2)
+  * Updated: 'WAIT WINDOW with an AVI expectation in a thread' sample.
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see demo3.prg in folder \samples\Basic\WAIT_WINDOW_4)
+  * Updated: 'OwnButtonPaint Function' sample shows how to create the ownerdraw
+           window, menu, toolbar and different buttons styles.
+           Contributed by Sergej Kiselev
+           (see in folder \samples\Advanced\ExpButton)
+  * Updated: 'Open Table InSpector' sample:
+           - updated the source code for the Otis library version 1.50 b01;
+           - updated documentation (look at \Doc folder).
+             Contributed by Hans Marc.
+           - modified size of 'Table InSpector' form for a small size screen;
+           - added color theme #3 in the set_theme() function.
+             Contributed by Grigory Filatov
+           (see in folder \samples\Advanced\OTIS)
+
+2024/02/27: HMG Extended Edition version 24.02.
+  * Fixed: The program crashed when using the HMG_SetMenuTheme() function
+           along with a transparent label on the form (introduced in the
+           build 19.10). The issue was reported by Verchenko Andrey.
+           Contributed by Grigory Filatov
+  * New: Added the useful function HMG_GetAllFonts( [ lObj ] ) to get an
+           array of font names and parameters that were defined with
+           DEFINE FONT <font> FONTNAME <name> ... command.
+           Sample code:
+             HMG_GetAllFonts() -> array with font names
+             HMG_GetAllFonts( .F. ) -> array with font names and parameters
+           Contributed by Sergej Kiselev
+  * Enhanced: Added the optional 3rd and 4th parameters in the ExtractIconEx()
+           function for extraction the ICON of a resource ID from exe or dll.
+           Syntax:
+           ExtractIconEx( cResName, nItem [, nX ] [, nY ] ) => { hIcon, nId },
+           where nX and xY are the icon sizes in pixels (32x32 by default).
+           Requested by Verchenko Andrey.
+           Contributed by Grigory Filatov
+           (see demo4.prg in folder \samples\Basic\Icons)
+  * Updated: Improved object error logging using the _o2Log() function.
+           Contributed by Sergej Kiselev
+           (see demo3.prg in folder \samples\Advanced\APP_OOPREPORT)
+  * Updated: Harbour's SQLRDD library binary has been updated with the latest
+           fork modifications: silence -w3 Harbour warnings.
+           Revised for Minigui Extended by Grigory Filatov
+           (see SQLRDD Manual in folder \Doc)
+  * Updated: HbSQLite3 library:
+           - update for using SQLITE3 version 3.45.1 (from 3.45.0).
+           Contributed by Grigory Filatov
+  * Updated: Harbour Compiler 3.2.0dev (SVN 2024-02-16 18:23):
+           - updated OLE support in the HbWin library 
+             (see demo in folder \samples\Advanced\SapiVoice)
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+           (look at ReadMe.txt in folder \harbour)
+  * New: 'WAIT WINDOW with an AVI expectation in a thread' sample.
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see in folder \samples\Basic\WAIT_WINDOW_4)
+  * New: 'Menu based on ButtonEx object' sample.
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see in folder \samples\Advanced\ACHOICE_4)
+  * New: 'Using the SPVoice API' sample.
+           Contributed by Daniel Maximiliano at the official HMG forum.
+           (see in folder \samples\Advanced\SapiVoice)
+  * Updated: 'Show of icons from the system DLL libraries' sample:
+           - updated for compatibility with the last Minigui changes.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\DLLICONS)
+  * Updated: 'Drawing examples' sample:
+           - an attempt to replace the ERASE WINDOW command with our
+             own processing, preserving some of the drawn lines.
+           Based upon a contribution of Adam Lubszczyk.
+           Revised by Grigory Filatov
+           (see in folder \samples\Basic\DRAW_LINE_ARC)
+  * Updated: 'Command Link Button emulation for WinXP' sample.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Advanced\CommandLinkXP)
+  * Updated: 'Show of icons from the system library shell32.dll':
+           - updated for compatibility with the last Minigui changes.
+           Contributed by Grigory Filatov
+           (see demos in folder \samples\Basic\ExtractIcon)
+  * Updated: 'Five GUI libraries for testing' sample.
+           Contribution of Jose Quintas.
+           Revised for Minigui Extended by Grigory Filatov
+           (see in folder \samples\Advanced\FiveLibsTest)
+
 2024/01/22: HMG Extended Edition version 24.01.
   * Fixed: Incorrect handling of the FontColor and BackColor properties in
            the CHECKLISTBOX control.

@@ -176,7 +176,7 @@ FUNCTION MAIN
    END POPUP
    POPUP 'H&elp'
       ITEM 'About' ACTION AlertInfo ( MiniGuiVersion ( 1 ) + ";" + APP_ABOUT, APP_TITLE )
-      ITEM 'Versions' ACTION AlertInfo ( "GUI Library       : " + App.Cargo + ";" + ;
+      ITEM 'Versions' ACTION AlertInfo ( "GUI Library       : " + App.Cargo:Version + ";" + ;
          "xBase Compiler: " + Version() + ";" + ;
          "C Compiler       : " + hb_Ccompiler(), 'Versions' )
    END POPUP

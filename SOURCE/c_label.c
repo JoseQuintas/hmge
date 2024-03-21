@@ -49,7 +49,7 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Static Class Name
-#define WC_STATIC              "Static"
+   #define WC_STATIC  "Static"
 #endif
 
 #include "hbvm.h"

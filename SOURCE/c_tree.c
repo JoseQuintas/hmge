@@ -43,7 +43,7 @@
     "HWGUI"
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
-  ---------------------------------------------------------------------------*/
+   ---------------------------------------------------------------------------*/
 #define _WIN32_IE  0x0501
 
 #include <mgdefs.h>
@@ -62,7 +62,8 @@ HB_FUNC( INITTREE )
    UINT mask;
 
    if( hb_parni( 9 ) != 0 )
-   {  //Tree+
+   {
+      //Tree+
       mask = 0x0000;
    }
    else
@@ -94,7 +95,7 @@ HB_FUNC( INITTREE )
    );
 }
 
-HB_FUNC( INITTREEVIEWBITMAP ) //Tree+
+HB_FUNC( INITTREEVIEWBITMAP )   //Tree+
 {
    HIMAGELIST himl = ( HIMAGELIST ) NULL;
    PHB_ITEM   hArray;
@@ -137,7 +138,7 @@ HB_FUNC( INITTREEVIEWBITMAP ) //Tree+
    hb_retni( ic );
 }
 
-HB_FUNC( ADDTREEVIEWBITMAP )  // Tree+
+HB_FUNC( ADDTREEVIEWBITMAP )    // Tree+
 {
    HWND       hbutton = hmg_par_raw_HWND( 1 );
    HIMAGELIST himl;
@@ -273,7 +274,7 @@ void TreeView_FreeMemoryLPARAMRecursive( HWND hWndTV, HTREEITEM ItemHandle )
    if( TreeItemLPARAM != NULL )
    {
       hb_xfree( TreeItemLPARAM );
-      TreeItem.lParam = ( LPARAM ) NULL;  // for security set lParam = NULL
+      TreeItem.lParam = ( LPARAM ) NULL;    // for security set lParam = NULL
       TreeView_SetItem( hWndTV, &TreeItem );
    }
 

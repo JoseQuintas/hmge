@@ -1,6 +1,6 @@
-// ------------------------------------------------------------ //
+****************************************************************
 #include <hmg.ch>
-// ------------------------------------------------------------ //
+****************************************************************
 REQUEST DBFNSX
 
 #xcommand ON KEY SPACE [ OF <parent> ] ACTION <action> ;
@@ -60,7 +60,7 @@ FUNCTION Main()
    wndMain.Activate()
 
 RETURN NIL
-// ------------------------------------------------------------ //
+****************************************************************
 STATIC FUNCTION DblClickBrowseScreen
 
    IF This.CellColIndex == 1
@@ -71,12 +71,12 @@ STATIC FUNCTION DblClickBrowseScreen
    ENDIF
 
 RETURN( NIL )
-// ------------------------------------------------------------ //
+****************************************************************
 FUNCTION SelectRecord( aRecs, nRecord )
 
    LOCAL nKey
 
-DEFAULT nRecord := RecNo()
+   DEFAULT nRecord := RecNo()
 
    nKey := AScan( aRecs, nRecord )
 
@@ -92,6 +92,6 @@ DEFAULT nRecord := RecNo()
    ENDIF
 
 RETURN( NIL )
-// ------------------------------------------------------------ //
+****************************************************************
 FUNCTION ChkSelectStatus()
 RETURN( AScan( aRecs, RecNo() ) <> 0 )

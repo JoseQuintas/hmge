@@ -49,7 +49,7 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Edit Class Name
-#define WC_EDIT                "Edit"
+   #define WC_EDIT  "Edit"
 #endif
 #include "hbvm.h"
 
@@ -92,20 +92,20 @@ HB_FUNC( INITMASKEDTEXTBOX )
    }
 
    hedit = CreateWindowEx
-      (
-         hb_parl( 16 ) ? 0 : WS_EX_CLIENTEDGE,
-         WC_EDIT,
-         TEXT( "" ),
-         Style,
-         hb_parni( 3 ),
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 11 ),
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 2 ),
-         GetInstance(),
-         NULL
-      );
+           (
+      hb_parl( 16 ) ? 0 : WS_EX_CLIENTEDGE,
+      WC_EDIT,
+      TEXT( "" ),
+      Style,
+      hb_parni( 3 ),
+      hb_parni( 4 ),
+      hb_parni( 5 ),
+      hb_parni( 11 ),
+      hmg_par_raw_HWND( 1 ),
+      hmg_par_raw_HMENU( 2 ),
+      GetInstance(),
+      NULL
+           );
 
    SetProp( ( HWND ) hedit, TEXT( "oldeditproc" ), ( HWND ) GetWindowLongPtr( ( HWND ) hedit, GWLP_WNDPROC ) );
    SubclassWindow2( hedit, OwnEditProc );
@@ -119,23 +119,27 @@ HB_FUNC( INITTEXTBOX )
    DWORD iStyle = WS_CHILD | ES_AUTOHSCROLL | BS_FLAT;
 
    if( hb_parl( 12 ) )
-   {                       // if <lNumeric> is TRUE, then ES_NUMBER style is added.
+   {
+      // if <lNumeric> is TRUE, then ES_NUMBER style is added.
       iStyle |= ES_NUMBER; // Set to a numeric TEXTBOX, so don't worry about other "textual" styles.
    }
    else
    {
       if( hb_parl( 10 ) )
-      {                    // if <lUpper> is TRUE, then ES_UPPERCASE style is added.
+      {
+         // if <lUpper> is TRUE, then ES_UPPERCASE style is added.
          iStyle |= ES_UPPERCASE;
       }
       else if( hb_parl( 11 ) )
-      {                    // if <lLower> is TRUE, then ES_LOWERCASE style is added.
+      {
+         // if <lLower> is TRUE, then ES_LOWERCASE style is added.
          iStyle |= ES_LOWERCASE;
       }
    }
 
    if( hb_parl( 13 ) )
-   {  // if <lPassword> is TRUE, then ES_PASSWORD style is added.
+   {
+      // if <lPassword> is TRUE, then ES_PASSWORD style is added.
       iStyle |= ES_PASSWORD;
    }
 
@@ -219,20 +223,20 @@ HB_FUNC( INITCHARMASKTEXTBOX )
    }
 
    hedit = CreateWindowEx
-      (
-         hb_parl( 16 ) ? 0 : WS_EX_CLIENTEDGE,
-         WC_EDIT,
-         TEXT( "" ),
-         Style,
-         hb_parni( 3 ),
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 11 ),
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 2 ),
-         GetInstance(),
-         NULL
-      );
+           (
+      hb_parl( 16 ) ? 0 : WS_EX_CLIENTEDGE,
+      WC_EDIT,
+      TEXT( "" ),
+      Style,
+      hb_parni( 3 ),
+      hb_parni( 4 ),
+      hb_parni( 5 ),
+      hb_parni( 11 ),
+      hmg_par_raw_HWND( 1 ),
+      hmg_par_raw_HMENU( 2 ),
+      GetInstance(),
+      NULL
+           );
 
    SetProp( ( HWND ) hedit, TEXT( "oldeditproc" ), ( HWND ) GetWindowLongPtr( ( HWND ) hedit, GWLP_WNDPROC ) );
    SubclassWindow2( hedit, OwnEditProc );

@@ -1,7 +1,7 @@
 /*
  * MINIGUI - Harbour Win32 GUI library source code
  *
- * Copyright 2019 Grigory Filatov <gfilatov@gmail.com>
+ * Copyright 2019-2024 Grigory Filatov <gfilatov@gmail.com>
 */
 
 #include "minigui.ch"
@@ -12,6 +12,11 @@ FUNCTION AlertYesNo ( Message, Title, RevertDefault, Icon, nSize, aColors, lTopM
 *-----------------------------------------------------------------------------*
    LOCAL aOptions := { '&' + _HMG_aABMLangLabel [20], '&' + _HMG_aABMLangLabel [21] }
    LOCAL nDefaultButton := 1
+
+   IF ISARRAY( Title )
+      aOptions := Title [2]
+      Title := Title [1]
+   ENDIF
 
    IF hb_defaultValue( RevertDefault, .F. )
       nDefaultButton := 2
@@ -24,11 +29,19 @@ FUNCTION AlertYesNoCancel ( Message, Title, nDefaultButton, Icon, nSize, aColors
 *-----------------------------------------------------------------------------*
    LOCAL aOptions := { '&' + _HMG_aABMLangLabel [20], '&' + _HMG_aABMLangLabel [21], '&' + _HMG_aABMLangButton [13] }
 
+   IF ISARRAY( Title )
+      aOptions := Title [2]
+      Title := Title [1]
+   ENDIF
+
    SWITCH _Alert( Message, aOptions, Title, , hb_defaultValue( nDefaultButton, 1 ), Icon, nSize, aColors, lTopMost, bInit, .T. )
 
    CASE 1
+
       RETURN ( 1 )
+
    CASE 2
+
       RETURN ( 0 )
 
    END SWITCH
@@ -40,12 +53,22 @@ FUNCTION AlertRetryCancel ( Message, Title, nDefaultButton, Icon, nSize, aColors
 *-----------------------------------------------------------------------------*
    LOCAL aOptions := { _HMG_aLangButton[ 13 ], _HMG_aLangButton[ 7 ] } // P.D. July 3, 2021
 
+   IF ISARRAY( Title )
+      aOptions := Title [2]
+      Title := Title [1]
+   ENDIF
+
 RETURN ( _Alert( Message, aOptions, Title, , hb_defaultValue( nDefaultButton, 1 ), Icon, nSize, aColors, lTopMost, bInit, .T. ) == IDOK )
 
 *-----------------------------------------------------------------------------*
 FUNCTION AlertOkCancel ( Message, Title, nDefaultButton, Icon, nSize, aColors, lTopMost, bInit )
 *-----------------------------------------------------------------------------*
    LOCAL aOptions := { _HMG_BRWLangButton [4], _HMG_BRWLangButton [3] }
+
+   IF ISARRAY( Title )
+      aOptions := Title [2]
+      Title := Title [1]
+   ENDIF
 
 RETURN ( _Alert( Message, aOptions, Title, , hb_defaultValue( nDefaultButton, 1 ), Icon, nSize, aColors, lTopMost, bInit, .T. ) == IDOK )
 
@@ -56,6 +79,9 @@ FUNCTION AlertExclamation ( Message, Title, Icon, nSize, aColors, lTopMost, bIni
 
    IF ISNUMERIC( Title )
       nWaitSec := Title
+   ELSEIF ISARRAY( Title )
+      nWaitSec := Title [2]
+      Title := Title [1]
    ENDIF
 
    IF Empty( lNoSound )
@@ -71,6 +97,9 @@ FUNCTION AlertInfo ( Message, Title, Icon, nSize, aColors, lTopMost, bInit, lNoS
 
    IF ISNUMERIC( Title )
       nWaitSec := Title
+   ELSEIF ISARRAY( Title )
+      nWaitSec := Title [2]
+      Title := Title [1]
    ENDIF
 
    IF Empty( lNoSound )
@@ -86,6 +115,9 @@ FUNCTION AlertStop ( Message, Title, Icon, nSize, aColors, lTopMost, bInit, lNoS
 
    IF ISNUMERIC( Title )
       nWaitSec := Title
+   ELSEIF ISARRAY( Title )
+      nWaitSec := Title [2]
+      Title := Title [1]
    ENDIF
 
    IF Empty( lNoSound )

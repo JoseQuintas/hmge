@@ -128,7 +128,7 @@ FUNCTION Main()
    @ 50, 67  HPDFPRINT "_________"
    @ 52, 92  HPDFPRINT "<----  This line was drawing to simulate a baseline (made manually)" SIZE 9 COLOR { 0, 0, 255 }
 
-   @ 60, 20 HPDFPRINT "I have " + App.Cargo + " in Courier-Bold" FONT "Courier-Bold"
+   @ 60, 20 HPDFPRINT "I have " + hmg_Version() + " in Courier-Bold" FONT "Courier-Bold"
 
    @ 80, 10 HPDFPRINT "This is a sample Text in default font in ITALIC." ITALIC
    @ 90, 10 HPDFPRINT "This is a sample Text in default font in BOLD." BOLD

@@ -104,7 +104,7 @@ BOOL CALLBACK _MonitorEnumProc0( HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcM
    return TRUE;
 }
 
-//	BOOL GetMonitorInfo( HMONITOR hMonitor, LPMONITORINFO lpmi )
+// BOOL GetMonitorInfo( HMONITOR hMonitor, LPMONITORINFO lpmi )
 HB_FUNC( GETMONITORINFO )
 {
    MONITORINFO mi;
@@ -191,7 +191,7 @@ HB_FUNC( MONITORFROMWINDOW )
 #define MONITOR_CLIP      0x0000    // clip rect to monitor
 #define MONITOR_WORKAREA  0x0002    // use monitor work area
 #define MONITOR_AREA      0x0000 \
- \
+   \
    // use monitor entire area
 HB_FUNC( WINDOWTOMONITOR )
 {

@@ -1,1 +1,0 @@
-call ..\..\batch\compile.bat archiver %1 /l hbmzip /l minizip /l hbzlib %2 %3 %4 %5 %6 %7 %8 %9

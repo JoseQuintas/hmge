@@ -44,7 +44,7 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE  0x0501
+#define _WIN32_IE       0x0501
 
 #include <mgdefs.h>
 
@@ -52,7 +52,7 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Combobox Class Name
-#define WC_COMBOBOX            "ComboBox"
+   #define WC_COMBOBOX  "ComboBox"
 #endif
 
 HIMAGELIST  HMG_ImageListLoadFirst( const char * FileName, int cGrow, int Transparent, int * nWidth, int * nHeight );
@@ -202,13 +202,14 @@ HB_FUNC( INITCOMBOBOXEX )
       SendMessage( hCombo, CBEM_SETIMAGELIST, 0, ( LPARAM ) himl );
    }
    else
-   {                                     // extend combo without images
+   {
+      // extend combo without images
       SendMessage
-         (                               // returns LRESULT in lResult
-         hCombo,                         // handle to destination control
-         CBEM_SETEXTENDEDSTYLE,          // message ID
-         ( WPARAM ) 0,                   // = (WPARAM) (DWORD) dwExMask;
-         ( LPARAM ) CBES_EX_NOEDITIMAGE  // = (LPARAM) (DWORD) dwExStyle;
+         (                              // returns LRESULT in lResult
+         hCombo,                        // handle to destination control
+         CBEM_SETEXTENDEDSTYLE,         // message ID
+         ( WPARAM ) 0,                  // = (WPARAM) (DWORD) dwExMask;
+         ( LPARAM ) CBES_EX_NOEDITIMAGE // = (LPARAM) (DWORD) dwExStyle;
          );
    }
 

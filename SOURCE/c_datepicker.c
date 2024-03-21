@@ -63,7 +63,7 @@ HINSTANCE               GetInstance( void );
 LRESULT CALLBACK        OwnPickProc( HWND hbutton, UINT msg, WPARAM wParam, LPARAM lParam );
 
 #ifdef __XHARBOUR__
-#define HB_ISDATETIME  ISDATETIME
+   #define HB_ISDATETIME  ISDATETIME
 #else
 extern HB_EXPORT double hb_timeStampPack( int iYear, int iMonth, int iDay, int iHour, int iMinutes, int iSeconds, int iMSec );
 #endif

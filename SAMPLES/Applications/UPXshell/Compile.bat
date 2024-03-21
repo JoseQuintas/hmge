@@ -1,1 +1,0 @@
-if exist upx.exe call ..\..\..\batch\compile.bat upxshell %1 %2 %3 %4 %5 %6 %7 %8 %9

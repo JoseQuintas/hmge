@@ -89,7 +89,7 @@
 
 /*-------------------------------------------------------------------------*/
 
-CLASS Get
+CLASS HMG_Get
 
    EXPORTED:
 
@@ -220,7 +220,7 @@ ENDCLASS
 
 /*-------------------------------------------------------------------------*/
 
-METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
+METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS HMG_Get
 
    DEFAULT nRow       TO Row()
    DEFAULT nCol       TO Col()
@@ -242,7 +242,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD Assign() CLASS Get
+METHOD Assign() CLASS HMG_Get
 
    IF ::HasFocus
       ::VarPut( ::UnTransform(), .F. )
@@ -252,7 +252,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD UpdateBuffer() CLASS Get
+METHOD UpdateBuffer() CLASS HMG_Get
 
    IF ::HasFocus
       ::Buffer := ::PutMask( ::VarGet() )
@@ -267,7 +267,7 @@ RETURN Self
 
 #ifdef HB_C52_UNDOC
 
-METHOD Reform() CLASS Get
+METHOD Reform() CLASS HMG_Get
 
    IF ::HasFocus
       ::Buffer := ::PutMask( ::xVarGet, .F. )
@@ -279,7 +279,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD Display( lForced ) CLASS Get
+METHOD Display( lForced ) CLASS HMG_Get
 
    LOCAL nOldCursor := SetCursor( SC_NONE )
    LOCAL cBuffer
@@ -346,7 +346,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD ColorDisp( cColorSpec ) CLASS Get
+METHOD ColorDisp( cColorSpec ) CLASS HMG_Get
 
    ::ColorSpec := cColorSpec
    ::Display()
@@ -355,7 +355,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD End() CLASS Get
+METHOD End() CLASS HMG_Get
 
    LOCAL nLastCharPos, nPos, nFor
 
@@ -380,7 +380,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD Home() CLASS Get
+METHOD Home() CLASS HMG_Get
 
    IF ::HasFocus
       ::Pos := ::FirstEditable()
@@ -392,7 +392,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD Reset() CLASS Get
+METHOD Reset() CLASS HMG_Get
 
    IF ::HasFocus
       ::Buffer   := ::PutMask( ::VarGet(), .F. )
@@ -409,7 +409,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD Undo() CLASS Get
+METHOD Undo() CLASS HMG_Get
 
    IF ::HasFocus
       ::VarPut( ::Initial )
@@ -421,7 +421,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD SetFocus() CLASS Get
+METHOD SetFocus() CLASS HMG_Get
 
    LOCAL lWasNIL
    LOCAL xVarGet
@@ -473,7 +473,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD KillFocus() CLASS Get
+METHOD KillFocus() CLASS HMG_Get
 
    LOCAL lHadFocus
 
@@ -502,7 +502,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD VarPut( xValue, lReFormat ) CLASS Get
+METHOD VarPut( xValue, lReFormat ) CLASS HMG_Get
 
    LOCAL aSubs, nLen, aValue
    LOCAL i
@@ -535,7 +535,7 @@ RETURN xValue
 
 /*-------------------------------------------------------------------------*/
 
-METHOD VarGet() CLASS Get
+METHOD VarGet() CLASS HMG_Get
 
    LOCAL aSubs, nLen, aValue
    LOCAL i
@@ -563,7 +563,7 @@ RETURN xValue
 
 /*-------------------------------------------------------------------------*/
 
-METHOD UnTransform( cBuffer ) CLASS Get
+METHOD UnTransform( cBuffer ) CLASS HMG_Get
 
    LOCAL xValue
    LOCAL cChar
@@ -676,7 +676,7 @@ RETURN xValue
 
 /*-------------------------------------------------------------------------*/
 
-METHOD OverStrike( cChar ) CLASS Get
+METHOD OverStrike( cChar ) CLASS HMG_Get
 
    IF ! ::HasFocus
       RETURN Self
@@ -732,7 +732,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD Insert( cChar ) CLASS Get
+METHOD Insert( cChar ) CLASS HMG_Get
 
    LOCAL n
    LOCAL nMaxEdit
@@ -808,7 +808,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD _Right( lDisplay ) CLASS Get
+METHOD _Right( lDisplay ) CLASS HMG_Get
 
    LOCAL nPos
 
@@ -846,7 +846,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD _Left( lDisplay ) CLASS Get
+METHOD _Left( lDisplay ) CLASS HMG_Get
 
    LOCAL nPos
 
@@ -884,7 +884,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD WordLeft() CLASS Get
+METHOD WordLeft() CLASS HMG_Get
 
    LOCAL nPos
 
@@ -932,7 +932,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD WordRight() CLASS Get
+METHOD WordRight() CLASS HMG_Get
 
    LOCAL nPos
 
@@ -974,7 +974,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD ToDecPos() CLASS Get
+METHOD ToDecPos() CLASS HMG_Get
 
    IF ! ::HasFocus
       RETURN Self
@@ -1005,7 +1005,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD IsEditable( nPos ) CLASS Get
+METHOD IsEditable( nPos ) CLASS HMG_Get
 
    LOCAL cChar
 
@@ -1034,7 +1034,7 @@ RETURN .F.
 
 /*-------------------------------------------------------------------------*/
 
-METHOD Input( cChar ) CLASS Get
+METHOD Input( cChar ) CLASS HMG_Get
 
    LOCAL cPic
 
@@ -1129,7 +1129,7 @@ RETURN cChar
 
 /*-------------------------------------------------------------------------*/
 
-METHOD PutMask( xValue, lEdit ) CLASS Get
+METHOD PutMask( xValue, lEdit ) CLASS HMG_Get
 
    LOCAL cChar
    LOCAL cBuffer
@@ -1239,7 +1239,7 @@ RETURN cBuffer
 
 /*-------------------------------------------------------------------------*/
 
-METHOD BackSpace( lDisplay ) CLASS Get
+METHOD BackSpace( lDisplay ) CLASS HMG_Get
 
    LOCAL nPos := ::Pos
    LOCAL nMinus
@@ -1281,7 +1281,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD _Delete( lDisplay ) CLASS Get
+METHOD _Delete( lDisplay ) CLASS HMG_Get
 
    LOCAL nMaxLen := ::nMaxLen, n
 
@@ -1324,7 +1324,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD DeleteAll() CLASS Get
+METHOD DeleteAll() CLASS HMG_Get
 
    LOCAL xValue
 
@@ -1350,7 +1350,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD DelEnd() CLASS Get
+METHOD DelEnd() CLASS HMG_Get
 
    LOCAL nPos := ::Pos
 
@@ -1371,7 +1371,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD DelLeft() CLASS Get
+METHOD DelLeft() CLASS HMG_Get
 
    ::Left( .F. )
    ::Delete( .F. )
@@ -1381,7 +1381,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD DelRight() CLASS Get
+METHOD DelRight() CLASS HMG_Get
 
    ::Right( .F. )
    ::Delete( .F. )
@@ -1394,7 +1394,7 @@ RETURN Self
 /* NOTE ::WordLeft()
         ::DelWordRight() */
 
-METHOD DelWordLeft() CLASS Get
+METHOD DelWordLeft() CLASS HMG_Get
 
    IF ! ::HasFocus
       RETURN Self
@@ -1423,7 +1423,7 @@ RETURN Self
 
 /*-------------------------------------------------------------------------*/
 
-METHOD DelWordRight() CLASS Get
+METHOD DelWordRight() CLASS HMG_Get
 
    IF ! ::HasFocus
       RETURN Self
@@ -1458,7 +1458,7 @@ RETURN Self
  * be used for GET_CLR_UNSELECTED and GET_CLR_ENHANCED.
  */
 
-METHOD ColorSpec( cColorSpec ) CLASS Get
+METHOD ColorSpec( cColorSpec ) CLASS HMG_Get
 
    LOCAL cClrUnSel
    LOCAL cClrEnh
@@ -1489,7 +1489,7 @@ RETURN ::cColorSpec
  * several tasks to adjust the internal data of the object.
  */
 
-METHOD Picture( cPicture ) CLASS Get
+METHOD Picture( cPicture ) CLASS HMG_Get
 
    LOCAL cChar
    LOCAL nAt
@@ -1640,7 +1640,7 @@ RETURN ::cPicture
 
 /*-------------------------------------------------------------------------*/
 
-METHOD SetKeyEvent( nKey, bKey, lCtrl, lShift, lAlt ) CLASS Get
+METHOD SetKeyEvent( nKey, bKey, lCtrl, lShift, lAlt ) CLASS HMG_Get
 
    LOCAL n, cKey
 
@@ -1659,7 +1659,7 @@ RETURN NIL
 
 /*-------------------------------------------------------------------------*/
 
-METHOD DoKeyEvent( nKey ) CLASS Get
+METHOD DoKeyEvent( nKey ) CLASS HMG_Get
 
    LOCAL n, r := 0, cKey := hb_ntos( nKey )
 
@@ -1685,7 +1685,7 @@ RETURN r
 
 /*-------------------------------------------------------------------------*/
 
-METHOD Refresh() CLASS Get
+METHOD Refresh() CLASS HMG_Get
 
    ::UpdateBuffer()
    _DispGetBoxText( ::Control, ::Buffer )
@@ -1694,7 +1694,7 @@ RETURN NIL
 
 /*-------------------------------------------------------------------------*/
 
-METHOD Type() CLASS Get
+METHOD Type() CLASS HMG_Get
 
    ::cType := ValType( iif( ::HasFocus, ::xVarGet, ::VarGet() ) )
 
@@ -1711,7 +1711,7 @@ RETURN ::cType
  * to display correctly.
  */
 
-METHOD Block( bBlock ) CLASS Get
+METHOD Block( bBlock ) CLASS HMG_Get
 
    IF bBlock != NIL .AND. !::HasFocus
 
@@ -1727,7 +1727,7 @@ RETURN ::bBlock
 
 #ifdef HB_COMPAT_C53
 
-METHOD HitTest( nMRow, nMCol ) CLASS Get
+METHOD HitTest( nMRow, nMCol ) CLASS HMG_Get
 
    IF ::Row != nMRow
       RETURN HTNOWHERE
@@ -1744,7 +1744,7 @@ RETURN HTNOWHERE
 
 /*-------------------------------------------------------------------------*/
 
-METHOD FirstEditable() CLASS Get
+METHOD FirstEditable() CLASS HMG_Get
 
    LOCAL nFor
 
@@ -1768,7 +1768,7 @@ RETURN 0
 
 /*-------------------------------------------------------------------------*/
 
-METHOD LastEditable() CLASS Get
+METHOD LastEditable() CLASS HMG_Get
 
    LOCAL nFor
 

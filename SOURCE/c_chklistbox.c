@@ -49,15 +49,15 @@
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 // Listbox Class Name
-#define WC_LISTBOX             "ListBox"
+   #define WC_LISTBOX  "ListBox"
 #endif
 
 #if ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x030000 )
-#include "hbwinuni.h"
+   #include "hbwinuni.h"
 #else
-#define HB_STRLEN  strlen
+   #define HB_STRLEN   strlen
 #endif
-#define BUFFER     MAX_PATH
+#define BUFFER         MAX_PATH
 
 #ifdef UNICODE
 LPWSTR      AnsiToWide( LPCSTR );
@@ -230,7 +230,7 @@ HB_FUNC( CHKLISTBOXADDITEM )
 #endif
 }
 
-HB_FUNC( SETCHKLBITEMHEIGHT ) // set the height of a string in pixels
+HB_FUNC( SETCHKLBITEMHEIGHT )   // set the height of a string in pixels
 {
    TCHAR achBuffer[ BUFFER ];
    HWND  hwnd     = hmg_par_raw_HWND( 1 );

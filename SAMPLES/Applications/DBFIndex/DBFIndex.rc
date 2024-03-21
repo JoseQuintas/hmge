@@ -1,7 +1,0 @@
-DBFINDEX            ICON        "dbfindex.ico"
-
-EXIT                BITMAP      "exit.bmp"
-FOLDER              BITMAP      "folder.bmp"
-CLRKEYS             BITMAP      "clrkeys.bmp"
-INDEX               BITMAP      "index.bmp"
-
