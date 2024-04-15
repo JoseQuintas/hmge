@@ -54,20 +54,20 @@
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ <= 1410 )
 WINCOMMCTRLAPI void WINAPI ImageList_EndDrag( void );
 #endif
-extern HBITMAP             HMG_LoadImage( const char * FileName );
+extern HBITMAP             HMG_LoadImage( const char *FileName );
 extern HBITMAP             HMG_LoadPicture
-(
-   const char *   FileName,
-   int New_Width,
-   int New_Height,
-   HWND hWnd,
-   int ScaleStretch,
-   int Transparent,
-   long BackgroundColor,
-   int AdjustImage,
-   HB_BOOL bAlphaFormat,
-   int iAlpfaConstant
-);
+                           (
+                              const char  *FileName,
+                              int         New_Width,
+                              int         New_Height,
+                              HWND        hWnd,
+                              int         ScaleStretch,
+                              int         Transparent,
+                              long        BackgroundColor,
+                              int         AdjustImage,
+                              HB_BOOL     bAlphaFormat,
+                              int         iAlpfaConstant
+                           );
 
 #ifdef UNICODE
 LPWSTR                     AnsiToWide( LPCSTR );
@@ -78,10 +78,10 @@ HINSTANCE                  GetResources( void );
 // Minigui Resources control system
 void                       RegisterResource( HANDLE hResource, LPCSTR szType );
 
-HB_FUNC( INITIMAGELIST )     //InitImageList ( cx , cy, mask , nCount )
+HB_FUNC( INITIMAGELIST )   //InitImageList ( cx , cy, mask , nCount )
 {
-   HIMAGELIST himlIcons;
-   UINT       nFlags = ILC_COLOR32;
+   HIMAGELIST  himlIcons;
+   UINT        nFlags = ILC_COLOR32;
 
    if( hb_parl( 3 ) )
    {
@@ -96,20 +96,20 @@ HB_FUNC( INITIMAGELIST )     //InitImageList ( cx , cy, mask , nCount )
    hmg_ret_raw_HANDLE( himlIcons );
 }
 
-HB_FUNC( IL_ADD )            //IL_Add( himl , image , maskimage , ix , iy , imagecount )
+HB_FUNC( IL_ADD )          //IL_Add( himl , image , maskimage , ix , iy , imagecount )
 {
 #ifndef UNICODE
-   LPCSTR lpImageName  = hb_parc( 2 );
-   LPCSTR lpImageName2 = hb_parc( 3 );
+   LPCSTR   lpImageName = hb_parc( 2 );
+   LPCSTR   lpImageName2 = hb_parc( 3 );
 #else
-   LPWSTR lpImageName  = AnsiToWide( ( char * ) hb_parc( 2 ) );
-   LPWSTR lpImageName2 = AnsiToWide( ( char * ) hb_parc( 3 ) );
+   LPWSTR   lpImageName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpImageName2 = AnsiToWide( ( char * ) hb_parc( 3 ) );
 #endif
-   BITMAP  bm;
-   HBITMAP himage1;  // handle to image
-   HBITMAP himage2;  // handle to maskimage
-   int     lResult = -1;
-   int     ic      = 1;
+   BITMAP   bm;
+   HBITMAP  himage1; // handle to image
+   HBITMAP  himage2; // handle to maskimage
+   int      lResult = -1;
+   int      ic = 1;
 
    if( hb_parni( 6 ) )
    {
@@ -163,18 +163,18 @@ HB_FUNC( IL_ADD )            //IL_Add( himl , image , maskimage , ix , iy , imag
    hmg_ret_NINT( lResult );
 }
 
-HB_FUNC( IL_ADDMASKED )   //IL_AddMasked( himl , image , color , ix , iy , imagecount )
+HB_FUNC( IL_ADDMASKED ) //IL_AddMasked( himl , image , color , ix , iy , imagecount )
 {
 #ifndef UNICODE
-   LPCSTR lpImageName = hb_parc( 2 );
+   LPCSTR   lpImageName = hb_parc( 2 );
 #else
-   LPWSTR lpImageName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpImageName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
    BITMAP   bm;
    HBITMAP  himage1; // handle to image
-   COLORREF clrBk   = CLR_NONE;
+   COLORREF clrBk = CLR_NONE;
    int      lResult = -1;
-   int      ic      = 1;
+   int      ic = 1;
 
    if( hb_parnl( 3 ) )
    {
@@ -213,10 +213,10 @@ HB_FUNC( IL_ADDMASKED )   //IL_AddMasked( himl , image , color , ix , iy , image
    hmg_ret_NINT( lResult );
 }
 
-HB_FUNC( IL_DRAW )              //BOOL IL_Draw(HWND hwnd, HIMAGELIST himl, int imageindex, cx , cy)
+HB_FUNC( IL_DRAW )            //BOOL IL_Draw(HWND hwnd, HIMAGELIST himl, int imageindex, cx , cy)
 {
-   HDC  hdc;
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HDC   hdc;
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( ( hdc = GetDC( hwnd ) ) == NULL )
    {
@@ -228,20 +228,20 @@ HB_FUNC( IL_DRAW )              //BOOL IL_Draw(HWND hwnd, HIMAGELIST himl, int i
    ReleaseDC( hwnd, hdc );
 }
 
-HB_FUNC( IL_REMOVE )            //IL_Remove( hwnd , imageindex )
+HB_FUNC( IL_REMOVE )          //IL_Remove( hwnd , imageindex )
 {
    hb_retl( ImageList_Remove( hmg_par_raw_HIMAGELIST( 1 ), hmg_par_INT( 2 ) ) );
 }
 
-HB_FUNC( IL_SETBKCOLOR )        //IL_SetBkColor( hwnd , color)
+HB_FUNC( IL_SETBKCOLOR )      //IL_SetBkColor( hwnd , color)
 {
    hmg_ret_COLORREF( ImageList_SetBkColor( hmg_par_raw_HIMAGELIST( 1 ), HB_ISNUM( 2 ) ? hmg_par_COLORREF( 2 ) : CLR_NONE ) );
 }
 
-HB_FUNC( IL_ERASEIMAGE )        //IL_EraseImage( hwnd, ix, iy, dx, dy )
+HB_FUNC( IL_ERASEIMAGE )      //IL_EraseImage( hwnd, ix, iy, dx, dy )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
-   RECT rcImage;
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
+   RECT  rcImage;
 
    SetRect( &rcImage, hb_parni( 2 ), hb_parni( 3 ), hb_parni( 4 ) + hb_parni( 2 ), hb_parni( 5 ) + hb_parni( 3 ) );
 
@@ -249,12 +249,12 @@ HB_FUNC( IL_ERASEIMAGE )        //IL_EraseImage( hwnd, ix, iy, dx, dy )
    UpdateWindow( hwnd );
 }
 
-HB_FUNC( IL_BEGINDRAG )         //IL_BeginDrag( hwnd, himl, ImageInx, ix, iy )
+HB_FUNC( IL_BEGINDRAG )       //IL_BeginDrag( hwnd, himl, ImageInx, ix, iy )
 {
-   int  cx;
-   int  cy;
-   HWND hwnd = hmg_par_raw_HWND( 1 );
-   RECT rcImage;
+   int   cx;
+   int   cy;
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
+   RECT  rcImage;
 
    if( ImageList_GetIconSize( hmg_par_raw_HIMAGELIST( 2 ), &cx, &cy ) )
    {
@@ -266,23 +266,23 @@ HB_FUNC( IL_BEGINDRAG )         //IL_BeginDrag( hwnd, himl, ImageInx, ix, iy )
    hb_retl( ImageList_BeginDrag( hmg_par_raw_HIMAGELIST( 2 ), hb_parni( 3 ), ( int ) 0, ( int ) 0 ) );
 }
 
-HB_FUNC( IL_DRAGMOVE )          //IL_DragMove( ix, iy )
+HB_FUNC( IL_DRAGMOVE )        //IL_DragMove( ix, iy )
 {
    hb_retl( ImageList_DragMove( hb_parni( 1 ), hb_parni( 2 ) ) );
 }
 
-HB_FUNC( IL_DRAGENTER )         //IL_DragEnter( hwnd, ix, iy )
+HB_FUNC( IL_DRAGENTER )       //IL_DragEnter( hwnd, ix, iy )
 {
    hb_retl( ImageList_DragEnter( hmg_par_raw_HWND( 1 ), hb_parni( 2 ), hb_parni( 3 ) ) );
 }
 
-HB_FUNC( IL_ENDDRAG )           //IL_EndDrag( hwnd )
+HB_FUNC( IL_ENDDRAG )         //IL_EndDrag( hwnd )
 {
    ImageList_EndDrag();
    ImageList_DragLeave( hmg_par_raw_HWND( 1 ) );
 }
 
-HB_FUNC( IL_GETIMAGECOUNT )     //IL_GetImageCount( himl )
+HB_FUNC( IL_GETIMAGECOUNT )   //IL_GetImageCount( himl )
 {
    hmg_ret_NINT( ImageList_GetImageCount( hmg_par_raw_HIMAGELIST( 1 ) ) );
 }

@@ -51,10 +51,10 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-#if ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x030000 )
-   #include "hbwinuni.h"
+#if !defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x030000 )
+#include "hbwinuni.h"
 #else
-   #define HB_STRNCPY  hb_strncpy
+#define HB_STRNCPY   hb_strncpy
 #endif
 #ifdef UNICODE
 LPWSTR   AnsiToWide( LPCSTR );
@@ -65,48 +65,47 @@ LPSTR    WideToAnsi( LPWSTR );
 void     RegisterResource( HANDLE hResource, LPCSTR szType );
 
 #ifdef __XCC__
-   #define HB_ISBLOCK  ISBLOCK
+#define HB_ISBLOCK   ISBLOCK
 #endif
-
-HFONT PrepareFont( TCHAR * FontName, int FontSize, int Weight, DWORD Italic, DWORD Underline, DWORD StrikeOut, DWORD Angle, DWORD charset )
+HFONT PrepareFont( TCHAR *FontName, int FontSize, int Weight, DWORD Italic, DWORD Underline, DWORD StrikeOut, DWORD Angle, DWORD charset )
 {
-   HDC hDC = GetDC( HWND_DESKTOP );
+   HDC   hDC = GetDC( HWND_DESKTOP );
 
    FontSize = -MulDiv( FontSize, GetDeviceCaps( hDC, LOGPIXELSY ), 72 );
 
    ReleaseDC( HWND_DESKTOP, hDC );
 
    return CreateFont
-          (
-      FontSize,
-      0,
-      Angle,
-      0,
-      Weight,
-      Italic,
-      Underline,
-      StrikeOut,
-      charset,
-      OUT_TT_PRECIS,
-      CLIP_DEFAULT_PRECIS,
-      DEFAULT_QUALITY,
-      FF_DONTCARE,
-      FontName
-          );
+      (
+         FontSize,
+         0,
+         Angle,
+         0,
+         Weight,
+         Italic,
+         Underline,
+         StrikeOut,
+         charset,
+         OUT_TT_PRECIS,
+         CLIP_DEFAULT_PRECIS,
+         DEFAULT_QUALITY,
+         FF_DONTCARE,
+         FontName
+      );
 }
 
 HB_FUNC( INITFONT )
 {
-   HFONT hFont;
-   int   bold      = hb_parl( 3 ) ? FW_BOLD : FW_NORMAL;
-   DWORD italic    = ( DWORD ) hb_parl( 4 );
-   DWORD underline = ( DWORD ) hb_parl( 5 );
-   DWORD strikeout = ( DWORD ) hb_parl( 6 );
-   DWORD angle     = hb_parnl( 7 );
-   DWORD charset   = hb_parnldef( 8, DEFAULT_CHARSET );
+   HFONT    hFont;
+   int      bold = hb_parl( 3 ) ? FW_BOLD : FW_NORMAL;
+   DWORD    italic = ( DWORD ) hb_parl( 4 );
+   DWORD    underline = ( DWORD ) hb_parl( 5 );
+   DWORD    strikeout = ( DWORD ) hb_parl( 6 );
+   DWORD    angle = hb_parnl( 7 );
+   DWORD    charset = hb_parnldef( 8, DEFAULT_CHARSET );
 
 #ifdef UNICODE
-   LPWSTR pStr = AnsiToWide( hb_parc( 1 ) );
+   LPWSTR   pStr = AnsiToWide( hb_parc( 1 ) );
    hFont = PrepareFont( ( TCHAR * ) pStr, hb_parni( 2 ), bold, italic, underline, strikeout, angle, charset );
    hb_xfree( pStr );
 #else
@@ -119,22 +118,22 @@ HB_FUNC( INITFONT )
 HB_FUNC( _SETFONT )
 {
 #ifdef UNICODE
-   LPWSTR pStr;
+   LPWSTR   pStr;
 #endif
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND     hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
       HFONT hFont;
-      int   bold      = hb_parl( 4 ) ? FW_BOLD : FW_NORMAL;
-      DWORD italic    = ( DWORD ) hb_parl( 5 );
+      int   bold = hb_parl( 4 ) ? FW_BOLD : FW_NORMAL;
+      DWORD italic = ( DWORD ) hb_parl( 5 );
       DWORD underline = ( DWORD ) hb_parl( 6 );
       DWORD strikeout = ( DWORD ) hb_parl( 7 );
-      DWORD angle     = hb_parnl( 8 );
-      DWORD charset   = hb_parnldef( 9, DEFAULT_CHARSET );
+      DWORD angle = hb_parnl( 8 );
+      DWORD charset = hb_parnldef( 9, DEFAULT_CHARSET );
 
 #ifdef UNICODE
-      pStr  = AnsiToWide( hb_parc( 2 ) );
+      pStr = AnsiToWide( hb_parc( 2 ) );
       hFont = PrepareFont( ( TCHAR * ) pStr, hb_parni( 3 ), bold, italic, underline, strikeout, angle, charset );
       hb_xfree( pStr );
 #else
@@ -153,7 +152,7 @@ HB_FUNC( _SETFONT )
 
 HB_FUNC( _SETFONTHANDLE )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
@@ -174,11 +173,11 @@ HB_FUNC( _SETFONTHANDLE )
 
 HB_FUNC( GETSYSTEMFONT )
 {
-   LOGFONT lfDlgFont;
-   NONCLIENTMETRICS ncm;
+   LOGFONT           lfDlgFont;
+   NONCLIENTMETRICS  ncm;
 
 #ifdef UNICODE
-   LPSTR pStr;
+   LPSTR             pStr;
 #endif
    ncm.cbSize = sizeof( ncm );
    SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0 );
@@ -203,13 +202,13 @@ HB_FUNC( GETSYSTEMFONT )
    EnumFontsEx ( [ hDC ], [ cFontFamilyName ], [ nCharSet ], [ nPitch ], [ nFontType ], [ SortCodeBlock ], [ @aFontName ] )
              --> return array { { cFontName, nCharSet, nPitchAndFamily, nFontType }, ... }
  */
-int CALLBACK   EnumFontFamExProc( ENUMLOGFONTEX * lpelfe, NEWTEXTMETRICEX * lpntme, DWORD FontType, LPARAM lParam );
+int CALLBACK   EnumFontFamExProc( ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, DWORD FontType, LPARAM lParam );
 
 HB_FUNC( ENUMFONTSEX )
 {
    HDC      hdc;
    LOGFONT  lf;
-   PHB_ITEM pArray     = hb_itemArrayNew( 0 );
+   PHB_ITEM pArray = hb_itemArrayNew( 0 );
    BOOL     bReleaseDC = FALSE;
 
    memset( &lf, 0, sizeof( LOGFONT ) );
@@ -220,7 +219,7 @@ HB_FUNC( ENUMFONTSEX )
    }
    else
    {
-      hdc        = GetDC( NULL );
+      hdc = GetDC( NULL );
       bReleaseDC = TRUE;
    }
 
@@ -230,10 +229,10 @@ HB_FUNC( ENUMFONTSEX )
    }
    else
    {
-      lf.lfFaceName[ 0 ] = TEXT( '\0' );
+      lf.lfFaceName[0] = TEXT( '\0' );
    }
 
-   lf.lfCharSet        = HB_ISNUM( 3 ) ? ( BYTE ) ( hb_parni( 3 ) == DEFAULT_CHARSET ? GetTextCharset( hdc ) : hb_parni( 3 ) ) : ( BYTE ) hb_parni( 3 );
+   lf.lfCharSet = HB_ISNUM( 3 ) ? ( BYTE ) ( hb_parni( 3 ) == DEFAULT_CHARSET ? GetTextCharset( hdc ) : hb_parni( 3 ) ) : ( BYTE ) hb_parni( 3 );
    lf.lfPitchAndFamily = HB_ISNUM( 4 ) ? ( BYTE ) ( hb_parni( 4 ) == DEFAULT_PITCH ? 0 : ( hb_parni( 4 ) | FF_DONTCARE ) ) : ( BYTE ) 0;
 
    /* TODO - nFontType */
@@ -265,14 +264,14 @@ HB_FUNC( ENUMFONTSEX )
    hb_itemReturnRelease( pArray );
 }
 
-int CALLBACK EnumFontFamExProc( ENUMLOGFONTEX * lpelfe, NEWTEXTMETRICEX * lpntme, DWORD FontType, LPARAM lParam )
+int CALLBACK EnumFontFamExProc( ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, DWORD FontType, LPARAM lParam )
 {
 #ifdef UNICODE
    LPSTR pStr;
 #endif
    HB_SYMBOL_UNUSED( lpntme );
 
-   if( lpelfe->elfLogFont.lfFaceName[ 0 ] != '@' )
+   if( lpelfe->elfLogFont.lfFaceName[0] != '@' )
    {
       PHB_ITEM pSubArray = hb_itemArrayNew( 4 );
 

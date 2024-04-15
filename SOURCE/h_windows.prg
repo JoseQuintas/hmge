@@ -1792,6 +1792,7 @@ PROCEDURE _SetActivationFlag ( i )
 
       IF NoAutoReleaseFound == .F. .AND. _HMG_AutoScroll
          iif( _HMG_IsXPorLater, KeyToggleNT( VK_INSERT ), KeyToggle( VK_INSERT ) )
+         DO EVENTS
       ENDIF
 
    ENDIF
@@ -1890,10 +1891,12 @@ PROCEDURE _SetActivationFocus ( i )
          IF _HMG_aControlParentHandles [x] == hParent .AND. _HMG_aControlType [x] != "HOTKEY" // BK 25-Apr-2012
 
             IF ISNUMBER ( hControl )
-               IF hControl == Sp ;
-                  .OR. ;
-                  _HMG_aControlType [x] == 'BUTTON' .AND. IsWindowHasStyle ( hControl, BS_DEFPUSHBUTTON )
+               IF _HMG_aControlType [x] == 'BUTTON' .AND. IsWindowHasStyle ( hControl, BS_DEFPUSHBUTTON )
                   _SetFocus ( , , x )
+                  FocusDefined := .T.
+                  EXIT
+               ENDIF
+               IF hControl == Sp
                   FocusDefined := .T.
                   EXIT
                ENDIF

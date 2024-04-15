@@ -89,7 +89,7 @@ return If( At( ":", cPathMask ) == 2, Upper( Left( cPathMask, 2 ) ), "" )
 /*
 */
 *-----------------------------------------------------------------------------*
-FUNCTION cFilePath( cPathMask )
+STATIC FUNCTION cFilePath( cPathMask )
 *-----------------------------------------------------------------------------*
 LOCAL n := RAt( "\", cPathMask )
 

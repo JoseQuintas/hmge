@@ -48,25 +48,24 @@
 
 #include <commctrl.h>
 #if defined( _MSC_VER )
-   #pragma warning( push )
-   #pragma warning( disable : 4201 )
+#pragma warning( push )
+#pragma warning( disable : 4201 )
 #endif
 #include <richedit.h>
 #if defined( _MSC_VER )
-   #pragma warning( pop )
+#pragma warning( pop )
 #endif
-
 #if defined( __MINGW32__ ) && defined( __MINGW32_VERSION )
-   #define IMF_AUTOFONT      0x0002
+#define IMF_AUTOFONT 0x0002
 #endif
 #if defined( __WATCOMC__ )
-   #define ENM_DRAGDROPDONE  0x00000010
-   #define SF_USECODEPAGE    0x0020    /* CodePage given by high word */
+#define ENM_DRAGDROPDONE   0x00000010
+#define SF_USECODEPAGE     0x0020   /* CodePage given by high word */
 #endif
 #if defined( MSFTEDIT_CLASS )
-   #undef MSFTEDIT_CLASS
+#undef MSFTEDIT_CLASS
 #endif
-#define MSFTEDIT_CLASS       TEXT( "RICHEDIT50W" )
+#define MSFTEDIT_CLASS  TEXT( "RICHEDIT50W" )
 
 static BOOL       IsWinxpSp1Min( void );
 
@@ -76,37 +75,37 @@ LPSTR             WideToAnsi( LPWSTR );
 #endif
 HINSTANCE         GetInstance( void );
 
-static HINSTANCE hRELib = NULL;
+static HINSTANCE  hRELib = NULL;
 
 HB_FUNC( INITRICHEDITBOX )
 {
-   HWND    hRE = NULL;
-   TCHAR * lpClassName;
-   DWORD   Style = ES_MULTILINE | ES_WANTRETURN | WS_CHILD | ES_NOHIDESEL | ( hb_parl( 14 ) ? ES_AUTOVSCROLL : WS_VSCROLL );
+   HWND  hRE = NULL;
+   TCHAR *lpClassName;
+   DWORD Style = ES_MULTILINE | ES_WANTRETURN | WS_CHILD | ES_NOHIDESEL | ( hb_parl( 14 ) ? ES_AUTOVSCROLL : WS_VSCROLL );
 
    if( hb_parl( 10 ) )
    {
       Style |= ES_READONLY;
    }
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 12 ) )
+   if( !hb_parl( 12 ) )
    {
       Style |= WS_TABSTOP;
    }
 
-   if( ! hb_parl( 13 ) )
+   if( !hb_parl( 13 ) )
    {
       Style |= WS_HSCROLL;
    }
 
    if( IsWinxpSp1Min() )
    {
-      if( ! hRELib )
+      if( !hRELib )
       {
          hRELib = LoadLibrary( TEXT( "Msftedit.dll" ) );
       }
@@ -115,7 +114,7 @@ HB_FUNC( INITRICHEDITBOX )
    }
    else
    {
-      if( ! hRELib )
+      if( !hRELib )
       {
          hRELib = LoadLibrary( TEXT( "RichEd20.dll" ) );
       }
@@ -126,20 +125,20 @@ HB_FUNC( INITRICHEDITBOX )
    if( hRELib )
    {
       hRE = CreateWindowEx
-            (
-         WS_EX_CLIENTEDGE,
-         lpClassName,
-         TEXT( "" ),
-         Style,
-         hb_parni( 3 ),
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 6 ),
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 2 ),
-         GetInstance(),
-         NULL
-            );
+         (
+            WS_EX_CLIENTEDGE,
+            lpClassName,
+            TEXT( "" ),
+            Style,
+            hb_parni( 3 ),
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hb_parni( 6 ),
+            hmg_par_raw_HWND( 1 ),
+            hmg_par_raw_HMENU( 2 ),
+            GetInstance(),
+            NULL
+         );
 
       SendMessage( hRE, EM_EXLIMITTEXT, ( WPARAM ) hb_parni( 9 ), ( LPARAM ) 0 );
       SendMessage( hRE, EM_SETEVENTMASK, ( WPARAM ) 0, ( LPARAM ) ENM_SELCHANGE | ENM_DRAGDROPDONE | ENM_CHANGE | ENM_SCROLL );
@@ -157,42 +156,42 @@ HB_FUNC( UNLOADRICHEDITLIB )
    }
 }
 
-DWORD CALLBACK EditStreamCallbackR( DWORD_PTR dwCookie, LPBYTE lpbBuff, LONG cb, LONG FAR * pcb )
+DWORD CALLBACK EditStreamCallbackR( DWORD_PTR dwCookie, LPBYTE lpbBuff, LONG cb, LONG FAR *pcb )
 {
-   HANDLE hFile = ( HANDLE ) dwCookie;
+   HANDLE   hFile = ( HANDLE ) dwCookie;
 
-   if( ! ReadFile( hFile, ( LPVOID ) lpbBuff, cb, ( LPDWORD ) pcb, NULL ) )
+   if( !ReadFile( hFile, ( LPVOID ) lpbBuff, cb, ( LPDWORD ) pcb, NULL ) )
    {
-      return ( DWORD ) -1;
+      return( DWORD ) - 1;
    }
 
    return 0;
 }
 
-DWORD CALLBACK EditStreamCallbackW( DWORD_PTR dwCookie, LPBYTE lpbBuff, LONG cb, LONG FAR * pcb )
+DWORD CALLBACK EditStreamCallbackW( DWORD_PTR dwCookie, LPBYTE lpbBuff, LONG cb, LONG FAR *pcb )
 {
-   HANDLE hFile = ( HANDLE ) dwCookie;
+   HANDLE   hFile = ( HANDLE ) dwCookie;
 
-   if( ! WriteFile( hFile, ( LPVOID ) lpbBuff, cb, ( LPDWORD ) pcb, NULL ) )
+   if( !WriteFile( hFile, ( LPVOID ) lpbBuff, cb, ( LPDWORD ) pcb, NULL ) )
    {
-      return ( DWORD ) -1;
+      return( DWORD ) - 1;
    }
 
    return 0;
 }
 
-HB_FUNC( STREAMIN )                   //StreamIn(HWND hwndCtrl, LPCTSTR lpszPath, int typ )
+HB_FUNC( STREAMIN )                 //StreamIn(HWND hwndCtrl, LPCTSTR lpszPath, int typ )
 {
-   HWND   hwnd = hmg_par_raw_HWND( 1 );
-   HANDLE hFile;
+   HWND        hwnd = hmg_par_raw_HWND( 1 );
+   HANDLE      hFile;
 
 #ifndef UNICODE
-   LPCSTR cFileName = ( char * ) hb_parc( 2 );
+   LPCSTR      cFileName = ( char * ) hb_parc( 2 );
 #else
-   LPCWSTR cFileName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR     cFileName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   EDITSTREAM es;
-   long       Flag, Mode;
+   EDITSTREAM  es;
+   long        Flag, Mode;
 
    switch( hb_parni( 3 ) )
    {
@@ -245,30 +244,30 @@ HB_FUNC( STREAMIN )                   //StreamIn(HWND hwndCtrl, LPCTSTR lpszPath
    }
 #endif
    es.pfnCallback = EditStreamCallbackR;
-   es.dwCookie    = ( DWORD_PTR ) hFile;
-   es.dwError     = 0;
+   es.dwCookie = ( DWORD_PTR ) hFile;
+   es.dwError = 0;
 
    // send EM_STREAMIN message to the Rich Edit Control.
-   SendMessage( hwnd, EM_STREAMIN, ( WPARAM ) Flag, ( LPARAM ) &es );
+   SendMessage( hwnd, EM_STREAMIN, ( WPARAM ) Flag, ( LPARAM ) & es );
    SendMessage( hwnd, EM_SETTEXTMODE, ( WPARAM ) Mode, 0 );
 
    CloseHandle( hFile );
 
-   hmg_ret_L( ! ( es.dwError ) );
+   hmg_ret_L( !( es.dwError ) );
 }
 
-HB_FUNC( STREAMOUT )                  //StreamOut(HWND hwndCtrl, LPCTSTR lpszPath, int Typ )
+HB_FUNC( STREAMOUT )                //StreamOut(HWND hwndCtrl, LPCTSTR lpszPath, int Typ )
 {
-   HWND   hwnd = hmg_par_raw_HWND( 1 );
-   HANDLE hFile;
+   HWND        hwnd = hmg_par_raw_HWND( 1 );
+   HANDLE      hFile;
 
 #ifndef UNICODE
-   LPCSTR cFileName = ( char * ) hb_parc( 2 );
+   LPCSTR      cFileName = ( char * ) hb_parc( 2 );
 #else
-   LPCWSTR cFileName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR     cFileName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   EDITSTREAM es;
-   long       Flag;
+   EDITSTREAM  es;
+   long        Flag;
 
    switch( hb_parni( 3 ) )
    {
@@ -314,30 +313,30 @@ HB_FUNC( STREAMOUT )                  //StreamOut(HWND hwndCtrl, LPCTSTR lpszPat
    }
 #endif
    es.pfnCallback = EditStreamCallbackW;
-   es.dwCookie    = ( DWORD_PTR ) hFile;
-   es.dwError     = 0;
+   es.dwCookie = ( DWORD_PTR ) hFile;
+   es.dwError = 0;
 
    // send EM_STREAMOUT message to the Rich Edit Control.
-   SendMessage( hwnd, EM_STREAMOUT, ( WPARAM ) Flag, ( LPARAM ) &es );
+   SendMessage( hwnd, EM_STREAMOUT, ( WPARAM ) Flag, ( LPARAM ) & es );
 
    CloseHandle( hFile );
 
-   hmg_ret_L( ! ( es.dwError ) );
+   hmg_ret_L( !( es.dwError ) );
 }
 
-HB_FUNC( GETAUTOFONTRTF )             // GetAutoFont(HWND hwnd)
+HB_FUNC( GETAUTOFONTRTF )           // GetAutoFont(HWND hwnd)
 {
-   LRESULT lAuto;
+   LRESULT  lAuto;
 
    lAuto = SendMessage( hmg_par_raw_HWND( 1 ), EM_GETLANGOPTIONS, 0, 0 ) & IMF_AUTOFONT;
 
    hmg_ret_L( lAuto );
 }
 
-HB_FUNC( SETAUTOFONTRTF )             // SetAutoFont(HWND hwnd, lAutoFont)
+HB_FUNC( SETAUTOFONTRTF )           // SetAutoFont(HWND hwnd, lAutoFont)
 {
-   HWND    hwnd = hmg_par_raw_HWND( 1 );
-   LRESULT lOpt, lResult;
+   HWND     hwnd = hmg_par_raw_HWND( 1 );
+   LRESULT  lOpt, lResult;
 
    lOpt = SendMessage( hwnd, EM_GETLANGOPTIONS, 0, 0 );
 
@@ -355,10 +354,10 @@ HB_FUNC( SETAUTOFONTRTF )             // SetAutoFont(HWND hwnd, lAutoFont)
    hmg_ret_L( lResult );
 }
 
-HB_FUNC( SETBKGNDCOLOR )              // SetBkgndColor(HWND hwnd, lSyscol, nRed, nGreen, nBlue)
+HB_FUNC( SETBKGNDCOLOR )            // SetBkgndColor(HWND hwnd, lSyscol, nRed, nGreen, nBlue)
 {
    LRESULT  lResult;
-   INT      syscol   = hb_parl( 2 ) ? 0 : 1;
+   INT      syscol = hb_parl( 2 ) ? 0 : 1;
    COLORREF bkgcolor = RGB( hb_parni( 3 ), hb_parni( 4 ), hb_parni( 5 ) );
 
    lResult = SendMessage( hmg_par_raw_HWND( 1 ), EM_SETBKGNDCOLOR, ( WPARAM ) syscol, ( LPARAM ) bkgcolor );
@@ -368,16 +367,16 @@ HB_FUNC( SETBKGNDCOLOR )              // SetBkgndColor(HWND hwnd, lSyscol, nRed,
 
 HB_FUNC( GETFONTRTF )
 {
-   CHARFORMAT cF;
-   long       PointSize;
-   int        bold;
-   int        Italic;
-   int        Underline;
-   int        StrikeOut;
-   int        SelText;
+   CHARFORMAT  cF;
+   long        PointSize;
+   int         bold;
+   int         Italic;
+   int         Underline;
+   int         StrikeOut;
+   int         SelText;
 
 #ifdef UNICODE
-   LPSTR pStr;
+   LPSTR       pStr;
 #endif
    cF.cbSize = sizeof( CHARFORMAT );
    cF.dwMask = CFM_BOLD | CFM_ITALIC | CFM_UNDERLINE | CFM_SIZE;
@@ -390,12 +389,12 @@ HB_FUNC( GETFONTRTF )
       SelText = SCF_DEFAULT;
    }
 
-   SendMessage( hmg_par_raw_HWND( 1 ), EM_GETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) &cF );
+   SendMessage( hmg_par_raw_HWND( 1 ), EM_GETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) & cF );
 
    PointSize = cF.yHeight / 20;
 
-   bold      = ( cF.dwEffects & CFE_BOLD ) ? 1 : 0;
-   Italic    = ( cF.dwEffects & CFE_ITALIC ) ? 1 : 0;
+   bold = ( cF.dwEffects & CFE_BOLD ) ? 1 : 0;
+   Italic = ( cF.dwEffects & CFE_ITALIC ) ? 1 : 0;
    Underline = ( cF.dwEffects & CFE_UNDERLINE ) ? 1 : 0;
    StrikeOut = ( cF.dwEffects & CFE_STRIKEOUT ) ? 1 : 0;
 
@@ -418,20 +417,20 @@ HB_FUNC( GETFONTRTF )
 
 HB_FUNC( SETFONTRTF )
 {
-   LRESULT    lResult;
-   CHARFORMAT cF;
-   DWORD      Mask;
-   DWORD      Effects = 0;
-   int        SelText = SCF_SELECTION;
+   LRESULT     lResult;
+   CHARFORMAT  cF;
+   DWORD       Mask;
+   DWORD       Effects = 0;
+   int         SelText = SCF_SELECTION;
 
 #ifndef UNICODE
-   TCHAR * szFaceName = ( TCHAR * ) hb_parc( 3 );
+   TCHAR       *szFaceName = ( TCHAR * ) hb_parc( 3 );
 #else
-   TCHAR * szFaceName = ( TCHAR * ) hb_osStrU16Encode( ( char * ) hb_parc( 3 ) );
+   TCHAR       *szFaceName = ( TCHAR * ) hb_osStrU16Encode( ( char * ) hb_parc( 3 ) );
 #endif
    cF.cbSize = sizeof( CHARFORMAT );
 
-   Mask = ( DWORD ) SendMessage( hmg_par_raw_HWND( 1 ), EM_GETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) &cF );
+   Mask = ( DWORD ) SendMessage( hmg_par_raw_HWND( 1 ), EM_GETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) & cF );
 
    if( hb_parni( 10 ) > 0 )
    {
@@ -467,7 +466,7 @@ HB_FUNC( SETFONTRTF )
       Effects |= CFE_STRIKEOUT;
    }
 
-   cF.dwMask    = Mask;
+   cF.dwMask = Mask;
    cF.dwEffects = Effects;
 
    if( hb_parnl( 4 ) )
@@ -482,26 +481,26 @@ HB_FUNC( SETFONTRTF )
       lstrcpy( cF.szFaceName, szFaceName );
    }
 
-   lResult = SendMessage( hmg_par_raw_HWND( 1 ), EM_SETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) &cF );
+   lResult = SendMessage( hmg_par_raw_HWND( 1 ), EM_SETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) & cF );
 
    hmg_ret_L( lResult );
 }
 
 #if defined( _MSC_VER )
-   #pragma warning( disable : 4996 )
+#pragma warning( disable : 4996 )
 #endif
 static BOOL IsWinxpSp1Min( void )
 {
 #ifndef UNICODE
-   LPCSTR pch;
+   LPCSTR         pch;
 #else
-   LPCWSTR pch;
+   LPCWSTR        pch;
 #endif
-   OSVERSIONINFO osvi;
+   OSVERSIONINFO  osvi;
 
    osvi.dwOSVersionInfoSize = sizeof( osvi );
 
-   if( ! GetVersionEx( &osvi ) )
+   if( !GetVersionEx( &osvi ) )
    {
       return FALSE;
    }

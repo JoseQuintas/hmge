@@ -49,16 +49,16 @@
 #include <commctrl.h>
 #include <mmsystem.h>
 
-#if defined( __BORLANDC__ )
-   #pragma warn -use /* unused var */
-   #if defined( _WIN64 )
-      #ifndef UNICODE
+#if defined( __BORLANDC__ ) && ! defined( _WIN64 )
+#pragma warn -use   /* unused var */
+#endif
+#if defined( __BORLANDC__ ) && defined( _WIN64 )
+#ifndef UNICODE
 extern HWND _MCIWndCreate( HWND, HINSTANCE, DWORD, LPCSTR );
-      #else
+#else
 extern HWND _MCIWndCreate( HWND, HINSTANCE, DWORD, LPCWSTR );
-      #endif
-   #endif /* _WIN64 */
-#endif    /* __BORLANDC__ */
+#endif
+#endif /* __BORLANDC__ & _WIN64 */
 
 #include <vfw.h>
 
@@ -74,18 +74,18 @@ HB_FUNC( MESSAGEBEEP )
 
 HB_FUNC( C_PLAYWAVE )
 {
-   DWORD   Style = SND_ASYNC;
-   HMODULE hmod  = NULL;
+   DWORD    Style = SND_ASYNC;
+   HMODULE  hmod = NULL;
 
 #ifndef UNICODE
-   LPCSTR pszSound = hb_parc( 1 );
+   LPCSTR   pszSound = hb_parc( 1 );
 #else
-   LPCWSTR pszSound = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   LPCWSTR  pszSound = AnsiToWide( ( char * ) hb_parc( 1 ) );
 #endif
    if( hb_parl( 2 ) )
    {
       Style |= SND_RESOURCE;
-      hmod   = ( HMODULE ) GetResources();
+      hmod = ( HMODULE ) GetResources();
    }
    else
    {
@@ -126,14 +126,14 @@ HB_FUNC( STOPWAVE )
 
 HB_FUNC( INITPLAYER )
 {
-   HWND hwnd;
+   HWND     hwnd;
 
 #ifndef UNICODE
-   LPCSTR szFile = hb_parc( 2 );
+   LPCSTR   szFile = hb_parc( 2 );
 #else
-   LPCWSTR szFile = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  szFile = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   DWORD Style = WS_VISIBLE | WS_CHILD | WS_BORDER;
+   DWORD    Style = WS_VISIBLE | WS_CHILD | WS_BORDER;
 
    if( hb_parl( 7 ) )
    {
@@ -190,7 +190,6 @@ HB_FUNC( INITPLAYER )
 #else
    hwnd = MCIWndCreate( hmg_par_raw_HWND( 1 ), NULL, Style, szFile );
 #endif
-
 #ifdef UNICODE
    hb_xfree( ( TCHAR * ) szFile );
 #endif
@@ -206,8 +205,8 @@ HB_FUNC( INITPLAYER )
 
 HB_FUNC( MCIFUNC )
 {
-   HWND mcihand = hmg_par_raw_HWND( 1 );
-   int  func    = hb_parni( 2 );
+   HWND  mcihand = hmg_par_raw_HWND( 1 );
+   int   func = hb_parni( 2 );
 
    switch( func )
    {
@@ -309,7 +308,7 @@ HB_FUNC( INITANIMATE )
       Style |= WS_BORDER;
    }
 
-   if( ! hb_parl( 10 ) )
+   if( !hb_parl( 10 ) )
    {
       Style |= WS_VISIBLE;
    }
@@ -344,9 +343,9 @@ HB_FUNC( INITANIMATE )
 HB_FUNC( OPENANIMATE )
 {
 #ifndef UNICODE
-   LPCSTR szName = hb_parc( 2 );
+   LPCSTR   szName = hb_parc( 2 );
 #else
-   LPCWSTR szName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  szName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
    Animate_Open( hmg_par_raw_HWND( 1 ), szName );
 

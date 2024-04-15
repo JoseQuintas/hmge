@@ -51,9 +51,10 @@
 #include <shellapi.h>
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
+
 // Button Class Name
-   #define WC_BUTTON                      "Button"
-   #define BUTTON_IMAGELIST_ALIGN_CENTER  4
+#define WC_BUTTON                      "Button"
+#define BUTTON_IMAGELIST_ALIGN_CENTER  4
 #endif
 #include <math.h>
 
@@ -61,27 +62,27 @@
 #include "hbvm.h"
 
 #ifndef BCM_FIRST
-   #define BCM_FIRST                      0x1600
-   #define BCM_SETIMAGELIST               ( BCM_FIRST + 0x0002 )
+#define BCM_FIRST          0x1600
+#define BCM_SETIMAGELIST   ( BCM_FIRST + 0x0002 )
 #endif
 static HBRUSH     CreateGradientBrush( HDC hDC, INT nWidth, INT nHeight, COLORREF Color1, COLORREF Color2 );
 
 HBITMAP           HMG_LoadPicture
-(
-   const char *  FileName,
-   int New_Width,
-   int New_Height,
-   HWND hWnd,
-   int ScaleStretch,
-   int Transparent,
-   long BackgroundColor,
-   int AdjustImage,
-   HB_BOOL bAlphaFormat,
-   int iAlpfaConstant
-);
+                  (
+                     const char  *FileName,
+                     int         New_Width,
+                     int         New_Height,
+                     HWND        hWnd,
+                     int         ScaleStretch,
+                     int         Transparent,
+                     long        BackgroundColor,
+                     int         AdjustImage,
+                     HB_BOOL     bAlphaFormat,
+                     int         iAlpfaConstant
+                  );
 
-HIMAGELIST        HMG_SetButtonImageList( HWND hButton, const char * FileName, int Transparent, UINT uAlign );
-BOOL              bmp_SaveFile( HBITMAP hBitmap, TCHAR * FileName );
+HIMAGELIST        HMG_SetButtonImageList( HWND hButton, const char *FileName, int Transparent, UINT uAlign );
+BOOL              bmp_SaveFile( HBITMAP hBitmap, TCHAR *FileName );
 
 LRESULT CALLBACK  OwnButtonProc( HWND hbutton, UINT msg, WPARAM wParam, LPARAM lParam );
 
@@ -94,35 +95,34 @@ HINSTANCE         GetResources( void );
 // Minigui Resources control system
 void              RegisterResource( HANDLE hResource, LPCSTR szType );
 
-#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 ) || ( defined( __MINGW32__ ) && defined( __MINGW32_VERSION ) ) || defined( __XCC__ )
+#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 ) || ( defined( __MINGW32__ ) && defined( __MINGW32_VERSION ) )
 typedef struct
 {
-   HIMAGELIST himl;
-   RECT       margin;
-   UINT       uAlign;
-}
-BUTTON_IMAGELIST, * PBUTTON_IMAGELIST;
+   HIMAGELIST  himl;
+   RECT        margin;
+   UINT        uAlign;
+} BUTTON_IMAGELIST, *PBUTTON_IMAGELIST;
 #endif
 HB_FUNC( INITBUTTON )
 {
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
+   LPCSTR   lpWindowName = hb_parc( 2 );
 #else
-   LPCWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   DWORD Style = BS_NOTIFY | WS_CHILD | ( hb_parl( 14 ) ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON );
+   DWORD    Style = BS_NOTIFY | WS_CHILD | ( hb_parl( 14 ) ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON );
 
    if( hb_parl( 10 ) )
    {
       Style |= BS_FLAT;
    }
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style |= WS_TABSTOP;
    }
 
-   if( ! hb_parl( 12 ) )
+   if( !hb_parl( 12 ) )
    {
       Style |= WS_VISIBLE;
    }
@@ -135,20 +135,20 @@ HB_FUNC( INITBUTTON )
    hmg_ret_raw_HWND
    (
       CreateWindowEx
-      (
-         0,
-         WC_BUTTON,
-         lpWindowName,
-         Style,
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 6 ),
-         hb_parni( 7 ),
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 3 ),
-         GetInstance(),
-         NULL
-      )
+         (
+            0,
+            WC_BUTTON,
+            lpWindowName,
+            Style,
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hb_parni( 6 ),
+            hb_parni( 7 ),
+            hmg_par_raw_HWND( 1 ),
+            hmg_par_raw_HMENU( 3 ),
+            GetInstance(),
+            NULL
+         )
    );
 
 #ifdef UNICODE
@@ -158,59 +158,59 @@ HB_FUNC( INITBUTTON )
 
 HB_FUNC( INITIMAGEBUTTON )
 {
-   HWND  hbutton;
-   HWND  himage;
-   HICON hIcon;
+   HWND        hbutton;
+   HWND        himage;
+   HICON       hIcon;
 
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
-   LPCSTR lpIconName   = hb_parc( 14 );
+   LPCSTR      lpWindowName = hb_parc( 2 );
+   LPCSTR      lpIconName = hb_parc( 14 );
 #else
-   LPWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
-   LPWSTR lpIconName   = AnsiToWide( ( char * ) hb_parc( 14 ) );
+   LPWSTR      lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR      lpIconName = AnsiToWide( ( char * ) hb_parc( 14 ) );
 #endif
-   HIMAGELIST himl;
+   HIMAGELIST  himl;
 
-   HWND  hwnd  = hmg_par_raw_HWND( 1 );
-   DWORD Style = BS_NOTIFY | WS_CHILD | ( hb_parl( 13 ) ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON ) | ( ( hb_parc( 14 ) == NULL ) ? BS_BITMAP : BS_ICON );
+   HWND        hwnd = hmg_par_raw_HWND( 1 );
+   DWORD       Style = BS_NOTIFY | WS_CHILD | ( hb_parl( 13 ) ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON ) | ( ( hb_parc( 14 ) == NULL ) ? BS_BITMAP : BS_ICON );
 
    if( hb_parl( 9 ) )
    {
       Style |= BS_FLAT;
    }
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 12 ) )
+   if( !hb_parl( 12 ) )
    {
       Style |= WS_TABSTOP;
    }
 
    hbutton = CreateWindowEx
-             (
-      0,
-      WC_BUTTON,
-      lpWindowName,
-      Style,
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hb_parni( 7 ),
-      hwnd,
-      hmg_par_raw_HMENU( 3 ),
-      GetInstance(),
-      NULL
-             );
+      (
+         0,
+         WC_BUTTON,
+         lpWindowName,
+         Style,
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hb_parni( 7 ),
+         hwnd,
+         hmg_par_raw_HMENU( 3 ),
+         GetInstance(),
+         NULL
+      );
 
 #ifdef UNICODE
    hb_xfree( lpWindowName );
 #endif
    if( HB_ISNIL( 14 ) )
    {
-      if( ! hb_parl( 17 ) )
+      if( !hb_parl( 17 ) )
       {
          himage = ( HWND ) HMG_LoadPicture( hb_parc( 8 ), -1, -1, hwnd, 0, hb_parl( 10 ) ? 0 : 1, -1, 0, HB_FALSE, 255 );
 
@@ -231,7 +231,7 @@ HB_FUNC( INITIMAGEBUTTON )
    }
    else
    {
-      if( ! hb_parl( 15 ) )
+      if( !hb_parl( 15 ) )
       {
          hIcon = ( HICON ) LoadImage( GetResources(), lpIconName, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR );
 
@@ -255,13 +255,13 @@ HB_FUNC( INITIMAGEBUTTON )
 #endif
       if( hb_parl( 17 ) )
       {
-         BITMAP   bm;
-         ICONINFO sIconInfo;
-         BUTTON_IMAGELIST bi;
+         BITMAP            bm;
+         ICONINFO          sIconInfo;
+         BUTTON_IMAGELIST  bi;
 
          if( GetIconInfo( hIcon, &sIconInfo ) )
          {
-            GetObject( sIconInfo.hbmColor, sizeof( BITMAP ), ( LPVOID ) &bm );
+            GetObject( sIconInfo.hbmColor, sizeof( BITMAP ), ( LPVOID ) & bm );
 
             if( sIconInfo.hbmMask )
             {
@@ -279,14 +279,14 @@ HB_FUNC( INITIMAGEBUTTON )
 
             DestroyIcon( hIcon );
 
-            bi.himl          = himl;
-            bi.margin.left   = 10;
-            bi.margin.top    = 10;
+            bi.himl = himl;
+            bi.margin.left = 10;
+            bi.margin.top = 10;
             bi.margin.bottom = 10;
-            bi.margin.right  = 10;
-            bi.uAlign        = BUTTON_IMAGELIST_ALIGN_CENTER;
+            bi.margin.right = 10;
+            bi.uAlign = BUTTON_IMAGELIST_ALIGN_CENTER;
 
-            SendMessage( ( HWND ) hbutton, BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) &bi );
+            SendMessage( ( HWND ) hbutton, BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) & bi );
 
             hb_reta( 2 );
             hmg_storvnl_HANDLE( hbutton, -1, 1 );
@@ -306,52 +306,52 @@ HB_FUNC( INITIMAGEBUTTON )
 
 HB_FUNC( INITOWNERBUTTON )
 {
-   HWND  hbutton;
-   HWND  himage;
-   HICON hIcon;
+   HWND     hbutton;
+   HWND     himage;
+   HICON    hIcon;
 
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
-   LPCSTR lpImageName  = hb_parc( 8 );
-   LPCSTR lpIconName   = hb_parc( 14 );
+   LPCSTR   lpWindowName = hb_parc( 2 );
+   LPCSTR   lpImageName = hb_parc( 8 );
+   LPCSTR   lpIconName = hb_parc( 14 );
 #else
-   LPCWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
-   LPCWSTR lpImageName  = AnsiToWide( ( char * ) hb_parc( 8 ) );
-   LPCWSTR lpIconName   = AnsiToWide( ( char * ) hb_parc( 14 ) );
+   LPCWSTR  lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  lpImageName = AnsiToWide( ( char * ) hb_parc( 8 ) );
+   LPCWSTR  lpIconName = AnsiToWide( ( char * ) hb_parc( 14 ) );
 #endif
-   DWORD Style    = BS_NOTIFY | WS_CHILD | BS_OWNERDRAW | ( hb_parl( 13 ) ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON ) | ( HB_ISNIL( 14 ) ? BS_BITMAP : BS_ICON );
-   UINT  ImgStyle = hb_parl( 10 ) ? 0 : LR_LOADTRANSPARENT;
+   DWORD    Style = BS_NOTIFY | WS_CHILD | BS_OWNERDRAW | ( hb_parl( 13 ) ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON ) | ( HB_ISNIL( 14 ) ? BS_BITMAP : BS_ICON );
+   UINT     ImgStyle = hb_parl( 10 ) ? 0 : LR_LOADTRANSPARENT;
 
    if( hb_parl( 9 ) )
    {
       Style |= BS_FLAT;
    }
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 12 ) )
+   if( !hb_parl( 12 ) )
    {
       Style |= WS_TABSTOP;
    }
 
    hbutton = CreateWindowEx
-             (
-      0,
-      WC_BUTTON,
-      lpWindowName,
-      Style,
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hb_parni( 7 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 3 ),
-      GetInstance(),
-      NULL
-             );
+      (
+         0,
+         WC_BUTTON,
+         lpWindowName,
+         Style,
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hb_parni( 7 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 3 ),
+         GetInstance(),
+         NULL
+      );
 
    SetProp( ( HWND ) hbutton, TEXT( "oldbtnproc" ), ( HWND ) GetWindowLongPtr( ( HWND ) hbutton, GWLP_WNDPROC ) );
    SubclassWindow2( hbutton, OwnButtonProc );
@@ -359,26 +359,26 @@ HB_FUNC( INITOWNERBUTTON )
    if( HB_ISNIL( 14 ) )
    {
       himage = ( HWND ) LoadImage
-               (
-         GetResources(),
-         lpImageName,
-         IMAGE_BITMAP,
-         HB_MAX( hb_parnidef( 15, 0 ), 0 ),
-         HB_MAX( hb_parnidef( 16, 0 ), 0 ),
-         LR_LOADMAP3DCOLORS | ImgStyle
-               );
-
-      if( himage == NULL )
-      {
-         himage = ( HWND ) LoadImage
-                  (
-            NULL,
+         (
+            GetResources(),
             lpImageName,
             IMAGE_BITMAP,
             HB_MAX( hb_parnidef( 15, 0 ), 0 ),
             HB_MAX( hb_parnidef( 16, 0 ), 0 ),
-            LR_LOADFROMFILE | LR_LOADMAP3DCOLORS | ImgStyle
-                  );
+            LR_LOADMAP3DCOLORS | ImgStyle
+         );
+
+      if( himage == NULL )
+      {
+         himage = ( HWND ) LoadImage
+            (
+               NULL,
+               lpImageName,
+               IMAGE_BITMAP,
+               HB_MAX( hb_parnidef( 15, 0 ), 0 ),
+               HB_MAX( hb_parnidef( 16, 0 ), 0 ),
+               LR_LOADFROMFILE | LR_LOADMAP3DCOLORS | ImgStyle
+            );
       }
 
       hb_reta( 2 );
@@ -388,26 +388,26 @@ HB_FUNC( INITOWNERBUTTON )
    else
    {
       hIcon = ( HICON ) LoadImage
-              (
-         GetResources(),
-         lpIconName,
-         IMAGE_ICON,
-         HB_MAX( hb_parnidef( 15, 0 ), 0 ),
-         HB_MAX( hb_parnidef( 16, 0 ), 0 ),
-         LR_DEFAULTCOLOR
-              );
-
-      if( hIcon == NULL )
-      {
-         hIcon = ( HICON ) LoadImage
-                 (
-            NULL,
+         (
+            GetResources(),
             lpIconName,
             IMAGE_ICON,
             HB_MAX( hb_parnidef( 15, 0 ), 0 ),
             HB_MAX( hb_parnidef( 16, 0 ), 0 ),
-            LR_LOADFROMFILE | LR_DEFAULTCOLOR
-                 );
+            LR_DEFAULTCOLOR
+         );
+
+      if( hIcon == NULL )
+      {
+         hIcon = ( HICON ) LoadImage
+            (
+               NULL,
+               lpIconName,
+               IMAGE_ICON,
+               HB_MAX( hb_parnidef( 15, 0 ), 0 ),
+               HB_MAX( hb_parnidef( 16, 0 ), 0 ),
+               LR_LOADFROMFILE | LR_DEFAULTCOLOR
+            );
       }
 
       if( hIcon == NULL )
@@ -429,35 +429,35 @@ HB_FUNC( INITOWNERBUTTON )
 
 HB_FUNC( _SETBTNPICTURE )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
-   HWND himage;
+   HWND     hwnd = hmg_par_raw_HWND( 1 );
+   HWND     himage;
 
 #ifndef UNICODE
-   LPCSTR lpImageName = hb_parc( 2 );
+   LPCSTR   lpImageName = hb_parc( 2 );
 #else
-   LPWSTR lpImageName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpImageName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
    himage = ( HWND ) LoadImage
-            (
-      GetResources(),
-      lpImageName,
-      IMAGE_BITMAP,
-      HB_MAX( hb_parnidef( 3, 0 ), 0 ),
-      HB_MAX( hb_parnidef( 4, 0 ), 0 ),
-      LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT
-            );
-
-   if( himage == NULL )
-   {
-      himage = ( HWND ) LoadImage
-               (
-         NULL,
+      (
+         GetResources(),
          lpImageName,
          IMAGE_BITMAP,
          HB_MAX( hb_parnidef( 3, 0 ), 0 ),
          HB_MAX( hb_parnidef( 4, 0 ), 0 ),
-         LR_LOADFROMFILE | LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT
-               );
+         LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT
+      );
+
+   if( himage == NULL )
+   {
+      himage = ( HWND ) LoadImage
+         (
+            NULL,
+            lpImageName,
+            IMAGE_BITMAP,
+            HB_MAX( hb_parnidef( 3, 0 ), 0 ),
+            HB_MAX( hb_parnidef( 4, 0 ), 0 ),
+            LR_LOADFROMFILE | LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT
+         );
    }
 
    if( himage == NULL )
@@ -482,7 +482,7 @@ HB_FUNC( _GETBTNPICTUREHANDLE )
 
 HB_FUNC( _SETMIXEDBTNPICTURE )
 {
-   HIMAGELIST himl;
+   HIMAGELIST  himl;
 
    himl = HMG_SetButtonImageList( hmg_par_raw_HWND( 1 ), hb_parc( 2 ), hb_parl( 3 ) ? 0 : 1, BUTTON_IMAGELIST_ALIGN_CENTER );
 
@@ -493,26 +493,26 @@ HB_FUNC( _SETMIXEDBTNPICTURE )
 // HMG 1.0 Experimental Build 8e
 HB_FUNC( _SETBTNICON )
 {
-   HICON hIcon;
+   HICON    hIcon;
 
 #ifndef UNICODE
-   LPCSTR lpIconName = hb_parc( 2 );
+   LPCSTR   lpIconName = hb_parc( 2 );
 #else
-   LPWSTR lpIconName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpIconName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
    hIcon = ( HICON ) LoadImage( GetResources(), lpIconName, IMAGE_ICON, HB_MAX( hb_parnidef( 3, 0 ), 0 ), HB_MAX( hb_parnidef( 4, 0 ), 0 ), LR_DEFAULTCOLOR );
 
    if( hIcon == NULL )
    {
       hIcon = ( HICON ) LoadImage
-              (
-         NULL,
-         lpIconName,
-         IMAGE_ICON,
-         HB_MAX( hb_parnidef( 3, 0 ), 0 ),
-         HB_MAX( hb_parnidef( 4, 0 ), 0 ),
-         LR_LOADFROMFILE | LR_DEFAULTCOLOR
-              );
+         (
+            NULL,
+            lpIconName,
+            IMAGE_ICON,
+            HB_MAX( hb_parnidef( 3, 0 ), 0 ),
+            HB_MAX( hb_parnidef( 4, 0 ), 0 ),
+            LR_LOADFROMFILE | LR_DEFAULTCOLOR
+         );
    }
 
    SendMessage( hmg_par_raw_HWND( 1 ), BM_SETIMAGE, ( WPARAM ) IMAGE_ICON, ( LPARAM ) hIcon );
@@ -527,18 +527,18 @@ HB_FUNC( _SETBTNICON )
 
 HB_FUNC( _SETMIXEDBTNICON )
 {
-   BITMAP   bm;
-   ICONINFO sIconInfo;
+   BITMAP            bm;
+   ICONINFO          sIconInfo;
 
 #ifndef UNICODE
-   LPCSTR lpIconName = hb_parc( 2 );
+   LPCSTR            lpIconName = hb_parc( 2 );
 #else
-   LPWSTR lpIconName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR            lpIconName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   HIMAGELIST       himl;
-   BUTTON_IMAGELIST bi;
+   HIMAGELIST        himl;
+   BUTTON_IMAGELIST  bi;
 
-   HICON hIcon = ( HICON ) LoadImage( GetResources(), lpIconName, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR );
+   HICON             hIcon = ( HICON ) LoadImage( GetResources(), lpIconName, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR );
 
    if( hIcon == NULL )
    {
@@ -547,7 +547,7 @@ HB_FUNC( _SETMIXEDBTNICON )
 
    GetIconInfo( hIcon, &sIconInfo );
 
-   GetObject( sIconInfo.hbmColor, sizeof( BITMAP ), ( LPVOID ) &bm );
+   GetObject( sIconInfo.hbmColor, sizeof( BITMAP ), ( LPVOID ) & bm );
 
    if( sIconInfo.hbmMask )
    {
@@ -565,14 +565,14 @@ HB_FUNC( _SETMIXEDBTNICON )
 
    DestroyIcon( hIcon );
 
-   bi.himl          = himl;
-   bi.margin.left   = 10;
-   bi.margin.top    = 10;
+   bi.himl = himl;
+   bi.margin.left = 10;
+   bi.margin.top = 10;
    bi.margin.bottom = 10;
-   bi.margin.right  = 10;
-   bi.uAlign        = 4;
+   bi.margin.right = 10;
+   bi.uAlign = 4;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) &bi );
+   SendMessage( hmg_par_raw_HWND( 1 ), BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) & bi );
 
    RegisterResource( himl, "IMAGELIST" );
    hmg_ret_raw_HANDLE( himl );
@@ -584,12 +584,12 @@ HB_FUNC( _SETMIXEDBTNICON )
 
 HB_FUNC( DRAWBUTTON )
 {
-   DRAWITEMSTRUCT * pps = hmg_par_raw_DITEMSTRUCT( 4 );
+   DRAWITEMSTRUCT *pps = hmg_par_raw_DITEMSTRUCT( 4 );
 
-   UINT iFocus     = hb_parni( 2 );
-   UINT iState     = hb_parni( 3 );
-   UINT iMouseOver = hb_parni( 5 );
-   UINT iFlat      = hb_parni( 6 );
+   UINT           iFocus = hb_parni( 2 );
+   UINT           iState = hb_parni( 3 );
+   UINT           iMouseOver = hb_parni( 5 );
+   UINT           iFlat = hb_parni( 6 );
 
    if( iFocus == 1 || iMouseOver == 1 )
    {
@@ -600,8 +600,8 @@ HB_FUNC( DRAWBUTTON )
 
    if( iFocus == 1 )
    {
-      HPEN   OldPen   = ( HPEN ) SelectObject( pps->hDC, GetStockObject( BLACK_PEN ) );
-      HBRUSH OldBrush = ( HBRUSH ) SelectObject( pps->hDC, GetStockObject( NULL_BRUSH ) );
+      HPEN     OldPen = ( HPEN ) SelectObject( pps->hDC, GetStockObject( BLACK_PEN ) );
+      HBRUSH   OldBrush = ( HBRUSH ) SelectObject( pps->hDC, GetStockObject( NULL_BRUSH ) );
 
       InflateRect( &pps->rcItem, 1, 1 );
       Rectangle( pps->hDC, pps->rcItem.left, pps->rcItem.top, pps->rcItem.right, pps->rcItem.bottom );
@@ -616,7 +616,7 @@ HB_FUNC( DRAWBUTTON )
  */
 HB_FUNC( GETOWNBTNHANDLE )
 {
-   DRAWITEMSTRUCT * pps = hmg_par_raw_DITEMSTRUCT( 1 );
+   DRAWITEMSTRUCT *pps = hmg_par_raw_DITEMSTRUCT( 1 );
 
    if( pps )
    {
@@ -629,7 +629,7 @@ HB_FUNC( GETOWNBTNHANDLE )
  */
 HB_FUNC( GETOWNBTNSTATE )
 {
-   DRAWITEMSTRUCT * pps = hmg_par_raw_DITEMSTRUCT( 1 );
+   DRAWITEMSTRUCT *pps = hmg_par_raw_DITEMSTRUCT( 1 );
 
    if( pps )
    {
@@ -642,7 +642,7 @@ HB_FUNC( GETOWNBTNSTATE )
  */
 HB_FUNC( GETOWNBTNDC )
 {
-   DRAWITEMSTRUCT * pps = hmg_par_raw_DITEMSTRUCT( 1 );
+   DRAWITEMSTRUCT *pps = hmg_par_raw_DITEMSTRUCT( 1 );
 
    if( pps )
    {
@@ -655,7 +655,7 @@ HB_FUNC( GETOWNBTNDC )
  */
 HB_FUNC( GETOWNBTNITEMID )
 {
-   DRAWITEMSTRUCT * pps = hmg_par_raw_DITEMSTRUCT( 1 );
+   DRAWITEMSTRUCT *pps = hmg_par_raw_DITEMSTRUCT( 1 );
 
    if( pps )
    {
@@ -668,7 +668,7 @@ HB_FUNC( GETOWNBTNITEMID )
  */
 HB_FUNC( GETOWNBTNITEMACTION )
 {
-   DRAWITEMSTRUCT * pps = hmg_par_raw_DITEMSTRUCT( 1 );
+   DRAWITEMSTRUCT *pps = hmg_par_raw_DITEMSTRUCT( 1 );
 
    if( pps )
    {
@@ -681,7 +681,7 @@ HB_FUNC( GETOWNBTNITEMACTION )
  */
 HB_FUNC( GETOWNBTNCTLTYPE )
 {
-   DRAWITEMSTRUCT * pps = hmg_par_raw_DITEMSTRUCT( 1 );
+   DRAWITEMSTRUCT *pps = hmg_par_raw_DITEMSTRUCT( 1 );
 
    if( pps )
    {
@@ -694,10 +694,10 @@ HB_FUNC( GETOWNBTNCTLTYPE )
  */
 HB_FUNC( GETOWNBTNRECT )
 {
-   PHB_ITEM aMetr       = hb_itemArrayNew( 4 );
-   DRAWITEMSTRUCT * pps = hmg_par_raw_DITEMSTRUCT( 1 );
+   PHB_ITEM       aMetr = hb_itemArrayNew( 4 );
+   DRAWITEMSTRUCT *pps = hmg_par_raw_DITEMSTRUCT( 1 );
 
-   RECT rc = pps->rcItem;
+   RECT           rc = pps->rcItem;
 
    HB_arraySetNL( aMetr, 1, rc.left );
    HB_arraySetNL( aMetr, 2, rc.top );
@@ -709,10 +709,10 @@ HB_FUNC( GETOWNBTNRECT )
 
 LRESULT CALLBACK OwnButtonProc( HWND hButton, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-   static PHB_SYMB pSymbol = NULL;
-   LRESULT         r;
-   TRACKMOUSEEVENT tme;
-   WNDPROC         OldWndProc;
+   static PHB_SYMB   pSymbol = NULL;
+   LRESULT           r;
+   TRACKMOUSEEVENT   tme;
+   WNDPROC           OldWndProc;
 
    OldWndProc = ( WNDPROC ) ( HB_PTRUINT ) GetProp( hButton, TEXT( "oldbtnproc" ) );
 
@@ -728,13 +728,13 @@ LRESULT CALLBACK OwnButtonProc( HWND hButton, UINT Msg, WPARAM wParam, LPARAM lP
          break;
 
       case WM_MOUSEMOVE:
-         tme.cbSize      = sizeof( TRACKMOUSEEVENT );
-         tme.dwFlags     = TME_LEAVE;
-         tme.hwndTrack   = hButton;
+         tme.cbSize = sizeof( TRACKMOUSEEVENT );
+         tme.dwFlags = TME_LEAVE;
+         tme.hwndTrack = hButton;
          tme.dwHoverTime = 0;
          _TrackMouseEvent( &tme );
 
-         if( ! pSymbol )
+         if( !pSymbol )
          {
             pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OBTNEVENTS" ) );
          }
@@ -752,10 +752,10 @@ LRESULT CALLBACK OwnButtonProc( HWND hButton, UINT Msg, WPARAM wParam, LPARAM lP
 
          r = hmg_par_LRESULT( -1 );
 
-         return ( r != 0 ) ? r : DefWindowProc( hButton, Msg, wParam, lParam );
+         return( r != 0 ) ? r : DefWindowProc( hButton, Msg, wParam, lParam );
 
       case WM_MOUSELEAVE:
-         if( ! pSymbol )
+         if( !pSymbol )
          {
             pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OBTNEVENTS" ) );
          }
@@ -773,7 +773,7 @@ LRESULT CALLBACK OwnButtonProc( HWND hButton, UINT Msg, WPARAM wParam, LPARAM lP
 
          r = hmg_par_LRESULT( -1 );
 
-         return ( r != 0 ) ? r : DefWindowProc( hButton, Msg, wParam, lParam );
+         return( r != 0 ) ? r : DefWindowProc( hButton, Msg, wParam, lParam );
    }
 
    return CallWindowProc( OldWndProc, hButton, Msg, wParam, lParam );
@@ -784,7 +784,7 @@ LRESULT CALLBACK OwnButtonProc( HWND hButton, UINT Msg, WPARAM wParam, LPARAM lP
  */
 HB_FUNC( CREATEBUTTONBRUSH )
 {
-   HBRUSH hBrush = CreateGradientBrush( hmg_par_raw_HDC( 1 ), hb_parni( 2 ), hb_parni( 3 ), hmg_par_COLORREF( 4 ), hmg_par_COLORREF( 5 ) );
+   HBRUSH   hBrush = CreateGradientBrush( hmg_par_raw_HDC( 1 ), hb_parni( 2 ), hb_parni( 3 ), hmg_par_COLORREF( 4 ), hmg_par_COLORREF( 5 ) );
 
    RegisterResource( hBrush, "BRUSH" );
    hmg_ret_raw_HBRUSH( hBrush );
@@ -792,13 +792,13 @@ HB_FUNC( CREATEBUTTONBRUSH )
 
 static HBRUSH CreateGradientBrush( HDC hDC, INT nWidth, INT nHeight, COLORREF Color1, COLORREF Color2 )
 {
-   HDC     hDCComp;
-   HBITMAP hBitmap;
-   HBRUSH  hBrush, hBrushOld, hBrushPat;
-   RECT    rcF;
-   int     r1, g1, b1, r2, g2, b2;
-   int     nCount;
-   int     i;
+   HDC      hDCComp;
+   HBITMAP  hBitmap;
+   HBRUSH   hBrush, hBrushOld, hBrushPat;
+   RECT     rcF;
+   int      r1, g1, b1, r2, g2, b2;
+   int      nCount;
+   int      i;
 
    r1 = GetRValue( Color1 );
    g1 = GetGValue( Color1 );
@@ -811,15 +811,15 @@ static HBRUSH CreateGradientBrush( HDC hDC, INT nWidth, INT nHeight, COLORREF Co
    hBitmap = CreateCompatibleBitmap( hDC, nWidth, nHeight );
    SelectObject( hDCComp, hBitmap );
 
-   rcF.left   = 0;
-   rcF.top    = 0;
-   rcF.right  = nWidth;
+   rcF.left = 0;
+   rcF.top = 0;
+   rcF.right = nWidth;
    rcF.bottom = nHeight;
-   nCount     = ( int ) ceil( ( double ) ( ( nWidth > nHeight ) ? nHeight : nWidth ) / 2 );
+   nCount = ( int ) ceil( ( double ) ( ( nWidth > nHeight ) ? nHeight : nWidth ) / 2 );
 
    for( i = 0; i < nCount; i++ )
    {
-      hBrush    = CreateSolidBrush( RGB( r1 + ( i * ( r2 - r1 ) / nCount ), g1 + ( i * ( g2 - g1 ) / nCount ), b1 + ( i * ( b2 - b1 ) / nCount ) ) );
+      hBrush = CreateSolidBrush( RGB( r1 + ( i * ( r2 - r1 ) / nCount ), g1 + ( i * ( g2 - g1 ) / nCount ), b1 + ( i * ( b2 - b1 ) / nCount ) ) );
       hBrushOld = SelectObject( hDCComp, hBrush );
       FillRect( hDCComp, &rcF, hBrush );
       SelectObject( hDCComp, hBrushOld );
@@ -836,13 +836,13 @@ static HBRUSH CreateGradientBrush( HDC hDC, INT nWidth, INT nHeight, COLORREF Co
    return hBrushPat;
 }
 
-HIMAGELIST HMG_SetButtonImageList( HWND hButton, const char * FileName, int Transparent, UINT uAlign )
+HIMAGELIST HMG_SetButtonImageList( HWND hButton, const char *FileName, int Transparent, UINT uAlign )
 {
-   HBITMAP          hBitmap;
-   HIMAGELIST       hImageList;
-   BITMAP           Bmp;
-   BUTTON_IMAGELIST bi;
-   TCHAR TempPathFileName[ MAX_PATH ];
+   HBITMAP           hBitmap;
+   HIMAGELIST        hImageList;
+   BITMAP            Bmp;
+   BUTTON_IMAGELIST  bi;
+   TCHAR             TempPathFileName[MAX_PATH];
 
    hBitmap = HMG_LoadPicture( FileName, -1, -1, NULL, 0, 0, -1, 0, HB_TRUE, 255 );
    if( hBitmap == NULL )
@@ -860,40 +860,40 @@ HIMAGELIST HMG_SetButtonImageList( HWND hButton, const char * FileName, int Tran
    if( Transparent == 1 )
    {
       hImageList = ImageList_LoadImage
-                   (
-         GetResources(),
-         TempPathFileName,
-         Bmp.bmWidth,
-         6,
-         CLR_DEFAULT,
-         IMAGE_BITMAP,
-         LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT
-                   );
+         (
+            GetResources(),
+            TempPathFileName,
+            Bmp.bmWidth,
+            6,
+            CLR_DEFAULT,
+            IMAGE_BITMAP,
+            LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT
+         );
    }
    else
    {
       hImageList = ImageList_LoadImage
-                   (
-         GetResources(),
-         TempPathFileName,
-         Bmp.bmWidth,
-         6,
-         CLR_NONE,
-         IMAGE_BITMAP,
-         LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS
-                   );
+         (
+            GetResources(),
+            TempPathFileName,
+            Bmp.bmWidth,
+            6,
+            CLR_NONE,
+            IMAGE_BITMAP,
+            LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS
+         );
    }
 
    DeleteFile( TempPathFileName );
 
-   bi.himl          = hImageList;
-   bi.margin.left   = 10;
-   bi.margin.top    = 10;
+   bi.himl = hImageList;
+   bi.margin.left = 10;
+   bi.margin.top = 10;
    bi.margin.bottom = 10;
-   bi.margin.right  = 10;
-   bi.uAlign        = uAlign;
+   bi.margin.right = 10;
+   bi.uAlign = uAlign;
 
-   SendMessage( hButton, BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) &bi );
+   SendMessage( hButton, BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) & bi );
 
    return hImageList;
 }

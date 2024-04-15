@@ -10,11 +10,11 @@
 #define APP_TITLE   'HMG GetBox Demo. '
 
 *-----------------------------
-Function MAIN( FontSize, FontName )
+Function Main( FontSize, FontName )
 *-----------------------------
-   LOCAL a, h, o, cFontName, nFontSize
+   LOCAL a, h, cFontName, nFontSize
    LOCAL cBrwFont, nBrwFont, nStbSize
-   LOCAL Width_Keybrd
+   LOCAL Width_Keybrd, oGet, oGet2
 
    If Empty(FontSize)              // Default
 
@@ -26,12 +26,12 @@ Function MAIN( FontSize, FontName )
       a := hb_ATokens(FontSize, ',')
       ASize(a, 2)
       FontSize := a[1]
-      FontName := iif( empty(a[2]), Nil, a[2] )
+      FontName := iif( Empty(a[2]), Nil, a[2] )
 
    EndIf
 
-   FontName    := hb_defaultvalue(FontName   , 'MS Sans Serif')
-   FontSize    := hb_defaultvalue(FontSize   ,  '10')
+   FontName    := hb_defaultvalue(FontName, 'MS Sans Serif')
+   FontSize    := hb_defaultvalue(FontSize, '10')
 
    cFontName    := FontName
    nFontSize    := val(FontSize   )
@@ -54,11 +54,8 @@ Function MAIN( FontSize, FontName )
    SET ShowDetailError ON
    SET DELETED ON
    SET BROWSESYNC ON
-   SET CENTERWINDOW RELATIVE PARENT
 
-   // -----------------------------
    SET OOP ON
-   // -----------------------------
 
    SET FONT TO cFontName, nFontSize
 
@@ -70,6 +67,9 @@ Function MAIN( FontSize, FontName )
    DEFINE FONT font_0  FONTNAME cFontName SIZE nFontSize
    DEFINE FONT font_1  FONTNAME cBrwFont  SIZE nBrwFont
    DEFINE FONT DlgFont FONTNAME "Tahoma"  SIZE nFontSize
+
+   // font for functions HMG_Alert() è Alert...()
+   DEFINE FONT DlgFont FONTNAME "DejaVu Sans Mono" SIZE 13
 
    OPEN_TABLE()
 
@@ -150,7 +150,10 @@ Function MAIN( FontSize, FontName )
       :O:nTop2  := :T
       :O:nLeft2 := :L + :O:nDefLen + :GapsWidth * 3
 
-      DEFINE GETBOX Text_1 // Alternate Syntax
+      _HMG_InplaceParentHandle := ThisWindow.Handle
+
+      /*  
+      DEFINE GETBOX Text_1 // Alternate Syntax - option 1
         ROW  ( :Y := :T )
         COL  ( :X := :L )
         WIDTH  :W(1.5)
@@ -164,25 +167,57 @@ Function MAIN( FontSize, FontName )
         ON INIT {|og| :Y += This.Height + :GapsHeight,  ;
                                           This.Alignment := 'CENTER', ;
                                           Set_KeyEvent(og) }
-      END GETBOX //OBJECT oGet
+      END GETBOX */
 
-      @ :Y, :X GETBOX Text_2 ;
+      DEFINE GETBOX Text_1    // Alternate Syntax - option 2
+        ROW  ( :Y := :T )
+        COL  ( :X := :L )
+        WIDTH  :W(1.5)
+        HEIGHT :H1
+        VALUE DATE()
+        PICTURE '@K'
+        TOOLTIP "Date Value: Must be greater or equal to "+DTOC(DATE())
+        MESSAGE "Date Value"
+        ON INIT {|og| :Y += This.Height + :GapsHeight,  ;
+                                          This.Alignment := 'CENTER', ;
+                                          Set_KeyEvent(og) }
+      END GETBOX OBJECT oGet
+
+      oGet:PostBlock := {|| Compare(This.value, This.Name) }
+
+      /*  
+      @ :Y, :X GETBOX Text_2 ;      // option 1
                WIDTH  :O:nDefLen ;
                HEIGHT :H1 ;
                VALUE 57639 ;
                ACTION MsgInfo( "Button Action");
-               TOOLTIP {"Numeric input. RANGE -100,200000 PICTURE @Z 99,999.99","Button ToolTip"};
+               TOOLTIP {"Numeric input. RANGE -100,200000 PICTURE @Z 999,999.99","Button ToolTip"};
                BUTTONWIDTH :H1 ;
-               PICTURE '@Z 99,999.99';
+               PICTURE '@Z 999,999.99';
                RANGE -100,200000;
                BOLD;
                MESSAGE "Numeric input";
                VALIDMESSAGE "Value between -100 and 200000 "  ;
                ON INIT {|og| :Y += This.Height + :GapsHeight, ;
+                                   Set_KeyEvent(og) } */
+
+      @ :Y, :X GETBOX Text_2 OBJ oGet2 ;     // option 2
+               WIDTH  :O:nDefLen ;
+               HEIGHT :H1 ;
+               VALUE 57639 ;
+               ACTION MsgInfo( "Button Action");
+               TOOLTIP {"Numeric input. RANGE -100,200000 PICTURE @Z 999,999.99","Button ToolTip"};
+               BUTTONWIDTH :H1 ;
+               PICTURE '@Z 999,999.99';
+               BOLD;
+               MESSAGE "Numeric input";
+               ON INIT {|og| :Y += This.Height + :GapsHeight, ;
                                    Set_KeyEvent(og) }
 
+      oGet2:PostBlock := {|| CompareNumeric(This.value, This.Name) }  // option 2
+
         h := Max(:H1, 24)
-      @ :Y, :X GETBOX Text_3 OBJ o WIDTH :O:nDefLen HEIGHT h ;
+      @ :Y, :X GETBOX Text_3 WIDTH :O:nDefLen HEIGHT h ;
                VALUE 10 ;
                ACTION  _wPost(3, , {This.Name, +1}) ;
                ACTION2 _wPost(3, , {This.Name, -1}) ;
@@ -261,7 +296,6 @@ Function MAIN( FontSize, FontName )
 
         :Y := This.Text_1.Row
         :X := :O:nLeft2
-//               WIDTHS {70,60,99,50};
       @ :Y, :X BROWSE Browse_1 ;
                WIDTH    :O:nBrwLen ;
                HEIGHT ( :O:nTop2 - :T + :GapsHeight * .5 ) ;
@@ -308,6 +342,7 @@ Function MAIN( FontSize, FontName )
           ON INIT {|og| :Y += This.Height + :GapsHeight, ;
                                       Set_KeyEvent(og) }
       END GETBOX
+
         :X := :O:nLeft2
       @ :Y, :X LABEL Label_1c VALUE "Char." WIDTH :O:nBrwSayLen HEIGHT :H1 BOLD ;
                ON INIT {|| :X += This.Width + :GapsWidth * 2 }
@@ -367,8 +402,8 @@ Function MAIN( FontSize, FontName )
 
    END WINDOW
 
-   Form_1.Center
-   Form_1.Activate
+   Form_1.Center()
+   Form_1.Activate()
 
 Return NIL
 
@@ -585,12 +620,38 @@ Function DBTESTCREATE(ufile)
 Return NIL
 
 *-----------------------------
-Function Compare(dDate)
+Function Compare(dDate, cName)
 *-----------------------------
-   if empty(dDate) .or. dDate < date()
-      return .f.
+   Local lRet := .F.
+
+   if !empty(dDate) .and. year(dDate) == year(date())
+      lRet := .T.
+   else
+      Define timer timer_1 ;
+		of form_1 ;
+		interval 50 ;
+		action ( C_Center( FindWindowEx( ,,, "Error -> " + cName ), form_1.timer_1.release ) ) once
+
+      AlertStop( "Must be greater or equal to "+hb_ntos(year(DATE())), "Error -> " + cName )
    endif
-return .t.
+return lRet
+
+*-----------------------------
+Function CompareNumeric(nVal, cName)
+*-----------------------------
+   Local lRet := .F.
+
+   if nVal > - 100.01 .and. nVal < 200000.01
+      lRet := .T.
+   else
+      Define timer timer_2 ;
+		of form_1 ;
+		interval 50 ;
+		action ( C_Center( FindWindowEx( ,,, "Error -> " + cName ) ), form_1.timer_2.release ) once
+
+      AlertStop( "Value between -100 or 200000 !", "Error -> " + cName )
+   endif
+return lRet
 
 *-----------------------------
 Function _Trans(xval)

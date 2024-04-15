@@ -21,15 +21,15 @@ DECLARE_FUNCPTR( GdipGetImageThumbnail );
 DECLARE_FUNCPTR( GdipCreateBitmapFromHBITMAP );
 DECLARE_FUNCPTR( GdipSaveImageToFile );
 
-HMODULE g_GpModule         = NULL;
-static ULONG_PTR g_GpToken = 0;
+HMODULE           g_GpModule = NULL;
+static ULONG_PTR  g_GpToken = 0;
 
 /**
  */
 GpStatus GdiplusInit( void )
 {
-   LPCTSTR lpFileName = TEXT( "Gdiplus.dll" );
-   GDIPLUS_STARTUP_INPUT GdiplusStartupInput = { 1, NULL, FALSE, FALSE };
+   LPCTSTR                 lpFileName = TEXT( "Gdiplus.dll" );
+   GDIPLUS_STARTUP_INPUT   GdiplusStartupInput = { 1, NULL, FALSE, FALSE };
 
    if( NULL == g_GpModule )
    {
@@ -119,11 +119,11 @@ HB_FUNC( GDIPLUSSHUTDOWN )
 
 HB_FUNC( GDIPCREATEBITMAPFROMFILE )
 {
-   GpBitmap * bitmap = ( GpBitmap * ) NULL;
+   GpBitmap *bitmap = ( GpBitmap * ) NULL;
 
    if( NULL != fn_GdipCreateBitmapFromFile )
    {
-      HB_WCHAR * lpFName = ( HB_WCHAR * ) ( ( hb_parclen( 1 ) == 0 ) ? NULL : hb_mbtowc( hb_parc( 1 ) ) );
+      HB_WCHAR *lpFName = ( HB_WCHAR * ) ( ( hb_parclen( 1 ) == 0 ) ? NULL : hb_mbtowc( hb_parc( 1 ) ) );
 
       if( NULL != lpFName )
       {
@@ -146,15 +146,15 @@ HB_FUNC( GDIPCREATEBITMAPFROMFILE )
 
 HB_FUNC( GDIPCREATEHBITMAPFROMBITMAP )
 {
-   HBITMAP hbitmap = ( HBITMAP ) NULL;
+   HBITMAP  hbitmap = ( HBITMAP ) NULL;
 
    if( NULL != fn_GdipCreateHBITMAPFromBitmap )
    {
-      GpBitmap * bitmap = ( GpBitmap * ) hb_parptr( 1 );
+      GpBitmap *bitmap = ( GpBitmap * ) hb_parptr( 1 );
 
       if( NULL != bitmap )
       {
-         ARGB argb = ( ARGB ) hb_parnl( 3 );
+         ARGB  argb = ( ARGB ) hb_parnl( 3 );
 
          hb_retni( fn_GdipCreateHBITMAPFromBitmap( bitmap, &hbitmap, argb ) );
       }

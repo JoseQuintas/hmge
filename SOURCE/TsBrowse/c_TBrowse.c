@@ -1008,12 +1008,12 @@ static void GoToPoint( HDC hDC, int ix, int iy )
 
 static void DegradColor( HDC hDC, RECT *rori, COLORREF cFrom, signed long cTo )
 {
-   float    clr1r, clr1g, clr1b, clr2r, clr2g, clr2b;
-   float    iEle, iRed, iGreen, iBlue;
-   BOOL     bDir, bHoriz = cTo < 0;
-   long     iTot = ( !bHoriz ? ( rori->bottom + 2 - rori->top ) : ( rori->right + 2 - rori->left ) );
-   RECT     rct;
-   HBRUSH   hOldBrush, hBrush;
+   int    clr1r, clr1g, clr1b, clr2r, clr2g, clr2b;
+   int    iEle, iRed, iGreen, iBlue;
+   BOOL    bDir, bHoriz = cTo < 0;
+   long    iTot = ( !bHoriz ? ( rori->bottom + 2 - rori->top ) : ( rori->right + 2 - rori->left ) );
+   RECT    rct;
+   HBRUSH  hOldBrush, hBrush;
 
    rct.top = rori->top;
    rct.left = rori->left;

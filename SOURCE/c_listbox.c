@@ -49,11 +49,11 @@
 #include <windowsx.h>
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
-// Listbox Class Name
-   #define WC_LISTBOX  "ListBox"
-#endif
 
-#define TOTAL_TABS     10
+// Listbox Class Name
+#define WC_LISTBOX   "ListBox"
+#endif
+#define TOTAL_TABS   10
 
 #ifdef UNICODE
 LPWSTR      AnsiToWide( LPCSTR );
@@ -66,12 +66,12 @@ HB_FUNC( INITLISTBOX )
    HWND  hbutton;
    DWORD Style = WS_CHILD | WS_VSCROLL | LBS_DISABLENOSCROLL | LBS_NOTIFY | LBS_NOINTEGRALHEIGHT;
 
-   if( ! hb_parl( 9 ) )
+   if( !hb_parl( 9 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 10 ) )
+   if( !hb_parl( 10 ) )
    {
       Style |= WS_TABSTOP;
    }
@@ -92,20 +92,20 @@ HB_FUNC( INITLISTBOX )
    }
 
    hbutton = CreateWindowEx
-             (
-      WS_EX_CLIENTEDGE,
-      WC_LISTBOX,
-      TEXT( "" ),
-      Style,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-             );
+      (
+         WS_EX_CLIENTEDGE,
+         WC_LISTBOX,
+         TEXT( "" ),
+         Style,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    if( hb_parl( 12 ) )
    {
@@ -123,9 +123,9 @@ HB_FUNC( INITLISTBOX )
 HB_FUNC( LISTBOXADDSTRING )
 {
 #ifndef UNICODE
-   LPTSTR lpString = ( LPTSTR ) hb_parc( 2 );
+   LPTSTR   lpString = ( LPTSTR ) hb_parc( 2 );
 #else
-   LPWSTR lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
    SendMessage( hmg_par_raw_HWND( 1 ), LB_ADDSTRING, 0, ( LPARAM ) lpString );
 #ifdef UNICODE
@@ -136,9 +136,9 @@ HB_FUNC( LISTBOXADDSTRING )
 HB_FUNC( LISTBOXINSERTSTRING )
 {
 #ifndef UNICODE
-   LPTSTR lpString = ( LPTSTR ) hb_parc( 2 );
+   LPTSTR   lpString = ( LPTSTR ) hb_parc( 2 );
 #else
-   LPWSTR lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
    SendMessage( hmg_par_raw_HWND( 1 ), LB_INSERTSTRING, ( WPARAM ) hb_parni( 3 ) - 1, ( LPARAM ) lpString );
 #ifdef UNICODE
@@ -152,8 +152,8 @@ HB_FUNC( LISTBOXGETSTRING )
 #ifdef UNICODE
    LPSTR lpString;
 #endif
-   int     iLen = ( int ) SendMessage( hmg_par_raw_HWND( 1 ), LB_GETTEXTLEN, ( WPARAM ) hb_parni( 2 ) - 1, ( LPARAM ) 0 );
-   TCHAR * cString;
+   int   iLen = ( int ) SendMessage( hmg_par_raw_HWND( 1 ), LB_GETTEXTLEN, ( WPARAM ) hb_parni( 2 ) - 1, ( LPARAM ) 0 );
+   TCHAR *cString;
 
    if( iLen > 0 && NULL != ( cString = ( TCHAR * ) hb_xgrab( ( iLen + 1 ) * sizeof( TCHAR ) ) ) )
    {
@@ -177,12 +177,12 @@ HB_FUNC( INITMULTILISTBOX )
    HWND  hbutton;
    DWORD Style = LBS_EXTENDEDSEL | WS_CHILD | WS_VSCROLL | LBS_DISABLENOSCROLL | LBS_NOTIFY | LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT;
 
-   if( ! hb_parl( 9 ) )
+   if( !hb_parl( 9 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 10 ) )
+   if( !hb_parl( 10 ) )
    {
       Style |= WS_TABSTOP;
    }
@@ -203,20 +203,20 @@ HB_FUNC( INITMULTILISTBOX )
    }
 
    hbutton = CreateWindowEx
-             (
-      WS_EX_CLIENTEDGE,
-      WC_LISTBOX,
-      TEXT( "" ),
-      Style,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-             );
+      (
+         WS_EX_CLIENTEDGE,
+         WC_LISTBOX,
+         TEXT( "" ),
+         Style,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    if( hb_parl( 12 ) )
    {
@@ -228,10 +228,10 @@ HB_FUNC( INITMULTILISTBOX )
 
 HB_FUNC( LISTBOXGETMULTISEL )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
-   int  i;
-   int  buffer[ 32768 ];
-   int  n;
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
+   int   i;
+   int   buffer[32768];
+   int   n;
 
    n = ( int ) SendMessage( hwnd, LB_GETSELCOUNT, 0, 0 );
 
@@ -241,7 +241,7 @@ HB_FUNC( LISTBOXGETMULTISEL )
 
    for( i = 0; i < n; i++ )
    {
-      HB_STORNI( buffer[ i ] + 1, -1, i + 1 );
+      HB_STORNI( buffer[i] + 1, -1, i + 1 );
    }
 }
 
@@ -273,7 +273,7 @@ HB_FUNC( LISTBOXSETMULTISEL )
 HB_FUNC( LISTBOXSETMULTITAB )
 {
    PHB_ITEM wArray;
-   int      nTabStops[ TOTAL_TABS ];
+   int      nTabStops[TOTAL_TABS];
    int      l, i;
    DWORD    dwDlgBase = GetDialogBaseUnits();
    int      baseunitX = LOWORD( dwDlgBase );
@@ -284,7 +284,7 @@ HB_FUNC( LISTBOXSETMULTITAB )
 
    for( i = 0; i <= l; i++ )
    {
-      nTabStops[ i ] = MulDiv( hb_arrayGetNI( wArray, i + 1 ), 4, baseunitX );
+      nTabStops[i] = MulDiv( hb_arrayGetNI( wArray, i + 1 ), 4, baseunitX );
    }
 
    hb_retl( ListBox_SetTabStops( hmg_par_raw_HWND( 1 ), l, nTabStops ) );
@@ -292,7 +292,7 @@ HB_FUNC( LISTBOXSETMULTITAB )
 
 HB_FUNC( _GETDDLMESSAGE )
 {
-   UINT g_dDLMessage;
+   UINT  g_dDLMessage;
 
    g_dDLMessage = RegisterWindowMessage( DRAGLISTMSGSTRING );
 
@@ -301,7 +301,7 @@ HB_FUNC( _GETDDLMESSAGE )
 
 HB_FUNC( GET_DRAG_LIST_NOTIFICATION_CODE )
 {
-   LPARAM lParam        = hmg_par_raw_LPARAM( 1 );
+   LPARAM         lParam = hmg_par_raw_LPARAM( 1 );
    LPDRAGLISTINFO lpdli = ( LPDRAGLISTINFO ) lParam;
 
    hmg_ret_UINT( lpdli->uNotification );
@@ -309,7 +309,7 @@ HB_FUNC( GET_DRAG_LIST_NOTIFICATION_CODE )
 
 HB_FUNC( GET_DRAG_LIST_DRAGITEM )
 {
-   LPARAM lParam        = hmg_par_raw_LPARAM( 1 );
+   LPARAM         lParam = hmg_par_raw_LPARAM( 1 );
    LPDRAGLISTINFO lpdli = ( LPDRAGLISTINFO ) lParam;
 
    hmg_ret_NINT( LBItemFromPt( lpdli->hWnd, lpdli->ptCursor, TRUE ) );
@@ -317,23 +317,23 @@ HB_FUNC( GET_DRAG_LIST_DRAGITEM )
 
 HB_FUNC( DRAG_LIST_DRAWINSERT )
 {
-   HWND   hwnd          = hmg_par_raw_HWND( 1 );
-   LPARAM lParam        = hmg_par_raw_LPARAM( 2 );
-   int    nItem         = hb_parni( 3 );
+   HWND           hwnd = hmg_par_raw_HWND( 1 );
+   LPARAM         lParam = hmg_par_raw_LPARAM( 2 );
+   int            nItem = hb_parni( 3 );
    LPDRAGLISTINFO lpdli = ( LPDRAGLISTINFO ) lParam;
 
-   int nItemCount = ( int ) SendMessage( ( HWND ) lpdli->hWnd, LB_GETCOUNT, 0, 0 );
+   int            nItemCount = ( int ) SendMessage( ( HWND ) lpdli->hWnd, LB_GETCOUNT, 0, 0 );
 
    DrawInsert( hwnd, lpdli->hWnd, ( nItem < nItemCount ) ? nItem : -1 );
 }
 
 HB_FUNC( DRAG_LIST_MOVE_ITEMS )
 {
-   LPARAM lParam        = hmg_par_raw_LPARAM( 1 );
+   LPARAM         lParam = hmg_par_raw_LPARAM( 1 );
    LPDRAGLISTINFO lpdli = ( LPDRAGLISTINFO ) lParam;
 
-   char string[ 1024 ];
-   int  result;
+   char           string[1024];
+   int            result;
 
    result = ListBox_GetText( lpdli->hWnd, hb_parni( 2 ), string );
    if( result != LB_ERR )

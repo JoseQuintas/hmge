@@ -44,7 +44,7 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE  0x0501
+#define _WIN32_IE 0x0501
 
 #include <mgdefs.h>
 
@@ -56,7 +56,7 @@ LPSTR    WideToAnsi( LPWSTR );
 /* Grigory Filatov <gfilatov@gmail.com> HMG 18.05 */
 HB_FUNC( GETNONCLIENT )
 {
-   NONCLIENTMETRICS ncm;
+   NONCLIENTMETRICS  ncm;
 
    memset( ( char * ) &ncm, 0, sizeof( NONCLIENTMETRICS ) );
    ncm.cbSize = sizeof( NONCLIENTMETRICS );
@@ -76,9 +76,9 @@ HB_FUNC( GETNONCLIENT )
 HB_FUNC( GETNONCLIENTFONT )
 {
 #ifdef UNICODE
-   LPSTR pStr;
+   LPSTR             pStr;
 #endif
-   NONCLIENTMETRICS ncm;
+   NONCLIENTMETRICS  ncm;
 
    memset( ( char * ) &ncm, 0, sizeof( NONCLIENTMETRICS ) );
    ncm.cbSize = sizeof( NONCLIENTMETRICS );
@@ -90,52 +90,52 @@ HB_FUNC( GETNONCLIENTFONT )
    switch( hb_parni( 1 ) )
    {
       case 1:
-#ifndef UNICODE
+   #ifndef UNICODE
          HB_STORC( ncm.lfCaptionFont.lfFaceName, -1, 1 );
-#else
+   #else
          pStr = WideToAnsi( ncm.lfCaptionFont.lfFaceName );
          HB_STORC( pStr, -1, 1 );
          hb_xfree( pStr );
-#endif
+   #endif
          HB_STORNI( ( int ) -0.75 * ncm.lfCaptionFont.lfHeight, -1, 2 );
          HB_STORL( ncm.lfCaptionFont.lfWeight == 700 ? TRUE : FALSE, -1, 3 );
          HB_STORNI( ncm.lfCaptionFont.lfCharSet, -1, 4 );
          break;
 
       case 2:
-#ifndef UNICODE
+   #ifndef UNICODE
          HB_STORC( ncm.lfMenuFont.lfFaceName, -1, 1 );
-#else
+   #else
          pStr = WideToAnsi( ncm.lfMenuFont.lfFaceName );
          HB_STORC( pStr, -1, 1 );
          hb_xfree( pStr );
-#endif
+   #endif
          HB_STORNI( ( int ) -0.75 * ncm.lfMenuFont.lfHeight, -1, 2 );
          HB_STORL( ncm.lfMenuFont.lfWeight == 700 ? TRUE : FALSE, -1, 3 );
          HB_STORNI( ncm.lfMenuFont.lfCharSet, -1, 4 );
          break;
 
       case 3:
-#ifndef UNICODE
+   #ifndef UNICODE
          HB_STORC( ncm.lfStatusFont.lfFaceName, -1, 1 );
-#else
+   #else
          pStr = WideToAnsi( ncm.lfStatusFont.lfFaceName );
          HB_STORC( pStr, -1, 1 );
          hb_xfree( pStr );
-#endif
+   #endif
          HB_STORNI( ( int ) -0.75 * ncm.lfStatusFont.lfHeight, -1, 2 );
          HB_STORL( ncm.lfStatusFont.lfWeight == 700 ? TRUE : FALSE, -1, 3 );
          HB_STORNI( ncm.lfStatusFont.lfCharSet, -1, 4 );
          break;
 
       case 4:
-#ifndef UNICODE
+   #ifndef UNICODE
          HB_STORC( ncm.lfMessageFont.lfFaceName, -1, 1 );
-#else
+   #else
          pStr = WideToAnsi( ncm.lfMessageFont.lfFaceName );
          HB_STORC( pStr, -1, 1 );
          hb_xfree( pStr );
-#endif
+   #endif
          HB_STORNI( ( int ) -0.75 * ncm.lfMessageFont.lfHeight, -1, 2 );
          HB_STORL( ncm.lfMessageFont.lfWeight == 700 ? TRUE : FALSE, -1, 3 );
          HB_STORNI( ncm.lfMessageFont.lfCharSet, -1, 4 );
@@ -145,7 +145,7 @@ HB_FUNC( GETNONCLIENTFONT )
 
 HB_FUNC( SETNONCLIENT )
 {
-   NONCLIENTMETRICS ncm;
+   NONCLIENTMETRICS  ncm;
 
    memset( ( char * ) &ncm, 0, sizeof( NONCLIENTMETRICS ) );
    ncm.cbSize = sizeof( NONCLIENTMETRICS );
@@ -158,7 +158,7 @@ HB_FUNC( SETNONCLIENT )
          break;
 
       case 2:
-         ncm.iScrollWidth  = HB_MIN( 100, HB_MAX( 8, hb_parni( 2 ) ) );
+         ncm.iScrollWidth = HB_MIN( 100, HB_MAX( 8, hb_parni( 2 ) ) );
          ncm.iScrollHeight = HB_MIN( 100, HB_MAX( 8, hb_parni( 2 ) ) );
          break;
 
@@ -171,7 +171,7 @@ HB_FUNC( SETNONCLIENT )
          break;
 
       case 5:
-         ncm.iMenuWidth  = HB_MIN( 100, HB_MAX( 17, hb_parni( 2 ) ) );
+         ncm.iMenuWidth = HB_MIN( 100, HB_MAX( 17, hb_parni( 2 ) ) );
          ncm.iMenuHeight = HB_MIN( 100, HB_MAX( 17, hb_parni( 2 ) ) );
          break;
    }
@@ -182,11 +182,11 @@ HB_FUNC( SETNONCLIENT )
 HB_FUNC( SETNONCLIENTFONT )
 {
 #ifdef UNICODE
-   LPWSTR pWStr;
+   LPWSTR            pWStr;
 #endif
-   HDC hDC = GetDC( HWND_DESKTOP );
-   NONCLIENTMETRICS ncm;
-   LOGFONT          lf;
+   HDC               hDC = GetDC( HWND_DESKTOP );
+   NONCLIENTMETRICS  ncm;
+   LOGFONT           lf;
 
    memset( ( char * ) &ncm, 0, sizeof( NONCLIENTMETRICS ) );
    ncm.cbSize = sizeof( NONCLIENTMETRICS );
@@ -200,8 +200,8 @@ HB_FUNC( SETNONCLIENTFONT )
 #else
    lstrcpy( lf.lfFaceName, hb_parc( 2 ) );
 #endif
-   lf.lfHeight  = -MulDiv( hb_parni( 3 ), GetDeviceCaps( hDC, LOGPIXELSY ), 72 );
-   lf.lfWeight  = ( HB_ISLOG( 4 ) && hb_parl( 4 ) ) ? 700 : 400;
+   lf.lfHeight = -MulDiv( hb_parni( 3 ), GetDeviceCaps( hDC, LOGPIXELSY ), 72 );
+   lf.lfWeight = ( HB_ISLOG( 4 ) && hb_parl( 4 ) ) ? 700 : 400;
    lf.lfCharSet = HB_ISNIL( 5 ) ? ( BYTE ) 0 : hmg_par_BYTE( 5 );
 
    switch( hb_parni( 1 ) )

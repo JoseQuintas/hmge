@@ -49,26 +49,26 @@
    author: Copyright 2016 (C) P.Chornyj <myorg63@mail.ru>
  */
 #ifndef CINTERFACE
-   #define CINTERFACE
+#define CINTERFACE
 #endif
 #include <mgdefs.h>
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
-// Static Class Name
-   #define WC_STATIC  "Static"
-#endif
 
+// Static Class Name
+#define WC_STATIC "Static"
+#endif
 #if defined( _MSC_VER )
-   #pragma warning( push )
-   #pragma warning( disable : 4201 )   /* warning C4201: nonstandard extension used: nameless struct/union */
+#pragma warning( push )
+#pragma warning( disable : 4201 )   /* warning C4201: nonstandard extension used: nameless struct/union */
 #endif
 #include <olectl.h>
 #if defined( _MSC_VER )
-   #pragma warning( pop )
+#pragma warning( pop )
 #endif
 #ifdef __XCC__
-   #include "ocidl.h"
+#include "ocidl.h"
 #endif
 #include "hbgdiplus.h"
 #include "hbapiitm.h"
@@ -82,27 +82,27 @@
    while( 0 )
 #define LOGHIMETRIC_TO_PIXEL( hm, ppli )  MulDiv( ( hm ), ( ppli ), 2540 ) // ppli = Point per Logic Inch
 #define PIXEL_TO_LOGHIMETRIC( px, ppli )  MulDiv( ( px ), 2540, ( ppli ) ) // ppli = Point per Logic Inch
-LRESULT APIENTRY  ImageSubClassFunc( HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam );
+   LRESULT APIENTRY  ImageSubClassFunc( HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam );
 
-HB_EXPORT IStream *     HMG_CreateMemStreamFromResource( HINSTANCE instance, const char * res_type, const char * res_name );
-HB_EXPORT IStream *     HMG_CreateMemStream( const BYTE * pInit, UINT cbInitSize );
+HB_EXPORT IStream    *HMG_CreateMemStreamFromResource( HINSTANCE instance, const char *res_type, const char *res_name );
+HB_EXPORT IStream    *HMG_CreateMemStream( const BYTE *pInit, UINT cbInitSize );
 HB_EXPORT HBITMAP    HMG_GdiCreateHBITMAP( HDC hDC_mem, int width, int height, WORD iBitCount );
 
-HB_EXPORT HBITMAP    HMG_LoadImage( const char * pszImageName, const char * pszTypeOfRes );
+HB_EXPORT HBITMAP    HMG_LoadImage( const char *pszImageName, const char *pszTypeOfRes );
 HB_EXPORT HBITMAP    HMG_LoadPicture
-(
-   const char *   pszName,
-   int width,
-   int height,
-   HWND hWnd,
-   int ScaleStretch,
-   int Transparent,
-   long BackgroundColor,
-   int AdjustImage,
-   HB_BOOL bAlphaFormat,
-   int iAlpfaConstant
-);
-HB_EXPORT HBITMAP    HMG_OleLoadPicturePath( const char * pszURLorPath );
+                     (
+                        const char  *pszName,
+                        int         width,
+                        int         height,
+                        HWND        hWnd,
+                        int         ScaleStretch,
+                        int         Transparent,
+                        long        BackgroundColor,
+                        int         AdjustImage,
+                        HB_BOOL     bAlphaFormat,
+                        int         iAlpfaConstant
+                     );
+HB_EXPORT HBITMAP    HMG_OleLoadPicturePath( const char *pszURLorPath );
 
 #ifdef UNICODE
 LPWSTR               AnsiToWide( LPCSTR );
@@ -112,19 +112,19 @@ HINSTANCE            GetResources( void );
 // Minigui Resources control system
 void                 RegisterResource( HANDLE hResource, LPCSTR szType );
 
-static WNDPROC s_Image_WNDPROC;
-static char *  MimeTypeOld;
-static int     s_nWidth, s_nHeight;
+static WNDPROC       s_Image_WNDPROC;
+static char          *MimeTypeOld;
+static int           s_nWidth, s_nHeight;
 
-HB_EXPORT IStream * HMG_CreateMemStreamFromResource( HINSTANCE hinstance, const char * res_name, const char * res_type )
+HB_EXPORT IStream *HMG_CreateMemStreamFromResource( HINSTANCE hinstance, const char *res_name, const char *res_type )
 {
-   HRSRC     resource;
-   DWORD     res_size;
-   HGLOBAL   res_global;
-   void *    res_data;
-   wchar_t * res_nameW;
-   wchar_t * res_typeW;
-   IStream * stream;
+   HRSRC    resource;
+   DWORD    res_size;
+   HGLOBAL  res_global;
+   void     *res_data;
+   wchar_t  *res_nameW;
+   wchar_t  *res_typeW;
+   IStream  *stream;
 
    if( NULL == res_name || NULL == res_type )
    {
@@ -144,7 +144,7 @@ HB_EXPORT IStream * HMG_CreateMemStreamFromResource( HINSTANCE hinstance, const 
       return NULL;
    }
 
-   res_size   = SizeofResource( hinstance, resource );
+   res_size = SizeofResource( hinstance, resource );
    res_global = LoadResource( hinstance, resource );
 
    if( NULL == res_global )
@@ -164,14 +164,14 @@ HB_EXPORT IStream * HMG_CreateMemStreamFromResource( HINSTANCE hinstance, const 
    return stream;
 }
 
-HB_EXPORT IStream * HMG_CreateMemStream( const BYTE * pInit, UINT cbInitSize )
+HB_EXPORT IStream *HMG_CreateMemStream( const BYTE *pInit, UINT cbInitSize )
 {
-   HMODULE   hShlDll = LoadLibrary( TEXT( "shlwapi.dll" ) );
-   IStream * stream  = NULL;
+   HMODULE  hShlDll = LoadLibrary( TEXT( "shlwapi.dll" ) );
+   IStream  *stream = NULL;
 
    if( NULL != hShlDll )
    {
-      typedef IStream * ( __stdcall * SHCreateMemStreamPtr )( const BYTE * pInit, UINT cbInitSize );
+      typedef IStream * ( __stdcall * SHCreateMemStreamPtr ) ( const BYTE *pInit, UINT cbInitSize );
 
       SHCreateMemStreamPtr f_SHCreateMemStream = ( SHCreateMemStreamPtr ) wapi_GetProcAddress( hShlDll, ( LPCSTR ) 12 );
 
@@ -188,33 +188,33 @@ HB_EXPORT IStream * HMG_CreateMemStream( const BYTE * pInit, UINT cbInitSize )
 
 HB_EXPORT HBITMAP HMG_GdiCreateHBITMAP( HDC hDC_mem, int width, int height, WORD iBitCount )
 {
-   LPBYTE     pBits;
-   HBITMAP    hBitmap;
-   BITMAPINFO BI;
+   LPBYTE      pBits;
+   HBITMAP     hBitmap;
+   BITMAPINFO  BI;
 
-   BI.bmiHeader.biSize          = sizeof( BITMAPINFOHEADER );
-   BI.bmiHeader.biWidth         = width;
-   BI.bmiHeader.biHeight        = height;
-   BI.bmiHeader.biPlanes        = 1;
-   BI.bmiHeader.biBitCount      = iBitCount;
-   BI.bmiHeader.biCompression   = BI_RGB; // TODO
-   BI.bmiHeader.biSizeImage     = 0;
+   BI.bmiHeader.biSize = sizeof( BITMAPINFOHEADER );
+   BI.bmiHeader.biWidth = width;
+   BI.bmiHeader.biHeight = height;
+   BI.bmiHeader.biPlanes = 1;
+   BI.bmiHeader.biBitCount = iBitCount;
+   BI.bmiHeader.biCompression = BI_RGB;   // TODO
+   BI.bmiHeader.biSizeImage = 0;
    BI.bmiHeader.biXPelsPerMeter = 0;
    BI.bmiHeader.biYPelsPerMeter = 0;
-   BI.bmiHeader.biClrUsed       = 0;
-   BI.bmiHeader.biClrImportant  = 0;
+   BI.bmiHeader.biClrUsed = 0;
+   BI.bmiHeader.biClrImportant = 0;
 
    hBitmap = CreateDIBSection( hDC_mem, ( BITMAPINFO * ) &BI, DIB_RGB_COLORS, ( VOID ** ) &pBits, NULL, 0 );
 
    return hBitmap;
 }
 
-static HBITMAP HMG_GdipLoadBitmap( const char * res_name, const char * res_type )
+static HBITMAP HMG_GdipLoadBitmap( const char *res_name, const char *res_type )
 {
-   HBITMAP    hBitmap  = ( HBITMAP ) NULL;
-   GpStatus   status   = GenericError;
-   GpBitmap * gpBitmap = NULL;
-   wchar_t *  res_nameW;
+   HBITMAP  hBitmap = ( HBITMAP ) NULL;
+   GpStatus status = GenericError;
+   GpBitmap *gpBitmap = NULL;
+   wchar_t  *res_nameW;
 
    if( NULL == res_name )
    {
@@ -230,7 +230,7 @@ static HBITMAP HMG_GdipLoadBitmap( const char * res_name, const char * res_type 
 
    if( Ok != status && NULL != res_type )
    {
-      IStream * stream;
+      IStream  *stream;
 
       stream = HMG_CreateMemStreamFromResource( GetResources(), res_name, res_type );
 
@@ -252,7 +252,7 @@ static HBITMAP HMG_GdipLoadBitmap( const char * res_name, const char * res_type 
 
    if( Ok == status )
    {
-      ARGB BkColor = 0xFF000000UL;        // TODO
+      ARGB  BkColor = 0xFF000000UL;       // TODO
       if( NULL != fn_GdipCreateHBITMAPFromBitmap )
       {
          fn_GdipCreateHBITMAPFromBitmap( gpBitmap, &hBitmap, BkColor );
@@ -275,18 +275,18 @@ LRESULT APIENTRY ImageSubClassFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
 
    if( Msg == WM_MOUSEMOVE || Msg == WM_MOUSELEAVE )
    {
-      static PHB_SYMB pSymbol = NULL;
-      LRESULT         r       = 0;
+      static PHB_SYMB   pSymbol = NULL;
+      LRESULT           r = 0;
 
       if( Msg == WM_MOUSEMOVE )
       {
          if( bMouseTracking == FALSE )
          {
-            TRACKMOUSEEVENT tme;
+            TRACKMOUSEEVENT   tme;
 
-            tme.cbSize      = sizeof( TRACKMOUSEEVENT );
-            tme.dwFlags     = TME_LEAVE;
-            tme.hwndTrack   = hWnd;
+            tme.cbSize = sizeof( TRACKMOUSEEVENT );
+            tme.dwFlags = TME_LEAVE;
+            tme.hwndTrack = hWnd;
             tme.dwHoverTime = HOVER_DEFAULT;
 
             bMouseTracking = _TrackMouseEvent( &tme );
@@ -297,7 +297,7 @@ LRESULT APIENTRY ImageSubClassFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
          bMouseTracking = FALSE;
       }
 
-      if( ! pSymbol )
+      if( !pSymbol )
       {
          pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OLABELEVENTS" ) );
       }
@@ -317,7 +317,7 @@ LRESULT APIENTRY ImageSubClassFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
          hb_vmRequestRestore();
       }
 
-      return ( r != 0 ) ? r : CallWindowProc( s_Image_WNDPROC, hWnd, 0, 0, 0 );
+      return( r != 0 ) ? r : CallWindowProc( s_Image_WNDPROC, hWnd, 0, 0, 0 );
    }
 
    bMouseTracking = FALSE;
@@ -330,7 +330,7 @@ HB_FUNC( INITIMAGE )
    HWND  hWnd;
    DWORD Style = WS_CHILD | SS_BITMAP;
 
-   if( ! hb_parl( 5 ) )
+   if( !hb_parl( 5 ) )
    {
       Style |= WS_VISIBLE;
    }
@@ -352,28 +352,28 @@ HB_FUNC( INITIMAGE )
 
 HB_FUNC( C_SETPICTURE )
 {
-   HWND    hWnd    = hmg_par_raw_HWND( 1 );
-   HBITMAP hBitmap = NULL;
+   HWND     hWnd = hmg_par_raw_HWND( 1 );
+   HBITMAP  hBitmap = NULL;
 
    if( IsWindow( hWnd ) && ( hb_parclen( 2 ) > 0 ) )
    {
       hBitmap = HMG_LoadPicture
-                (
-         hb_parc( 2 ),                 // Filename, resource or URL
-         hb_parni( 3 ),                // Width
-         hb_parni( 4 ),                // Height
-         hWnd,                         // Handle of parent window
-         hb_parni( 5 ),                // Scale factor
-         hb_parni( 6 ),                // Transparent
-         hb_parnl( 7 ),                // BackColor
-         hb_parni( 8 ),                // Adjust factor
-         hb_parldef( 9, HB_FALSE ),    // Bitmap with alpha channel
-         hb_parnidef( 10, 255 )
-                );
+         (
+            hb_parc( 2 ),                 // Filename, resource or URL
+            hb_parni( 3 ),                // Width
+            hb_parni( 4 ),                // Height
+            hWnd,          // Handle of parent window
+            hb_parni( 5 ), // Scale factor
+            hb_parni( 6 ), // Transparent
+            hb_parnl( 7 ), // BackColor
+            hb_parni( 8 ), // Adjust factor
+            hb_parldef( 9, HB_FALSE ), // Bitmap with alpha channel
+            hb_parnidef( 10, 255 )
+         );
 
       if( hBitmap != NULL )
       {
-         HBITMAP hOldBitmap = ( HBITMAP ) SendMessage( hWnd, STM_SETIMAGE, ( WPARAM ) IMAGE_BITMAP, ( LPARAM ) hBitmap );
+         HBITMAP  hOldBitmap = ( HBITMAP ) SendMessage( hWnd, STM_SETIMAGE, ( WPARAM ) IMAGE_BITMAP, ( LPARAM ) hBitmap );
          RegisterResource( hBitmap, "BMP" );
 
          if( hOldBitmap != NULL )
@@ -388,24 +388,24 @@ HB_FUNC( C_SETPICTURE )
 
 HB_FUNC( LOADIMAGE )
 {
-   HWND    hWnd    = HB_ISNIL( 2 ) ? GetActiveWindow() : hmg_par_raw_HWND( 2 );
-   HBITMAP hBitmap = NULL;
+   HWND     hWnd = HB_ISNIL( 2 ) ? GetActiveWindow() : hmg_par_raw_HWND( 2 );
+   HBITMAP  hBitmap = NULL;
 
    if( hb_parclen( 1 ) > 0 )
    {
       hBitmap = HMG_LoadPicture
-                (
-         hb_parc( 1 ),                 // Filename, resource or URL
-         hb_parnidef( 3, -1 ),         // Width
-         hb_parnidef( 4, -1 ),         // Height
-         hWnd,                         // Handle of parent window
-         hb_parnidef( 5, 1 ),          // Scale factor
-         hb_parnidef( 6, 1 ),          // Transparent
-         hb_parnldef( 7, -1 ),         // BackColor
-         hb_parnidef( 8, 0 ),          // Adjust factor
-         hb_parldef( 9, HB_FALSE ),    // Bitmap with alpha channel
-         hb_parnidef( 10, 255 )
-                );
+         (
+            hb_parc( 1 ),              // Filename, resource or URL
+            hb_parnidef( 3, -1 ),      // Width
+            hb_parnidef( 4, -1 ),      // Height
+            hWnd,                   // Handle of parent window
+            hb_parnidef( 5, 1 ),    // Scale factor
+            hb_parnidef( 6, 1 ),    // Transparent
+            hb_parnldef( 7, -1 ),   // BackColor
+            hb_parnidef( 8, 0 ),    // Adjust factor
+            hb_parldef( 9, HB_FALSE ), // Bitmap with alpha channel
+            hb_parnidef( 10, 255 )
+         );
 
       if( hBitmap != NULL )
       {
@@ -418,7 +418,7 @@ HB_FUNC( LOADIMAGE )
 
 HB_FUNC( C_GETRESPICTURE )
 {
-   HBITMAP hBitmap;
+   HBITMAP  hBitmap;
 
    hBitmap = HMG_LoadImage( hb_parc( 1 ), hb_parc( 2 ) );
 
@@ -433,9 +433,9 @@ HB_FUNC( C_GETRESPICTURE )
 //****************************************************************************************************************
 // HMG_LoadImage (const char *FileName) -> hBitmap (Load: JPG, GIF, ICO, TIF, PNG, WMF)
 //****************************************************************************************************************
-HB_EXPORT HBITMAP HMG_LoadImage( const char * pszImageName, const char * pszTypeOfRes )
+HB_EXPORT HBITMAP HMG_LoadImage( const char *pszImageName, const char *pszTypeOfRes )
 {
-   HBITMAP hBitmap;
+   HBITMAP  hBitmap;
 
    HB_SYMBOL_UNUSED( pszTypeOfRes );
 
@@ -486,36 +486,36 @@ HB_EXPORT HBITMAP HMG_LoadImage( const char * pszImageName, const char * pszType
 //****************************************************************************************************************
 HB_EXPORT HBITMAP HMG_LoadPicture
 (
-   const char *   pszName,
-   int width,
-   int height,
-   HWND hWnd,
-   int ScaleStretch,
-   int Transparent,
-   long BackgroundColor,
-   int AdjustImage,
-   HB_BOOL bAlphaFormat,
-   int iAlphaConstant
+   const char  *pszName,
+   int         width,
+   int         height,
+   HWND        hWnd,
+   int         ScaleStretch,
+   int         Transparent,
+   long        BackgroundColor,
+   int         AdjustImage,
+   HB_BOOL     bAlphaFormat,
+   int         iAlphaConstant
 )
 {
-   UINT    fuLoad = ( Transparent == 0 ) ? LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS : LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT;
-   HBITMAP old_hBitmap, new_hBitmap, hBitmap_old, hBitmap_new = NULL;
-   RECT    rect, rect2;
-   BITMAP  bm;
-   LONG    bmWidth, bmHeight;
-   HDC     hDC, memDC1, memDC2;
+   UINT     fuLoad = ( Transparent == 0 ) ? LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS : LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT;
+   HBITMAP  old_hBitmap, new_hBitmap, hBitmap_old, hBitmap_new = NULL;
+   RECT     rect, rect2;
+   BITMAP   bm;
+   LONG     bmWidth, bmHeight;
+   HDC      hDC, memDC1, memDC2;
 
    if( NULL == pszName )
    {
       return NULL;
    }
 
-   if( bAlphaFormat == HB_FALSE )       // Firstly find BMP image in resourses (.EXE file)
+   if( bAlphaFormat == HB_FALSE )      // Firstly find BMP image in resourses (.EXE file)
    {
 #ifndef UNICODE
-      LPCSTR lpImageName = pszName;
+      LPCSTR   lpImageName = pszName;
 #else
-      LPWSTR lpImageName = AnsiToWide( ( char * ) pszName );
+      LPWSTR   lpImageName = AnsiToWide( ( char * ) pszName );
 #endif
       hBitmap_new = ( HBITMAP ) LoadImage( GetResources(), lpImageName, IMAGE_BITMAP, 0, 0, fuLoad );
 
@@ -549,7 +549,7 @@ HB_EXPORT HBITMAP HMG_LoadPicture
    }
 
    GetObject( hBitmap_new, sizeof( BITMAP ), &bm );
-   bmWidth  = bm.bmWidth;
+   bmWidth = bm.bmWidth;
    bmHeight = bm.bmHeight;
 
    if( width < 0 )
@@ -575,7 +575,7 @@ HB_EXPORT HBITMAP HMG_LoadPicture
 
    SetRect( &rect2, 0, 0, rect.right, rect.bottom );
 
-   hDC    = GetDC( hWnd );
+   hDC = GetDC( hWnd );
    memDC1 = CreateCompatibleDC( hDC );
    memDC2 = CreateCompatibleDC( hDC );
 
@@ -592,13 +592,13 @@ HB_EXPORT HBITMAP HMG_LoadPicture
 
       if( AdjustImage == 1 )
       {
-         width  = ( long ) rect.right;
+         width = ( long ) rect.right;
          height = ( long ) rect.bottom;
       }
       else  // Center Image
       {
          rect.left = ( int ) ( width - rect.right ) / 2;
-         rect.top  = ( int ) ( height - rect.bottom ) / 2;
+         rect.top = ( int ) ( height - rect.bottom ) / 2;
       }
    }
 
@@ -612,7 +612,7 @@ HB_EXPORT HBITMAP HMG_LoadPicture
    }
    else
    {
-      HBRUSH hBrush = CreateSolidBrush( BackgroundColor );
+      HBRUSH   hBrush = CreateSolidBrush( BackgroundColor );
 
       FillRect( memDC2, &rect2, hBrush );
       DeleteObject( hBrush );
@@ -639,14 +639,10 @@ HB_EXPORT HBITMAP HMG_LoadPicture
    {
       // TransparentBlt is supported for source bitmaps of 4 bits per pixel and 8 bits per pixel.
       // Use AlphaBlend to specify 32 bits-per-pixel bitmaps with transparency.
-      BLENDFUNCTION ftn;
+      BLENDFUNCTION  ftn;
 
-      if( bAlphaFormat )
-      {
-         ftn.AlphaFormat = AC_SRC_ALPHA;
-      }
-
-      ftn.BlendOp    = AC_SRC_OVER;
+      ftn.AlphaFormat = ( BYTE ) ( bAlphaFormat ? AC_SRC_ALPHA : 0 );
+      ftn.BlendOp = AC_SRC_OVER;
       ftn.BlendFlags = 0;
       ftn.SourceConstantAlpha = ( BYTE ) iAlphaConstant;
 
@@ -673,14 +669,13 @@ HB_EXPORT HBITMAP HMG_LoadPicture
 // HMG_OleLoadPicturePath( pszURLorPath ) -> hBitmap
 // (stream must be in BMP (bitmap), JPEG, WMF (metafile), ICO (icon), or GIF format)
 //*************************************************************************************************
-HB_EXPORT HBITMAP HMG_OleLoadPicturePath( const char * pszURLorPath )
+HB_EXPORT HBITMAP HMG_OleLoadPicturePath( const char *pszURLorPath )
 {
-   IPicture * iPicture = NULL;
-   HRESULT    hres     = E_FAIL;
-   HBITMAP    hBitmap  = NULL;
-   HDC        memDC;
-   LONG       hmWidth, hmHeight;                // HiMetric
-
+   IPicture *iPicture = NULL;
+   HRESULT  hres = E_FAIL;
+   HBITMAP  hBitmap = NULL;
+   HDC      memDC;
+   LONG     hmWidth, hmHeight;                  // HiMetric
    if( NULL != pszURLorPath )
    {
       LPOLESTR lpURLorPath = ( LPOLESTR ) ( LPCTSTR ) hb_mbtowc( pszURLorPath );
@@ -706,7 +701,7 @@ HB_EXPORT HBITMAP HMG_OleLoadPicturePath( const char * pszURLorPath )
       SetBrushOrgEx( memDC, Point.x, Point.y, NULL );
 
       // Convert HiMetric to Pixel
-      pxWidth  = LOGHIMETRIC_TO_PIXEL( hmWidth, GetDeviceCaps( memDC, LOGPIXELSX ) );
+      pxWidth = LOGHIMETRIC_TO_PIXEL( hmWidth, GetDeviceCaps( memDC, LOGPIXELSX ) );
       pxHeight = LOGHIMETRIC_TO_PIXEL( hmHeight, GetDeviceCaps( memDC, LOGPIXELSY ) );
 
       hBitmap = HMG_GdiCreateHBITMAP( memDC, pxWidth, pxHeight, 32 );
@@ -730,9 +725,8 @@ HB_EXPORT HBITMAP HMG_OleLoadPicturePath( const char * pszURLorPath )
  */
 HB_FUNC( GPLUSGETENCODERSNUM )
 {
-   UINT num  = 0;                               // number of image encoders
-   UINT size = 0;                               // size of the image encoder array in bytes
-
+   UINT  num = 0;                               // number of image encoders
+   UINT  size = 0;                              // size of the image encoder array in bytes
    fn_GdipGetImageEncodersSize( &num, &size );
 
    hmg_ret_UINT( num );
@@ -740,8 +734,8 @@ HB_FUNC( GPLUSGETENCODERSNUM )
 
 HB_FUNC( GPLUSGETENCODERSSIZE )
 {
-   UINT num  = 0;
-   UINT size = 0;
+   UINT  num = 0;
+   UINT  size = 0;
 
    fn_GdipGetImageEncodersSize( &num, &size );
 
@@ -750,13 +744,13 @@ HB_FUNC( GPLUSGETENCODERSSIZE )
 
 HB_FUNC( GPLUSGETENCODERSMIMETYPE )
 {
-   UINT num  = 0;
-   UINT size = 0;
-   UINT i;
-   ImageCodecInfo * pImageCodecInfo;
-   PHB_ITEM         pResult = hb_itemArrayNew( 0 );
-   PHB_ITEM         pItem;
-   char * RecvMimeType;
+   UINT           num = 0;
+   UINT           size = 0;
+   UINT           i;
+   ImageCodecInfo *pImageCodecInfo;
+   PHB_ITEM       pResult = hb_itemArrayNew( 0 );
+   PHB_ITEM       pItem;
+   char           *RecvMimeType;
 
    fn_GdipGetImageEncodersSize( &num, &size );
 
@@ -789,7 +783,7 @@ HB_FUNC( GPLUSGETENCODERSMIMETYPE )
 
    for( i = 0; i < num; ++i )
    {
-      WideCharToMultiByte( CP_ACP, 0, pImageCodecInfo[ i ].MimeType, -1, RecvMimeType, size, NULL, NULL );
+      WideCharToMultiByte( CP_ACP, 0, pImageCodecInfo[i].MimeType, -1, RecvMimeType, size, NULL, NULL );
 
       pItem = hb_itemPutC( NULL, RecvMimeType );
 
@@ -806,14 +800,14 @@ HB_FUNC( GPLUSGETENCODERSMIMETYPE )
    hb_itemReturnRelease( pResult );
 }
 
-static BOOL GetEnCodecClsid( const char * MimeType, CLSID * Clsid )
+static BOOL GetEnCodecClsid( const char *MimeType, CLSID *Clsid )
 {
-   UINT num  = 0;
-   UINT size = 0;
-   ImageCodecInfo * pImageCodecInfo;
-   UINT   CodecIndex;
-   char * RecvMimeType;
-   BOOL   bFounded = FALSE;
+   UINT           num = 0;
+   UINT           size = 0;
+   ImageCodecInfo *pImageCodecInfo;
+   UINT           CodecIndex;
+   char           *RecvMimeType;
+   BOOL           bFounded = FALSE;
 
    hb_xmemset( Clsid, 0, sizeof( CLSID ) );
 
@@ -850,7 +844,7 @@ static BOOL GetEnCodecClsid( const char * MimeType, CLSID * Clsid )
 
    for( CodecIndex = 0; CodecIndex < num; ++CodecIndex )
    {
-      WideCharToMultiByte( CP_ACP, 0, pImageCodecInfo[ CodecIndex ].MimeType, -1, RecvMimeType, size, NULL, NULL );
+      WideCharToMultiByte( CP_ACP, 0, pImageCodecInfo[CodecIndex].MimeType, -1, RecvMimeType, size, NULL, NULL );
 
       if( strcmp( MimeType, RecvMimeType ) == 0 )
       {
@@ -861,7 +855,7 @@ static BOOL GetEnCodecClsid( const char * MimeType, CLSID * Clsid )
 
    if( bFounded )
    {
-      CopyMemory( Clsid, &pImageCodecInfo[ CodecIndex ].Clsid, sizeof( CLSID ) );
+      CopyMemory( Clsid, &pImageCodecInfo[CodecIndex].Clsid, sizeof( CLSID ) );
    }
 
    hb_xfree( pImageCodecInfo );
@@ -870,10 +864,10 @@ static BOOL GetEnCodecClsid( const char * MimeType, CLSID * Clsid )
    return bFounded ? TRUE : FALSE;
 }
 
-BOOL SaveHBitmapToFile( void * HBitmap, const char * FileName, unsigned int Width, unsigned int Height, const char * MimeType, ULONG JpgQuality )
+BOOL SaveHBitmapToFile( void *HBitmap, const char *FileName, unsigned int Width, unsigned int Height, const char *MimeType, ULONG JpgQuality )
 {
-   GpBitmap *        GBitmap;
-   GpBitmap *        GBitmapThumbnail;
+   GpBitmap          *GBitmap;
+   GpBitmap          *GBitmapThumbnail;
    LPWSTR            WFileName;
    static CLSID      Clsid;
    EncoderParameters EncoderParameters;
@@ -886,7 +880,7 @@ BOOL SaveHBitmapToFile( void * HBitmap, const char * FileName, unsigned int Widt
 
    if( MimeTypeOld == NULL )
    {
-      if( ! GetEnCodecClsid( MimeType, &Clsid ) )
+      if( !GetEnCodecClsid( MimeType, &Clsid ) )
       {
          HB_GPLUS_MSG_ERROR( "Wrong MimeType" );
          return FALSE;
@@ -908,7 +902,7 @@ BOOL SaveHBitmapToFile( void * HBitmap, const char * FileName, unsigned int Widt
       {
          LocalFree( MimeTypeOld );
 
-         if( ! GetEnCodecClsid( MimeType, &Clsid ) )
+         if( !GetEnCodecClsid( MimeType, &Clsid ) )
          {
             HB_GPLUS_MSG_ERROR( "Wrong MimeType" );
             return FALSE;
@@ -928,20 +922,20 @@ BOOL SaveHBitmapToFile( void * HBitmap, const char * FileName, unsigned int Widt
 
    ZeroMemory( &EncoderParameters, sizeof( EncoderParameters ) );
    EncoderParameters.Count = 1;
-   EncoderParameters.Parameter[ 0 ].Guid.Data1      = 0x1d5be4b5;
-   EncoderParameters.Parameter[ 0 ].Guid.Data2      = 0xfa4a;
-   EncoderParameters.Parameter[ 0 ].Guid.Data3      = 0x452d;
-   EncoderParameters.Parameter[ 0 ].Guid.Data4[ 0 ] = 0x9c;
-   EncoderParameters.Parameter[ 0 ].Guid.Data4[ 1 ] = 0xdd;
-   EncoderParameters.Parameter[ 0 ].Guid.Data4[ 2 ] = 0x5d;
-   EncoderParameters.Parameter[ 0 ].Guid.Data4[ 3 ] = 0xb3;
-   EncoderParameters.Parameter[ 0 ].Guid.Data4[ 4 ] = 0x51;
-   EncoderParameters.Parameter[ 0 ].Guid.Data4[ 5 ] = 0x05;
-   EncoderParameters.Parameter[ 0 ].Guid.Data4[ 6 ] = 0xe7;
-   EncoderParameters.Parameter[ 0 ].Guid.Data4[ 7 ] = 0xeb;
-   EncoderParameters.Parameter[ 0 ].NumberOfValues  = 1;
-   EncoderParameters.Parameter[ 0 ].Type  = 4;
-   EncoderParameters.Parameter[ 0 ].Value = ( void * ) &JpgQuality;
+   EncoderParameters.Parameter[0].Guid.Data1 = 0x1d5be4b5;
+   EncoderParameters.Parameter[0].Guid.Data2 = 0xfa4a;
+   EncoderParameters.Parameter[0].Guid.Data3 = 0x452d;
+   EncoderParameters.Parameter[0].Guid.Data4[0] = 0x9c;
+   EncoderParameters.Parameter[0].Guid.Data4[1] = 0xdd;
+   EncoderParameters.Parameter[0].Guid.Data4[2] = 0x5d;
+   EncoderParameters.Parameter[0].Guid.Data4[3] = 0xb3;
+   EncoderParameters.Parameter[0].Guid.Data4[4] = 0x51;
+   EncoderParameters.Parameter[0].Guid.Data4[5] = 0x05;
+   EncoderParameters.Parameter[0].Guid.Data4[6] = 0xe7;
+   EncoderParameters.Parameter[0].Guid.Data4[7] = 0xeb;
+   EncoderParameters.Parameter[0].NumberOfValues = 1;
+   EncoderParameters.Parameter[0].Type = 4;
+   EncoderParameters.Parameter[0].Value = ( void * ) &JpgQuality;
 
    GBitmap = 0;
 
@@ -993,7 +987,7 @@ BOOL SaveHBitmapToFile( void * HBitmap, const char * FileName, unsigned int Widt
 
 HB_FUNC( C_SAVEHBITMAPTOFILE )
 {
-   HBITMAP hbmp = hmg_par_raw_HBITMAP( 1 );
+   HBITMAP  hbmp = hmg_par_raw_HBITMAP( 1 );
 
    hb_retl( SaveHBitmapToFile( ( void * ) hbmp, hb_parc( 2 ), hmg_par_UINT( 3 ), hmg_par_UINT( 4 ), hb_parc( 5 ), ( ULONG ) hb_parnl( 6 ) ) );
 }
@@ -1010,9 +1004,9 @@ HB_FUNC( C_SAVEHBITMAPTOFILE )
 //*************************************************************************************************
 typedef struct
 {
-   WORD idReserved;                             // must be 0
-   WORD idType;                                 // 1 = ICON, 2 = CURSOR
-   WORD idCount;                                // number of images (and ICONDIRs)
+   WORD  idReserved;                            // must be 0
+   WORD  idType;                                // 1 = ICON, 2 = CURSOR
+   WORD  idCount;                               // number of images (and ICONDIRs)
 } ICONHEADER;
 
 //*************************************************************************************************
@@ -1037,7 +1031,7 @@ typedef struct
 //*************************************************************************************************
 typedef struct
 {
-   BITMAPINFOHEADER biHeader;                   // header for color bitmap (no mask header)
+   BITMAPINFOHEADER  biHeader;                  // header for color bitmap (no mask header)
 } ICONIMAGE;
 
 //*************************************************************************************************
@@ -1045,16 +1039,16 @@ typedef struct
 //*************************************************************************************************
 static UINT WriteIconHeader( HANDLE hFile, int nImages )
 {
-   ICONHEADER iconheader;
-   UINT       nWritten;
+   ICONHEADER  iconheader;
+   UINT        nWritten;
 
    // Setup the icon header
    iconheader.idReserved = 0;                   // Must be 0
-   iconheader.idType     = 1;                   // Type 1 = ICON  (type 2 = CURSOR)
-   iconheader.idCount    = ( WORD ) nImages;    // number of ICONDIRs
+   iconheader.idType = 1;                       // Type 1 = ICON  (type 2 = CURSOR)
+   iconheader.idCount = ( WORD ) nImages;       // number of ICONDIRs
 
    // Write the header to disk
-   WriteFile( hFile, ( LPVOID ) &iconheader, sizeof( iconheader ), ( LPDWORD ) &nWritten, NULL );
+   WriteFile( hFile, ( LPVOID ) & iconheader, sizeof( iconheader ), ( LPDWORD ) & nWritten, NULL );
 
    // following ICONHEADER is a series of ICONDIR structures (idCount of them, in fact)
    return nWritten;
@@ -1063,15 +1057,15 @@ static UINT WriteIconHeader( HANDLE hFile, int nImages )
 //*************************************************************************************************
 // Return the number of BYTES the bitmap will take ON DISK
 //*************************************************************************************************
-static UINT NumBitmapBytes( BITMAP * pBitmap )
+static UINT NumBitmapBytes( BITMAP *pBitmap )
 {
-   int nWidthBytes = pBitmap->bmWidthBytes;
+   int   nWidthBytes = pBitmap->bmWidthBytes;
 
    // bitmap scanlines MUST be a multiple of 4 bytes when stored
    // inside a bitmap resource, so round up if necessary
    if( nWidthBytes & 3 )
    {
-      nWidthBytes = ( nWidthBytes + 4 ) & ~3;
+      nWidthBytes = ( nWidthBytes + 4 ) &~3;
    }
 
    return nWidthBytes * pBitmap->bmHeight;
@@ -1080,11 +1074,11 @@ static UINT NumBitmapBytes( BITMAP * pBitmap )
 //*************************************************************************************************
 // Return number of bytes written
 //*************************************************************************************************
-static UINT WriteIconImageHeader( HANDLE hFile, BITMAP * pbmpColor, BITMAP * pbmpMask )
+static UINT WriteIconImageHeader( HANDLE hFile, BITMAP *pbmpColor, BITMAP *pbmpMask )
 {
-   BITMAPINFOHEADER biHeader;
-   UINT nWritten;
-   UINT nImageBytes;
+   BITMAPINFOHEADER  biHeader;
+   UINT              nWritten;
+   UINT              nImageBytes;
 
    // calculate how much space the COLOR and MASK bitmaps take
    nImageBytes = NumBitmapBytes( pbmpColor ) + NumBitmapBytes( pbmpMask );
@@ -1093,15 +1087,15 @@ static UINT WriteIconImageHeader( HANDLE hFile, BITMAP * pbmpColor, BITMAP * pbm
    ZeroMemory( &biHeader, sizeof( biHeader ) );
 
    // Fill in only those fields that are necessary
-   biHeader.biSize      = sizeof( biHeader );
-   biHeader.biWidth     = pbmpColor->bmWidth;
-   biHeader.biHeight    = pbmpColor->bmHeight * 2; // height of color+mono
-   biHeader.biPlanes    = pbmpColor->bmPlanes;
-   biHeader.biBitCount  = pbmpColor->bmBitsPixel;
+   biHeader.biSize = sizeof( biHeader );
+   biHeader.biWidth = pbmpColor->bmWidth;
+   biHeader.biHeight = pbmpColor->bmHeight * 2; // height of color+mono
+   biHeader.biPlanes = pbmpColor->bmPlanes;
+   biHeader.biBitCount = pbmpColor->bmBitsPixel;
    biHeader.biSizeImage = nImageBytes;
 
    // write the BITMAPINFOHEADER
-   WriteFile( hFile, ( LPVOID ) &biHeader, sizeof( biHeader ), ( LPDWORD ) &nWritten, NULL );
+   WriteFile( hFile, ( LPVOID ) & biHeader, sizeof( biHeader ), ( LPDWORD ) & nWritten, NULL );
 
    return nWritten;
 }
@@ -1109,19 +1103,19 @@ static UINT WriteIconImageHeader( HANDLE hFile, BITMAP * pbmpColor, BITMAP * pbm
 //*************************************************************************************************
 // Wrapper around GetIconInfo and GetObject(BITMAP)
 //*************************************************************************************************
-static BOOL GetIconBitmapInfo( HICON hIcon, ICONINFO * pIconInfo, BITMAP * pbmpColor, BITMAP * pbmpMask )
+static BOOL GetIconBitmapInfo( HICON hIcon, ICONINFO *pIconInfo, BITMAP *pbmpColor, BITMAP *pbmpMask )
 {
-   if( ! GetIconInfo( hIcon, pIconInfo ) )
+   if( !GetIconInfo( hIcon, pIconInfo ) )
    {
       return FALSE;
    }
 
-   if( ! GetObject( pIconInfo->hbmColor, sizeof( BITMAP ), pbmpColor ) )
+   if( !GetObject( pIconInfo->hbmColor, sizeof( BITMAP ), pbmpColor ) )
    {
       return FALSE;
    }
 
-   if( ! GetObject( pIconInfo->hbmMask, sizeof( BITMAP ), pbmpMask ) )
+   if( !GetObject( pIconInfo->hbmMask, sizeof( BITMAP ), pbmpMask ) )
    {
       return FALSE;
    }
@@ -1137,12 +1131,12 @@ static UINT WriteIconDirectoryEntry( HANDLE hFile, HICON hIcon, UINT nImageOffse
    ICONINFO iconInfo;
    ICONDIR  iconDir;
 
-   BITMAP bmpColor;
-   BITMAP bmpMask;
+   BITMAP   bmpColor;
+   BITMAP   bmpMask;
 
-   UINT nWritten;
-   UINT nColorCount;
-   UINT nImageBytes;
+   UINT     nWritten;
+   UINT     nColorCount;
+   UINT     nImageBytes;
 
    GetIconBitmapInfo( hIcon, &iconInfo, &bmpColor, &bmpMask );
 
@@ -1158,17 +1152,17 @@ static UINT WriteIconDirectoryEntry( HANDLE hFile, HICON hIcon, UINT nImageOffse
    }
 
    // Create the ICONDIR structure
-   iconDir.bWidth        = ( BYTE ) bmpColor.bmWidth;
-   iconDir.bHeight       = ( BYTE ) bmpColor.bmHeight;
-   iconDir.bColorCount   = ( BYTE ) nColorCount;
-   iconDir.bReserved     = 0;
-   iconDir.wPlanes       = bmpColor.bmPlanes;
-   iconDir.wBitCount     = bmpColor.bmBitsPixel;
-   iconDir.dwBytesInRes  = sizeof( BITMAPINFOHEADER ) + nImageBytes;
+   iconDir.bWidth = ( BYTE ) bmpColor.bmWidth;
+   iconDir.bHeight = ( BYTE ) bmpColor.bmHeight;
+   iconDir.bColorCount = ( BYTE ) nColorCount;
+   iconDir.bReserved = 0;
+   iconDir.wPlanes = bmpColor.bmPlanes;
+   iconDir.wBitCount = bmpColor.bmBitsPixel;
+   iconDir.dwBytesInRes = sizeof( BITMAPINFOHEADER ) + nImageBytes;
    iconDir.dwImageOffset = nImageOffset;
 
    // Write to disk
-   WriteFile( hFile, ( LPVOID ) &iconDir, sizeof( iconDir ), ( LPDWORD ) &nWritten, NULL );
+   WriteFile( hFile, ( LPVOID ) & iconDir, sizeof( iconDir ), ( LPDWORD ) & nWritten, NULL );
 
    // Free resources
    DeleteObject( iconInfo.hbmColor );
@@ -1179,12 +1173,12 @@ static UINT WriteIconDirectoryEntry( HANDLE hFile, HICON hIcon, UINT nImageOffse
 
 static UINT WriteIconData( HANDLE hFile, HBITMAP hBitmap )
 {
-   BITMAP bmp;
-   int    i;
-   BYTE * pIconData;
+   BITMAP   bmp;
+   int      i;
+   BYTE     *pIconData;
 
-   UINT nBitmapBytes;
-   UINT nWritten;
+   UINT     nBitmapBytes;
+   UINT     nWritten;
 
    GetObject( hBitmap, sizeof( BITMAP ), &bmp );
 
@@ -1204,9 +1198,9 @@ static UINT WriteIconData( HANDLE hFile, HBITMAP hBitmap )
       WriteFile
       (
          hFile,
-         pIconData + ( i * bmp.bmWidthBytes ), // calculate offset to the line
-         bmp.bmWidthBytes,                     // 1 line of BYTES
-         ( LPDWORD ) &nWritten,
+         pIconData + ( i * bmp.bmWidthBytes ),  // calculate offset to the line
+         bmp.bmWidthBytes, // 1 line of BYTES
+         ( LPDWORD ) & nWritten,
          NULL
       );
 
@@ -1214,7 +1208,7 @@ static UINT WriteIconData( HANDLE hFile, HBITMAP hBitmap )
       if( bmp.bmWidthBytes & 3 )
       {
          DWORD padding = 0;
-         WriteFile( hFile, ( LPVOID ) &padding, 4 - bmp.bmWidthBytes, ( LPDWORD ) &nWritten, NULL );
+         WriteFile( hFile, ( LPVOID ) & padding, 4 - bmp.bmWidthBytes, ( LPDWORD ) & nWritten, NULL );
       }
    }
 
@@ -1226,11 +1220,11 @@ static UINT WriteIconData( HANDLE hFile, HBITMAP hBitmap )
 //*************************************************************************************************
 // Create a .ICO file, using the specified array of HICON images
 //*************************************************************************************************
-BOOL SaveIconToFile( TCHAR * szIconFile, HICON hIcon[], int nNumIcons )
+BOOL SaveIconToFile( TCHAR *szIconFile, HICON hIcon[], int nNumIcons )
 {
-   HANDLE hFile;
-   int    i;
-   int *  pImageOffset;
+   HANDLE   hFile;
+   int      i;
+   int      *pImageOffset;
 
    if( hIcon == 0 || nNumIcons < 1 )
    {
@@ -1265,10 +1259,10 @@ BOOL SaveIconToFile( TCHAR * szIconFile, HICON hIcon[], int nNumIcons )
       ICONINFO iconInfo;
       BITMAP   bmpColor, bmpMask;
 
-      GetIconBitmapInfo( hIcon[ i ], &iconInfo, &bmpColor, &bmpMask );
+      GetIconBitmapInfo( hIcon[i], &iconInfo, &bmpColor, &bmpMask );
 
       // record the file-offset of the icon image for when we write the icon directories
-      pImageOffset[ i ] = SetFilePointer( hFile, 0, 0, FILE_CURRENT );
+      pImageOffset[i] = SetFilePointer( hFile, 0, 0, FILE_CURRENT );
 
       // bitmapinfoheader + colortable
       WriteIconImageHeader( hFile, &bmpColor, &bmpMask );
@@ -1288,7 +1282,7 @@ BOOL SaveIconToFile( TCHAR * szIconFile, HICON hIcon[], int nNumIcons )
 
    for( i = 0; i < nNumIcons; i++ )
    {
-      WriteIconDirectoryEntry( hFile, hIcon[ i ], pImageOffset[ i ] );
+      WriteIconDirectoryEntry( hFile, hIcon[i], pImageOffset[i] );
    }
 
    free( pImageOffset );
@@ -1305,21 +1299,21 @@ BOOL SaveIconToFile( TCHAR * szIconFile, HICON hIcon[], int nNumIcons )
 HB_FUNC( C_SAVEHICONTOFILE )
 {
 #ifndef UNICODE
-   TCHAR * szIconFile = ( TCHAR * ) hb_parc( 1 );
+   TCHAR    *szIconFile = ( TCHAR * ) hb_parc( 1 );
 #else
-   TCHAR * szIconFile = ( TCHAR * ) AnsiToWide( ( char * ) hb_parc( 1 ) );
+   TCHAR    *szIconFile = ( TCHAR * ) AnsiToWide( ( char * ) hb_parc( 1 ) );
 #endif
-   HICON    hIcon[ 9 ];
+   HICON    hIcon[9];
    PHB_ITEM pArray = hb_param( 2, HB_IT_ARRAY );
    int      nLen;
 
    if( pArray && ( ( nLen = ( int ) hb_arrayLen( pArray ) ) > 0 ) )
    {
-      int i;
+      int   i;
 
       for( i = 0; i < nLen; i++ )
       {
-         hIcon[ i ] = ( HICON ) ( LONG_PTR ) hb_arrayGetNL( pArray, i + 1 );
+         hIcon[i] = ( HICON ) ( LONG_PTR ) hb_arrayGetNL( pArray, i + 1 );
       }
 
       hmg_ret_L( SaveIconToFile( szIconFile, hIcon, hb_parnidef( 3, nLen ) ) );
@@ -1327,7 +1321,7 @@ HB_FUNC( C_SAVEHICONTOFILE )
       // clean up
       for( i = 0; i < nLen; i++ )
       {
-         DestroyIcon( hIcon[ i ] );
+         DestroyIcon( hIcon[i] );
       }
    }
    else
@@ -1340,43 +1334,43 @@ HB_FUNC( C_SAVEHICONTOFILE )
 #endif
 }
 
-BOOL bmp_SaveFile( HBITMAP hBitmap, TCHAR * FileName )
+BOOL bmp_SaveFile( HBITMAP hBitmap, TCHAR *FileName )
 {
-   HGLOBAL hBits;
-   LPBYTE  lp_hBits;
-   HANDLE  hFile;
-   HDC     memDC;
-   BITMAPFILEHEADER BIFH;
-   BITMAPINFO       Bitmap_Info;
-   BITMAP bm;
-   DWORD  nBytes_Bits, nBytes_Written;
-   BOOL   ret;
+   HGLOBAL           hBits;
+   LPBYTE            lp_hBits;
+   HANDLE            hFile;
+   HDC               memDC;
+   BITMAPFILEHEADER  BIFH;
+   BITMAPINFO        Bitmap_Info;
+   BITMAP            bm;
+   DWORD             nBytes_Bits, nBytes_Written;
+   BOOL              ret;
 
    memDC = CreateCompatibleDC( NULL );
    SelectObject( memDC, hBitmap );
-   GetObject( hBitmap, sizeof( BITMAP ), ( LPBYTE ) &bm );
+   GetObject( hBitmap, sizeof( BITMAP ), ( LPBYTE ) & bm );
 
-   bm.bmBitsPixel  = 24;
+   bm.bmBitsPixel = 24;
    bm.bmWidthBytes = ( bm.bmWidth * bm.bmBitsPixel + 31 ) / 32 * 4;
-   nBytes_Bits     = ( DWORD ) ( bm.bmWidthBytes * labs( bm.bmHeight ) );
+   nBytes_Bits = ( DWORD ) ( bm.bmWidthBytes * labs( bm.bmHeight ) );
 
-   BIFH.bfType      = ( 'M' << 8 ) + 'B';
-   BIFH.bfSize      = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + nBytes_Bits;
+   BIFH.bfType = ( 'M' << 8 ) + 'B';
+   BIFH.bfSize = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + nBytes_Bits;
    BIFH.bfReserved1 = 0;
    BIFH.bfReserved2 = 0;
-   BIFH.bfOffBits   = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER );
+   BIFH.bfOffBits = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER );
 
-   Bitmap_Info.bmiHeader.biSize          = sizeof( BITMAPINFOHEADER );
-   Bitmap_Info.bmiHeader.biWidth         = bm.bmWidth;
-   Bitmap_Info.bmiHeader.biHeight        = bm.bmHeight;
-   Bitmap_Info.bmiHeader.biPlanes        = 1;
-   Bitmap_Info.bmiHeader.biBitCount      = 24;
-   Bitmap_Info.bmiHeader.biCompression   = BI_RGB;
-   Bitmap_Info.bmiHeader.biSizeImage     = 0;
+   Bitmap_Info.bmiHeader.biSize = sizeof( BITMAPINFOHEADER );
+   Bitmap_Info.bmiHeader.biWidth = bm.bmWidth;
+   Bitmap_Info.bmiHeader.biHeight = bm.bmHeight;
+   Bitmap_Info.bmiHeader.biPlanes = 1;
+   Bitmap_Info.bmiHeader.biBitCount = 24;
+   Bitmap_Info.bmiHeader.biCompression = BI_RGB;
+   Bitmap_Info.bmiHeader.biSizeImage = 0;
    Bitmap_Info.bmiHeader.biXPelsPerMeter = 0;
    Bitmap_Info.bmiHeader.biYPelsPerMeter = 0;
-   Bitmap_Info.bmiHeader.biClrUsed       = 0;
-   Bitmap_Info.bmiHeader.biClrImportant  = 0;
+   Bitmap_Info.bmiHeader.biClrUsed = 0;
+   Bitmap_Info.bmiHeader.biClrImportant = 0;
 
    hBits = GlobalAlloc( GHND, ( DWORD ) nBytes_Bits );
    if( hBits == NULL )
@@ -1392,8 +1386,8 @@ BOOL bmp_SaveFile( HBITMAP hBitmap, TCHAR * FileName )
 
    if( hFile != INVALID_HANDLE_VALUE )
    {
-      WriteFile( hFile, ( LPBYTE ) &BIFH, sizeof( BITMAPFILEHEADER ), &nBytes_Written, NULL );
-      WriteFile( hFile, ( LPBYTE ) &Bitmap_Info.bmiHeader, sizeof( BITMAPINFOHEADER ), &nBytes_Written, NULL );
+      WriteFile( hFile, ( LPBYTE ) & BIFH, sizeof( BITMAPFILEHEADER ), &nBytes_Written, NULL );
+      WriteFile( hFile, ( LPBYTE ) & Bitmap_Info.bmiHeader, sizeof( BITMAPINFOHEADER ), &nBytes_Written, NULL );
       WriteFile( hFile, ( LPBYTE ) lp_hBits, nBytes_Bits, &nBytes_Written, NULL );
       CloseHandle( hFile );
       ret = TRUE;
@@ -1410,14 +1404,14 @@ BOOL bmp_SaveFile( HBITMAP hBitmap, TCHAR * FileName )
    return ret;
 }
 
-HIMAGELIST HMG_ImageListLoadFirst( const char * FileName, int cGrow, int Transparent, int * nWidth, int * nHeight )
+HIMAGELIST HMG_ImageListLoadFirst( const char *FileName, int cGrow, int Transparent, int *nWidth, int *nHeight )
 {
-   HIMAGELIST hImageList;
-   HBITMAP    hBitmap;
-   BITMAP     Bmp;
-   TCHAR      TempPathFileName[ MAX_PATH ];
+   HIMAGELIST  hImageList;
+   HBITMAP     hBitmap;
+   BITMAP      Bmp;
+   TCHAR       TempPathFileName[MAX_PATH];
 
-   s_nWidth  = *nWidth;
+   s_nWidth = *nWidth;
    s_nHeight = *nHeight;
 
    hBitmap = HMG_LoadPicture( FileName, s_nWidth, s_nHeight, NULL, 0, 0, -1, 0, HB_FALSE, 255 );
@@ -1447,28 +1441,28 @@ HIMAGELIST HMG_ImageListLoadFirst( const char * FileName, int cGrow, int Transpa
    if( Transparent == 1 )
    {
       hImageList = ImageList_LoadImage
-                   (
-         GetResources(),
-         TempPathFileName,
-         Bmp.bmWidth,
-         cGrow,
-         CLR_DEFAULT,
-         IMAGE_BITMAP,
-         LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT
-                   );
+         (
+            GetResources(),
+            TempPathFileName,
+            Bmp.bmWidth,
+            cGrow,
+            CLR_DEFAULT,
+            IMAGE_BITMAP,
+            LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT
+         );
    }
    else
    {
       hImageList = ImageList_LoadImage
-                   (
-         GetResources(),
-         TempPathFileName,
-         Bmp.bmWidth,
-         cGrow,
-         CLR_NONE,
-         IMAGE_BITMAP,
-         LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS
-                   );
+         (
+            GetResources(),
+            TempPathFileName,
+            Bmp.bmWidth,
+            cGrow,
+            CLR_NONE,
+            IMAGE_BITMAP,
+            LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS
+         );
    }
 
    DeleteFile( TempPathFileName );
@@ -1476,9 +1470,9 @@ HIMAGELIST HMG_ImageListLoadFirst( const char * FileName, int cGrow, int Transpa
    return hImageList;
 }
 
-void HMG_ImageListAdd( HIMAGELIST hImageList, char * FileName, int Transparent )
+void HMG_ImageListAdd( HIMAGELIST hImageList, char *FileName, int Transparent )
 {
-   HBITMAP hBitmap;
+   HBITMAP  hBitmap;
 
    if( hImageList == NULL )
    {

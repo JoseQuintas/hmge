@@ -44,19 +44,20 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE                0x0501
+#define _WIN32_IE 0x0501
 
 #include <mgdefs.h>
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
+
 // Edit Class Name
-   #define WC_EDIT               "Edit"
+#define WC_EDIT   "Edit"
 #endif
 #include "hbvm.h"
 
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 ) || defined( __XCC__ )
-   #define ICC_STANDARD_CLASSES  0x00004000
+#define ICC_STANDARD_CLASSES  0x00004000
 #endif
 LRESULT CALLBACK  OwnSpinProc( HWND hedit, UINT Msg, WPARAM wParam, LPARAM lParam );
 
@@ -64,22 +65,22 @@ HINSTANCE         GetInstance( void );
 
 HB_FUNC( INITSPINNER )
 {
-   HWND  hedit, hupdown;
-   HWND  hwnd   = hmg_par_raw_HWND( 1 );
-   DWORD Style1 = ES_NUMBER | WS_CHILD | ES_AUTOHSCROLL;
-   DWORD Style2 = WS_CHILD | WS_BORDER | UDS_ARROWKEYS | UDS_ALIGNRIGHT | UDS_SETBUDDYINT | UDS_NOTHOUSANDS;
+   HWND                 hedit, hupdown;
+   HWND                 hwnd = hmg_par_raw_HWND( 1 );
+   DWORD                Style1 = ES_NUMBER | WS_CHILD | ES_AUTOHSCROLL;
+   DWORD                Style2 = WS_CHILD | WS_BORDER | UDS_ARROWKEYS | UDS_ALIGNRIGHT | UDS_SETBUDDYINT | UDS_NOTHOUSANDS;
 
    INITCOMMONCONTROLSEX i;
 
    i.dwSize = sizeof( INITCOMMONCONTROLSEX );
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style1 |= WS_VISIBLE;
       Style2 |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 12 ) )
+   if( !hb_parl( 12 ) )
    {
       Style1 |= WS_TABSTOP;
    }
@@ -104,40 +105,40 @@ HB_FUNC( INITSPINNER )
    InitCommonControlsEx( &i );
 
    hedit = CreateWindowEx
-           (
-      WS_EX_CLIENTEDGE,
-      WC_EDIT,
-      NULL,
-      Style1,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 10 ),
-      hwnd,
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-           );
+      (
+         WS_EX_CLIENTEDGE,
+         WC_EDIT,
+         NULL,
+         Style1,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 10 ),
+         hwnd,
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    // Create the Up-Down Control
    i.dwICC = ICC_UPDOWN_CLASS;               /* P.Ch. 10.16. */
    InitCommonControlsEx( &i );
 
    hupdown = CreateWindowEx
-             (
-      WS_EX_CLIENTEDGE,
-      UPDOWN_CLASS,
-      NULL,
-      Style2,
-      0,
-      0,
-      0,
-      0,       // Set to zero to automatically size to fit the buddy window.
-      hwnd,
-      ( HMENU ) NULL,
-      GetInstance(),
-      NULL
-             );
+      (
+         WS_EX_CLIENTEDGE,
+         UPDOWN_CLASS,
+         NULL,
+         Style2,
+         0,
+         0,
+         0,
+         0, // Set to zero to automatically size to fit the buddy window.
+         hwnd,
+         ( HMENU ) NULL,
+         GetInstance(),
+         NULL
+      );
 
    SendMessage( hupdown, UDM_SETBUDDY, ( WPARAM ) hedit, ( LPARAM ) NULL );
    SendMessage( hupdown, UDM_SETRANGE32, ( WPARAM ) hb_parni( 8 ), ( LPARAM ) hb_parni( 9 ) );
@@ -153,20 +154,20 @@ HB_FUNC( INITSPINNER )
 
 HB_FUNC( SETSPINNERINCREMENT )
 {
-   UDACCEL inc;
+   UDACCEL  inc;
 
    inc.nSec = 0;
    inc.nInc = hb_parni( 2 );
 
-   SendMessage( hmg_par_raw_HWND( 1 ), UDM_SETACCEL, ( WPARAM ) 1, ( LPARAM ) &inc );
+   SendMessage( hmg_par_raw_HWND( 1 ), UDM_SETACCEL, ( WPARAM ) 1, ( LPARAM ) & inc );
 }
 
 // 2006.08.13 JD
 LRESULT CALLBACK OwnSpinProc( HWND hedit, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-   static PHB_SYMB pSymbol = NULL;
-   LRESULT         r;
-   WNDPROC         OldWndProc;
+   static PHB_SYMB   pSymbol = NULL;
+   LRESULT           r;
+   WNDPROC           OldWndProc;
 
    OldWndProc = ( WNDPROC ) ( HB_PTRUINT ) GetProp( hedit, TEXT( "oldspinproc" ) );
 
@@ -179,7 +180,7 @@ LRESULT CALLBACK OwnSpinProc( HWND hedit, UINT Msg, WPARAM wParam, LPARAM lParam
 
       case WM_CONTEXTMENU:
       case WM_GETDLGCODE:
-         if( ! pSymbol )
+         if( !pSymbol )
          {
             pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OSPINEVENTS" ) );
          }
@@ -195,9 +196,9 @@ LRESULT CALLBACK OwnSpinProc( HWND hedit, UINT Msg, WPARAM wParam, LPARAM lParam
             hb_vmDo( 4 );
          }
 
-         r = hmg_par_LRESULT( -1 );            /* P.Ch. 10.16. */
+         r = hmg_par_LRESULT( -1 ); /* P.Ch. 10.16. */
 
-         return ( r != 0 ) ? r : CallWindowProc( OldWndProc, hedit, Msg, wParam, lParam );
+         return( r != 0 ) ? r : CallWindowProc( OldWndProc, hedit, Msg, wParam, lParam );
    }
 
    return CallWindowProc( OldWndProc, hedit, Msg, wParam, lParam );

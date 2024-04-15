@@ -62,14 +62,14 @@ HINSTANCE   GetResources( void );
 
 HB_FUNC( LOADCURSOR )
 {
-   HINSTANCE hInstance = HB_ISNIL( 1 ) ? NULL : hmg_par_raw_HINSTANCE( 1 );
+   HINSTANCE   hInstance = HB_ISNIL( 1 ) ? NULL : hmg_par_raw_HINSTANCE( 1 );
 
 #ifndef UNICODE
-   LPCSTR lpCursorName = ( hb_parinfo( 2 ) & HB_IT_STRING ) ? hb_parc( 2 ) : ( LPCSTR ) MAKEINTRESOURCE( hb_parni( 2 ) );
+   LPCSTR      lpCursorName = ( hb_parinfo( 2 ) & HB_IT_STRING ) ? hb_parc( 2 ) : MAKEINTRESOURCE( hb_parni( 2 ) );
    hmg_ret_raw_HANDLE( LoadCursor( hInstance, lpCursorName ) );
 #else
-   LPWSTR  pW = AnsiToWide( ( char * ) hb_parc( 2 ) );
-   LPCWSTR lpCursorName = HB_ISCHAR( 2 ) ? pW : ( LPCWSTR ) MAKEINTRESOURCE( hb_parni( 2 ) );
+   LPWSTR   pW = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  lpCursorName = HB_ISCHAR( 2 ) ? pW : ( LPCWSTR ) MAKEINTRESOURCE( hb_parni( 2 ) );
 
    hmg_ret_raw_HANDLE( LoadCursor( hInstance, lpCursorName ) );
    hb_xfree( pW );
@@ -81,7 +81,7 @@ HB_FUNC( LOADCURSORFROMFILE )
 #ifndef UNICODE
    hmg_ret_raw_HANDLE( LoadCursorFromFile( ( LPCSTR ) hb_parc( 1 ) ) );
 #else
-   LPCWSTR lpFileName = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   LPCWSTR  lpFileName = AnsiToWide( ( char * ) hb_parc( 1 ) );
    hmg_ret_raw_HANDLE( LoadCursorFromFile( lpFileName ) );
    hb_xfree( ( TCHAR * ) lpFileName );
 #endif
@@ -97,7 +97,7 @@ HB_FUNC( FILECURSOR )
 #ifndef UNICODE
    hmg_ret_raw_HANDLE( SetCursor( LoadCursorFromFile( ( LPCSTR ) hb_parc( 1 ) ) ) );
 #else
-   LPCWSTR lpFileName = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   LPCWSTR  lpFileName = AnsiToWide( ( char * ) hb_parc( 1 ) );
    hmg_ret_raw_HANDLE( SetCursor( LoadCursorFromFile( lpFileName ) ) );
    hb_xfree( ( TCHAR * ) lpFileName );
 #endif
@@ -114,13 +114,13 @@ HB_FUNC( CURSORHAND )
 
 HB_FUNC( SETWINDOWCURSOR )
 {
-   HCURSOR ch;
+   HCURSOR  ch;
 
 #ifndef UNICODE
-   LPCSTR lpCursorName = ( hb_parinfo( 2 ) & HB_IT_STRING ) ? hb_parc( 2 ) : ( LPCSTR ) MAKEINTRESOURCE( hb_parni( 2 ) );
+   LPCSTR   lpCursorName = ( hb_parinfo( 2 ) & HB_IT_STRING ) ? hb_parc( 2 ) : MAKEINTRESOURCE( hb_parni( 2 ) );
 #else
-   LPWSTR  pW = AnsiToWide( ( char * ) hb_parc( 2 ) );
-   LPCWSTR lpCursorName = HB_ISCHAR( 2 ) ? pW : ( LPCWSTR ) MAKEINTRESOURCE( hb_parni( 2 ) );
+   LPWSTR   pW = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  lpCursorName = HB_ISCHAR( 2 ) ? pW : ( LPCWSTR ) MAKEINTRESOURCE( hb_parni( 2 ) );
 #endif
    ch = LoadCursor( ( HB_ISCHAR( 2 ) ) ? GetResources() : NULL, lpCursorName );
 
@@ -132,8 +132,8 @@ HB_FUNC( SETWINDOWCURSOR )
    if( ch != NULL )
    {
       SetClassLongPtr( hmg_par_raw_HWND( 1 ), // window handle
-                       GCLP_HCURSOR,          // change cursor
-                       ( LONG_PTR ) ch );     // new cursor
+      GCLP_HCURSOR, // change cursor
+      ( LONG_PTR ) ch );  // new cursor
    }
 
 #ifdef UNICODE

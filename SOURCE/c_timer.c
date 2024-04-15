@@ -54,5 +54,5 @@ HB_FUNC( INITTIMER )
 HB_FUNC( KILLTIMER )
 {
    hb_retl( KillTimer( hmg_par_raw_HWND( 1 ), // handle of main window
-                       hmg_par_UINT( 2 ) ) ); // timer identifier
+   hmg_par_UINT( 2 ) ) );   // timer identifier
 }

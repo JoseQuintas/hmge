@@ -11,6 +11,11 @@
  */
 
 
+#ifdef __XHARBOUR__
+#define __SYSDATA__
+#define __MINIPRINT__
+#endif
+
 #include <hmg.ch>
 #include <GraphPlus.ch>
 #include "hbclass.ch"

@@ -49,8 +49,9 @@
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
+
 // Button Class Name
-   #define WC_BUTTON  "Button"
+#define WC_BUTTON "Button"
 #endif
 #include "hbapierr.h"
 
@@ -62,34 +63,34 @@ HINSTANCE   GetInstance( void );
 /* Modified by P.Ch. 16.12. */
 HB_FUNC( INITFRAME )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
-      HMENU hmenu     = hmg_par_raw_HMENU( 2 );
-      DWORD dwExStyle = hb_parl( 10 ) ? 0 : WS_EX_TRANSPARENT;
+      HMENU    hmenu = hmg_par_raw_HMENU( 2 );
+      DWORD    dwExStyle = hb_parl( 10 ) ? 0 : WS_EX_TRANSPARENT;
 #ifndef UNICODE
-      LPCSTR lpWindowName = hb_parc( 7 );
+      LPCSTR   lpWindowName = hb_parc( 7 );
 #else
-      LPWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 7 ) );
+      LPWSTR   lpWindowName = AnsiToWide( ( char * ) hb_parc( 7 ) );
 #endif
       hmg_ret_raw_HWND
       (
          CreateWindowEx
-         (
-            dwExStyle,
-            WC_BUTTON,
-            lpWindowName,
-            WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_NOTIFY,
-            hb_parni( 3 ),
-            hb_parni( 4 ),
-            hb_parni( 5 ),
-            hb_parni( 6 ),
-            hwnd,
-            ( IsMenu( hmenu ) ? hmenu : NULL ),
-            GetInstance(),
-            NULL
-         )
+            (
+               dwExStyle,
+               WC_BUTTON,
+               lpWindowName,
+               WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_NOTIFY,
+               hb_parni( 3 ),
+               hb_parni( 4 ),
+               hb_parni( 5 ),
+               hb_parni( 6 ),
+               hwnd,
+               ( IsMenu( hmenu ) ? hmenu : NULL ),
+               GetInstance(),
+               NULL
+            )
       );
 #ifdef UNICODE
       hb_xfree( ( TCHAR * ) lpWindowName );

@@ -16,7 +16,7 @@
 
 #define _METHOD METHOD
 
-STATIC o_AppDlu2Pixel
+STATIC o_AppDlu2Pixel := NIL
 
 ///////////////////////////////////////////////////////////////////////////////
 CLASS THmgData
@@ -246,6 +246,16 @@ METHOD ControlAssign( xValue ) CLASS THmgData
    ENDIF
 
 RETURN uRet
+
+#ifdef __XHARBOUR__
+*-----------------------------------------------------------------------------*
+STATIC FUNCTION hb_HGetDef( hHash, xKey, xDef )
+*-----------------------------------------------------------------------------*
+   LOCAL nPos := HGetPos( hHash, xKey )
+
+RETURN iif( nPos > 0, HGetValueAt( hHash, nPos ), xDef )
+
+#endif
 
 #ifdef _OBJECT_
 
@@ -2098,15 +2108,5 @@ FUNCTION oKeyData( Obj, Event )
    ENDIF
 
 RETURN o
-
-#ifdef __XHARBOUR__
-*-----------------------------------------------------------------------------*
-STATIC FUNCTION hb_HGetDef( hHash, xKey, xDef )
-*-----------------------------------------------------------------------------*
-   LOCAL nPos := HGetPos( hHash, xKey )
-
-RETURN iif( nPos > 0, HGetValueAt( hHash, nPos ), xDef )
-
-#endif
 
 #endif

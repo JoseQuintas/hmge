@@ -141,7 +141,7 @@ FUNCTION _DefineGetBox ( ControlName, ParentFormName, x, y, w, h, Value, ;
    hb_default( @noborder, .F. )
    hb_default( @lAutoUpdate, .F. )
 
-   lInsert := IsInsertActive()
+   lInsert  := IsInsertActive()
    cPicture := hb_asciiUpper( cPicture )
 
    DO CASE
@@ -184,6 +184,9 @@ FUNCTION _DefineGetBox ( ControlName, ParentFormName, x, y, w, h, Value, ;
 #endif
          ParentFormName := iif( _HMG_BeginDialogActive, _HMG_ActiveDialogName, _HMG_ActiveFormName )
 #ifdef _TSBROWSE_
+         IF ( k := GetFormIndex ( ParentFormName ) ) > 0 .AND. _HMG_aFormType [ k ] == 'A'
+            lInsert := _HMG_AutoScroll
+         ENDIF
       ENDIF
 #endif
       __defaultNIL( @FontName, _HMG_ActiveFontName )

@@ -95,13 +95,13 @@ HB_FUNC( DUPLICATEICON )
 // HICON LoadIcon( HINSTANCE hInstance, LPCTSTR lpIconName )
 HB_FUNC( LOADICON )
 {
-   HINSTANCE hinstance = ( HB_ISNIL( 1 ) ? NULL : hmg_par_raw_HINSTANCE( 1 ) );
-   HICON     hIcon;
+   HINSTANCE   hinstance = ( HB_ISNIL( 1 ) ? NULL : hmg_par_raw_HINSTANCE( 1 ) );
+   HICON       hIcon;
 
 #ifndef UNICODE
    hIcon = LoadIcon( hinstance, HB_ISCHAR( 2 ) ? hb_parc( 2 ) : MAKEINTRESOURCE( hb_parni( 2 ) ) );
 #else
-   LPWSTR pW = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   pW = AnsiToWide( ( char * ) hb_parc( 2 ) );
    hIcon = LoadIcon( hinstance, HB_ISCHAR( 2 ) ? pW : ( LPCWSTR ) MAKEINTRESOURCE( hb_parni( 2 ) ) );
 #endif
    RegisterResource( hIcon, "ICON" );
@@ -116,11 +116,11 @@ HB_FUNC( LOADICON )
 HB_FUNC( EXTRACTICON )
 {
 #ifndef UNICODE
-   char * lpFileName = ( char * ) hb_parc( 1 );
+   char     *lpFileName = ( char * ) hb_parc( 1 );
 #else
-   LPWSTR lpFileName = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   LPWSTR   lpFileName = AnsiToWide( ( char * ) hb_parc( 1 ) );
 #endif
-   int nIconIndex = hmg_par_INT( 2 );
+   int      nIconIndex = hmg_par_INT( 2 );
 
    if( nIconIndex == -1 )
    {
@@ -144,11 +144,11 @@ HB_FUNC( EXTRACTICON )
 HB_FUNC( EXTRACTICONEX )
 {
 #ifndef UNICODE
-   char * lpFileName = ( char * ) hb_parc( 1 );
+   char     *lpFileName = ( char * ) hb_parc( 1 );
 #else
-   LPWSTR lpFileName = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   LPWSTR   lpFileName = AnsiToWide( ( char * ) hb_parc( 1 ) );
 #endif
-   int nIconIndex = hb_parni( 2 );
+   int      nIconIndex = hb_parni( 2 );
 
    if( nIconIndex == -1 )
    {
@@ -162,15 +162,17 @@ HB_FUNC( EXTRACTICONEX )
    {
       HICON hIcon;
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
-      UINT nIconId = 0;
+      UINT  nIconId = 0;
+
       // UINT ExtractIconExA(LPCSTR lpszFile, int nIconIndex, HICON *phiconLarge, HICON *phiconSmall, UINT nIcons)
-      UINT nIconCount = ExtractIconEx( lpFileName, nIconIndex, &hIcon, NULL, 1 );
+      UINT  nIconCount = ExtractIconEx( lpFileName, nIconIndex, &hIcon, NULL, 1 );
 #else
-      UINT nIconId;
-      int  cx = hb_parnidef( 3, GetSystemMetrics( SM_CXICON ) );
-      int  cy = hb_parnidef( 4, GetSystemMetrics( SM_CYICON ) );
+      UINT  nIconId;
+      int   cx = hb_parnidef( 3, GetSystemMetrics( SM_CXICON ) );
+      int   cy = hb_parnidef( 4, GetSystemMetrics( SM_CYICON ) );
+
       // UINT PrivateExtractIcons( LPCTSTR lpszFile, int nIconIndex, int cxIcon, int cyIcon, HICON *phicon, UINT *piconid, UINT nIcons, UINT flags )
-      UINT nIconCount = PrivateExtractIcons( lpFileName, nIconIndex, cx, cy, &hIcon, &nIconId, 1, 0 );
+      UINT  nIconCount = PrivateExtractIcons( lpFileName, nIconIndex, cx, cy, &hIcon, &nIconId, 1, 0 );
 #endif
       if( nIconCount > 0 )
       {
@@ -220,13 +222,13 @@ HB_FUNC( LOADICONBYNAME )
    if( hb_parclen( 1 ) > 0 )
    {
 #ifndef UNICODE
-      const char * pszResOrFile = hb_parc( 1 );
+      const char  *pszResOrFile = hb_parc( 1 );
 #else
-      LPCWSTR pszResOrFile = AnsiToWide( ( char * ) hb_parc( 1 ) );
+      LPCWSTR     pszResOrFile = AnsiToWide( ( char * ) hb_parc( 1 ) );
 #endif
-      int       cxDesired = hb_parni( 2 );
-      int       cyDesired = hb_parni( 3 );
-      HINSTANCE hInstance = HB_ISNIL( 4 ) ? GetResources() : hmg_par_raw_HINSTANCE( 4 );
+      int         cxDesired = hb_parni( 2 );
+      int         cyDesired = hb_parni( 3 );
+      HINSTANCE   hInstance = HB_ISNIL( 4 ) ? GetResources() : hmg_par_raw_HINSTANCE( 4 );
 
       hIcon = ( HICON ) LoadImage( hInstance, pszResOrFile, IMAGE_ICON, cxDesired, cyDesired, LR_DEFAULTCOLOR );
 
@@ -250,13 +252,13 @@ HB_FUNC( LOADICONBYNAME )
 
 HB_FUNC( DRAWICONEX )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
-      HICON  hIcon = hmg_par_raw_HICON( 4 );
-      HDC    hdc   = GetDC( hwnd );
-      HBRUSH hbrFlickerFreeDraw = CreateSolidBrush( hmg_par_COLORREF( 7 ) );
+      HICON    hIcon = hmg_par_raw_HICON( 4 );
+      HDC      hdc = GetDC( hwnd );
+      HBRUSH   hbrFlickerFreeDraw = CreateSolidBrush( hmg_par_COLORREF( 7 ) );
 
       hb_retl( DrawIconEx( hdc, hb_parni( 2 ), hb_parni( 3 ), hIcon, hb_parni( 5 ), hb_parni( 6 ), 0, hbrFlickerFreeDraw, DI_NORMAL ) );
 

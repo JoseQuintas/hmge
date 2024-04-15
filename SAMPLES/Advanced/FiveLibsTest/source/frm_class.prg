@@ -157,9 +157,9 @@ METHOD EditKeyOn() CLASS frm_Class
    // search key field
    FOR EACH aItem IN ::aControlList
       IF aItem[ CFG_CTLTYPE ] == TYPE_HWGUIBUG
-            gui_TextEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
       ELSEIF aItem[ CFG_CTLTYPE ] == TYPE_EDIT .AND. aItem[ CFG_ISKEY ]
-         gui_TextEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
+         gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
          IF ! lFound .AND. aItem[ CFG_ISKEY ]
             lFound := .T.
             oKeyEdit := aItem[ CFG_FCONTROL ]
@@ -181,12 +181,12 @@ METHOD EditOn() CLASS frm_Class
 
    FOR EACH aItem IN ::aControlList
       IF aItem[ CFG_CTLTYPE ] == TYPE_HWGUIBUG
-            gui_TextEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
-      ELSEIF aItem[ CFG_CTLTYPE ] == TYPE_EDIT
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
+      ELSEIF hb_AScan( { TYPE_EDIT, TYPE_COMBOBOX, TYPE_CHECKBOX }, { | e | e == aItem[ CFG_CTLTYPE ] } ) != 0
          IF aItem[ CFG_ISKEY ]
-            gui_TextEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
          ELSE
-            gui_TextEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
             IF ! lFound
                lFound := .T.
                oFirstEdit := aItem[ CFG_FCONTROL ]
@@ -204,8 +204,8 @@ METHOD EditOff() CLASS frm_Class
    LOCAL aItem
 
    FOR EACH aItem IN ::aControlList
-      IF aItem[ CFG_CTLTYPE ] == TYPE_EDIT .OR. aItem[ CFG_CTLTYPE ] == TYPE_HWGUIBUG
-         gui_TextEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
+      IF hb_AScan( { TYPE_EDIT, TYPE_HWGUIBUG , TYPE_COMBOBOX, TYPE_CHECKBOX }, { | e | e == aItem[ CFG_CTLTYPE ] } ) != 0
+         gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
       ENDIF
    NEXT
    ::ButtonSaveOff()
@@ -246,7 +246,7 @@ METHOD Delete() CLASS frm_Class
             SKIP -1
             IF ! Bof()
                SKIP
-            ENDIF
+         ENDIF
             IF Eof()
                SKIP -1
             ENDIF
@@ -262,23 +262,25 @@ METHOD UpdateEdit() CLASS frm_Class
    LOCAL aItem, nSelect, xValue, cText, xScope, nLenScope
 
    FOR EACH aItem IN ::aControlList
-      IF aItem[ CFG_CTLTYPE ] == TYPE_EDIT .AND. ! Empty( aItem[ CFG_FNAME ] )
+      DO CASE
+      CASE aItem[ CFG_CTLTYPE ] == TYPE_EDIT .AND. ! Empty( aItem[ CFG_FNAME ] )
          xValue := FieldGet( FieldNum( aItem[ CFG_FNAME ] ) )
          gui_TextSetValue( ::xDlg, aItem[ CFG_FCONTROL ], xValue )
          IF ! Empty( aItem[ CFG_VTABLE ] ) .AND. ! Empty( aItem[ CFG_VSHOW ] )
             nSelect := Select()
             SELECT ( Select( aItem[ CFG_VTABLE ] ) )
             SEEK xValue
-            cText := &( aItem[ CFG_VTABLE ] )->( FieldGet( FieldNum( aItem[ CFG_VSHOW ] ) ) )
+            cText := ( aItem[ CFG_VTABLE ] )->( FieldGet( FieldNum( aItem[ CFG_VSHOW ] ) ) )
             SELECT ( nSelect )
             gui_LabelSetValue( ::xDlg, aItem[ CFG_VCONTROL ], cText )
          ENDIF
-      ENDIF
-      IF aItem[ CFG_CTLTYPE ] == TYPE_BROWSE
+      CASE aItem[ CFG_CTLTYPE ] == TYPE_COMBOBOX
+
+      CASE aItem[ CFG_CTLTYPE ] == TYPE_BROWSE
          SELECT  ( Select( aItem[ CFG_BTABLE ] ) )
          SET ORDER TO ( aItem[ CFG_BINDEXORD ] )
-         xScope := &( ::cFileDbf )->( FieldGet( FieldNum( aItem[ CFG_BKEYFROM ] ) ) )
-         nLenScope := &( ::cFileDbf )->( FieldLen( aItem[ CFG_BKEYFROM ] ) )
+         xScope := ( ::cFileDbf )->( FieldGet( FieldNum( aItem[ CFG_BKEYFROM ] ) ) )
+         nLenScope := ( ::cFileDbf )->( FieldLen( aItem[ CFG_BKEYFROM ] ) )
          IF ValType( xScope ) == "C"
             SET SCOPE TO xScope
          ELSE
@@ -287,7 +289,7 @@ METHOD UpdateEdit() CLASS frm_Class
          GOTO TOP
          gui_BrowseRefresh( ::xDlg, aItem[ CFG_FCONTROL ] )
          SELECT ( Select( ::cFileDbf ) ) // HMG Extended
-      ENDIF
+      ENDCASE
    NEXT
    (cText)
 
@@ -301,6 +303,8 @@ METHOD Save() CLASS frm_Class
    IF RLock()
       FOR EACH aItem IN ::aControlList
          DO CASE
+         CASE aItem[ CFG_CTLTYPE ] == TYPE_COMBOBOX
+
          CASE aItem[ CFG_CTLTYPE ] != TYPE_EDIT // not editable
          CASE Empty( aItem[ CFG_FNAME ] )       // do not have name
          CASE aItem[ CFG_ISKEY ]

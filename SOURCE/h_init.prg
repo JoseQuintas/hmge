@@ -544,6 +544,9 @@ RETURN aRetVal
 #define _UTF8_BOM       e"\xEF\xBB\xBF"  /* hb_utf8Chr( 0xFEFF ) */
 #ifdef __XHARBOUR__
 #xtranslate hb_eol() => hb_OsNewLine()
+#ifdef __XCC__
+#xtranslate hb_BLen( <c> ) => Len( <c> )
+#endif
 #endif
 *------------------------------------------------------------------------------*
 FUNCTION HMG_CreateFile_UTF16LE_BOM( cFile )

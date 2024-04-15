@@ -1,0 +1,24 @@
+Comparison of standard and professional MiniGUI builds
+Compiler: Borland C++ 5.8.2 (32-bit)
+
++---------------------------+------------+-------------+
+|                           |  STANDARD  |  PRO-build  |
++---------------------------+------------+-------------+
+| Harbour binary            |  Standard  |  Optimized  |
++---------------------------+------------+-------------+
+| MiniGUI library           |  Debug     |  Release    |
++---------------------------+------------+-------------+
+| Hmgs-Ide binary           |  Supported |  Supported  |
++---------------------------+------------+-------------+
+| HMG IDE binary and source |      -     |  Supported  |
++---------------------------+------------+-------------+
+| Basic samples             |  Supported |  Supported  |
++---------------------------+------------+-------------+
+| Advanced samples          |  Supported |  Supported  |
++---------------------------+------------+-------------+
+| Applications samples      |      -     |  Supported  |
++---------------------------+------------+-------------+
+| Utils samples and tools   |      -     |  Supported  |
++---------------------------+------------+-------------+
+| SQLRDD library and samples|      -     |  Supported  |
++---------------------------+------------+-------------+

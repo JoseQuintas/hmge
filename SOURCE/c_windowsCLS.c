@@ -54,14 +54,14 @@
 #include "hbapistr.h"
 
 #ifdef __XHARBOUR__
-   #define hb_storclen_buffer  hb_storclenAdopt
+#define hb_storclen_buffer hb_storclenAdopt
 #endif
 #ifdef UNICODE
 BOOL  _isValidCtrlClassW( HWND hwndTip, LPWSTR ClassName );
 
 BOOL _isValidCtrlClassW( HWND hwndTip, LPWSTR ClassName )
 {
-   TCHAR lpClassName[ 256 ];
+   TCHAR lpClassName[256];
    int   iLen = 0;
 
    if( IsWindow( hwndTip ) )
@@ -80,14 +80,13 @@ BOOL _isValidCtrlClassW( HWND hwndTip, LPWSTR ClassName )
 }
 
 #else
-BOOL  _isValidCtrlClassA( HWND hwndTip, const char * ClassName );
+BOOL  _isValidCtrlClassA( HWND hwndTip, const char *ClassName );
 
 /* P.Ch. 16.10. */
-
-BOOL _isValidCtrlClassA( HWND hwndTip, const char * ClassName )
+BOOL _isValidCtrlClassA( HWND hwndTip, const char *ClassName )
 {
-   char lpClassName[ 256 ];
-   int  iLen = 0;
+   char  lpClassName[256];
+   int   iLen = 0;
 
    if( IsWindow( hwndTip ) )
    {
@@ -113,12 +112,12 @@ BOOL _isValidCtrlClassA( HWND hwndTip, const char * ClassName )
  */
 HB_FUNC( GETCLASSNAME )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
-      char ClassName[ 256 ];
-      int  iLen;
+      char  ClassName[256];
+      int   iLen;
 
       iLen = GetClassNameA( hwnd, ClassName, sizeof( ClassName ) / sizeof( char ) );
 
@@ -147,18 +146,17 @@ HB_FUNC( GETCLASSNAME )
  */
 HB_FUNC( GETCLASSNAMEBYREF )
 {
-   HWND    hwnd = hmg_par_raw_HWND( 1 );
-   HB_SIZE nLen = hb_parcsiz( 2 );    // fixed P.Ch. 16.12.
-
+   HWND     hwnd = hmg_par_raw_HWND( 1 );
+   HB_SIZE  nLen = hb_parcsiz( 2 ); // fixed P.Ch. 16.12.
    hb_retni( 0 );
 
    if( IsWindow( hwnd ) && nLen > 1 )
    {
-      char * pBuffer = ( char * ) hb_xgrab( nLen + 1 );
+      char  *pBuffer = ( char * ) hb_xgrab( nLen + 1 );
 
       if( pBuffer )
       {
-         int nResult = GetClassNameA( hwnd, pBuffer, ( int ) nLen );
+         int   nResult = GetClassNameA( hwnd, pBuffer, ( int ) nLen );
 
          if( nResult > 0 )
          {
@@ -174,7 +172,7 @@ HB_FUNC( GETCLASSNAMEBYREF )
 
 HB_FUNC( GETWINDOWLONG )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
@@ -188,7 +186,7 @@ HB_FUNC( GETWINDOWLONG )
 
 HB_FUNC( SETWINDOWLONG )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
@@ -211,7 +209,7 @@ HB_FUNC( SETWINDOWLONG )
  */
 HB_FUNC( GETWINDOWSTYLE )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
@@ -232,14 +230,14 @@ HB_FUNC( GETWINDOWSTYLE )
  */
 HB_FUNC( SETWINDOWSTYLE )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
       LONG_PTR OldStyle = GetWindowLongPtr( hwnd, GWL_STYLE );
       LONG_PTR NewStyle = hmg_par_raw_LONG_PTR( 2 );
 
-      HB_RETNL( SetWindowLongPtr( hwnd, GWL_STYLE, ( ( BOOL ) hb_parl( 3 ) ) ? OldStyle | NewStyle : OldStyle&( ~NewStyle ) ) );
+      HB_RETNL( SetWindowLongPtr( hwnd, GWL_STYLE, ( ( BOOL ) hb_parl( 3 ) ) ? OldStyle | NewStyle : OldStyle & ( ~NewStyle ) ) );
    }
    else
    {
@@ -256,7 +254,7 @@ HB_FUNC( SETWINDOWSTYLE )
  */
 HB_FUNC( ISWINDOWHASSTYLE )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
@@ -272,7 +270,7 @@ HB_FUNC( ISWINDOWHASSTYLE )
 
 HB_FUNC( ISWINDOWHASEXSTYLE )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {

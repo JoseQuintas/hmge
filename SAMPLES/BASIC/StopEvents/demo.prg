@@ -31,11 +31,13 @@ RETURN NIL
 PROCEDURE Form_ONGOTFOCUS
    LOCAL i := GetLastActiveControlIndex ()
 
-   DISABLE WINDOW EVENT OF Form_1
+   IF i > 0 .AND. GetControlNameByIndex (i) <> "Button_1"
+      DISABLE WINDOW EVENT OF Form_1
 
-   MsgInfo ("ON GOTFOCUS: " + ThisWindow.Name + iif( i > 0, " - Last Control Focused: " + GetControlNameByIndex (i), "" ))
+      MsgInfo ("ON GOTFOCUS: " + ThisWindow.Name + iif( i > 0, " - Last Control Focused: " + GetControlNameByIndex (i), "" ))
 
-   ENABLE WINDOW EVENT OF Form_1
+      ENABLE WINDOW EVENT OF Form_1
+   ENDIF
 
 RETURN
 

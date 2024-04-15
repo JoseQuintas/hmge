@@ -46,7 +46,7 @@
    Parts of this code is contributed and used here under permission of his author:
        Copyright 2006 (C) Grigory Filatov <gfilatov@gmail.com>
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE  0x0501
+#define _WIN32_IE 0x0501
 
 #include <mgdefs.h>
 #include <windowsx.h>
@@ -72,22 +72,22 @@ HINSTANCE         GetInstance( void );
 
 HB_FUNC( INITMONTHCAL )
 {
-   HWND hmonthcal;
-   RECT rc;
+   HWND                 hmonthcal;
+   RECT                 rc;
    INITCOMMONCONTROLSEX icex;
-   DWORD Style = WS_BORDER | WS_CHILD | MCS_DAYSTATE;
-   HFONT hfont;
-   DWORD bold      = FW_NORMAL;
-   DWORD italic    = 0;
-   DWORD underline = 0;
-   DWORD strikeout = 0;
-   DWORD angle     = 0;
+   DWORD                Style = WS_BORDER | WS_CHILD | MCS_DAYSTATE;
+   HFONT                hfont;
+   DWORD                bold = FW_NORMAL;
+   DWORD                italic = 0;
+   DWORD                underline = 0;
+   DWORD                strikeout = 0;
+   DWORD                angle = 0;
 
 #ifdef UNICODE
-   LPWSTR pStr;
+   LPWSTR               pStr;
 #endif
    icex.dwSize = sizeof( icex );
-   icex.dwICC  = ICC_DATE_CLASSES;
+   icex.dwICC = ICC_DATE_CLASSES;
    InitCommonControlsEx( &icex );
 
    if( hb_parl( 9 ) )
@@ -105,12 +105,12 @@ HB_FUNC( INITMONTHCAL )
       Style |= MCS_WEEKNUMBERS;
    }
 
-   if( ! hb_parl( 12 ) )
+   if( !hb_parl( 12 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 13 ) )
+   if( !hb_parl( 13 ) )
    {
       Style |= WS_TABSTOP;
    }
@@ -141,7 +141,7 @@ HB_FUNC( INITMONTHCAL )
    }
 
 #ifdef UNICODE
-   pStr  = AnsiToWide( hb_parc( 7 ) );
+   pStr = AnsiToWide( hb_parc( 7 ) );
    hfont = PrepareFont( ( TCHAR * ) pStr, hb_parni( 8 ), bold, italic, underline, strikeout, angle, DEFAULT_CHARSET );
    hb_xfree( pStr );
 #else
@@ -160,17 +160,17 @@ HB_FUNC( INITMONTHCAL )
 
 HB_FUNC( SETMONTHCALVALUE )
 {
-   SYSTEMTIME sysTime;
-   HWND       hwnd = hmg_par_raw_HWND( 1 );
+   SYSTEMTIME  sysTime;
+   HWND        hwnd = hmg_par_raw_HWND( 1 );
 
-   sysTime.wYear      = hmg_par_WORD( 2 );
-   sysTime.wMonth     = hmg_par_WORD( 3 );
-   sysTime.wDay       = hmg_par_WORD( 4 );
+   sysTime.wYear = hmg_par_WORD( 2 );
+   sysTime.wMonth = hmg_par_WORD( 3 );
+   sysTime.wDay = hmg_par_WORD( 4 );
    sysTime.wDayOfWeek = LOWORD( SendMessage( hwnd, MCM_GETFIRSTDAYOFWEEK, 0, 0 ) );
 
-   sysTime.wHour         = 0;
-   sysTime.wMinute       = 0;
-   sysTime.wSecond       = 0;
+   sysTime.wHour = 0;
+   sysTime.wMinute = 0;
+   sysTime.wSecond = 0;
    sysTime.wMilliseconds = 0;
 
    MonthCal_SetCurSel( hwnd, &sysTime );
@@ -178,9 +178,9 @@ HB_FUNC( SETMONTHCALVALUE )
 
 HB_FUNC( GETMONTHCALVALUE )
 {
-   SYSTEMTIME st;
+   SYSTEMTIME  st;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), MCM_GETCURSEL, 0, ( LPARAM ) &st );
+   SendMessage( hmg_par_raw_HWND( 1 ), MCM_GETCURSEL, 0, ( LPARAM ) & st );
 
    switch( hb_parni( 2 ) )
    {
@@ -199,9 +199,9 @@ HB_FUNC( GETMONTHCALVALUE )
 
 HB_FUNC( GETMONTHCALDATE )
 {
-   SYSTEMTIME st;
+   SYSTEMTIME  st;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), MCM_GETCURSEL, 0, ( LPARAM ) &st );
+   SendMessage( hmg_par_raw_HWND( 1 ), MCM_GETCURSEL, 0, ( LPARAM ) & st );
 
    hb_retdl( hb_dateEncode( st.wYear, st.wMonth, st.wDay ) );
 }
@@ -230,29 +230,29 @@ HB_FUNC( SETPOSMONTHCAL )
 
 HB_FUNC( GETMONTHRANGE )
 {
-   SYSTEMTIME sysTime[ 2 ];
-   int        iCount;
+   SYSTEMTIME  sysTime[2];
+   int         iCount;
 
    iCount = MonthCal_GetMonthRange( hmg_par_raw_HWND( 1 ), GMR_DAYSTATE, sysTime );
 
    hb_reta( 3 );
    HB_STORNI( iCount, -1, 1 );
-   HB_STORDL( hb_dateEncode( sysTime[ 0 ].wYear, sysTime[ 0 ].wMonth, sysTime[ 0 ].wDay ), -1, 2 );
-   HB_STORDL( hb_dateEncode( sysTime[ 1 ].wYear, sysTime[ 1 ].wMonth, sysTime[ 1 ].wDay ), -1, 3 );
+   HB_STORDL( hb_dateEncode( sysTime[0].wYear, sysTime[0].wMonth, sysTime[0].wDay ), -1, 2 );
+   HB_STORDL( hb_dateEncode( sysTime[1].wYear, sysTime[1].wMonth, sysTime[1].wDay ), -1, 3 );
 }
 
 #ifndef BOLDDAY
 #define BOLDDAY( ds, iDay ) \
-   if( iDay > 0 && iDay < 32 )( ds ) |= ( 0x00000001 << ( iDay - 1 ) )
+   if( iDay > 0 && iDay < 32 ) ( ds ) |= ( 0x00000001 << ( iDay - 1 ) )
 #endif
-HB_FUNC( C_SETDAYSTATE )
+   HB_FUNC( C_SETDAYSTATE )
 {
-   int             iCount = hb_parni( 2 );
-   PHB_ITEM        hArray = hb_param( 3, HB_IT_ARRAY );
-   LPMONTHDAYSTATE rgMonths;
-   int             i, j, iSize;
+   int               iCount = hb_parni( 2 );
+   PHB_ITEM          hArray = hb_param( 3, HB_IT_ARRAY );
+   LPMONTHDAYSTATE   rgMonths;
+   int               i, j, iSize;
 
-   iSize    = sizeof( MONTHDAYSTATE ) * iCount;
+   iSize = sizeof( MONTHDAYSTATE ) * iCount;
    rgMonths = ( LPMONTHDAYSTATE ) hb_xgrab( iSize );
    memset( rgMonths, 0, iSize );
 
@@ -262,7 +262,7 @@ HB_FUNC( C_SETDAYSTATE )
       {
          if( hb_arrayGetNI( hArray, i * 32 + j ) == 1 )
          {
-            BOLDDAY( rgMonths[ i ], j );
+            BOLDDAY( rgMonths[i], j );
          }
       }
    }
@@ -272,13 +272,13 @@ HB_FUNC( C_SETDAYSTATE )
 }
 HB_FUNC( C_RETDAYSTATE )
 {
-   LPNMDAYSTATE    pData  = ( NMDAYSTATE * ) HB_PARNL( 1 );
-   int             iCount = hb_parni( 2 );
-   PHB_ITEM        hArray = hb_param( 3, HB_IT_ARRAY );
-   LPMONTHDAYSTATE rgMonths;
-   int             i, j, iSize;
+   LPNMDAYSTATE      pData = ( NMDAYSTATE * ) HB_PARNL( 1 );
+   int               iCount = hb_parni( 2 );
+   PHB_ITEM          hArray = hb_param( 3, HB_IT_ARRAY );
+   LPMONTHDAYSTATE   rgMonths;
+   int               i, j, iSize;
 
-   iSize    = sizeof( MONTHDAYSTATE ) * iCount;
+   iSize = sizeof( MONTHDAYSTATE ) * iCount;
    rgMonths = ( LPMONTHDAYSTATE ) hb_xgrab( iSize );
    memset( rgMonths, 0, iSize );
 
@@ -288,7 +288,7 @@ HB_FUNC( C_RETDAYSTATE )
       {
          if( hb_arrayGetNI( hArray, i * 32 + j ) == 1 )
          {
-            BOLDDAY( rgMonths[ i ], j );
+            BOLDDAY( rgMonths[i], j );
          }
       }
    }
@@ -300,7 +300,7 @@ HB_FUNC( C_RETDAYSTATE )
 
 HB_FUNC( GETDAYSTATEDATA )
 {
-   LPNMDAYSTATE pData = ( NMDAYSTATE * ) HB_PARNL( 1 );
+   LPNMDAYSTATE   pData = ( NMDAYSTATE * ) HB_PARNL( 1 );
 
    hb_reta( 2 );
    HB_STORNI( ( int ) pData->cDayState, -1, 1 );
@@ -309,9 +309,9 @@ HB_FUNC( GETDAYSTATEDATA )
 
 LRESULT CALLBACK OwnMCProc( HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-   static PHB_SYMB pSymbol = NULL;
-   LRESULT         r;
-   WNDPROC         OldWndProc;
+   static PHB_SYMB   pSymbol = NULL;
+   LRESULT           r;
+   WNDPROC           OldWndProc;
 
    OldWndProc = ( WNDPROC ) ( HB_PTRUINT ) GetProp( hwnd, TEXT( "oldmcproc" ) );
 
@@ -325,7 +325,7 @@ LRESULT CALLBACK OwnMCProc( HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam )
       case WM_MOUSEACTIVATE:
       case WM_SETFOCUS:
       case WM_KILLFOCUS:
-         if( ! pSymbol )
+         if( !pSymbol )
          {
             pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OMONTHCALEVENTS" ) );
          }
@@ -343,7 +343,7 @@ LRESULT CALLBACK OwnMCProc( HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 
          r = hmg_par_LRESULT( -1 );
 
-         return ( r != 0 ) ? r : CallWindowProc( OldWndProc, hwnd, Msg, wParam, lParam );
+         return( r != 0 ) ? r : CallWindowProc( OldWndProc, hwnd, Msg, wParam, lParam );
    }
 
    return CallWindowProc( OldWndProc, hwnd, Msg, wParam, lParam );

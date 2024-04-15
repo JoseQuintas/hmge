@@ -44,7 +44,7 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE  0x0501
+#define _WIN32_IE 0x0501
 
 #include <mgdefs.h>
 
@@ -54,20 +54,20 @@ HINSTANCE   GetInstance( void );
 
 HB_FUNC( INITIPADDRESS )
 {
-   DWORD Style = WS_CHILD;
+   DWORD                Style = WS_CHILD;
 
    INITCOMMONCONTROLSEX icex;
 
    icex.dwSize = sizeof( INITCOMMONCONTROLSEX );
-   icex.dwICC  = ICC_INTERNET_CLASSES;
+   icex.dwICC = ICC_INTERNET_CLASSES;
    InitCommonControlsEx( &icex );
 
-   if( ! hb_parl( 7 ) )
+   if( !hb_parl( 7 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 8 ) )
+   if( !hb_parl( 8 ) )
    {
       Style |= WS_TABSTOP;
    }
@@ -75,20 +75,20 @@ HB_FUNC( INITIPADDRESS )
    hmg_ret_raw_HWND
    (
       CreateWindowEx
-      (
-         WS_EX_CLIENTEDGE,
-         WC_IPADDRESS,
-         TEXT( "" ),
-         Style,
-         hb_parni( 3 ),
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 6 ),
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 2 ),
-         GetInstance(),
-         NULL
-      )
+         (
+            WS_EX_CLIENTEDGE,
+            WC_IPADDRESS,
+            TEXT( "" ),
+            Style,
+            hb_parni( 3 ),
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hb_parni( 6 ),
+            hmg_par_raw_HWND( 1 ),
+            hmg_par_raw_HMENU( 2 ),
+            GetInstance(),
+            NULL
+         )
    );
 }
 
@@ -101,7 +101,7 @@ HB_FUNC( GETIPADDRESS )
 {
    DWORD pdwAddr;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), IPM_GETADDRESS, 0, ( LPARAM ) ( LPDWORD ) &pdwAddr );
+   SendMessage( hmg_par_raw_HWND( 1 ), IPM_GETADDRESS, 0, ( LPARAM ) ( LPDWORD ) & pdwAddr );
 
    hb_reta( 4 );
    HB_STORNI( ( INT ) FIRST_IPADDRESS( pdwAddr ), -1, 1 );

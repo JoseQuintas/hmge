@@ -44,7 +44,7 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE  0x0501
+#define _WIN32_IE 0x0501
 
 #include <mgdefs.h>
 
@@ -54,14 +54,14 @@ HINSTANCE   GetInstance( void );
 
 HB_FUNC( INITSLIDER )
 {
-   HWND  hTrackBar;
-   DWORD Style = WS_CHILD | ( hb_parl( 10 ) ? TBS_NOTICKS : TBS_AUTOTICKS );
-   DWORD iSelMin = 0, iSelMax = 0;
+   HWND                 hTrackBar;
+   DWORD                Style = WS_CHILD | ( hb_parl( 10 ) ? TBS_NOTICKS : TBS_AUTOTICKS );
+   DWORD                iSelMin = 0, iSelMax = 0;
 
    INITCOMMONCONTROLSEX i;
 
    i.dwSize = sizeof( INITCOMMONCONTROLSEX );
-   i.dwICC  = ICC_BAR_CLASSES;
+   i.dwICC = ICC_BAR_CLASSES;
    InitCommonControlsEx( &i );
 
    if( hb_parl( 9 ) )
@@ -84,43 +84,43 @@ HB_FUNC( INITSLIDER )
       Style |= TBS_LEFT;
    }
 
-   if( ! hb_parl( 14 ) )
+   if( !hb_parl( 14 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 15 ) )
+   if( !hb_parl( 15 ) )
    {
       Style |= WS_TABSTOP;
    }
 
-   if( hb_parl( 16 ) )     /* P.Ch. 16.10 */
+   if( hb_parl( 16 ) )  /* P.Ch. 16.10 */
    {
-      Style  |= TBS_ENABLESELRANGE;
+      Style |= TBS_ENABLESELRANGE;
       iSelMin = HB_MIN( hb_parnidef( 17, 0 ), hb_parnidef( 18, 0 ) );
       iSelMax = HB_MAX( hb_parnidef( 17, 0 ), hb_parnidef( 18, 0 ) );
    }
 
    hTrackBar = CreateWindow
-               (
-      TRACKBAR_CLASS,
-      0,
-      Style,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-               );
+      (
+         TRACKBAR_CLASS,
+         0,
+         Style,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    SendMessage( hTrackBar, TBM_SETRANGE, ( WPARAM ) TRUE, MAKELONG( hb_parni( 7 ), hb_parni( 8 ) ) );
 
    if( ( hb_parl( 16 ) ) && ( iSelMin != iSelMax ) )
    {
-      SendMessage( hTrackBar, TBM_SETSEL, ( WPARAM ) TRUE, MAKELONG( iSelMin, iSelMax ) );         /* P.Ch. 16.10 */
+      SendMessage( hTrackBar, TBM_SETSEL, ( WPARAM ) TRUE, MAKELONG( iSelMin, iSelMax ) );   /* P.Ch. 16.10 */
    }
 
    hmg_ret_raw_HWND( hTrackBar );

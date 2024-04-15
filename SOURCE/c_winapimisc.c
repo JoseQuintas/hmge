@@ -47,7 +47,7 @@
 #include <mgdefs.h>
 
 #if defined( _MSC_VER )
-   #pragma warning( disable : 4996 )
+#pragma warning( disable : 4996 )
 #endif
 #include <commctrl.h>
 #include <lmcons.h>
@@ -59,30 +59,30 @@
 #include "hbapiitm.h"
 
 #if defined( __XHARBOUR__ )
-   #define HB_FILE_TYPE_MAX  128
+#define HB_FILE_TYPE_MAX   128
 #else
 
 /* this has to be declared before hbapifs.h is included */
-   #define _HB_FILE_INTERNAL_
+#define _HB_FILE_INTERNAL_
 #endif
 #include "hbapifs.h"
 #include "inkey.ch"
 
 #ifdef __XCC__
-char *                        itoa( int __value, char * __string, int __radix );
+char                       *itoa( int __value, char *__string, int __radix );
 #endif
-#if defined( _MSC_VER ) && ! defined( __POCC__ )
-   #define itoa( __value, __string, __radix )  _itoa( __value, __string, __radix )
+#if defined( _MSC_VER ) && !defined( __POCC__ )
+#define itoa( __value, __string, __radix )   _itoa( __value, __string, __radix )
 #endif
 #if defined( __XHARBOUR__ )
-   #define HB_LONGLONG  LONGLONG
+#define HB_LONGLONG  LONGLONG
 extern HB_EXPORT void      hb_evalBlock0( PHB_ITEM pCodeBlock );
 #endif
-extern HB_EXPORT BOOL      Array2Rect( PHB_ITEM aRect, RECT * rc );
-extern HB_EXPORT PHB_ITEM  Rect2Array( RECT * rc );
+extern HB_EXPORT BOOL      Array2Rect( PHB_ITEM aRect, RECT *rc );
+extern HB_EXPORT PHB_ITEM  Rect2Array( RECT *rc );
 extern void                hmg_ErrorExit( LPCTSTR lpMessage, DWORD dwError, BOOL bExit );
 
-typedef HMODULE ( __stdcall * SHGETFOLDERPATH )( HWND, int, HANDLE, DWORD, LPTSTR );
+typedef HMODULE ( __stdcall *SHGETFOLDERPATH ) ( HWND, int, HANDLE, DWORD, LPTSTR );
 
 #ifdef UNICODE
 LPWSTR   AnsiToWide( LPCSTR );
@@ -95,10 +95,10 @@ void     RegisterResource( HANDLE hResource, LPCSTR szType );
 
 HB_PTRUINT wapi_GetProcAddress( HMODULE hModule, LPCSTR lpProcName )
 {
-   FARPROC pProc;
+   FARPROC  pProc;
 
    pProc = GetProcAddress( hModule, lpProcName );
-   return ( HB_PTRUINT ) pProc;
+   return( HB_PTRUINT ) pProc;
 }
 
 /*
@@ -108,30 +108,30 @@ HB_PTRUINT wapi_GetProcAddress( HMODULE hModule, LPCSTR lpProcName )
  */
 HB_FUNC( WAITRUNPIPE )
 {
-   STARTUPINFO StartupInfo;
-   PROCESS_INFORMATION ProcessInfo;
-   HANDLE ReadPipeHandle;
-   HANDLE WritePipeHandle;                // not used here
-   char * Data;
+   STARTUPINFO          StartupInfo;
+   PROCESS_INFORMATION  ProcessInfo;
+   HANDLE               ReadPipeHandle;
+   HANDLE               WritePipeHandle;  // not used here
+   char                 *Data;
 
 #ifndef UNICODE
-   LPSTR lpCommandLine = ( char * ) hb_parc( 1 );
+   LPSTR                lpCommandLine = ( char * ) hb_parc( 1 );
 #else
-   LPWSTR lpCommandLine = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   LPWSTR               lpCommandLine = AnsiToWide( ( char * ) hb_parc( 1 ) );
 #endif
-   const char *        szFile = ( const char * ) hb_parc( 3 );
-   HB_FHANDLE          nHandle;
-   SECURITY_ATTRIBUTES sa;
+   const char           *szFile = ( const char * ) hb_parc( 3 );
+   HB_FHANDLE           nHandle;
+   SECURITY_ATTRIBUTES  sa;
 
    ZeroMemory( &sa, sizeof( SECURITY_ATTRIBUTES ) );
-   sa.nLength              = sizeof( SECURITY_ATTRIBUTES );
-   sa.bInheritHandle       = 1;
+   sa.nLength = sizeof( SECURITY_ATTRIBUTES );
+   sa.bInheritHandle = 1;
    sa.lpSecurityDescriptor = NULL;
 
    memset( &StartupInfo, 0, sizeof( StartupInfo ) );
    memset( &ProcessInfo, 0, sizeof( ProcessInfo ) );
 
-   if( ! hb_fsFile( szFile ) )
+   if( !hb_fsFile( szFile ) )
    {
       nHandle = hb_fsCreate( szFile, 0 );
    }
@@ -141,20 +141,20 @@ HB_FUNC( WAITRUNPIPE )
       hb_fsSeek( nHandle, 0, 2 );
    }
 
-   if( ! CreatePipe( &ReadPipeHandle, &WritePipeHandle, &sa, 0 ) )
+   if( !CreatePipe( &ReadPipeHandle, &WritePipeHandle, &sa, 0 ) )
    {
       hb_retni( -1 );
       return;
    }
 
-   ProcessInfo.hProcess    = INVALID_HANDLE_VALUE;
-   ProcessInfo.hThread     = INVALID_HANDLE_VALUE;
-   StartupInfo.dwFlags     = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+   ProcessInfo.hProcess = INVALID_HANDLE_VALUE;
+   ProcessInfo.hThread = INVALID_HANDLE_VALUE;
+   StartupInfo.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
    StartupInfo.wShowWindow = hmg_par_WORD( 2 );
-   StartupInfo.hStdOutput  = WritePipeHandle;
-   StartupInfo.hStdError   = WritePipeHandle;
+   StartupInfo.hStdOutput = WritePipeHandle;
+   StartupInfo.hStdError = WritePipeHandle;
 
-   if( ! CreateProcess( NULL, lpCommandLine, 0, 0, FALSE, CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS, 0, 0, &StartupInfo, &ProcessInfo ) )
+   if( !CreateProcess( NULL, lpCommandLine, 0, 0, FALSE, CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS, 0, 0, &StartupInfo, &ProcessInfo ) )
    {
       hb_retni( -1 );
       return;
@@ -167,14 +167,14 @@ HB_FUNC( WAITRUNPIPE )
    }
 
    Data = ( char * ) hb_xgrab( 1024 );
-   for(;; )
+   for( ;; )
    {
       DWORD BytesRead;
       DWORD TotalBytes;
       DWORD BytesLeft;
 
       // Check for the presence of data in the pipe
-      if( ! PeekNamedPipe( ReadPipeHandle, Data, sizeof( Data ), &BytesRead, &TotalBytes, &BytesLeft ) )
+      if( !PeekNamedPipe( ReadPipeHandle, Data, sizeof( Data ), &BytesRead, &TotalBytes, &BytesLeft ) )
       {
          hb_retni( -1 );
          return;
@@ -183,13 +183,13 @@ HB_FUNC( WAITRUNPIPE )
       // If there is bytes, read them
       if( BytesRead )
       {
-         if( ! ReadFile( ReadPipeHandle, Data, sizeof( Data ) - 1, &BytesRead, NULL ) )
+         if( !ReadFile( ReadPipeHandle, Data, sizeof( Data ) - 1, &BytesRead, NULL ) )
          {
             hb_retni( -1 );
             return;
          }
 
-         Data[ BytesRead ] = TEXT( '\0' );
+         Data[BytesRead] = TEXT( '\0' );
          hb_fsWriteLarge( nHandle, Data, BytesRead );
       }
       else
@@ -210,15 +210,15 @@ HB_FUNC( WAITRUNPIPE )
    hb_xfree( Data );
 }
 
-HB_FUNC( COPYRTFTOCLIPBOARD )   // CopyRtfToClipboard(cRtfText) store cRTFText in Windows clipboard
+HB_FUNC( COPYRTFTOCLIPBOARD ) // CopyRtfToClipboard(cRtfText) store cRTFText in Windows clipboard
 {
-   HGLOBAL      hglbCopy;
-   char *       lptstrCopy;
-   UINT         cf;
-   const char * cStr = HB_ISCHAR( 1 ) ? hb_parc( 1 ) : "";
-   int          nLen = ( int ) strlen( cStr );
+   HGLOBAL     hglbCopy;
+   char        *lptstrCopy;
+   UINT        cf;
+   const char  *cStr = HB_ISCHAR( 1 ) ? hb_parc( 1 ) : "";
+   int         nLen = ( int ) strlen( cStr );
 
-   if( ( nLen == 0 ) || ! OpenClipboard( GetActiveWindow() ) )
+   if( ( nLen == 0 ) || !OpenClipboard( GetActiveWindow() ) )
    {
       return;
    }
@@ -237,22 +237,22 @@ HB_FUNC( COPYRTFTOCLIPBOARD )   // CopyRtfToClipboard(cRtfText) store cRTFText i
 
    lptstrCopy = ( char * ) GlobalLock( hglbCopy );
    memcpy( lptstrCopy, cStr, nLen * sizeof( TCHAR ) );
-   lptstrCopy[ nLen ] = ( TCHAR ) 0;    // NULL character
+   lptstrCopy[nLen] = ( TCHAR ) 0;  // NULL character
    GlobalUnlock( hglbCopy );
 
    SetClipboardData( cf, hglbCopy );
    CloseClipboard();
 }
 
-HB_FUNC( COPYTOCLIPBOARD )   // CopyToClipboard(cText) store cText in Windows clipboard
+HB_FUNC( COPYTOCLIPBOARD ) // CopyToClipboard(cText) store cText in Windows clipboard
 {
-   HGLOBAL hglbCopy;
-   char *  lptstrCopy;
+   HGLOBAL     hglbCopy;
+   char        *lptstrCopy;
 
-   const char * cStr = HB_ISCHAR( 1 ) ? hb_parc( 1 ) : "";
-   int          nLen = ( int ) strlen( cStr );
+   const char  *cStr = HB_ISCHAR( 1 ) ? hb_parc( 1 ) : "";
+   int         nLen = ( int ) strlen( cStr );
 
-   if( ( nLen == 0 ) || ! OpenClipboard( GetActiveWindow() ) )
+   if( ( nLen == 0 ) || !OpenClipboard( GetActiveWindow() ) )
    {
       return;
    }
@@ -268,7 +268,7 @@ HB_FUNC( COPYTOCLIPBOARD )   // CopyToClipboard(cText) store cText in Windows cl
 
    lptstrCopy = ( char * ) GlobalLock( hglbCopy );
    memcpy( lptstrCopy, cStr, nLen * sizeof( TCHAR ) );
-   lptstrCopy[ nLen ] = ( TCHAR ) 0;    // null character
+   lptstrCopy[nLen] = ( TCHAR ) 0;  // null character
    GlobalUnlock( hglbCopy );
 
    SetClipboardData( HB_ISNUM( 2 ) ? hmg_par_UINT( 2 ) : CF_TEXT, hglbCopy );
@@ -277,8 +277,8 @@ HB_FUNC( COPYTOCLIPBOARD )   // CopyToClipboard(cText) store cText in Windows cl
 
 HB_FUNC( RETRIEVETEXTFROMCLIPBOARD )
 {
-   HGLOBAL hClipMem;
-   LPSTR   lpClip;
+   HGLOBAL  hClipMem;
+   LPSTR    lpClip;
 
    if( IsClipboardFormatAvailable( CF_TEXT ) && OpenClipboard( GetActiveWindow() ) )
    {
@@ -350,23 +350,23 @@ HB_FUNC( GETASYNCKEYSTATE )
 
 HB_FUNC( HMG_KEYBOARDCLEARBUFFER )
 {
-   MSG Msg;
+   MSG   Msg;
 
    while( PeekMessage( &Msg, NULL, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE ) );
 }
 
 HB_FUNC( HMG_MOUSECLEARBUFFER )
 {
-   MSG Msg;
+   MSG   Msg;
 
    while( PeekMessage( &Msg, NULL, WM_MOUSEFIRST, WM_MOUSELAST, PM_REMOVE ) );
 }
 
 #ifndef USER_TIMER_MINIMUM
-   #define USER_TIMER_MINIMUM  0x0000000A
+#define USER_TIMER_MINIMUM 0x0000000A
 #endif
 #ifndef USER_TIMER_MAXIMUM
-   #define USER_TIMER_MAXIMUM  0x7FFFFFFF
+#define USER_TIMER_MAXIMUM 0x7FFFFFFF
 #endif
 HB_FUNC( INKEYGUI )
 {
@@ -397,7 +397,7 @@ HB_FUNC( INKEYGUI )
             case WM_KEYDOWN:
             case WM_SYSKEYDOWN:
                bBreak = TRUE;
-               uRet   = ( UINT ) Msg.wParam;
+               uRet = ( UINT ) Msg.wParam;
                break;
 
             case WM_TIMER:
@@ -407,7 +407,7 @@ HB_FUNC( INKEYGUI )
             case WM_LBUTTONDOWN:
             case WM_RBUTTONDOWN:
                bBreak = TRUE;
-               uRet   = ( Msg.message == WM_LBUTTONDOWN ) ? K_LBUTTONDOWN : K_RBUTTONDOWN;
+               uRet = ( Msg.message == WM_LBUTTONDOWN ) ? K_LBUTTONDOWN : K_RBUTTONDOWN;
                PostMessage( Msg.hwnd, Msg.message, Msg.wParam, Msg.lParam );
                break;
          }
@@ -420,8 +420,8 @@ HB_FUNC( INKEYGUI )
       }
       else
       {
-         TranslateMessage( &Msg );    // Translates virtual key codes
-         DispatchMessage( &Msg );     // Dispatches message to window
+         TranslateMessage( &Msg );  // Translates virtual key codes
+         DispatchMessage( &Msg );   // Dispatches message to window
       }
    }
 
@@ -448,13 +448,13 @@ HB_FUNC( LOWORD )
    hmg_ret_WORD( LOWORD( hmg_par_DWORD( 1 ) ) );
 }
 
-HB_FUNC( C_GETSPECIALFOLDER )   // Contributed By Ryszard Ryüko
+HB_FUNC( C_GETSPECIALFOLDER ) // Contributed By Ryszard Ryüko
 {
 #ifdef UNICODE
-   LPSTR pStr;
+   LPSTR          pStr;
 #endif
-   TCHAR *      lpBuffer = ( TCHAR * ) hb_xgrab( ( MAX_PATH + 1 ) * sizeof( TCHAR ) );
-   LPITEMIDLIST pidlBrowse;   // PIDL selected by user
+   TCHAR          *lpBuffer = ( TCHAR * ) hb_xgrab( ( MAX_PATH + 1 ) * sizeof( TCHAR ) );
+   LPITEMIDLIST   pidlBrowse; // PIDL selected by user
    SHGetSpecialFolderLocation( GetActiveWindow(), hb_parni( 1 ), &pidlBrowse );
    SHGetPathFromIDList( pidlBrowse, lpBuffer );
 
@@ -477,12 +477,12 @@ HB_FUNC( C_GETSPECIALFOLDER )   // Contributed By Ryszard Ryüko
  */
 HB_FUNC( C_GETDLLSPECIALFOLDER )
 {
-   TCHAR   szPath[ MAX_PATH ];
-   HMODULE hModule = LoadLibrary( TEXT( "SHFolder.dll" ) );
+   TCHAR    szPath[MAX_PATH];
+   HMODULE  hModule = LoadLibrary( TEXT( "SHFolder.dll" ) );
 
    if( hModule )
    {
-      SHGETFOLDERPATH fnShGetFolderPath = ( SHGETFOLDERPATH ) wapi_GetProcAddress( hModule, "SHGetFolderPathA" );
+      SHGETFOLDERPATH   fnShGetFolderPath = ( SHGETFOLDERPATH ) wapi_GetProcAddress( hModule, "SHGetFolderPathA" );
 
       if( fnShGetFolderPath )
       {
@@ -502,25 +502,25 @@ HB_FUNC( C_GETDLLSPECIALFOLDER )
 #endif /* __WIN98__ */
 
 // Memory Management Functions
-typedef BOOL ( WINAPI * GetPhysicallyInstalledSystemMemory_ptr )( ULONGLONG * );
+typedef BOOL ( WINAPI *GetPhysicallyInstalledSystemMemory_ptr ) ( ULONGLONG * );
 
 HB_FUNC( GETPHYSICALLYINSTALLEDSYSTEMMEMORY )
 {
-   HMODULE hDll = GetModuleHandle( TEXT( "kernel32.dll" ) );
+   HMODULE  hDll = GetModuleHandle( TEXT( "kernel32.dll" ) );
 
    hb_retnll( 0 );
 
    if( NULL != hDll )
    {
       GetPhysicallyInstalledSystemMemory_ptr fn_GetPhysicallyInstalledSystemMemory = ( GetPhysicallyInstalledSystemMemory_ptr ) wapi_GetProcAddress
-                                                                                     (
-         hDll,
-         "GetPhysicallyInstalledSystemMemory"
-                                                                                     );
+         (
+            hDll,
+            "GetPhysicallyInstalledSystemMemory"
+         );
 
       if( NULL != fn_GetPhysicallyInstalledSystemMemory )
       {
-         ULONGLONG ullTotalMemoryInKilobytes;
+         ULONGLONG   ullTotalMemoryInKilobytes;
 
          if( fn_GetPhysicallyInstalledSystemMemory( &ullTotalMemoryInKilobytes ) )
          {
@@ -530,18 +530,18 @@ HB_FUNC( GETPHYSICALLYINSTALLEDSYSTEMMEMORY )
    }
 }
 
-typedef BOOL ( WINAPI * GlobalMemoryStatusEx_ptr )( MEMORYSTATUSEX * );
-#define DIV  ( 1024 * 1024 )
+typedef BOOL ( WINAPI *GlobalMemoryStatusEx_ptr ) ( MEMORYSTATUSEX * );
+#define DIV ( 1024 * 1024 )
 
 HB_FUNC( MEMORYSTATUS )
 {
-   HMODULE hDll = GetModuleHandle( TEXT( "kernel32.dll" ) );
+   HMODULE  hDll = GetModuleHandle( TEXT( "kernel32.dll" ) );
 
    HB_RETNL( 0 );
 
    if( NULL != hDll )
    {
-      GlobalMemoryStatusEx_ptr fn_GlobalMemoryStatusEx = ( GlobalMemoryStatusEx_ptr ) wapi_GetProcAddress( hDll, "GlobalMemoryStatusEx" );
+      GlobalMemoryStatusEx_ptr   fn_GlobalMemoryStatusEx = ( GlobalMemoryStatusEx_ptr ) wapi_GetProcAddress( hDll, "GlobalMemoryStatusEx" );
 
       if( NULL != fn_GlobalMemoryStatusEx )
       {
@@ -581,7 +581,7 @@ HB_FUNC( MEMORYSTATUS )
       }
       else
       {
-         MEMORYSTATUS mst;
+         MEMORYSTATUS   mst;
 
          mst.dwLength = sizeof( MEMORYSTATUS );
          GlobalMemoryStatus( &mst );
@@ -619,11 +619,11 @@ HB_FUNC( MEMORYSTATUS )
 HB_FUNC( C_SHELLABOUT )
 {
 #ifndef UNICODE
-   LPCSTR szApp        = hb_parc( 2 );
-   LPCSTR szOtherStuff = hb_parc( 3 );
+   LPCSTR   szApp = hb_parc( 2 );
+   LPCSTR   szOtherStuff = hb_parc( 3 );
 #else
-   LPCWSTR szApp        = AnsiToWide( ( char * ) hb_parc( 2 ) );
-   LPCWSTR szOtherStuff = AnsiToWide( ( char * ) hb_parc( 3 ) );
+   LPCWSTR  szApp = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  szOtherStuff = AnsiToWide( ( char * ) hb_parc( 3 ) );
 #endif
    hb_retl( ShellAbout( hmg_par_raw_HWND( 1 ), szApp, szOtherStuff, hmg_par_raw_HICON( 4 ) ) );
 #ifdef UNICODE
@@ -634,17 +634,17 @@ HB_FUNC( C_SHELLABOUT )
 
 HB_FUNC( PAINTBKGND )
 {
-   HWND   hwnd;
-   HBRUSH hBrush;
-   RECT   recClie;
-   HDC    hdc;
+   HWND     hwnd;
+   HBRUSH   hBrush;
+   RECT     recClie;
+   HDC      hdc;
 
    hwnd = hmg_par_raw_HWND( 1 );
-   hdc  = GetDC( hwnd );
+   hdc = GetDC( hwnd );
 
    GetClientRect( hwnd, &recClie );
 
-   if( hb_pcount() > 1 && ! HB_ISNIL( 2 ) )
+   if( hb_pcount() > 1 && !HB_ISNIL( 2 ) )
    {
       hBrush = CreateSolidBrush( RGB( HB_PARNI( 2, 1 ), HB_PARNI( 2, 2 ), HB_PARNI( 2, 3 ) ) );
       FillRect( hdc, &recClie, hBrush );
@@ -664,7 +664,7 @@ HB_FUNC( PAINTBKGND )
 /* Functions Contributed  By Luiz Rafael Culik Guimaraes( culikr@uol.com.br) */
 HB_FUNC( GETWINDOWSDIR )
 {
-   TCHAR szBuffer[ MAX_PATH + 1 ] = { 0 };
+   TCHAR szBuffer[MAX_PATH + 1] = { 0 };
 
 #ifdef UNICODE
    LPSTR pStr;
@@ -682,7 +682,7 @@ HB_FUNC( GETWINDOWSDIR )
 
 HB_FUNC( GETSYSTEMDIR )
 {
-   TCHAR szBuffer[ MAX_PATH + 1 ] = { 0 };
+   TCHAR szBuffer[MAX_PATH + 1] = { 0 };
 
 #ifdef UNICODE
    LPSTR pStr;
@@ -700,7 +700,7 @@ HB_FUNC( GETSYSTEMDIR )
 
 HB_FUNC( GETTEMPDIR )
 {
-   TCHAR szBuffer[ MAX_PATH + 1 ] = { 0 };
+   TCHAR szBuffer[MAX_PATH + 1] = { 0 };
 
 #ifdef UNICODE
    LPSTR pStr;
@@ -736,30 +736,30 @@ HB_FUNC( GETNEXTDLGTABITEM )
    hmg_ret_raw_HWND( GetNextDlgTabItem( hmg_par_raw_HWND( 1 ), hmg_par_raw_HWND( 2 ), hb_parl( 3 ) ) );
 }
 
-typedef BOOL ( WINAPI * LPFN_ISWOW64PROCESS )( HANDLE, PBOOL );
-typedef BOOL ( WINAPI * LPFN_WOW64DISABLEWOW64FSREDIRECTION )( PVOID * );
-typedef BOOL ( WINAPI * LPFN_WOW64REVERTWOW64FSREDIRECTION )( PVOID );
+typedef BOOL ( WINAPI *LPFN_ISWOW64PROCESS ) ( HANDLE, PBOOL );
+typedef BOOL ( WINAPI *LPFN_WOW64DISABLEWOW64FSREDIRECTION ) ( PVOID * );
+typedef BOOL ( WINAPI *LPFN_WOW64REVERTWOW64FSREDIRECTION ) ( PVOID );
 
 HB_FUNC( SHELLEXECUTE )
 {
 #ifndef UNICODE
-   LPCSTR lpOperation  = hb_parc( 2 );
-   LPCSTR lpFile       = hb_parc( 3 );
-   LPCSTR lpParameters = hb_parc( 4 );
-   LPCSTR lpDirectory  = hb_parc( 5 );
+   LPCSTR                              lpOperation = hb_parc( 2 );
+   LPCSTR                              lpFile = hb_parc( 3 );
+   LPCSTR                              lpParameters = hb_parc( 4 );
+   LPCSTR                              lpDirectory = hb_parc( 5 );
 #else
-   LPCWSTR lpOperation  = AnsiToWide( ( char * ) hb_parc( 2 ) );
-   LPCWSTR lpFile       = AnsiToWide( ( char * ) hb_parc( 3 ) );
-   LPCWSTR lpParameters = AnsiToWide( ( char * ) hb_parc( 4 ) );
-   LPCWSTR lpDirectory  = AnsiToWide( ( char * ) hb_parc( 5 ) );
+   LPCWSTR                             lpOperation = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR                             lpFile = AnsiToWide( ( char * ) hb_parc( 3 ) );
+   LPCWSTR                             lpParameters = AnsiToWide( ( char * ) hb_parc( 4 ) );
+   LPCWSTR                             lpDirectory = AnsiToWide( ( char * ) hb_parc( 5 ) );
 #endif
-   LPFN_ISWOW64PROCESS fnIsWow64Process;
-   BOOL bIsWow64 = FALSE;
+   LPFN_ISWOW64PROCESS                 fnIsWow64Process;
+   BOOL                                bIsWow64 = FALSE;
    LPFN_WOW64DISABLEWOW64FSREDIRECTION fnDisable;
-   PVOID OldValue = NULL;
-   BOOL  bRestore = FALSE;
-   LPFN_WOW64REVERTWOW64FSREDIRECTION fnRevert;
-   HMODULE hDll = GetModuleHandle( TEXT( "kernel32.dll" ) );
+   PVOID                               OldValue = NULL;
+   BOOL                                bRestore = FALSE;
+   LPFN_WOW64REVERTWOW64FSREDIRECTION  fnRevert;
+   HMODULE                             hDll = GetModuleHandle( TEXT( "kernel32.dll" ) );
 
    fnIsWow64Process = ( LPFN_ISWOW64PROCESS ) wapi_GetProcAddress( hDll, "IsWow64Process" );
    if( NULL != fnIsWow64Process )
@@ -784,14 +784,14 @@ HB_FUNC( SHELLEXECUTE )
    hmg_ret_raw_HANDLE
    (
       ShellExecute
-      (
-         hmg_par_raw_HWND( 1 ),
-         HB_ISNIL( 2 ) ? NULL : lpOperation,
-         lpFile,
-         HB_ISNIL( 4 ) ? NULL : lpParameters,
-         HB_ISNIL( 5 ) ? NULL : lpDirectory,
-         hb_parni( 6 )
-      )
+         (
+            hmg_par_raw_HWND( 1 ),
+            HB_ISNIL( 2 ) ? NULL : lpOperation,
+            lpFile,
+            HB_ISNIL( 4 ) ? NULL : lpParameters,
+            HB_ISNIL( 5 ) ? NULL : lpDirectory,
+            hb_parni( 6 )
+         )
    );
 
    hb_idleSleep( 1.0 );
@@ -816,27 +816,27 @@ HB_FUNC( SHELLEXECUTE )
 HB_FUNC( SHELLEXECUTEEX )
 {
 #ifndef UNICODE
-   LPCSTR lpOperation  = hb_parc( 2 );
-   LPCSTR lpFile       = hb_parc( 3 );
-   LPCSTR lpParameters = hb_parc( 4 );
-   LPCSTR lpDirectory  = hb_parc( 5 );
+   LPCSTR            lpOperation = hb_parc( 2 );
+   LPCSTR            lpFile = hb_parc( 3 );
+   LPCSTR            lpParameters = hb_parc( 4 );
+   LPCSTR            lpDirectory = hb_parc( 5 );
 #else
-   LPCWSTR lpOperation  = AnsiToWide( ( char * ) hb_parc( 2 ) );
-   LPCWSTR lpFile       = AnsiToWide( ( char * ) hb_parc( 3 ) );
-   LPCWSTR lpParameters = AnsiToWide( ( char * ) hb_parc( 4 ) );
-   LPCWSTR lpDirectory  = AnsiToWide( ( char * ) hb_parc( 5 ) );
+   LPCWSTR           lpOperation = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR           lpFile = AnsiToWide( ( char * ) hb_parc( 3 ) );
+   LPCWSTR           lpParameters = AnsiToWide( ( char * ) hb_parc( 4 ) );
+   LPCWSTR           lpDirectory = AnsiToWide( ( char * ) hb_parc( 5 ) );
 #endif
-   SHELLEXECUTEINFO SHExecInfo;
+   SHELLEXECUTEINFO  SHExecInfo;
    ZeroMemory( &SHExecInfo, sizeof( SHExecInfo ) );
 
-   SHExecInfo.cbSize       = sizeof( SHExecInfo );
-   SHExecInfo.fMask        = SEE_MASK_NOCLOSEPROCESS;
-   SHExecInfo.hwnd         = HB_ISNIL( 1 ) ? GetActiveWindow() : hmg_par_raw_HWND( 1 );
-   SHExecInfo.lpVerb       = HB_ISNIL( 2 ) ? NULL : lpOperation;
-   SHExecInfo.lpFile       = lpFile;
+   SHExecInfo.cbSize = sizeof( SHExecInfo );
+   SHExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+   SHExecInfo.hwnd = HB_ISNIL( 1 ) ? GetActiveWindow() : hmg_par_raw_HWND( 1 );
+   SHExecInfo.lpVerb = HB_ISNIL( 2 ) ? NULL : lpOperation;
+   SHExecInfo.lpFile = lpFile;
    SHExecInfo.lpParameters = HB_ISNIL( 4 ) ? NULL : lpParameters;
-   SHExecInfo.lpDirectory  = HB_ISNIL( 5 ) ? NULL : lpDirectory;
-   SHExecInfo.nShow        = hb_parni( 6 );
+   SHExecInfo.lpDirectory = HB_ISNIL( 5 ) ? NULL : lpDirectory;
+   SHExecInfo.nShow = hb_parni( 6 );
 
    if( ShellExecuteEx( &SHExecInfo ) )
    {
@@ -857,16 +857,16 @@ HB_FUNC( SHELLEXECUTEEX )
 
 HB_FUNC( WAITRUN )
 {
-   DWORD dwExitCode;
+   DWORD                dwExitCode;
 
 #ifndef UNICODE
-   LPSTR lpCommandLine = ( char * ) hb_parc( 1 );
+   LPSTR                lpCommandLine = ( char * ) hb_parc( 1 );
 #else
-   LPWSTR lpCommandLine = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   LPWSTR               lpCommandLine = AnsiToWide( ( char * ) hb_parc( 1 ) );
 #endif
-   STARTUPINFO stInfo;
-   PROCESS_INFORMATION prInfo;
-   BOOL bResult;
+   STARTUPINFO          stInfo;
+   PROCESS_INFORMATION  prInfo;
+   BOOL                 bResult;
 
    ZeroMemory( &stInfo, sizeof( stInfo ) );
 
@@ -881,7 +881,7 @@ HB_FUNC( WAITRUN )
 #ifdef UNICODE
    hb_xfree( ( TCHAR * ) lpCommandLine );
 #endif
-   if( ! bResult )
+   if( !bResult )
    {
       hb_retni( -1 );
       return;
@@ -901,46 +901,46 @@ HB_FUNC( WAITRUN )
 HB_FUNC( WAITRUNTERM )
 {
 #ifndef UNICODE
-   LPSTR  lpCommandLine      = ( char * ) hb_parc( 1 );
-   LPCSTR lpCurrentDirectory = hb_parc( 2 );
+   LPSTR                lpCommandLine = ( char * ) hb_parc( 1 );
+   LPCSTR               lpCurrentDirectory = hb_parc( 2 );
 #else
-   LPWSTR  lpCommandLine      = AnsiToWide( ( char * ) hb_parc( 1 ) );
-   LPCWSTR lpCurrentDirectory = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR               lpCommandLine = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   LPCWSTR              lpCurrentDirectory = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   PHB_ITEM    pWaitProc  = hb_param( 4, HB_IT_BLOCK );
-   ULONG       ulWaitMsec = ( HB_ISNIL( 5 ) ? 2000 : hb_parnl( 5 ) );
-   BOOL        bTerm      = FALSE;
-   BOOL        bWait;
-   ULONG       ulNoSignal;
-   DWORD       dwExitCode;
-   STARTUPINFO stInfo;
-   PROCESS_INFORMATION prInfo;
-   BOOL bResult;
+   PHB_ITEM             pWaitProc = hb_param( 4, HB_IT_BLOCK );
+   ULONG                ulWaitMsec = ( HB_ISNIL( 5 ) ? 2000 : hb_parnl( 5 ) );
+   BOOL                 bTerm = FALSE;
+   BOOL                 bWait;
+   ULONG                ulNoSignal;
+   DWORD                dwExitCode;
+   STARTUPINFO          stInfo;
+   PROCESS_INFORMATION  prInfo;
+   BOOL                 bResult;
 
    ZeroMemory( &stInfo, sizeof( stInfo ) );
-   stInfo.cb          = sizeof( stInfo );
-   stInfo.dwFlags     = STARTF_USESHOWWINDOW;
+   stInfo.cb = sizeof( stInfo );
+   stInfo.dwFlags = STARTF_USESHOWWINDOW;
    stInfo.wShowWindow = HB_ISNIL( 3 ) ? ( WORD ) 5 : hmg_par_WORD( 3 );
 
    bResult = CreateProcess
-             (
-      NULL,
-      lpCommandLine,
-      NULL,
-      NULL,
-      TRUE,
-      CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS,
-      NULL,
-      HB_ISNIL( 2 ) ? NULL : lpCurrentDirectory,
-      &stInfo,
-      &prInfo
-             );
+      (
+         NULL,
+         lpCommandLine,
+         NULL,
+         NULL,
+         TRUE,
+         CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS,
+         NULL,
+         HB_ISNIL( 2 ) ? NULL : lpCurrentDirectory,
+         &stInfo,
+         &prInfo
+      );
 
 #ifdef UNICODE
    hb_xfree( ( TCHAR * ) lpCommandLine );
    hb_xfree( ( TCHAR * ) lpCurrentDirectory );
 #endif
-   if( ! bResult )
+   if( !bResult )
    {
       hb_retni( -2 );
       return;
@@ -955,7 +955,7 @@ HB_FUNC( WAITRUNTERM )
          {
             hb_evalBlock0( pWaitProc );
             bWait = hb_parl( -1 );
-            if( ! bWait )
+            if( !bWait )
             {
                if( TerminateProcess( prInfo.hProcess, 0 ) != 0 )
                {
@@ -981,7 +981,7 @@ HB_FUNC( WAITRUNTERM )
 
    if( bTerm )
    {
-      dwExitCode = ( DWORD ) -1;
+      dwExitCode = ( DWORD ) - 1;
    }
    else
    {
@@ -993,9 +993,9 @@ HB_FUNC( WAITRUNTERM )
    hmg_ret_DWORD( dwExitCode );
 }
 
-HB_FUNC( ISEXERUNNING )   // ( cExeNameCaseSensitive ) --> lResult
+HB_FUNC( ISEXERUNNING ) // ( cExeNameCaseSensitive ) --> lResult
 {
-   HANDLE hMutex = CreateMutex( NULL, FALSE, ( LPTSTR ) hb_parc( 1 ) );
+   HANDLE   hMutex = CreateMutex( NULL, FALSE, ( LPTSTR ) hb_parc( 1 ) );
 
    hb_retl( GetLastError() == ERROR_ALREADY_EXISTS );
 
@@ -1018,9 +1018,9 @@ HB_FUNC( GETLASTERROR )
 HB_FUNC( CREATEFOLDER )
 {
 #ifndef UNICODE
-   LPCSTR lpPathName = hb_parc( 1 );
+   LPCSTR   lpPathName = hb_parc( 1 );
 #else
-   LPCWSTR lpPathName = AnsiToWide( hb_parc( 1 ) );
+   LPCWSTR  lpPathName = AnsiToWide( hb_parc( 1 ) );
 #endif
    hb_retl( CreateDirectory( lpPathName, NULL ) );
 #ifdef UNICODE
@@ -1031,9 +1031,9 @@ HB_FUNC( CREATEFOLDER )
 HB_FUNC( SETCURRENTFOLDER )
 {
 #ifndef UNICODE
-   LPCSTR lpPathName = hb_parc( 1 );
+   LPCSTR   lpPathName = hb_parc( 1 );
 #else
-   LPCWSTR lpPathName = AnsiToWide( hb_parc( 1 ) );
+   LPCWSTR  lpPathName = AnsiToWide( hb_parc( 1 ) );
 #endif
    hb_retl( SetCurrentDirectory( lpPathName ) );
 #ifdef UNICODE
@@ -1044,9 +1044,9 @@ HB_FUNC( SETCURRENTFOLDER )
 HB_FUNC( REMOVEFOLDER )
 {
 #ifndef UNICODE
-   LPCSTR lpPathName = hb_parc( 1 );
+   LPCSTR   lpPathName = hb_parc( 1 );
 #else
-   LPCWSTR lpPathName = AnsiToWide( hb_parc( 1 ) );
+   LPCWSTR  lpPathName = AnsiToWide( hb_parc( 1 ) );
 #endif
    hb_retl( RemoveDirectory( lpPathName ) );
 #ifdef UNICODE
@@ -1056,7 +1056,7 @@ HB_FUNC( REMOVEFOLDER )
 
 HB_FUNC( GETCURRENTFOLDER )
 {
-   TCHAR Path[ MAX_PATH + 1 ] = { 0 };
+   TCHAR Path[MAX_PATH + 1] = { 0 };
 
 #ifdef UNICODE
    LPSTR pStr;
@@ -1073,7 +1073,7 @@ HB_FUNC( GETCURRENTFOLDER )
 
 HB_FUNC( CREATESOLIDBRUSH )
 {
-   HBRUSH hBrush = CreateSolidBrush( RGB( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ) ) );
+   HBRUSH   hBrush = CreateSolidBrush( RGB( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ) ) );
 
    RegisterResource( hBrush, "BRUSH" );
    hmg_ret_raw_HBRUSH( hBrush );
@@ -1095,50 +1095,41 @@ HB_FUNC( GETSYSCOLOR )
 }
 
 /**************************************************************************************/
-
 /*                                                                                    */
-
 /*  This function returns the Windows Version on which the app calling the function   */
-
 /*  is running.                                                                       */
-
 /*                                                                                    */
-
 /*  The return value is an 4-th dimensinal array containing the OS in the first,      */
-
 /*  the servicepack or the system release number in the second, the build number      */
-
 /*  in the third and extended OS information in the fourth array element.             */
-
 /*                                                                                    */
-
 /**************************************************************************************/
 HB_FUNC( WINVERSION )
 {
 #if defined( __BORLANDC__ )
-#define VER_SUITE_PERSONAL  0x00000200
-#define VER_SUITE_BLADE     0x00000400
+#define VER_SUITE_PERSONAL 0x00000200
+#define VER_SUITE_BLADE    0x00000400
 #endif
 
-   OSVERSIONINFOEX osvi;
-   BOOL    bOsVersionInfoEx;
-   TCHAR * szVersion     = NULL;
-   TCHAR * szServicePack = NULL;
-   TCHAR * szBuild       = NULL;
-   TCHAR   buffer[ 5 ];
+   OSVERSIONINFOEX   osvi;
+   BOOL              bOsVersionInfoEx;
+   TCHAR             *szVersion = NULL;
+   TCHAR             *szServicePack = NULL;
+   TCHAR             *szBuild = NULL;
+   TCHAR             buffer[5];
 
-   TCHAR * szVersionEx = NULL;
+   TCHAR             *szVersionEx = NULL;
 #ifdef UNICODE
-   LPSTR pStr;
+   LPSTR             pStr;
 #endif
    ZeroMemory( &osvi, sizeof( OSVERSIONINFOEX ) );
    osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
 
    bOsVersionInfoEx = GetVersionEx( ( OSVERSIONINFO * ) &osvi );
-   if( ! bOsVersionInfoEx )
+   if( !bOsVersionInfoEx )
    {
       osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
-      if( ! GetVersionEx( ( OSVERSIONINFO * ) &osvi ) )
+      if( !GetVersionEx( ( OSVERSIONINFO * ) &osvi ) )
       {
          szVersion = TEXT( "Unknown Operating System" );
       }
@@ -1283,7 +1274,7 @@ HB_FUNC( WINVERSION )
             else
             {
                HKEY  hKey;
-               TCHAR szProductType[ 80 ];
+               TCHAR szProductType[80];
                DWORD dwBufLen = 80;
                LONG  lRetVal;
 
@@ -1329,19 +1320,19 @@ HB_FUNC( WINVERSION )
 
             if( osvi.dwMajorVersion == 4 && lstrcmpi( osvi.szCSDVersion, TEXT( "Service Pack 6" ) ) == 0 )
             {
-               HKEY hKey;
-               LONG lRetVal;
+               HKEY  hKey;
+               LONG  lRetVal;
 
                lRetVal = RegOpenKeyEx( HKEY_LOCAL_MACHINE, TEXT( "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Hotfix\\Q246009" ), 0, KEY_QUERY_VALUE, &hKey );
                if( lRetVal == ERROR_SUCCESS )
                {
                   szServicePack = TEXT( "Service Pack 6a" );
-                  szBuild       = _itot( osvi.dwBuildNumber & 0xFFFF, buffer, 10 );
+                  szBuild = _itot( osvi.dwBuildNumber & 0xFFFF, buffer, 10 );
                }
                else
                {
                   szServicePack = osvi.szCSDVersion;
-                  szBuild       = _itot( osvi.dwBuildNumber & 0xFFFF, buffer, 10 );
+                  szBuild = _itot( osvi.dwBuildNumber & 0xFFFF, buffer, 10 );
                }
 
                RegCloseKey( hKey );
@@ -1349,28 +1340,28 @@ HB_FUNC( WINVERSION )
             else
             {
                szServicePack = osvi.szCSDVersion;
-               szBuild       = _itot( osvi.dwBuildNumber & 0xFFFF, buffer, 10 );
+               szBuild = _itot( osvi.dwBuildNumber & 0xFFFF, buffer, 10 );
             }
             break;
 
          case VER_PLATFORM_WIN32_WINDOWS:
             if( ( osvi.dwMajorVersion == 4 ) && ( osvi.dwMinorVersion == 0 ) )
             {
-               if( osvi.szCSDVersion[ 1 ] == TEXT( 'B' ) )
+               if( osvi.szCSDVersion[1] == TEXT( 'B' ) )
                {
-                  szVersion     = TEXT( "Windows 95 B" );
+                  szVersion = TEXT( "Windows 95 B" );
                   szServicePack = TEXT( "OSR2" );
                }
                else
                {
-                  if( osvi.szCSDVersion[ 1 ] == TEXT( 'C' ) )
+                  if( osvi.szCSDVersion[1] == TEXT( 'C' ) )
                   {
-                     szVersion     = TEXT( "Windows 95 C" );
+                     szVersion = TEXT( "Windows 95 C" );
                      szServicePack = TEXT( "OSR2" );
                   }
                   else
                   {
-                     szVersion     = TEXT( "Windows 95" );
+                     szVersion = TEXT( "Windows 95" );
                      szServicePack = TEXT( "OSR1" );
                   }
                }
@@ -1380,14 +1371,14 @@ HB_FUNC( WINVERSION )
 
             if( ( osvi.dwMajorVersion == 4 ) && ( osvi.dwMinorVersion == 10 ) )
             {
-               if( osvi.szCSDVersion[ 1 ] == 'A' )
+               if( osvi.szCSDVersion[1] == 'A' )
                {
-                  szVersion     = TEXT( "Windows 98 A" );
+                  szVersion = TEXT( "Windows 98 A" );
                   szServicePack = TEXT( "Second Edition" );
                }
                else
                {
-                  szVersion     = TEXT( "Windows 98" );
+                  szVersion = TEXT( "Windows 98" );
                   szServicePack = TEXT( "First Edition" );
                }
 
@@ -1397,7 +1388,7 @@ HB_FUNC( WINVERSION )
             if( ( osvi.dwMajorVersion == 4 ) && ( osvi.dwMinorVersion == 90 ) )
             {
                szVersion = TEXT( "Windows ME" );
-               szBuild   = _itot( osvi.dwBuildNumber & 0x0000FFFF, buffer, 10 );
+               szBuild = _itot( osvi.dwBuildNumber & 0x0000FFFF, buffer, 10 );
             }
             break;
       }
@@ -1426,22 +1417,22 @@ HB_FUNC( WINVERSION )
 }
 
 #if defined( __XHARBOUR__ )
-HB_FUNC( ISEXE64 )        // Check if our app is 64 bits
+HB_FUNC( ISEXE64 )      // Check if our app is 64 bits
 {
    hb_retl( ( sizeof( void * ) == 8 ) );
 }
 #endif
 HB_FUNC( GETDLLVERSION )
 {
-   HMODULE hModule;
-   DWORD   dwMajorVersion = 0;
-   DWORD   dwMinorVersion = 0;
-   DWORD   dwBuildNumber  = 0;
+   HMODULE  hModule;
+   DWORD    dwMajorVersion = 0;
+   DWORD    dwMinorVersion = 0;
+   DWORD    dwBuildNumber = 0;
 
 #ifndef UNICODE
-   LPCSTR lpLibFileName = hb_parc( 1 );
+   LPCSTR   lpLibFileName = hb_parc( 1 );
 #else
-   LPCWSTR lpLibFileName = AnsiToWide( hb_parc( 1 ) );
+   LPCWSTR  lpLibFileName = AnsiToWide( hb_parc( 1 ) );
 #endif
    hModule = LoadLibrary( lpLibFileName );
    if( hModule )
@@ -1460,7 +1451,7 @@ HB_FUNC( GETDLLVERSION )
          {
             dwMajorVersion = dvi.dwMajorVersion;
             dwMinorVersion = dvi.dwMinorVersion;
-            dwBuildNumber  = dvi.dwBuildNumber;
+            dwBuildNumber = dvi.dwBuildNumber;
          }
       }
       else
@@ -1484,16 +1475,16 @@ HB_FUNC( GETDLLVERSION )
 // Jacek Kubica <kubica@wssk.wroc.pl> HMG 1.0 Experimental Build 9a
 HB_FUNC( SELECTOBJECT )
 {
-   hmg_ret_raw_HGDIOBJ( SelectObject( hmg_par_raw_HDC( 1 ),    // handle of device context
-                                      hmg_par_raw_HGDIOBJ( 2 ) // handle of object
-                                      ) );
+   hmg_ret_raw_HGDIOBJ( SelectObject( hmg_par_raw_HDC( 1 ), // handle of device context
+   hmg_par_raw_HGDIOBJ( 2 ) // handle of object
+   ) );
 }
 
 HB_FUNC( FILLRECT )
 {
-   HWND hWnd = hmg_par_raw_HWND( 1 );
-   HDC  hDC;
-   BOOL bDC = FALSE;
+   HWND  hWnd = hmg_par_raw_HWND( 1 );
+   HDC   hDC;
+   BOOL  bDC = FALSE;
 
    if( IsWindow( hWnd ) )
    {
@@ -1507,8 +1498,8 @@ HB_FUNC( FILLRECT )
 
    if( GetObjectType( ( HGDIOBJ ) hDC ) == OBJ_DC )
    {
-      RECT rc;
-      int  iParam = 6;
+      RECT  rc;
+      int   iParam = 6;
 
       if( Array2Rect( hb_param( 2, HB_IT_ANY ), &rc ) )
       {
@@ -1516,9 +1507,9 @@ HB_FUNC( FILLRECT )
       }
       else
       {
-         rc.left   = hb_parni( 2 );
-         rc.top    = hb_parni( 3 );
-         rc.right  = hb_parni( 4 );
+         rc.left = hb_parni( 2 );
+         rc.top = hb_parni( 3 );
+         rc.right = hb_parni( 4 );
          rc.bottom = hb_parni( 5 );
       }
 
@@ -1536,22 +1527,22 @@ HB_FUNC( FILLRECT )
 }
 
 #if defined( __MINGW32__ )
-   #pragma GCC diagnostic push
-   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif /* __MINGW32__ */
 
 #if ( defined( __POCC__ ) && __POCC__ >= 900 )
-   #ifndef _NO_W32_PSEUDO_MODIFIERS
-      #define IN
-      #define OUT
-   #endif
+#ifndef _NO_W32_PSEUDO_MODIFIERS
+#define IN
+#define OUT
+#endif
 #endif
 BOOL IsAppHung( IN HWND hWnd, OUT PBOOL pbHung )
 {
-   OSVERSIONINFO osvi;
-   HINSTANCE     hUser;
+   OSVERSIONINFO  osvi;
+   HINSTANCE      hUser;
 
-   if( ! IsWindow( hWnd ) )
+   if( !IsWindow( hWnd ) )
    {
       return SetLastError( ERROR_INVALID_PARAMETER ), FALSE;
    }
@@ -1566,10 +1557,10 @@ BOOL IsAppHung( IN HWND hWnd, OUT PBOOL pbHung )
 
    if( osvi.dwPlatformId == VER_PLATFORM_WIN32_NT )
    {
-      BOOL( WINAPI * _IsHungAppWindow )( HWND );
+      BOOL ( WINAPI *_IsHungAppWindow ) ( HWND );
 
       // found the function IsHungAppWindow
-      *( FARPROC * )&_IsHungAppWindow = GetProcAddress( hUser, "IsHungAppWindow" );
+      *( FARPROC * ) &_IsHungAppWindow = GetProcAddress( hUser, "IsHungAppWindow" );
       if( _IsHungAppWindow == NULL )
       {
          return SetLastError( ERROR_PROC_NOT_FOUND ), FALSE;
@@ -1582,10 +1573,10 @@ BOOL IsAppHung( IN HWND hWnd, OUT PBOOL pbHung )
    {
       DWORD dwThreadId = GetWindowThreadProcessId( hWnd, NULL );
 
-      BOOL( WINAPI * _IsHungThread )( DWORD );
+      BOOL ( WINAPI *_IsHungThread ) ( DWORD );
 
       // found the function IsHungThread
-      *( FARPROC * )&_IsHungThread = GetProcAddress( hUser, "IsHungThread" );
+      *( FARPROC * ) &_IsHungThread = GetProcAddress( hUser, "IsHungThread" );
       if( _IsHungThread == NULL )
       {
          return SetLastError( ERROR_PROC_NOT_FOUND ), FALSE;
@@ -1599,14 +1590,13 @@ BOOL IsAppHung( IN HWND hWnd, OUT PBOOL pbHung )
 }
 
 #if defined( __MINGW32__ )
-   #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif \
-\
-/* __MINGW32__ */
-
+ \
+   /* __MINGW32__ */
 HB_FUNC( ISAPPHUNG )
 {
-   BOOL bIsHung;
+   BOOL  bIsHung;
 
    if( IsAppHung( hmg_par_raw_HWND( 1 ), &bIsHung ) )
    {
@@ -1624,7 +1614,7 @@ HB_FUNC( ISAPPHUNG )
 }
 
 #ifndef PROCESS_QUERY_LIMITED_INFORMATION
-   #define PROCESS_QUERY_LIMITED_INFORMATION  ( 0x1000 )
+#define PROCESS_QUERY_LIMITED_INFORMATION ( 0x1000 )
 #endif
 
 // EmptyWorkingSet( [ ProcessID ] ) ---> lBoolean
@@ -1632,22 +1622,22 @@ HB_FUNC( EMPTYWORKINGSET )
 {
    // It removes as many pages as possible from the process working set (clean the working set memory).
    // This operation is useful primarily for testing and tuning.
-   DWORD  ProcessID;
-   HANDLE hProcess;
+   DWORD    ProcessID;
+   HANDLE   hProcess;
 
-   typedef BOOL ( WINAPI * Func_EmptyWorkingSet )( HANDLE );
+   typedef BOOL ( WINAPI *Func_EmptyWorkingSet ) ( HANDLE );
 
-   static Func_EmptyWorkingSet pEmptyWorkingSet = NULL;
+   static Func_EmptyWorkingSet   pEmptyWorkingSet = NULL;
 
    if( pEmptyWorkingSet == NULL )
    {
-      HMODULE hLib = LoadLibrary( TEXT( "Kernel32.dll" ) );
+      HMODULE  hLib = LoadLibrary( TEXT( "Kernel32.dll" ) );
       pEmptyWorkingSet = ( Func_EmptyWorkingSet ) wapi_GetProcAddress( hLib, "K32EmptyWorkingSet" );
    }
 
    if( pEmptyWorkingSet == NULL )
    {
-      HMODULE hLib = LoadLibrary( TEXT( "Psapi.dll" ) );
+      HMODULE  hLib = LoadLibrary( TEXT( "Psapi.dll" ) );
       pEmptyWorkingSet = ( Func_EmptyWorkingSet ) wapi_GetProcAddress( hLib, "K32EmptyWorkingSet" );
    }
 
@@ -1676,19 +1666,19 @@ HB_FUNC( EMPTYWORKINGSET )
 // Grigory Filatov <gfilatov@gmail.com> HMG 1.1 Experimental Build 10d
 HB_FUNC( CLEANPROGRAMMEMORY )
 {
-   hb_retl( SetProcessWorkingSetSize( GetCurrentProcess(), ( SIZE_T ) -1, ( SIZE_T ) -1 ) );
+   hb_retl( SetProcessWorkingSetSize( GetCurrentProcess(), ( SIZE_T ) - 1, ( SIZE_T ) - 1 ) );
 }
 
 // Grigory Filatov <gfilatov@gmail.com> HMG 1.1 Experimental Build 11a
-typedef INT ( WINAPI * _GETCOMPACTPATH )( LPTSTR pszOut, LPTSTR pszSrc, INT cchMax, DWORD dwFlags );
+typedef INT ( WINAPI *_GETCOMPACTPATH ) ( LPTSTR pszOut, LPTSTR pszSrc, INT cchMax, DWORD dwFlags );
 
 HB_FUNC( GETCOMPACTPATH )
 {
-   HINSTANCE handle = LoadLibrary( TEXT( "shlwapi.dll" ) );
+   HINSTANCE   handle = LoadLibrary( TEXT( "shlwapi.dll" ) );
 
    if( handle )
    {
-      _GETCOMPACTPATH pFunc;
+      _GETCOMPACTPATH   pFunc;
       pFunc = ( _GETCOMPACTPATH ) wapi_GetProcAddress( handle, "PathCompactPathExA" );
       hb_retni( pFunc( ( LPTSTR ) hb_parc( 1 ), ( LPTSTR ) hb_parc( 2 ), hmg_par_INT( 3 ), hmg_par_DWORD( 4 ) ) );
       FreeLibrary( handle );
@@ -1698,15 +1688,15 @@ HB_FUNC( GETCOMPACTPATH )
 // Jacek Kubica <kubica@wssk.wroc.pl> HMG 1.1 Experimental Build 11a
 HB_FUNC( GETSHORTPATHNAME )
 {
-   HB_SIZE iRet;
+   HB_SIZE  iRet;
 
 #ifndef UNICODE
-   char   buffer[ MAX_PATH + 1 ] = { 0 };
-   LPCSTR lpszLongPath = hb_parc( 1 );
+   char     buffer[MAX_PATH + 1] = { 0 };
+   LPCSTR   lpszLongPath = hb_parc( 1 );
 #else
-   TCHAR   buffer[ MAX_PATH + 1 ] = { 0 };
-   LPCWSTR lpszLongPath = AnsiToWide( ( char * ) hb_parc( 1 ) );
-   LPSTR   pStr;
+   TCHAR    buffer[MAX_PATH + 1] = { 0 };
+   LPCWSTR  lpszLongPath = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   LPSTR    pStr;
 #endif
    iRet = GetShortPathName( lpszLongPath, buffer, MAX_PATH );
    if( iRet < MAX_PATH )
@@ -1742,24 +1732,24 @@ HB_FUNC( GETSHORTPATHNAME )
 HB_FUNC( DRAWTEXT )
 {
 #ifndef UNICODE
-   LPCSTR lpchText = hb_parc( 2 );
+   LPCSTR   lpchText = hb_parc( 2 );
 #else
-   LPCWSTR lpchText = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  lpchText = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   RECT rc;
+   RECT     rc;
 
-   rc.left   = hb_parni( 3 );
-   rc.top    = hb_parni( 4 );
-   rc.right  = hb_parni( 5 );
+   rc.left = hb_parni( 3 );
+   rc.top = hb_parni( 4 );
+   rc.right = hb_parni( 5 );
    rc.bottom = hb_parni( 6 );
 
    DrawText
    (
-      hmg_par_raw_HDC( 1 ),        // device context
-      lpchText,                    // pointer to string
-      ( int ) lstrlen( lpchText ), // length of  string
-      &rc,                         // rectangle
-      hb_parni( 7 )                // draw style
+      hmg_par_raw_HDC( 1 ),         // device context
+      lpchText,                     // pointer to string
+      ( int ) lstrlen( lpchText ),  // length of  string
+      &rc,              // rectangle
+      hb_parni( 7 )     // draw style
    );
 
 #ifdef UNICODE
@@ -1769,12 +1759,12 @@ HB_FUNC( DRAWTEXT )
 
 HB_FUNC( GETTEXTMETRIC )
 {
-   TEXTMETRIC tm;
-   PHB_ITEM   aMetr = hb_itemArrayNew( 7 );
+   TEXTMETRIC  tm;
+   PHB_ITEM    aMetr = hb_itemArrayNew( 7 );
 
    if( GetTextMetrics( hmg_par_raw_HDC( 1 ), // handle of device context
-                       &tm                   // address of text metrics structure
-                       ) )
+   &tm // address of text metrics structure
+   ) )
    {
       //tmHeight
       //Specifies the height (ascent + descent) of characters.
@@ -1816,8 +1806,8 @@ HB_FUNC( GETTEXTMETRIC )
 
 HB_FUNC( _GETCLIENTRECT )
 {
-   RECT rc;
-   HWND hWnd = hmg_par_raw_HWND( 1 );
+   RECT  rc;
+   HWND  hWnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hWnd ) )
    {
@@ -1834,13 +1824,13 @@ HB_FUNC( _GETCLIENTRECT )
 // Grigory Filatov <gfilatov@gmail.com> HMG 1.1 Experimental Build 17d
 HB_FUNC( ISOEMTEXT )
 {
-   LPBYTE pString = ( LPBYTE ) hb_parc( 1 );
-   WORD   w = 0, wLen = ( WORD ) hb_parclen( 1 );
-   BOOL   bOem = FALSE;
+   LPBYTE   pString = ( LPBYTE ) hb_parc( 1 );
+   WORD     w = 0, wLen = ( WORD ) hb_parclen( 1 );
+   BOOL     bOem = FALSE;
 
-   while( w < wLen && ! bOem )
+   while( w < wLen && !bOem )
    {
-      bOem = pString[ w ] >= 128 && pString[ w ] <= 168;
+      bOem = pString[w] >= 128 && pString[w] <= 168;
       w++;
    }
 
@@ -1895,10 +1885,10 @@ HB_FUNC( DRAGACCEPTFILES )
 
 HB_FUNC( DRAGQUERYFILES )
 {
-   HDROP hDrop  = hmg_par_raw_HDROP( 1 );
+   HDROP hDrop = hmg_par_raw_HDROP( 1 );
    UINT  iFiles = DragQueryFile( hDrop, 0xFFFFFFFF, NULL, 0 );
    UINT  i;
-   TCHAR bBuffer[ 250 ];
+   TCHAR bBuffer[250];
 
 #ifdef UNICODE
    LPSTR pStr;
@@ -1934,13 +1924,13 @@ HB_FUNC( HMG_CHARSETNAME )
 
 HB_FUNC( HMG_GETLOCALEINFO )
 {
-   INT LCType = hb_parni( 1 );
+   INT      LCType = hb_parni( 1 );
 
 #ifndef UNICODE
-   LPSTR cText;
+   LPSTR    cText;
 #else
-   LPWSTR cText;
-   LPSTR  pStr;
+   LPWSTR   cText;
+   LPSTR    pStr;
 #endif
    cText = ( LPTSTR ) hb_xgrab( HB_FILE_TYPE_MAX );
 
@@ -1998,40 +1988,44 @@ HB_FUNC( HMG_GETLOCALEINFO )
  */
 #ifndef UNICODE
 static HRESULT CreateShortCut
-   ( LPSTR pszTargetfile, LPSTR pszTargetargs, LPSTR pszLinkfile, LPSTR pszDescription, int iShowmode, LPSTR pszCurdir, LPSTR pszIconfile, int iIconindex, WORD wHotKey )
+   (
+      LPSTR pszTargetfile, LPSTR pszTargetargs, LPSTR pszLinkfile, LPSTR pszDescription, int iShowmode, LPSTR pszCurdir, LPSTR pszIconfile, int iIconindex, WORD
+         wHotKey
+   )
 #else
 static HRESULT CreateShortCut
-   ( LPWSTR pszTargetfile, LPWSTR pszTargetargs, LPWSTR pszLinkfile, LPWSTR pszDescription, int iShowmode, LPWSTR pszCurdir, LPWSTR pszIconfile, int iIconindex, WORD wHotKey )
+   (
+      LPWSTR pszTargetfile, LPWSTR pszTargetargs, LPWSTR pszLinkfile, LPWSTR pszDescription, int iShowmode, LPWSTR pszCurdir, LPWSTR pszIconfile, int iIconindex,
+         WORD wHotKey
+   )
 #endif
 {
-   HRESULT        hRes;           /* Returned COM result code */
-   IShellLink *   pShellLink;     /* IShellLink object pointer */
-   IPersistFile * pPersistFile;   /* IPersistFile object pointer */
-   WORD wszLinkfile[ MAX_PATH ];  /* pszLinkfile as Unicode string */
+   HRESULT        hRes; /* Returned COM result code */
+   IShellLink     *pShellLink;            /* IShellLink object pointer */
+   IPersistFile   *pPersistFile;          /* IPersistFile object pointer */
+   WORD           wszLinkfile[MAX_PATH];  /* pszLinkfile as Unicode string */
 
    hRes = E_INVALIDARG;
    if
    (
       ( pszTargetfile != NULL )
-      && ( lstrlen( pszTargetfile ) > 0 )
-      && ( pszTargetargs != NULL )
-      && ( pszLinkfile != NULL )
-      && ( lstrlen( pszLinkfile ) > 0 )
-      && ( pszDescription != NULL )
-      && ( iShowmode >= 0 )
-      && ( pszCurdir != NULL )
-      && ( pszIconfile != NULL )
-      && ( iIconindex >= 0 )
+   && ( lstrlen( pszTargetfile ) > 0 )
+   && ( pszTargetargs != NULL )
+   && ( pszLinkfile != NULL )
+   && ( lstrlen( pszLinkfile ) > 0 )
+   && ( pszDescription != NULL )
+   && ( iShowmode >= 0 )
+   && ( pszCurdir != NULL )
+   && ( pszIconfile != NULL )
+   && ( iIconindex >= 0 )
    )
    {
       hRes = CoCreateInstance
-             (
-         &CLSID_ShellLink,           /* pre-defined CLSID of the IShellLink object */
-         NULL,                       /* pointer to parent interface if part of aggregate */
-         CLSCTX_INPROC_SERVER,       /* caller and called code are in same process */
-         &IID_IShellLink,            /* pre-defined interface of the IShellLink object */
-         ( LPVOID * ) &pShellLink    /* Returns a pointer to the IShellLink object */
-             );
+         (
+            &CLSID_ShellLink, /* pre-defined CLSID of the IShellLink object */ NULL,                     /* pointer to parent interface if part of aggregate */
+               CLSCTX_INPROC_SERVER, /* caller and called code are in same process */ &IID_IShellLink,   /* pre-defined interface of the IShellLink object */
+                  ( LPVOID * ) &pShellLink   /* Returns a pointer to the IShellLink object */
+         );
       if( SUCCEEDED( hRes ) )
       {
          /* Set the fields in the IShellLink object */
@@ -2059,9 +2053,7 @@ static HRESULT CreateShortCut
          }
 
          /* Use the IPersistFile object to save the shell link */
-         hRes = pShellLink->lpVtbl->QueryInterface( pShellLink,                   /* existing IShellLink object */
-                                                    &IID_IPersistFile,            /* pre-defined interface of the IPersistFile object */
-                                                    ( LPVOID * ) &pPersistFile ); /* returns a pointer to the IPersistFile object */
+         hRes = pShellLink->lpVtbl->QueryInterface( pShellLink, /* existing IShellLink object */ &IID_IPersistFile, /* pre-defined interface of the IPersistFile object */ ( LPVOID * ) &pPersistFile ); /* returns a pointer to the IPersistFile object */
          if( SUCCEEDED( hRes ) )
          {
 #ifndef UNICODE
@@ -2079,68 +2071,67 @@ static HRESULT CreateShortCut
 }
 
 /***************************************************************************/
-#if defined( __BORLANDC__ )
-   #pragma warn -prc /* suggest parentheses to clarify precedence */
+#if defined( __BORLANDC__ ) && ! defined( _WIN64 )
+#pragma warn -prc         /* suggest parentheses to clarify precedence */
 #endif
-
 HB_FUNC( C_CREATELINK )
 {
-   int     iShowmode;      /* <Showmode> (optional) */
-   int     iIconindex;     /* <Iconindex> (optional) */
-   WORD    wHotKey;        /* Virtual key code (optional) */
-   BYTE    uVirtualKeyCode;
-   BYTE    uModifiers;     /* modifier flags */
-   HRESULT hRes;           /* result of calling COM functions */
+   int      iShowmode;     /* <Showmode> (optional) */
+   int      iIconindex;    /* <Iconindex> (optional) */
+   WORD     wHotKey;       /* Virtual key code (optional) */
+   BYTE     uVirtualKeyCode;
+   BYTE     uModifiers;    /* modifier flags */
+   HRESULT  hRes;          /* result of calling COM functions */
 
 #ifndef UNICODE
-   LPSTR szTargetfile;     /* <Targetfile> */
-   LPSTR szTargetargs;     /* <Targetargs> */
-   LPSTR szLinkfile;       /* <Linkfile> */
-   LPSTR szDescription;    /* <Description> */
-   LPSTR szCurdir;         /* <Curdir> (optional) */
-   LPSTR szIconfile;       /* <Iconfile> (optional) */
-   szTargetfile  = ( char * ) hb_parc( 1 );
-   szTargetargs  = HB_ISCHAR( 2 ) ? ( char * ) hb_parc( 2 ) : "";
-   szLinkfile    = ( char * ) hb_parc( 3 );
+   LPSTR    szTargetfile;  /* <Targetfile> */
+   LPSTR    szTargetargs;  /* <Targetargs> */
+   LPSTR    szLinkfile;    /* <Linkfile> */
+   LPSTR    szDescription; /* <Description> */
+   LPSTR    szCurdir;      /* <Curdir> (optional) */
+   LPSTR    szIconfile;    /* <Iconfile> (optional) */
+   szTargetfile = ( char * ) hb_parc( 1 );
+   szTargetargs = HB_ISCHAR( 2 ) ? ( char * ) hb_parc( 2 ) : "";
+   szLinkfile = ( char * ) hb_parc( 3 );
    szDescription = HB_ISCHAR( 4 ) ? ( char * ) hb_parc( 4 ) : "";
-   szCurdir      = HB_ISCHAR( 6 ) ? ( char * ) hb_parc( 6 ) : "";
-   szIconfile    = HB_ISCHAR( 7 ) ? ( char * ) hb_parc( 7 ) : "";
+   szCurdir = HB_ISCHAR( 6 ) ? ( char * ) hb_parc( 6 ) : "";
+   szIconfile = HB_ISCHAR( 7 ) ? ( char * ) hb_parc( 7 ) : "";
 #else
-   LPWSTR szTargetfile;    /* <Targetfile> */
-   LPWSTR szTargetargs;    /* <Targetargs> */
-   LPWSTR szLinkfile;      /* <Linkfile> */
-   LPWSTR szDescription;   /* <Description> */
-   LPWSTR szCurdir;        /* <Curdir> (optional) */
-   LPWSTR szIconfile;      /* <Iconfile> (optional) */
-   szTargetfile  = AnsiToWide( ( char * ) hb_parc( 1 ) );
-   szTargetargs  = HB_ISCHAR( 2 ) ? AnsiToWide( ( char * ) hb_parc( 2 ) ) : TEXT( "" );
-   szLinkfile    = AnsiToWide( ( char * ) hb_parc( 3 ) );
+   LPWSTR   szTargetfile;  /* <Targetfile> */
+   LPWSTR   szTargetargs;  /* <Targetargs> */
+   LPWSTR   szLinkfile;    /* <Linkfile> */
+   LPWSTR   szDescription; /* <Description> */
+   LPWSTR   szCurdir;      /* <Curdir> (optional) */
+   LPWSTR   szIconfile;    /* <Iconfile> (optional) */
+   szTargetfile = AnsiToWide( ( char * ) hb_parc( 1 ) );
+   szTargetargs = HB_ISCHAR( 2 ) ? AnsiToWide( ( char * ) hb_parc( 2 ) ) : TEXT( "" );
+   szLinkfile = AnsiToWide( ( char * ) hb_parc( 3 ) );
    szDescription = HB_ISCHAR( 4 ) ? AnsiToWide( ( char * ) hb_parc( 4 ) ) : TEXT( "" );
-   szCurdir      = HB_ISCHAR( 6 ) ? AnsiToWide( ( char * ) hb_parc( 6 ) ) : TEXT( "" );
-   szIconfile    = HB_ISCHAR( 7 ) ? AnsiToWide( ( char * ) hb_parc( 7 ) ) : TEXT( "" );
+   szCurdir = HB_ISCHAR( 6 ) ? AnsiToWide( ( char * ) hb_parc( 6 ) ) : TEXT( "" );
+   szIconfile = HB_ISCHAR( 7 ) ? AnsiToWide( ( char * ) hb_parc( 7 ) ) : TEXT( "" );
 #endif
-   iShowmode       = hb_parnidef( 5, 0 );
-   iIconindex      = hb_parnidef( 8, 0 );
+   iShowmode = hb_parnidef( 5, 0 );
+   iIconindex = hb_parnidef( 8, 0 );
    uVirtualKeyCode = hmg_par_BYTE( 9 );
-   uModifiers      = hmg_par_BYTE( 10 );
-   wHotKey         = MAKEWORD( uVirtualKeyCode, uModifiers );
+   uModifiers = hmg_par_BYTE( 10 );
+   wHotKey = MAKEWORD( uVirtualKeyCode, uModifiers );
 
    /* Call CoInitialize() and create the link if OK. */
    hRes = CoInitialize( NULL );
    if( SUCCEEDED( hRes ) )
    {
       hRes = CreateShortCut
-             (
-         szTargetfile,        /* Target file */
-         szTargetargs,        /* Target arguments */
-         szLinkfile,          /* Short-cut filename */
-         szDescription,       /* Short-cut description */
-         iShowmode,           /* Showmode constant */
-         szCurdir,            /* Working directory for linked file */
-         szIconfile,          /* Icon file shown for the link */
-         iIconindex,          /* Index of icon in the file */
-         wHotKey              /* Virtual key code */
-             );
+         (
+            szTargetfile,  /* Target file */
+            szTargetargs,  /* Target arguments */
+            szLinkfile,    /* Short-cut filename */
+            szDescription, /* Short-cut description */
+            iShowmode,     /* Showmode constant */
+            szCurdir,      /* Working directory for linked file */
+            szIconfile,    /* Icon file shown for the link */
+            iIconindex,    /* Index of icon in the file */
+            wHotKey        /* Virtual key code */
+         );
       if( SUCCEEDED( hRes ) )
       {
          hmg_ret_HRESULT( hRes );
@@ -2156,16 +2147,16 @@ HB_FUNC( C_CREATELINK )
 }
 
 #ifdef __XCC__
-char * itoa( int n, char s[], int base )
+char *itoa( int n, char s[], int base )
 {
-   int d = n % base;
-   int r = n / base;
+   int   d = n % base;
+   int   r = n / base;
 
    if( n < 0 )
    {
       *s++ = '-';
-      d    = -d;
-      r    = -r;
+      d = -d;
+      r = -r;
    }
 
    if( r )
@@ -2173,8 +2164,8 @@ char * itoa( int n, char s[], int base )
       s = itoa( r, s, base );
    }
 
-   *s++ = "0123456789abcdefghijklmnopqrstuvwxyz"[ d ];
-   *s   = 0;
+   *s++ = "0123456789abcdefghijklmnopqrstuvwxyz"[d];
+   *s = 0;
 
    return s;
 }

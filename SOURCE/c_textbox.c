@@ -48,8 +48,9 @@
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
+
 // Edit Class Name
-   #define WC_EDIT  "Edit"
+#define WC_EDIT   "Edit"
 #endif
 #include "hbvm.h"
 
@@ -81,31 +82,31 @@ HB_FUNC( INITMASKEDTEXTBOX )
       Style |= ES_READONLY;
    }
 
-   if( ! hb_parl( 14 ) )
+   if( !hb_parl( 14 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 15 ) )
+   if( !hb_parl( 15 ) )
    {
       Style |= WS_TABSTOP;
    }
 
    hedit = CreateWindowEx
-           (
-      hb_parl( 16 ) ? 0 : WS_EX_CLIENTEDGE,
-      WC_EDIT,
-      TEXT( "" ),
-      Style,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 11 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-           );
+      (
+         hb_parl( 16 ) ? 0 : WS_EX_CLIENTEDGE,
+         WC_EDIT,
+         TEXT( "" ),
+         Style,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 11 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    SetProp( ( HWND ) hedit, TEXT( "oldeditproc" ), ( HWND ) GetWindowLongPtr( ( HWND ) hedit, GWLP_WNDPROC ) );
    SubclassWindow2( hedit, OwnEditProc );
@@ -153,32 +154,32 @@ HB_FUNC( INITTEXTBOX )
       iStyle |= ES_READONLY;
    }
 
-   if( ! hb_parl( 16 ) )
+   if( !hb_parl( 16 ) )
    {
       iStyle |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 17 ) )
+   if( !hb_parl( 17 ) )
    {
       iStyle |= WS_TABSTOP;
    }
 
    // Creates the child control.
    hedit = CreateWindowEx
-           (
-      hb_parl( 18 ) ? 0 : WS_EX_CLIENTEDGE,
-      WC_EDIT,
-      TEXT( "" ),
-      iStyle,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-           );
+      (
+         hb_parl( 18 ) ? 0 : WS_EX_CLIENTEDGE,
+         WC_EDIT,
+         TEXT( "" ),
+         iStyle,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    SendMessage( hedit, EM_LIMITTEXT, hmg_par_WPARAM( 9 ), ( LPARAM ) 0 );
 
@@ -212,31 +213,31 @@ HB_FUNC( INITCHARMASKTEXTBOX )
       Style |= ES_READONLY;
    }
 
-   if( ! hb_parl( 14 ) )
+   if( !hb_parl( 14 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 15 ) )
+   if( !hb_parl( 15 ) )
    {
       Style |= WS_TABSTOP;
    }
 
    hedit = CreateWindowEx
-           (
-      hb_parl( 16 ) ? 0 : WS_EX_CLIENTEDGE,
-      WC_EDIT,
-      TEXT( "" ),
-      Style,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 11 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-           );
+      (
+         hb_parl( 16 ) ? 0 : WS_EX_CLIENTEDGE,
+         WC_EDIT,
+         TEXT( "" ),
+         Style,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 11 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    SetProp( ( HWND ) hedit, TEXT( "oldeditproc" ), ( HWND ) GetWindowLongPtr( ( HWND ) hedit, GWLP_WNDPROC ) );
    SubclassWindow2( hedit, OwnEditProc );
@@ -246,9 +247,9 @@ HB_FUNC( INITCHARMASKTEXTBOX )
 
 LRESULT CALLBACK OwnEditProc( HWND hButton, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-   static PHB_SYMB pSymbol = NULL;
-   LRESULT         r;
-   WNDPROC         OldWndProc;
+   static PHB_SYMB   pSymbol = NULL;
+   LRESULT           r;
+   WNDPROC           OldWndProc;
 
    OldWndProc = ( WNDPROC ) ( HB_PTRUINT ) GetProp( hButton, TEXT( "oldeditproc" ) );
 
@@ -261,7 +262,7 @@ LRESULT CALLBACK OwnEditProc( HWND hButton, UINT Msg, WPARAM wParam, LPARAM lPar
 
       case WM_CONTEXTMENU:
       case WM_CHAR:
-         if( ! pSymbol )
+         if( !pSymbol )
          {
             pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OEDITEVENTS" ) );
          }
@@ -279,7 +280,7 @@ LRESULT CALLBACK OwnEditProc( HWND hButton, UINT Msg, WPARAM wParam, LPARAM lPar
 
          r = hmg_par_LRESULT( -1 );
 
-         return ( r != 0 ) ? r : CallWindowProc( OldWndProc, hButton, Msg, wParam, lParam );
+         return( r != 0 ) ? r : CallWindowProc( OldWndProc, hButton, Msg, wParam, lParam );
    }
 
    return CallWindowProc( OldWndProc, hButton, Msg, wParam, lParam );

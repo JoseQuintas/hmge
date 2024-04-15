@@ -2701,3 +2701,16 @@ STATIC FUNCTION ABM2Listado( aImpresoras )
    wndABM2Listado.RELEASE
 
 RETURN NIL
+
+#ifdef __XHARBOUR__
+*-----------------------------------------------------------------------------*
+FUNCTION hb_CToD( cDate, cFormat )
+*-----------------------------------------------------------------------------*
+   LOCAL ofd := Set( _SET_DATEFORMAT, cFormat )
+   LOCAL dDate := CToD( cDate )
+
+   SET ( _SET_DATEFORMAT, ofd )
+
+RETURN dDate
+
+#endif

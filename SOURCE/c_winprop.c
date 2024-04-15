@@ -74,24 +74,24 @@ LPSTR    WideToAnsi( LPWSTR );
 /* Revised by P.Chornyj 16.11 */
 HB_FUNC( SETPROP )
 {
-   HWND    hwnd = hmg_par_raw_HWND( 1 );
-   HGLOBAL hMem;
-   char *  lpMem;
-   char    chType;
-   int     nLen;
-   BOOL    bValue;
-   double  dValue;
-   INT     iValue;
+   HWND     hwnd = hmg_par_raw_HWND( 1 );
+   HGLOBAL  hMem;
+   char     *lpMem;
+   char     chType;
+   int      nLen;
+   BOOL     bValue;
+   double   dValue;
+   INT      iValue;
 
 #ifndef UNICODE
-   LPCSTR pW;
+   LPCSTR   pW;
 #else
-   LPWSTR pW;
+   LPWSTR   pW;
 #endif
    hb_retl( HB_FALSE );
 
    // check params
-   if( ! IsWindow( hwnd ) || hb_parclen( 2 ) == 0 )
+   if( !IsWindow( hwnd ) || hb_parclen( 2 ) == 0 )
    {
       return;
    }
@@ -99,36 +99,36 @@ HB_FUNC( SETPROP )
    // check data
    if( HB_ISCHAR( 3 ) )
    {
-      chType = 'C';              // character
-      nLen   = ( int ) hb_parclen( 3 );
+      chType = 'C';     // character
+      nLen = ( int ) hb_parclen( 3 );
    }
    else if( HB_ISLOG( 3 ) )
    {
-      chType = 'L';              // logical
-      nLen   = sizeof( BOOL );
+      chType = 'L';     // logical
+      nLen = sizeof( BOOL );
    }
    else if( HB_ISDATE( 3 ) )
    {
-      chType = 'D';              // date
-      nLen   = 9;                // len of "yyyymmdd"
+      chType = 'D';     // date
+      nLen = 9;         // len of "yyyymmdd"
    }
    else if( HB_IS_NUMINT( hb_param( 3, HB_IT_ANY ) ) )
    {
       if( ( BOOL ) hb_parldef( 4, HB_FALSE ) )
       {
-         chType = 'X';           // if 'X' memory HANDLE passed
+         chType = 'X';  // if 'X' memory HANDLE passed
       }
       else
       {
-         chType = 'I';           // int
+         chType = 'I';  // int
       }
 
       nLen = sizeof( INT );
    }
    else if( HB_ISNUM( 3 ) )
    {
-      chType = 'F';              // float
-      nLen   = sizeof( double );
+      chType = 'F';     // float
+      nLen = sizeof( double );
    }
    else
    {
@@ -166,7 +166,7 @@ HB_FUNC( SETPROP )
       }
    }
 
-   lpMem[ 0 ] = chType;
+   lpMem[0] = chType;
    memcpy( lpMem + 1, ( char * ) &nLen, sizeof( int ) );
 
    switch( chType )
@@ -213,20 +213,20 @@ HB_FUNC( SETPROP )
 // [lHandle] : .T. =  return the value directly
 HB_FUNC( GETPROP )
 {
-   HWND    hwnd = hmg_par_raw_HWND( 1 );
-   HGLOBAL hMem;
-   char *  lpMem;
-   int     nLen;
+   HWND     hwnd = hmg_par_raw_HWND( 1 );
+   HGLOBAL  hMem;
+   char     *lpMem;
+   int      nLen;
 
 #ifndef UNICODE
-   LPCSTR pW = hb_parc( 2 );
+   LPCSTR   pW = hb_parc( 2 );
 #else
-   LPWSTR pW = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   pW = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
    hb_ret();
 
    // check params
-   if( ! IsWindow( hwnd ) || hb_parclen( 2 ) == 0 )
+   if( !IsWindow( hwnd ) || hb_parclen( 2 ) == 0 )
    {
       return;
    }
@@ -258,15 +258,15 @@ HB_FUNC( GETPROP )
       }
    }
 
-   nLen = ( int ) *( int * ) ( lpMem + 1 );
-   switch( lpMem[ 0 ] )
+   nLen = ( int ) * ( int * ) ( lpMem + 1 );
+   switch( lpMem[0] )
    {
       case 'C':
          hb_retclen( lpMem + sizeof( int ) + 1, nLen );
          break;
 
       case 'L':
-         hb_retl( ( BOOL ) *( BOOL * ) ( lpMem + sizeof( int ) + 1 ) );
+         hb_retl( ( BOOL ) * ( BOOL * ) ( lpMem + sizeof( int ) + 1 ) );
          break;
 
       case 'D':
@@ -274,11 +274,11 @@ HB_FUNC( GETPROP )
          break;
 
       case 'I':
-         hb_retni( ( INT ) *( INT * ) ( lpMem + sizeof( int ) + 1 ) );
+         hb_retni( ( INT ) * ( INT * ) ( lpMem + sizeof( int ) + 1 ) );
          break;
 
       case 'F':
-         hb_retnd( ( double ) *( double * ) ( lpMem + sizeof( int ) + 1 ) );
+         hb_retnd( ( double ) * ( double * ) ( lpMem + sizeof( int ) + 1 ) );
          break;
    }
 
@@ -288,15 +288,15 @@ HB_FUNC( GETPROP )
 // Usage: RemoveProp( hWnd, cPropName, [lNoFree] ) -> hMem | NIL
 HB_FUNC( REMOVEPROP )
 {
-   HWND    hwnd = hmg_par_raw_HWND( 1 );
-   HGLOBAL hMem;
+   HWND     hwnd = hmg_par_raw_HWND( 1 );
+   HGLOBAL  hMem;
 
 #ifdef UNICODE
-   LPWSTR lpString;
+   LPWSTR   lpString;
 #endif
    hb_ret();
 
-   if( ! IsWindow( hwnd ) || ( hb_parclen( 2 ) == 0 ) )
+   if( !IsWindow( hwnd ) || ( hb_parclen( 2 ) == 0 ) )
    {
       return;
    }
@@ -305,10 +305,10 @@ HB_FUNC( REMOVEPROP )
    hMem = RemovePropA( hwnd, hb_parc( 2 ) );
 #else
    lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
-   hMem     = RemovePropW( hwnd, lpString );
+   hMem = RemovePropW( hwnd, lpString );
    hb_xfree( ( TCHAR * ) lpString );
 #endif
-   if( ( NULL != hMem ) && ( ! hb_parldef( 3, HB_FALSE ) ) )
+   if( ( NULL != hMem ) && ( !hb_parldef( 3, HB_FALSE ) ) )
    {
       GlobalFree( hMem );
       hMem = NULL;
@@ -326,7 +326,7 @@ static BOOL CALLBACK PropsEnumProc( HWND hWnd, LPCTSTR pszPropName, HANDLE handl
 /* Usage: aProps := EnumProps( nHandle ) */
 HB_FUNC( ENUMPROPS )
 {
-   HWND hWnd = hmg_par_raw_HWND( 1 );
+   HWND  hWnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hWnd ) )
    {
@@ -340,17 +340,17 @@ HB_FUNC( ENUMPROPS )
 
 static BOOL CALLBACK PropsEnumProc( HWND hWnd, LPCTSTR pszPropName, HANDLE handle, ULONG_PTR lParam )
 {
-   int iLen = lstrlen( pszPropName );
+   int   iLen = lstrlen( pszPropName );
 
    if( iLen )
    {
-      PHB_ITEM item    = hb_itemArrayNew( 3 );
+      PHB_ITEM item = hb_itemArrayNew( 3 );
       LPTSTR   pszName = ( LPTSTR ) hb_xgrabz( ( iLen + 1 ) * sizeof( TCHAR ) );
 
       lstrcpy( pszName, pszPropName );
 
       hb_arraySetNInt( item, 1, ( LONG_PTR ) hWnd );
-#if ! ( defined( __XHARBOUR__ ) )
+#if !( defined( __XHARBOUR__ ) )
 #ifndef UNICODE
       hb_arraySetCLPtr( item, 2, pszName, iLen );
 #else
@@ -402,7 +402,7 @@ BOOL CALLBACK  PropsEnumProcEx( HWND hWnd, LPCTSTR pszPropName, HANDLE handle, U
 
 HB_FUNC( ENUMPROPSEX )
 {
-   HWND     hWnd       = hmg_par_raw_HWND( 1 );
+   HWND     hWnd = hmg_par_raw_HWND( 1 );
    PHB_ITEM pCodeBlock = hb_param( 2, HB_IT_BLOCK );
 
    if( IsWindow( hWnd ) && pCodeBlock )
@@ -418,7 +418,7 @@ HB_FUNC( ENUMPROPSEX )
 BOOL CALLBACK PropsEnumProcEx( HWND hWnd, LPCTSTR pszPropName, HANDLE handle, ULONG_PTR lParam )
 {
    PHB_ITEM pCodeBlock = ( PHB_ITEM ) lParam;
-   int      iLen       = lstrlen( pszPropName );
+   int      iLen = lstrlen( pszPropName );
 
    if( iLen )
    {
@@ -428,7 +428,7 @@ BOOL CALLBACK PropsEnumProcEx( HWND hWnd, LPCTSTR pszPropName, HANDLE handle, UL
       LPTSTR   pszName = ( LPTSTR ) hb_xgrabz( ( iLen + 1 ) * sizeof( TCHAR ) );
 
       lstrcpy( pszName, pszPropName );
-#if ! ( defined( __XHARBOUR__ ) )
+#if !( defined( __XHARBOUR__ ) )
 #ifndef UNICODE
       pPropName = hb_itemPutCPtr( NULL, pszName );
 #else
@@ -443,7 +443,7 @@ BOOL CALLBACK PropsEnumProcEx( HWND hWnd, LPCTSTR pszPropName, HANDLE handle, UL
       hb_itemRelease( pPropName );
       hb_itemRelease( pHandle );
 
-      return ( BOOL ) hb_parl( -1 );
+      return( BOOL ) hb_parl( -1 );
    }
 
    return TRUE;

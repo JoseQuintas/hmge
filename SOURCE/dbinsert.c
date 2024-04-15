@@ -52,12 +52,12 @@
 HB_FUNC( DBINSERT )
 {
    DBFAREAP pArea = ( DBFAREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL     bOk   = TRUE;
+   BOOL     bOk = TRUE;
 
-   if( pArea && ! pArea->fReadonly && ! pArea->fShared )
+   if( pArea && !pArea->fReadonly && !pArea->fShared )
    {
-      ULONG      ulRec, ulCount = HB_ISNUM( 2 ) ? hb_parnl( 2 ) : 1;
-      HB_FHANDLE hFile = hb_fileHandle( pArea->pDataFile );
+      ULONG       ulRec, ulCount = HB_ISNUM( 2 ) ? hb_parnl( 2 ) : 1;
+      HB_FHANDLE  hFile = hb_fileHandle( pArea->pDataFile );
 
       if( HB_ISNUM( 1 ) )
       {
@@ -96,10 +96,10 @@ HB_FUNC( DBINSERT )
 
          if( bOk )
          {
-            ULONG  ulLen  = ( pArea->ulRecCount - ulRec ) * pArea->uiRecordLen;
-            ULONG  ulLen1 = ulCount * pArea->uiRecordLen;
-            char * pData  = hb_xgrab( ulLen + 1 );
-            char * pZero  = hb_xgrab( ulLen1 + 1 );
+            ULONG ulLen = ( pArea->ulRecCount - ulRec ) * pArea->uiRecordLen;
+            ULONG ulLen1 = ulCount * pArea->uiRecordLen;
+            char  *pData = hb_xgrab( ulLen + 1 );
+            char  *pZero = hb_xgrab( ulLen1 + 1 );
 
             hb_fsSeekLarge( hFile, ( HB_FOFFSET ) pArea->uiHeaderLen + ( HB_FOFFSET ) pArea->uiRecordLen * ( HB_FOFFSET ) ( ulRec - 1 ), FS_SET );
             hb_fsReadLarge( hFile, pData, ulLen );

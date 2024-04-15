@@ -44,57 +44,58 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE          0x0501
+#define _WIN32_IE 0x0501
 
 #ifdef __XCC__
-   #define _WIN32_WINDOWS  0x0410
+#define _WIN32_WINDOWS  0x0410
 #endif
 #include <mgdefs.h>
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
-// Scrollbar Class Name
-   #define WC_SCROLLBAR    "ScrollBar"
-// Static Class Name
-   #define WC_STATIC       "Static"
-#endif
 
+// Scrollbar Class Name
+#define WC_SCROLLBAR "ScrollBar"
+
+// Static Class Name
+#define WC_STATIC "Static"
+#endif
 LRESULT APIENTRY  SubClassFunc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-static WNDPROC lpfnOldWndProc;
+static WNDPROC    lpfnOldWndProc;
 
 HINSTANCE         GetInstance( void );
 
 HB_FUNC( INITBROWSE )
 {
-   HWND  hbutton;
-   DWORD style = LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_CHILD | WS_VISIBLE | LVS_REPORT;
+   HWND                 hbutton;
+   DWORD                style = LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_CHILD | WS_VISIBLE | LVS_REPORT;
 
    INITCOMMONCONTROLSEX i;
 
    i.dwSize = sizeof( INITCOMMONCONTROLSEX );
-   i.dwICC  = ICC_LISTVIEW_CLASSES;
+   i.dwICC = ICC_LISTVIEW_CLASSES;
    InitCommonControlsEx( &i );
 
-   if( ! hb_parl( 7 ) )
+   if( !hb_parl( 7 ) )
    {
       style |= WS_TABSTOP;
    }
 
    hbutton = CreateWindowEx
-             (
-      WS_EX_CLIENTEDGE,
-      WC_LISTVIEW,
-      TEXT( "" ),
-      style,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-             );
+      (
+         WS_EX_CLIENTEDGE,
+         WC_LISTVIEW,
+         TEXT( "" ),
+         style,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    lpfnOldWndProc = SubclassWindow1( hbutton, SubClassFunc );
 
@@ -138,23 +139,23 @@ LRESULT APIENTRY SubClassFunc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 HB_FUNC( INITVSCROLLBAR )
 {
-   HWND hscrollbar;
+   HWND  hscrollbar;
 
    hscrollbar = CreateWindowEx
-                (
-      0,
-      WC_SCROLLBAR,
-      TEXT( "" ),
-      WS_CHILD | WS_VISIBLE | SBS_VERT,
-      hb_parni( 2 ),
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hmg_par_raw_HWND( 1 ),
-      ( HMENU ) NULL,
-      GetInstance(),
-      NULL
-                );
+      (
+         0,
+         WC_SCROLLBAR,
+         TEXT( "" ),
+         WS_CHILD | WS_VISIBLE | SBS_VERT,
+         hb_parni( 2 ),
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hmg_par_raw_HWND( 1 ),
+         ( HMENU ) NULL,
+         GetInstance(),
+         NULL
+      );
 
    SetScrollRange
    (
@@ -170,7 +171,7 @@ HB_FUNC( INITVSCROLLBAR )
 
 HB_FUNC( GETSCROLLRANGEMAX )
 {
-   INT MinPos, MaxPos;
+   INT   MinPos, MaxPos;
 
    GetScrollRange( hmg_par_raw_HWND( 1 ), hb_parni( 2 ), &MinPos, &MaxPos );
 
@@ -182,32 +183,32 @@ HB_FUNC( INITVSCROLLBARBUTTON )
    hmg_ret_raw_HWND
    (
       CreateWindow
-      (
-         WC_STATIC,
-         TEXT( "" ),
-         WS_CHILD | WS_VISIBLE | SS_SUNKEN,
-         hb_parni( 2 ),
-         hb_parni( 3 ),
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hmg_par_raw_HWND( 1 ),
-         ( HMENU ) NULL,
-         GetInstance(),
-         NULL
-      )
+         (
+            WC_STATIC,
+            TEXT( "" ),
+            WS_CHILD | WS_VISIBLE | SS_SUNKEN,
+            hb_parni( 2 ),
+            hb_parni( 3 ),
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hmg_par_raw_HWND( 1 ),
+            ( HMENU ) NULL,
+            GetInstance(),
+            NULL
+         )
    );
 }
 
 HB_FUNC( SETSCROLLINFO )
 {
-   SCROLLINFO lpsi;
+   SCROLLINFO  lpsi;
 
    lpsi.cbSize = sizeof( SCROLLINFO );
-   lpsi.fMask  = SIF_PAGE | SIF_POS | SIF_RANGE;
-   lpsi.nMin   = 1;
-   lpsi.nMax   = hb_parni( 2 );
-   lpsi.nPage  = hb_parni( 4 );
-   lpsi.nPos   = hb_parni( 3 );
+   lpsi.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
+   lpsi.nMin = 1;
+   lpsi.nMax = hb_parni( 2 );
+   lpsi.nPage = hb_parni( 4 );
+   lpsi.nPos = hb_parni( 3 );
 
-   hmg_ret_NINT( SetScrollInfo( hmg_par_raw_HWND( 1 ), SB_CTL, ( LPSCROLLINFO ) &lpsi, 1 ) );
+   hmg_ret_NINT( SetScrollInfo( hmg_par_raw_HWND( 1 ), SB_CTL, ( LPSCROLLINFO ) & lpsi, 1 ) );
 }

@@ -407,8 +407,6 @@ FUNCTION pdfClose()
 
    LOCAL nI, cTemp, nCurLevel, nObj1, nLast, nCount, nFirst, nRecno, nBooklen
 
-   FIELD FIRST, PREV, NEXT, LAST, COUNT, PARENT, PAGE, COORD, TITLE, LEVEL
-
    pdfClosePage()
 
    // kids
@@ -1196,8 +1194,8 @@ FUNCTION pdfText( cString, nTop, nLeft, nLength, nTab, nJustify, cUnits, cColor,
       nLeft := nLeft - nLength
    ENDIF
 
-   nL := nLeft
-   nL += nNew * nSpace // first always paragraph
+   //nL := nLeft
+   //nL += nNew * nSpace // first always paragraph
    nLineLen := nSpace * nNew - nSpace
 
    lParagraph := .T.

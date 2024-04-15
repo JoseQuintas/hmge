@@ -57,24 +57,24 @@ extern HB_PTRUINT wapi_GetProcAddress( HMODULE hModule, LPCSTR lpProcName );
 // Contributed by Andy Wos <andywos@unwired.com.au>
 HB_FUNC( MESSAGEBOXINDIRECT )
 {
-   MSGBOXPARAMS mbp;
+   MSGBOXPARAMS   mbp;
 
-   mbp.cbSize    = sizeof( MSGBOXPARAMS );
+   mbp.cbSize = sizeof( MSGBOXPARAMS );
    mbp.hwndOwner = HB_ISNUM( 1 ) ? hmg_par_raw_HWND( 1 ) : GetActiveWindow();
    mbp.hInstance = HB_ISNUM( 6 ) ? hmg_par_raw_HINSTANCE( 6 ) : GetInstance();
 #ifndef UNICODE
-   mbp.lpszText    = HB_ISCHAR( 2 ) ? hb_parc( 2 ) : ( HB_ISNUM( 2 ) ? MAKEINTRESOURCE( hb_parni( 2 ) ) : NULL );
+   mbp.lpszText = HB_ISCHAR( 2 ) ? hb_parc( 2 ) : ( HB_ISNUM( 2 ) ? MAKEINTRESOURCE( hb_parni( 2 ) ) : NULL );
    mbp.lpszCaption = HB_ISCHAR( 3 ) ? hb_parc( 3 ) : ( HB_ISNUM( 3 ) ? MAKEINTRESOURCE( hb_parni( 3 ) ) : "" );
-   mbp.lpszIcon    = HB_ISCHAR( 5 ) ? hb_parc( 5 ) : ( HB_ISNUM( 5 ) ? MAKEINTRESOURCE( hb_parni( 5 ) ) : NULL );
+   mbp.lpszIcon = HB_ISCHAR( 5 ) ? hb_parc( 5 ) : ( HB_ISNUM( 5 ) ? MAKEINTRESOURCE( hb_parni( 5 ) ) : NULL );
 #else
-   mbp.lpszText    = ( LPCWSTR ) ( HB_ISCHAR( 2 ) ? hb_osStrU16Encode( hb_parc( 2 ) ) : ( HB_ISNUM( 2 ) ? MAKEINTRESOURCE( hb_parni( 2 ) ) : NULL ) );
+   mbp.lpszText = ( LPCWSTR ) ( HB_ISCHAR( 2 ) ? hb_osStrU16Encode( hb_parc( 2 ) ) : ( HB_ISNUM( 2 ) ? MAKEINTRESOURCE( hb_parni( 2 ) ) : NULL ) );
    mbp.lpszCaption = ( LPCWSTR ) ( HB_ISCHAR( 3 ) ? hb_osStrU16Encode( hb_parc( 3 ) ) : ( HB_ISNUM( 3 ) ? MAKEINTRESOURCE( hb_parni( 3 ) ) : TEXT( "" ) ) );
-   mbp.lpszIcon    = ( LPCWSTR ) ( HB_ISCHAR( 5 ) ? hb_osStrU16Encode( hb_parc( 5 ) ) : ( HB_ISNUM( 5 ) ? MAKEINTRESOURCE( hb_parni( 5 ) ) : NULL ) );
+   mbp.lpszIcon = ( LPCWSTR ) ( HB_ISCHAR( 5 ) ? hb_osStrU16Encode( hb_parc( 5 ) ) : ( HB_ISNUM( 5 ) ? MAKEINTRESOURCE( hb_parni( 5 ) ) : NULL ) );
 #endif
-   mbp.dwStyle            = hmg_par_DWORD( 4 );
-   mbp.dwContextHelpId    = HB_ISNUM( 7 ) ? hmg_par_DWORD( 7 ) : 0;
+   mbp.dwStyle = hmg_par_DWORD( 4 );
+   mbp.dwContextHelpId = HB_ISNUM( 7 ) ? hmg_par_DWORD( 7 ) : 0;
    mbp.lpfnMsgBoxCallback = NULL;   /* Modified by P.Ch. 16.10. */
-   mbp.dwLanguageId       = HB_ISNUM( 9 ) ? hmg_par_DWORD( 9 ) : MAKELANGID( LANG_NEUTRAL, SUBLANG_NEUTRAL );
+   mbp.dwLanguageId = HB_ISNUM( 9 ) ? hmg_par_DWORD( 9 ) : MAKELANGID( LANG_NEUTRAL, SUBLANG_NEUTRAL );
 
    hmg_ret_NINT( MessageBoxIndirect( &mbp ) );
 }
@@ -82,31 +82,31 @@ HB_FUNC( MESSAGEBOXINDIRECT )
 // MessageBoxTimeout (Text, Caption, nTypeButton, nMilliseconds) ---> Return iRetButton
 HB_FUNC( MESSAGEBOXTIMEOUT )
 {
-   HWND hWnd = GetActiveWindow();
+   HWND        hWnd = GetActiveWindow();
 
 #ifndef UNICODE
-   const char * lpText    = hb_parc( 1 );
-   const char * lpCaption = hb_parc( 2 );
+   const char  *lpText = hb_parc( 1 );
+   const char  *lpCaption = hb_parc( 2 );
 #else
-   TCHAR * lpText    = hb_osStrU16Encode( hb_parc( 1 ) );
-   TCHAR * lpCaption = hb_osStrU16Encode( hb_parc( 2 ) );
+   TCHAR       *lpText = hb_osStrU16Encode( hb_parc( 1 ) );
+   TCHAR       *lpCaption = hb_osStrU16Encode( hb_parc( 2 ) );
 #endif
-   UINT  uType          = hmg_par_UINT_def( 3, MB_OK );
-   WORD  wLanguageId    = MAKELANGID( LANG_NEUTRAL, SUBLANG_NEUTRAL );
-   DWORD dwMilliseconds = HB_ISNUM( 4 ) ? hmg_par_DWORD( 4 ) : ( DWORD ) 0xFFFFFFFF;
+   UINT        uType = hmg_par_UINT_def( 3, MB_OK );
+   WORD        wLanguageId = MAKELANGID( LANG_NEUTRAL, SUBLANG_NEUTRAL );
+   DWORD       dwMilliseconds = HB_ISNUM( 4 ) ? hmg_par_DWORD( 4 ) : ( DWORD ) 0xFFFFFFFF;
 
    hmg_ret_NINT( MessageBoxTimeout( hWnd, lpText, lpCaption, uType, wLanguageId, dwMilliseconds ) );
 }
 
 int WINAPI MessageBoxTimeout( HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType, WORD wLanguageId, DWORD dwMilliseconds )
 {
-   typedef int ( WINAPI * PMessageBoxTimeout )( HWND, LPCTSTR, LPCTSTR, UINT, WORD, DWORD );
+   typedef int ( WINAPI *PMessageBoxTimeout ) ( HWND, LPCTSTR, LPCTSTR, UINT, WORD, DWORD );
 
-   static PMessageBoxTimeout pMessageBoxTimeout = NULL;
+   static PMessageBoxTimeout  pMessageBoxTimeout = NULL;
 
    if( pMessageBoxTimeout == NULL )
    {
-      HMODULE hLib = LoadLibrary( TEXT( "User32.dll" ) );
+      HMODULE  hLib = LoadLibrary( TEXT( "User32.dll" ) );
 
 #ifdef UNICODE
       pMessageBoxTimeout = ( PMessageBoxTimeout ) wapi_GetProcAddress( hLib, "MessageBoxTimeoutW" );

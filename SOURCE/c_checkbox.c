@@ -48,26 +48,26 @@
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
+
 // Button Class Name
-   #define WC_BUTTON                      "Button"
-   #define BUTTON_IMAGELIST_ALIGN_CENTER  4
+#define WC_BUTTON                      "Button"
+#define BUTTON_IMAGELIST_ALIGN_CENTER  4
 #endif
-
 HBITMAP     HMG_LoadPicture
-(
-   const char *   FileName,
-   int New_Width,
-   int New_Height,
-   HWND hWnd,
-   int ScaleStretch,
-   int Transparent,
-   long BackgroundColor,
-   int AdjustImage,
-   HB_BOOL bAlphaFormat,
-   int iAlpfaConstant
-);
+            (
+               const char  *FileName,
+               int         New_Width,
+               int         New_Height,
+               HWND        hWnd,
+               int         ScaleStretch,
+               int         Transparent,
+               long        BackgroundColor,
+               int         AdjustImage,
+               HB_BOOL     bAlphaFormat,
+               int         iAlpfaConstant
+            );
 
-HIMAGELIST  HMG_SetButtonImageList( HWND hButton, const char * FileName, int Transparent, UINT uAlign );
+HIMAGELIST  HMG_SetButtonImageList( HWND hButton, const char *FileName, int Transparent, UINT uAlign );
 
 #ifdef UNICODE
 LPWSTR      AnsiToWide( LPCSTR );
@@ -78,19 +78,19 @@ HINSTANCE   GetResources( void );
 HB_FUNC( INITCHECKBOX )
 {
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
+   LPCSTR   lpWindowName = hb_parc( 2 );
 #else
-   LPWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   DWORD Style   = BS_NOTIFY | WS_CHILD | ( hb_parl( 7 ) ? BS_AUTO3STATE : BS_AUTOCHECKBOX );
-   DWORD ExStyle = hb_parl( 13 ) ? WS_EX_TRANSPARENT : 0;
+   DWORD    Style = BS_NOTIFY | WS_CHILD | ( hb_parl( 7 ) ? BS_AUTO3STATE : BS_AUTOCHECKBOX );
+   DWORD    ExStyle = hb_parl( 13 ) ? WS_EX_TRANSPARENT : 0;
 
-   if( ! hb_parl( 10 ) )
+   if( !hb_parl( 10 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style |= WS_TABSTOP;
    }
@@ -108,20 +108,20 @@ HB_FUNC( INITCHECKBOX )
    hmg_ret_raw_HWND
    (
       CreateWindowEx
-      (
-         ExStyle,
-         WC_BUTTON,
-         lpWindowName,
-         Style,
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 8 ),
-         hb_parni( 9 ),
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 3 ),
-         GetInstance(),
-         NULL
-      )
+         (
+            ExStyle,
+            WC_BUTTON,
+            lpWindowName,
+            Style,
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hb_parni( 8 ),
+            hb_parni( 9 ),
+            hmg_par_raw_HWND( 1 ),
+            hmg_par_raw_HMENU( 3 ),
+            GetInstance(),
+            NULL
+         )
    );
 
 #ifdef UNICODE
@@ -132,18 +132,18 @@ HB_FUNC( INITCHECKBOX )
 HB_FUNC( INITCHECKBUTTON )
 {
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
+   LPCSTR   lpWindowName = hb_parc( 2 );
 #else
-   LPWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   DWORD Style = BS_NOTIFY | WS_CHILD | BS_AUTOCHECKBOX | BS_PUSHLIKE;
+   DWORD    Style = BS_NOTIFY | WS_CHILD | BS_AUTOCHECKBOX | BS_PUSHLIKE;
 
-   if( ! hb_parl( 10 ) )
+   if( !hb_parl( 10 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style |= WS_TABSTOP;
    }
@@ -151,19 +151,19 @@ HB_FUNC( INITCHECKBUTTON )
    hmg_ret_raw_HWND
    (
       CreateWindow
-      (
-         WC_BUTTON,
-         lpWindowName,
-         Style,
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 8 ),
-         hb_parni( 9 ),
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 3 ),
-         GetInstance(),
-         NULL
-      )
+         (
+            WC_BUTTON,
+            lpWindowName,
+            Style,
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hb_parni( 8 ),
+            hb_parni( 9 ),
+            hmg_par_raw_HWND( 1 ),
+            hmg_par_raw_HMENU( 3 ),
+            GetInstance(),
+            NULL
+         )
    );
 
 #ifdef UNICODE
@@ -173,44 +173,44 @@ HB_FUNC( INITCHECKBUTTON )
 
 HB_FUNC( INITIMAGECHECKBUTTON )
 {
-   HWND       hbutton;
-   HWND       himage;
-   HIMAGELIST himl;
+   HWND        hbutton;
+   HWND        himage;
+   HIMAGELIST  himl;
 
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
+   LPCSTR      lpWindowName = hb_parc( 2 );
 #else
-   LPWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR      lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   HWND  hwnd  = hmg_par_raw_HWND( 1 );
-   DWORD Style = BS_NOTIFY | BS_BITMAP | WS_CHILD | BS_AUTOCHECKBOX | BS_PUSHLIKE;
+   HWND        hwnd = hmg_par_raw_HWND( 1 );
+   DWORD       Style = BS_NOTIFY | BS_BITMAP | WS_CHILD | BS_AUTOCHECKBOX | BS_PUSHLIKE;
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 12 ) )
+   if( !hb_parl( 12 ) )
    {
       Style |= WS_TABSTOP;
    }
 
    hbutton = CreateWindow
-             (
-      WC_BUTTON,
-      lpWindowName,
-      Style,
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 9 ),
-      hb_parni( 10 ),
-      hwnd,
-      hmg_par_raw_HMENU( 3 ),
-      GetInstance(),
-      NULL
-             );
+      (
+         WC_BUTTON,
+         lpWindowName,
+         Style,
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 9 ),
+         hb_parni( 10 ),
+         hwnd,
+         hmg_par_raw_HMENU( 3 ),
+         GetInstance(),
+         NULL
+      );
 
-   if( ! hb_parl( 13 ) )
+   if( !hb_parl( 13 ) )
    {
       himage = ( HWND ) HMG_LoadPicture( hb_parc( 8 ), -1, -1, hwnd, 0, hb_parl( 7 ) ? 0 : 1, -1, 0, HB_FALSE, 255 );
 

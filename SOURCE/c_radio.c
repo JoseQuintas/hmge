@@ -48,10 +48,10 @@
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
-// Button Class Name
-   #define WC_BUTTON  "Button"
-#endif
 
+// Button Class Name
+#define WC_BUTTON "Button"
+#endif
 #ifdef UNICODE
 LPWSTR      AnsiToWide( LPCSTR );
 #endif
@@ -60,18 +60,18 @@ HINSTANCE   GetInstance( void );
 HB_FUNC( INITRADIOGROUP )
 {
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
+   LPCSTR   lpWindowName = hb_parc( 2 );
 #else
-   LPWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   DWORD Style = BS_NOTIFY | WS_CHILD | BS_AUTORADIOBUTTON | WS_GROUP;
+   DWORD    Style = BS_NOTIFY | WS_CHILD | BS_AUTORADIOBUTTON | WS_GROUP;
 
-   if( ! hb_parl( 9 ) )
+   if( !hb_parl( 9 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 10 ) )
+   if( !hb_parl( 10 ) )
    {
       Style |= WS_TABSTOP;
    }
@@ -84,19 +84,19 @@ HB_FUNC( INITRADIOGROUP )
    hmg_ret_raw_HWND
    (
       CreateWindow
-      (
-         WC_BUTTON,
-         lpWindowName,
-         Style,
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 8 ),
-         28,
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 3 ),
-         GetInstance(),
-         NULL
-      )
+         (
+            WC_BUTTON,
+            lpWindowName,
+            Style,
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hb_parni( 8 ),
+            28,
+            hmg_par_raw_HWND( 1 ),
+            hmg_par_raw_HMENU( 3 ),
+            GetInstance(),
+            NULL
+         )
    );
 
 #ifdef UNICODE
@@ -107,13 +107,13 @@ HB_FUNC( INITRADIOGROUP )
 HB_FUNC( INITRADIOBUTTON )
 {
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
+   LPCSTR   lpWindowName = hb_parc( 2 );
 #else
-   LPWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   DWORD Style = BS_NOTIFY | WS_CHILD | BS_AUTORADIOBUTTON;
+   DWORD    Style = BS_NOTIFY | WS_CHILD | BS_AUTORADIOBUTTON;
 
-   if( ! hb_parl( 9 ) )
+   if( !hb_parl( 9 ) )
    {
       Style |= WS_VISIBLE;
    }
@@ -126,19 +126,19 @@ HB_FUNC( INITRADIOBUTTON )
    hmg_ret_raw_HWND
    (
       CreateWindow
-      (
-         WC_BUTTON,
-         lpWindowName,
-         Style,
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 8 ),
-         28,
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 3 ),
-         GetInstance(),
-         NULL
-      )
+         (
+            WC_BUTTON,
+            lpWindowName,
+            Style,
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hb_parni( 8 ),
+            28,
+            hmg_par_raw_HWND( 1 ),
+            hmg_par_raw_HMENU( 3 ),
+            GetInstance(),
+            NULL
+         )
    );
 
 #ifdef UNICODE

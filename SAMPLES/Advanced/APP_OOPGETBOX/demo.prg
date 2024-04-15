@@ -1,8 +1,8 @@
 /*
  * MINIGUI - Harbour Win32 GUI library Demo
  *
- * Copyright 2021, Verchenko Andrey <verchenkoag@gmail.com>
- * Copyright 2021, Sergej Kiselev <bilance@bilance.lv>
+ * Copyright 2021-2024, Verchenko Andrey <verchenkoag@gmail.com>
+ * Copyright 2021-2024, Sergej Kiselev <bilance@bilance.lv>
  *
  * Пример построения карточки на базе объекта Tab
  * События на объектах карточки, контейнер на объектах
@@ -18,14 +18,15 @@
 #include "hmg.ch"
 
 Function Main
-   Local nW, /*nH,*/ nG := 20, nWBtn := 150
+   Local nW, nG := 20, nWBtn := 150, cLog := "_msg.log"
 
-   SET MSGALERT BACKCOLOR TO { 238, 249, 142 }               // for HMG_Alert()
-   DEFINE FONT DlgFont FONTNAME "DejaVu Sans Mono" SIZE 14   // for HMG_Alert()
+   SET MSGALERT BACKCOLOR TO { 238, 249, 142 }                    // for HMG_Alert()
+   DEFINE FONT DlgFont  FONTNAME "DejaVu Sans Mono" SIZE 14       // for HMG_Alert()
+   DEFINE FONT ComSanMS FONTNAME "Comic Sans MS"    SIZE 14 BOLD  
 
-   //////////
    SET OOP ON
-   //////////
+
+   _SetGetLogFile( cLog ) ; fErase( cLog )
 
    SET FONT TO "Arial", 14
 
@@ -33,18 +34,18 @@ Function Main
    SET GETBOX FOCUS FONTCOLOR TO {0  ,0  ,255}
 
    DEFINE WINDOW Form_1 ;
-      AT 0,0 WIDTH 990 HEIGHT 480                      ;
+      AT 0,0 WIDTH 990 HEIGHT 480                                  ;
       TITLE 'Harbour MiniGUI Demo: Events on the form + Container' ;
-      MAIN                                             ;
-      ON SIZE SizeTest(nG)                             ;
+      MAIN BACKCOLOR {211, 165, 236}                               ;
+      ON SIZE SizeTest(nG)                                         ;
       ON RELEASE _wSend(99)
 
       nW := This.ClientWidth
-      //nH := This.ClientHeight
 
       (This.Object):Cargo := oKeyData()  // создать объект (контейнер) для окна Form_1
       (This.Object):Cargo:nBtn    := 0
       (This.Object):Cargo:nModify := 0
+      (This.Object):Cargo:nG      := nG  // отступ по краям формы
 
       @ 5, nW - nG*2 - nWBtn*2 BUTTON Btn_Save CAPTION "Save" WIDTH nWBtn HEIGHT 35 ;
         BOLD ACTION { || ThisWindow.Release } ;
@@ -119,19 +120,26 @@ Function myThisObjectEvent
       Local nMod  := ow:Cargo:nModify
       Local cForm := ow:Name, cGet, lGet
       Local aGet  := HMG_GetFormControls(cForm, "GETBOX")
-      Local xOldGet, xNewGet
-      ? "Event(99) GETBOX modification=", nMod
+      Local xOldGet, xNewGet, oCrg
+      ? ProcNL(), "Event(99) GETBOX modification=", nMod, "=== EXIT ==="
       IF nMod > 0
          FOR EACH cGet IN aGet
-             lGet    := This.&(cGet).Cargo:lModify
-             xOldGet := This.&(cGet).Cargo:xValue
-             xNewGet := This.&(cGet).Value
-             ? hb_enumindex(cGet), cGet, lGet
-             IF !Empty(lGet)
-                //?? "Initial value =", xOldGet
-                //?? "New value = ", xNewGet
-                myChangeGetBox(xOldGet,xNewGet,cGet)
-             ENDIF
+            ? hb_enumindex(cGet), cGet
+            oCrg := This.&(cGet).Cargo 
+            ?? oCrg
+            IF IsObject(oCrg) 
+               //Default This.&(cGet).Cargo := oHmgData() 
+               //Default This.&(cGet).Cargo:lModify := .F. 
+               lGet    := oCrg:lModify
+               xOldGet := oCrg:xValue
+               xNewGet := This.&(cGet).Value
+               ?? "lGet=", lGet
+               IF !Empty(lGet)
+                  myChangeGetBox(xOldGet,xNewGet,cGet)
+               ENDIF
+            ELSE
+               ?? "PASS! The object does not have - ON INIT {|| ....} "
+            ENDIF
          NEXT
       ENDIF
       Return Nil
@@ -156,9 +164,10 @@ Return
 
 ///////////////////////////////////////////////////////////////////////////////
 Procedure SetTab_1( lBottomStyle, nG )
-   Local nColor := GetSysColor( COLOR_BTNFACE )
+   Local nColor := HMG_RGB2n(This.Backcolor)
    Local aColor := {GetRed( nColor ), GetGreen( nColor ), GetBlue( nColor )}
-   Local nI, nW, nH, aTabBC, aTabName, aRet, aDimCard
+   Local nI, nW, nH, aTabName, aRet, aDimCard
+   Local nRow, nCol, aVal, a2Dim
    Default lBottomStyle := .f.
 
    IF IsControlDefined(Tab_1, Form_1)
@@ -167,8 +176,6 @@ Procedure SetTab_1( lBottomStyle, nG )
 
    nW       := This.ClientWidth
    nH       := This.ClientHeight
-   aTabBC   := {159,191,236}
-
    aRet     := myListTab()         // list of cards for tabs
    aDimCard := aRet[1]
    aTabName := aRet[2]
@@ -183,7 +190,7 @@ Procedure SetTab_1( lBottomStyle, nG )
       AT nG,nG WIDTH nW-nG*2 HEIGHT nH-nG*2 ;
       VALUE 1                               ;
       HOTTRACK                              ;
-      BACKCOLOR aTabBC                      ;
+      BACKCOLOR aColor                      ;
       FONT "Tahona" SIZE 16                 ;
       ON CHANGE _wSend(25,,This.Name)
 
@@ -194,7 +201,78 @@ Procedure SetTab_1( lBottomStyle, nG )
           PAGE aTabName[ nI ]  TOOLTIP 'Tooltip ' + aTabName[ nI ]
 
              // Show a list of cards on a tab
-             ShowPageCard( nI, aDimCard[ nI ] )
+             nRow := ShowPageCard( nI, aDimCard[ nI ] )
+
+             IF nI == 1
+                nCol := 50
+                @ nRow , nCol GETBOX my_Test VALUE "abcdefg"  ;
+                         WIDTH 200 HEIGHT 34 ;
+                         ACTION  {|| AlertInfo("ON CLICK GETBOX "+This.Name)} ;
+                         IMAGE   "res\16 colors.bmp" BUTTONWIDTH 32
+                nRow += This.my_Test.Height + 20
+                @ nRow , nCol GETBOX my_Test2 VALUE "abcdefg"  ;
+                         WIDTH 200 HEIGHT 34 ;
+                         ACTION  {|| AlertInfo("ON CLICK GETBOX "+This.Name)} ;
+                         IMAGE   "res\Erase.bmp" BUTTONWIDTH 32
+                nRow += This.my_Test2.Height + 20
+                @ nRow , nCol GETBOX my_Test3 VALUE "abcdefg"  ;
+                         WIDTH 200 HEIGHT 34 ;
+                         ACTION  {|| AlertInfo("ON CLICK GETBOX "+This.Name)} ;
+                         ACTION2 {|| AlertInfo("ACTION2  GETBOX "+This.Name)} ;
+                         IMAGE   {"res\Erase.bmp", "res\16 colors.bmp"} BUTTONWIDTH 32
+                nRow := This.My_Test.Row
+                nCol := This.My_Test.Col + This.My_Test.Width + 20
+                @ nRow , nCol GETBOX my_Test4 VALUE "abcdefg"  ;
+                         WIDTH 200 HEIGHT 34 ;
+                         ACTION  {|| AlertInfo("ON CLICK GETBOX "+This.Name)} ;
+                         ACTION2 {|| AlertInfo("ACTION2  GETBOX "+This.Name)} ;
+                         IMAGE   {"res\Form.bmp", "res\List.bmp"} BUTTONWIDTH 32
+                nRow += This.my_Test.Height + 20
+                @ nRow , nCol GETBOX my_Test5 VALUE "abcdefg"  ;
+                         WIDTH 200 HEIGHT 34 ;
+                         ACTION  {|| AlertInfo("ON CLICK GETBOX "+This.Name)} ;
+                         IMAGE   "res\Critical details.bmp" BUTTONWIDTH 32
+
+                // ВАЖНО ! ЗАПРЕТ правки текста, только выбор по кнопкам
+                // !!! В вызовах по кнопкам могут быть созданы другие окна, поэтому 
+                // нужно сохранять/восстанавливать переменные среды This 
+                nRow += This.my_Test.Height + 20
+                a2Dim := { 10 , "Value = 10" }
+                aVal  := {"Als:Firma","Fld1","Fld2","TagIndex"}
+                @ nRow , nCol GETBOX my_Test6 VALUE "List (code, value)"  ;
+                    WIDTH 300 HEIGHT 34 /*READONLY*/ PICTURE "@K"         ;
+                    TOOLTIP "Selection by buttons ! Code and values from the database/array" ;
+                    ACTION2 {|a,o,ow| o := This.Cargo , ow := ThisWindow.Object , ;
+                                      _SetThisFormInfo(ow) ,;                     // сохранить среду This
+                                      a := Test_Dim_Dbf(aVal,"ON CLICK GETBOX: "+o:cObj,o) ,;  // o = This.Cargo - ВАЖНО !
+                                      _SetThisFormInfo() ,;                       // восстановить среду This
+                                      o:nCode := a[1], o:cText := a[2] , a2Dim := a ,;
+                                      DoEvents() , This.Value := a2Dim[2] , o:lModify := .T. } ;
+                    ACTION  {|ow,o| o := This.Cargo , ow := o:oWnd ,;
+                                    _SetThisFormInfo(ow) ,;                         // сохранить среду This
+                                    AlertInfo("ZERO ACTION2 GETBOX: "+o:cObj) ,;
+                                    _SetThisFormInfo() ,;                           // восстановить среду This
+                                    o:lModify := .T. ,;
+                                    a2Dim := {0,"--empty--"}  ,;
+                                    o:nCode := a2Dim[1] , o:cText := a2Dim[2] ,;
+                                    This.Value := a2Dim[2] } ;
+                    IMAGE   {"res\Erase.bmp", "res\Critical details.bmp"} BUTTONWIDTH 32                                      ;
+                    ON CHANGE {|o| o := This.Cargo , /* change content GetBox */;
+                              _logfile(.t., "  -> Modify:",This.Name, o:lModify, ThisWindow.Cargo:nModify,This.Value), ;
+                              (ThisWindow.Cargo):nModify += 1, ;
+                              o:lModify := .T., This.Value := o:cText ,;
+                              _logfile(.t., "  -> Modify:",This.Name, o:lModify, ThisWindow.Cargo:nModify) } ;
+                    ON GOTFOCUS {|| a2Dim[1] := This.Cargo:nCode , a2Dim[2] := This.Cargo:cText ,;
+                                    ThisWindow.Cargo:cFocusedGetBox := This.Name } ;
+                    ON INIT {|o| This.Cargo := oHmgData(), o := This.Cargo  ,;
+                                 o:xValue := This.Value                     ,; // ВАЖНО ! первоначальное значение GetBox
+                                 o:a2Dim  := a2Dim , o:cObj := This.Name    ,;
+                                 o:nCode  := a2Dim[1] , o:cText := a2Dim[2] ,;
+                                 o:lModify := .F. , This.Value := o:cText   ,;
+                                 o:nRow := nRow + This.my_Test6.Height + nG ,; // Y
+                                 o:nCol := nCol + nG                        ,; // X
+                                 o:oWnd := ThisWindow.Object  }
+             ENDIF
 
           END PAGE
 
@@ -242,15 +320,15 @@ Function ShowPageCard( nI, aDimLine )
 
    Next
 
-Return Nil
+Return nRow
 
 ///////////////////////////////////////////////////////////////////////////////
 Function myCardFieldGetBox( nI, nJ, cObj, aDim, nRow, nCol, nHLine, nFSize )
    Local cFName := _HMG_DefaultFontName
    Local cTypeLine, xPole, nK, xDopType, /*xDopRun, cRowCardAccess,*/ xRet
    Local aField, cField, cAType, cObjGbx, aDimObjAI, nWCol, nWBtn, nHBtn
-   Local cBtnFontI, nBtnFSizeI, cBtnCaptI, nWidth, cMsg
-   Local cObjGbxA, nObjId
+   Local cBtnFontI, nBtnFSizeI, cBtnCaptI, nWidth, cMsg, nG
+   Local cObjGbxA, nObjId, cTltpS, a2Dim, aVal
    Local aFocus := ThisWindow.Cargo:aFocusedGetBox
 
    cTypeLine      := aDim[1]   // тип построения строки А-массив, CDN-обычный, M-мемополе и т.д.
@@ -259,7 +337,8 @@ Function myCardFieldGetBox( nI, nJ, cObj, aDim, nRow, nCol, nHLine, nFSize )
    //xDopRun        := aDim[5]   // вызов функции для кнопки или нет вызова
    //cRowCardAccess := IIF( LEN(aDim) == 6, aDim[6], "?" ) // доступ юзера к строке карточки
                                                          // можно сделать проверку на доступ
-   nWBtn := nHBtn := nHLine     // ширина и высота кнопки
+   nG := (This.Object):Cargo:nG    // отступ по краям формы
+   nWBtn := nHBtn := nHLine         // ширина и высота кнопки
    cBtnFontI      := "Wingdings"
    nBtnFSizeI     := nFSize + 6
    cBtnCaptI      := CHR(40)
@@ -277,13 +356,14 @@ Function myCardFieldGetBox( nI, nJ, cObj, aDim, nRow, nCol, nHLine, nFSize )
          cAType        := xDopType[nK]
          cObjGbxA      := cObj + "_A" + cAType + "_" + HB_NtoS(nK)
          aDimObjAI[nK] := cObjGbxA
-         nObjId          := nI*1000 + nJ*100 + nK
+         nObjId        := nI*1000 + nJ*100 + nK
+         //? nK, cField, cObjGbxA, cAType, xRet
 
          IF cAType == "D" .OR. cAType == "C"  .OR. cAType == "N"
 
             xRet    := "ALIAS()->" + cField       // FIELDGET(FIELDNUM(cField))
             nWidth  := GetTxtWidth( xRet, nFSize, cFName ) + 10
-
+            
             @ nRow , nCol + nWCol GETBOX &cObjGbxA VALUE xRet  ;
               WIDTH nWidth HEIGHT nHLine ;
               PICTURE "@K" ;
@@ -329,7 +409,7 @@ Function myCardFieldGetBox( nI, nJ, cObj, aDim, nRow, nCol, nHLine, nFSize )
             cMsg := "Error! No handling type ["+cAType+"] !;" + HB_ValToExp(aDim)
             cMsg += ";;" + ProcNL(0)
             cMsg := AtRepl( ";", cMsg, CRLF )
-            MsgStop( cMsg )
+            AlertStop( cMsg )
          ENDIF
 
          nWCol += nWidth + 2
@@ -339,7 +419,6 @@ Function myCardFieldGetBox( nI, nJ, cObj, aDim, nRow, nCol, nHLine, nFSize )
          ENDIF
 
       NEXT
-
 
    ELSEIF cTypeLine == "C" .OR. cTypeLine == "D"
 
@@ -364,11 +443,59 @@ Function myCardFieldGetBox( nI, nJ, cObj, aDim, nRow, nCol, nHLine, nFSize )
       IF Empty(aFocus[ nI ])    // GetBox в фокусе
          aFocus[ nI ] := cObjGbx
       ENDIF
+
+   ELSEIF cTypeLine == "S"
+
+      xRet    := "ALIAS()->" + xPole + " => " + HB_ValToExp(xDopType)
+      nWidth  := GetTxtWidth( xRet, nFSize, cFName ) + 10 + 32*2  // 2 кнопки
+      cTltpS  := "Selection by buttons ! Reading example: code and values from the database/array"
+
+      // ВАЖНО ! ЗАПРЕТ правки текста, только выбор по кнопкам
+      // !!! В вызовах по кнопкам могут быть созданы другие окна, поэтому 
+      // нужно сохранять/восстанавливать переменные среды This 
+      a2Dim := { nJ + 10 , "Value = " + HB_NtoS(nJ + 10) }
+      aVal  := xDopType         // <-- {"Als:Firma","Fld1","Fld2","TagIndex"}
+      @ nRow , nCol GETBOX &cObjGbx VALUE xRet WIDTH nWidth HEIGHT nHLine ;
+          /*READONLY*/ PICTURE "@K" TOOLTIP cTltpS                        ;
+          ACTION2 {|a,o,ow| o := This.Cargo , ow := o:oWnd ,;
+                            _SetThisFormInfo(ow) ,;                     // сохранить среду This
+                            a := Test_Dim_Dbf(aVal,"ON CLICK GETBOX: "+o:cObj,o) ,;  // o = This.Cargo - ВАЖНО !
+                            _SetThisFormInfo() ,;                       // восстановить среду This
+                            This.Cargo:nCode := a[1], This.Cargo:cText := a[2] , a2Dim := a ,;
+                            DoEvents() , This.Value := a2Dim[2] , This.Cargo:lModify := .T. } ;
+          ACTION  {|o,ow| o := This.Cargo , ow := o:oWnd ,;
+                          _SetThisFormInfo(ow) ,;                         // сохранить среду This
+                          AlertInfo("ZERO ACTION2 GETBOX: "+o:cObj) ,;
+                          _SetThisFormInfo() ,;                           // восстановить среду This
+                          This.Cargo:lModify := .T. ,;
+                          a2Dim := {0,"--empty--"}  ,;
+                          This.Cargo:nCode := a2Dim[1] , This.Cargo:cText := a2Dim[2] ,;
+                          This.Value := a2Dim[2] } ;
+          IMAGE   {"res\Erase.bmp", "res\Critical details.bmp"} BUTTONWIDTH 32                                      ;
+          ON CHANGE {|| /* change content GetBox */;
+                    _logfile(.t., "  -> Modify:",This.Name, This.Cargo:lModify, ThisWindow.Cargo:nModify,This.Value), ;
+                    (ThisWindow.Cargo):nModify += 1, ;
+                    This.Cargo:lModify := .T., This.Value := This.Cargo:cText ,;
+                    _logfile(.t., "  -> Modify:",This.Name, This.Cargo:lModify, ThisWindow.Cargo:nModify) } ;
+          ON GOTFOCUS {|| a2Dim[1] := This.Cargo:nCode , a2Dim[2] := This.Cargo:cText ,;
+                          ThisWindow.Cargo:cFocusedGetBox := This.Name } ;
+          ON INIT {|o| This.Cargo := oHmgData(), o := This.Cargo  ,; // создать объект (контейнер) для этого объекта
+                       o:xValue := This.Value                     ,; // ВАЖНО ! первоначальное значение GetBox
+                       o:a2Dim  := a2Dim , o:cObj := This.Name    ,;
+                       o:nCode  := a2Dim[1] , o:cText := a2Dim[2] ,;
+                       o:lModify := .F. , This.Value := o:cText   ,;
+                       o:nRow := nRow + This.&(cObjGbx).Height + nG, o:nCol := nCol + nG ,; // координаты
+                       o:oWnd := ThisWindow.Object  }
+
+      IF Empty(aFocus[ nI ])    // GetBox в фокусе
+         aFocus[ nI ] := cObjGbx
+      ENDIF
+
    ELSE
       cMsg := "Error! No handling type ["+cTypeLine+"] !;" + HB_ValToExp(aDim)
       cMsg += ";;" + ProcNL(0)
       cMsg := AtRepl( ";", cMsg, CRLF )
-      MsgStop( cMsg )
+      AlertStop( cMsg )
    ENDIF
 
 Return Nil
@@ -380,11 +507,15 @@ Function myChangeGetBox(xOld,xNew,cObj)
     IF VALTYPE(xOld) == "C"
        xOld := ALLTRIM(xOld)
        xNew := ALLTRIM(xNew)
+    ELSEIF VALTYPE(xOld) == "A"
+       xOld := HB_ValtoExp(xOld)
+       xNew := HB_ValtoExp(xNew)
     ENDIF
     IF xOld == xNew
        // пропуск записи в журнал
     ELSE
-       ?? "Change Getbox:" + cObj + ", [" + xOld + "] # [" + xNew + "]"
+       ?? "Change Getbox:" ; ?? cObj 
+       ?? "[" ; ?? xOld ; ?? "] # [" ; ?? xNew ; ?? "]"
     ENDIF
 
 Return Nil
@@ -412,7 +543,7 @@ Function myPressButtonI(nEvent, cForm, cObj, nObjId, nBtn, nMod, aDim, aObjNameL
        cMsg := "Functions  " + cRun + "() not in the EXE file!;"
        cMsg += "call -" + hb_ValToExp(aDim) + ";"
        cMsg := AtRepl( ";", cMsg, CRLF )
-       MsgStop( cMsg, "Stop!")
+       AlertStop( cMsg, "Stop!")
    ELSE
       cTtl   := AtRepl( ";", cTtl, CRLF )
       aParam := { cTtl, cField, cObjRt, nBtn, aDim }
@@ -456,6 +587,43 @@ Function BtnTestRC(aPar)
 Return cRet
 
 //////////////////////////////////////////////////////////////////
+Function Test_Dim_Dbf(aDbf, cMsg, oCargo)
+   LOCAL nI, aRet, aIsx, a2Dim := {}
+   DEFAULT cMsg := "no cMsg"
+
+   IF !ISOBJECT(oCargo)
+      AlertStop("Not an oCargo object !;" + ProcNL())
+      RETURN NIL
+   ENDIF
+   // в качестве примера считаем что открыты базы и получаем
+   // справочник из этой базы (код и значение)
+   // массив aDbf = {"Als:City","Field1","Field2","TagIndex"}
+   // USE City  
+   // USE Street
+   // USE House 
+   // USE Firma 
+
+   // SELECT CITY
+   // OrdSetFocus("TagIndex")
+   // DbGotop()
+   //DO WHILE !EOF()
+   //   AADD( a2Dim, { FIELD->&Field1, FIELD->&Field2 } )
+   //   SKIP
+   //ENDDO
+   //
+   FOR nI := 1 TO 5
+      AADD( a2Dim, { nI + 100, "Value= "+HB_NtoS(nI)+ " -> " + aDbf[1] } )
+   NEXT    
+
+   aIsx := oCargo:a2Dim   // ВАЖНО ! первоначальные значения
+   aRet := myContexMenu2Dim(a2Dim,"BMP",oCargo)
+   IF LEN(aRet) == 0     // выбран пункт меню Выход
+      aRet := aIsx
+   ENDIF
+
+Return aRet
+
+//////////////////////////////////////////////////////////////////
 Function myListTab()
    Local i, aTabName, aDim, aRetDim := {}
 
@@ -469,6 +637,10 @@ Function myListTab()
    // TabPage 2
    aDim := {}
    AADD( aDim, { "D", "Date of Birth"                         , "DBirth"                         , nil              , nil                                   , ""               } )
+   AADD( aDim, { "S", "1-List (code, value)"                  , "KCity"                          , {"Als:City"  ,"Fld1","Fld2","TagIndex"}  , nil                 , ""               } )
+   AADD( aDim, { "S", "2-List (code, value)"                  , "KStreet"                        , {"Als:Street","Fld1","Fld2","TagIndex"}  , nil                 , ""               } )
+   AADD( aDim, { "S", "3-List (code, value)"                  , "KHouse"                         , {"Als:House" ,"Fld1","Fld2","TagIndex"}  , nil                 , ""               } )
+   AADD( aDim, { "S", "4-List (code, value)"                  , "KFirma"                         , {"Als:Firma" ,"Fld1","Fld2","TagIndex"}  , nil                 , ""               } )
    AADD( aRetDim, aDim )
 
    // TabPage 3
@@ -501,8 +673,80 @@ FUNCTION GetTxtWidth( cText, nFontSize, cFontName, lBold )  // получить Width те
 
 RETURN nWidth
 
+////////////////////////////////////////////////////////////////
+FUNCTION myContexMenu2Dim(a2Dim,cType,oCrg)
+   LOCAL Font1, Font2, nY, nX, aRet, nChoice
+   LOCAL oWnd, cImg, aItem, nI, nSize, aCode, cForm
+   LOCAL cMenu, bAction, cName, lChk, lDis, lIcon
+   //LOCAL cForm := ThisWindow.Name                  // имя окна
+
+   aItem := {}
+   aCode := {}
+   FOR nI := 1 TO LEN(a2Dim)
+      AADD( aCode, a2Dim[nI,1] )
+      AADD( aItem, a2Dim[nI,2] )
+   NEXT
+   nSize := 32
+   cImg  := "res\List.bmp"
+   Font1 := GetFontHandle( "DlgFont"  )
+   Font2 := GetFontHandle( "ComSanMS" )
+   lIcon := IIF( "ICO" $ UPPER(cType), .T., .F. )
+
+   // или можно так
+   oWnd  := _WindowObj( GetActiveWindow() )  // окно в фокусе
+   cForm := oWnd:Name                        // имя окна
+   // координаты вывода окна
+   nY    := GetProperty(cForm, "Row") + GetTitleHeight()
+   nY    += oCrg:nRow                                    // это oCargo текущего GetBox
+   nX    := GetProperty(cForm, "Col") + GetBorderWidth()
+   nX    += oCrg:nCol                                    // это oCargo текущего GetBox
+
+   SET MENUSTYLE EXTENDED        // переключить стиль меню на расширенный
+   SetMenuBitmapHeight( nSize )  // установить размер иконок 32х32
+
+   nChoice := -2              // обязательно, первоначальное значение
+   DEFINE CONTEXT MENU OF &cForm
+
+       //MENUITEM "название меню" DISABLED FONT Font3  ICON ""
+       //SEPARATOR
+
+       FOR nI := 1 TO LEN(aItem)
+          cMenu   := aItem[nI]
+          cName   := StrZero(nI, 10)
+          bAction := {|| nChoice := Val( This.Name ) }
+          lChk    := .F.
+          lDis    := .F.
+          IF lIcon
+             _DefineMenuItem( cMenu, bAction, cName,     , lChk, lDis, , Font1 , , .F., .F. , cImg, .F. )
+          ELSE
+             _DefineMenuItem( cMenu, bAction, cName, cImg, lChk, lDis, , Font1 , , .F., .F. )
+          ENDIF
+       NEXT
+
+       SEPARATOR
+       MENUITEM  "Exit"           ACTION  {|| nChoice := -1 } FONT Font2
+
+   END MENU
+
+   _PushKey( VK_DOWN )
+   _ShowContextMenu(cForm, nY, nX, .f. ) // ПОКАЗ ВЫПАДАЕЩЕГО МЕНЮ
+
+   InkeyGui(20)  // menu работает через очередь !
+
+   DEFINE CONTEXT MENU OF &cForm         // delete menu after exiting
+   END MENU
+
+   DO EVENTS
+
+   aRet := {}
+   IF nChoice > 0
+      aRet := {aCode[nChoice], aItem[nChoice]}
+   ENDIF
+
+RETURN aRet
+
 //////////////////////////////////////////////////
 FUNCTION ProcNL(nVal)
    Default nVal := 0
-RETURN "Call from: " + ProcName(nVal+1) + "(" + hb_ntos(ProcLine(nVal+1)) + ") --> " + ProcFile(nVal+1)
+RETURN ">>> " + ProcName(nVal+1) + "(" + hb_ntos(ProcLine(nVal+1)) + ") --> " + ProcFile(nVal+1)
 

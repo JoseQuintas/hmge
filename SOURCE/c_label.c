@@ -48,14 +48,14 @@
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
-// Static Class Name
-   #define WC_STATIC  "Static"
-#endif
 
+// Static Class Name
+#define WC_STATIC "Static"
+#endif
 #include "hbvm.h"
 
 LRESULT APIENTRY  LabelSubClassFunc( HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam );
-static WNDPROC LabelOldWndProc;
+static WNDPROC    LabelOldWndProc;
 
 #ifdef UNICODE
 LPWSTR            AnsiToWide( LPCSTR );
@@ -64,15 +64,15 @@ HINSTANCE         GetInstance( void );
 
 HB_FUNC( INITLABEL )
 {
-   HWND hWnd;
+   HWND     hWnd;
 
-   DWORD Style   = WS_CHILD;
-   DWORD ExStyle = hb_parl( 15 ) ? WS_EX_TRANSPARENT : 0;
+   DWORD    Style = WS_CHILD;
+   DWORD    ExStyle = hb_parl( 15 ) ? WS_EX_TRANSPARENT : 0;
 
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
+   LPCSTR   lpWindowName = hb_parc( 2 );
 #else
-   LPCWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
    if( hb_parl( 9 ) || hb_parl( 10 ) )
    {
@@ -94,7 +94,7 @@ HB_FUNC( INITLABEL )
       Style |= WS_VSCROLL;
    }
 
-   if( ! hb_parl( 16 ) )
+   if( !hb_parl( 16 ) )
    {
       Style |= WS_VISIBLE;
    }
@@ -125,20 +125,20 @@ HB_FUNC( INITLABEL )
    }
 
    hWnd = CreateWindowEx
-          (
-      ExStyle,
-      WC_STATIC,
-      lpWindowName,
-      Style,
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hb_parni( 7 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 3 ),
-      GetInstance(),
-      NULL
-          );
+      (
+         ExStyle,
+         WC_STATIC,
+         lpWindowName,
+         Style,
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hb_parni( 7 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 3 ),
+         GetInstance(),
+         NULL
+      );
 
    if( hb_parl( 10 ) )
    {
@@ -152,17 +152,17 @@ HB_FUNC( INITLABEL )
 #endif
 }
 
-#define _OLD_STYLE  0
+#define _OLD_STYLE   0
 
 LRESULT APIENTRY LabelSubClassFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-   TRACKMOUSEEVENT tme;
-   static PHB_SYMB pSymbol        = NULL;
-   static BOOL     bMouseTracking = FALSE;
-   LRESULT         r = 0;
+   TRACKMOUSEEVENT   tme;
+   static PHB_SYMB   pSymbol = NULL;
+   static BOOL       bMouseTracking = FALSE;
+   LRESULT           r = 0;
 
 #if _OLD_STYLE
-   BOOL bCallUDF = FALSE;
+   BOOL              bCallUDF = FALSE;
 #endif
    if( Msg == WM_MOUSEMOVE || Msg == WM_MOUSELEAVE )
    {
@@ -170,9 +170,9 @@ LRESULT APIENTRY LabelSubClassFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
       {
          if( bMouseTracking == FALSE )
          {
-            tme.cbSize      = sizeof( TRACKMOUSEEVENT );
-            tme.dwFlags     = TME_LEAVE;
-            tme.hwndTrack   = hWnd;
+            tme.cbSize = sizeof( TRACKMOUSEEVENT );
+            tme.dwFlags = TME_LEAVE;
+            tme.hwndTrack = hWnd;
             tme.dwHoverTime = HOVER_DEFAULT;
 
             if( _TrackMouseEvent( &tme ) == TRUE )
@@ -203,30 +203,30 @@ LRESULT APIENTRY LabelSubClassFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
       if( bCallUDF == TRUE )
       {
 #endif
-      if( ! pSymbol )
-      {
-         pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OLABELEVENTS" ) );
-      }
+         if( !pSymbol )
+         {
+            pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OLABELEVENTS" ) );
+         }
 
-      if( pSymbol && hb_vmRequestReenter() )
-      {
-         hb_vmPushSymbol( pSymbol );
-         hb_vmPushNil();
-         hb_vmPushNumInt( ( HB_PTRUINT ) hWnd );
-         hb_vmPushLong( Msg );
-         hb_vmPushNumInt( wParam );
-         hb_vmPushNumInt( lParam );
-         hb_vmDo( 4 );
+         if( pSymbol && hb_vmRequestReenter() )
+         {
+            hb_vmPushSymbol( pSymbol );
+            hb_vmPushNil();
+            hb_vmPushNumInt( ( HB_PTRUINT ) hWnd );
+            hb_vmPushLong( Msg );
+            hb_vmPushNumInt( wParam );
+            hb_vmPushNumInt( lParam );
+            hb_vmDo( 4 );
 
-         r = hmg_par_LRESULT( -1 );
+            r = hmg_par_LRESULT( -1 );
 
-         hb_vmRequestRestore();
-      }
+            hb_vmRequestRestore();
+         }
 
 #if _OLD_STYLE
-   }
+      }
 #endif
-      return ( r != 0 ) ? r : CallWindowProc( LabelOldWndProc, hWnd, 0, 0, 0 );
+      return( r != 0 ) ? r : CallWindowProc( LabelOldWndProc, hWnd, 0, 0, 0 );
    }
 
    bMouseTracking = FALSE;

@@ -47,8 +47,8 @@
    Parts of this code  is contributed and used here under permission of his
    author: Copyright 2016 (C) P.Chornyj <myorg63@mail.ru>
    ----------------------------------------------------------------------*/
-#define _WIN32_IE     0x0501
-#define _WIN32_WINNT  0x0600
+#define _WIN32_IE    0x0501
+#define _WIN32_WINNT 0x0600
 
 #include <mgdefs.h>
 
@@ -59,53 +59,52 @@
 #include <commctrl.h>
 
 #ifndef TTS_CLOSE
-   #define TTS_CLOSE  0x80
+#define TTS_CLOSE 0x80
 #endif
 #ifndef TTM_POPUP
-   #define TTM_POPUP  ( WM_USER + 34 )
+#define TTM_POPUP ( WM_USER + 34 )
 #endif
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
 typedef struct _tagEDITBALLOONTIP
 {
-   DWORD   cbStruct;
-   LPCWSTR pszTitle;
-   LPCWSTR pszText;
-   INT     ttiIcon;  // From TTI_*
-}
-EDITBALLOONTIP, * PEDITBALLOONTIP;
+   DWORD    cbStruct;
+   LPCWSTR  pszTitle;
+   LPCWSTR  pszText;
+   INT      ttiIcon; // From TTI_*
+} EDITBALLOONTIP, *PEDITBALLOONTIP;
 
-#define ECM_FIRST          0x1500                                       // Edit control messages
-#define EM_SHOWBALLOONTIP  ( ECM_FIRST + 3 )                            // Show a balloon tip associated to the edit control
+#define ECM_FIRST                                     0x1500            // Edit control messages
+#define EM_SHOWBALLOONTIP                             ( ECM_FIRST + 3 ) // Show a balloon tip associated to the edit control
 #define Edit_ShowBalloonTip( hwnd, peditballoontip )  ( BOOL ) SNDMSG( ( hwnd ), EM_SHOWBALLOONTIP, 0, ( LPARAM ) ( peditballoontip ) )
-#define EM_HIDEBALLOONTIP  ( ECM_FIRST + 4 )                            // Hide any balloon tip associated with the edit control
+#define EM_HIDEBALLOONTIP                             ( ECM_FIRST + 4 ) // Hide any balloon tip associated with the edit control
 #define Edit_HideBalloonTip( hwnd )                   ( BOOL ) SNDMSG( ( hwnd ), EM_HIDEBALLOONTIP, 0, 0 )
 #endif
 #ifndef __XHARBOUR__
-   #define HB_cdpGetU16( cdp, fCtrl, ch )             hb_cdpGetU16( cdp, ch )
+#define HB_cdpGetU16( cdp, fCtrl, ch ) hb_cdpGetU16( cdp, ch )
 #else
-   #define HB_cdpGetU16( cdp, fCtrl, ch )             hb_cdpGetU16( cdp, fCtrl, ch )
-   #define hb_vmCDP()                                 hb_cdppage()
+#define HB_cdpGetU16( cdp, fCtrl, ch ) hb_cdpGetU16( cdp, fCtrl, ch )
+#define hb_vmCDP()                     hb_cdppage()
 #endif
 extern BOOL _isValidCtrlClass( HWND, LPCTSTR );
 
-extern BOOL Array2Point( PHB_ITEM aPoint, POINT * pt );
-extern BOOL Array2Rect( PHB_ITEM aPoint, RECT * rect );
-extern BOOL Array2ColorRef( PHB_ITEM aCRef, COLORREF * cr );
-extern HB_EXPORT PHB_ITEM Rect2Array( RECT * rc );
+extern BOOL Array2Point( PHB_ITEM aPoint, POINT *pt );
+extern BOOL Array2Rect( PHB_ITEM aPoint, RECT *rect );
+extern BOOL Array2ColorRef( PHB_ITEM aCRef, COLORREF *cr );
+extern HB_EXPORT PHB_ITEM Rect2Array( RECT *rc );
 
 #ifdef UNICODE
 LPWSTR AnsiToWide( LPCSTR );
 #endif
 HINSTANCE GetInstance( void );
 
-static HB_BOOL g_bIsToolTipActive  = TRUE;
+static HB_BOOL g_bIsToolTipActive = TRUE;
 static HB_BOOL g_bIsToolTipBalloon = FALSE;
 
 static int g_iToolTipMaxWidth = -1;
 
 HB_FUNC( SETTOOLTIPACTIVATE )
 {
-   HB_BOOL g_bOldToolTipActive = g_bIsToolTipActive;
+   HB_BOOL  g_bOldToolTipActive = g_bIsToolTipActive;
 
    if( HB_ISLOG( 1 ) )
    {
@@ -117,7 +116,7 @@ HB_FUNC( SETTOOLTIPACTIVATE )
 
 HB_FUNC( SETTOOLTIPBALLOON )
 {
-   HB_BOOL g_bOldToolTipBalloon = g_bIsToolTipBalloon;
+   HB_BOOL  g_bOldToolTipBalloon = g_bIsToolTipBalloon;
 
    if( HB_ISLOG( 1 ) )
    {
@@ -129,7 +128,7 @@ HB_FUNC( SETTOOLTIPBALLOON )
 
 HB_FUNC( SETTOOLTIPMAXWIDTH )
 {
-   HB_BOOL g_iOldToolTipMaxWidth = g_iToolTipMaxWidth;
+   HB_BOOL  g_iOldToolTipMaxWidth = g_iToolTipMaxWidth;
 
    if( HB_ISNUM( 1 ) )
    {
@@ -146,11 +145,11 @@ HB_FUNC( SETTOOLTIPMAXWIDTH )
  */
 HB_FUNC( INITTOOLTIP )
 {
-   HWND hwndParent = HB_ISNUM( 1 ) ? hmg_par_raw_HWND( 1 ) : ( HWND ) NULL;
+   HWND  hwndParent = HB_ISNUM( 1 ) ? hmg_par_raw_HWND( 1 ) : ( HWND ) NULL;
 
-   if( HB_ISNIL( 1 ) ? TRUE : IsWindow( hwndParent ) )                       // hack for ModalWindow
+   if( HB_ISNIL( 1 ) ? TRUE : IsWindow( hwndParent ) )                  // hack for ModalWindow
    {
-      DWORD dwStyle = WS_POPUP | TTS_ALWAYSTIP;
+      DWORD                dwStyle = WS_POPUP | TTS_ALWAYSTIP;
       INITCOMMONCONTROLSEX icex = { sizeof( INITCOMMONCONTROLSEX ), ICC_BAR_CLASSES };
 
       if( hb_pcount() > 1 )
@@ -171,19 +170,19 @@ HB_FUNC( INITTOOLTIP )
       hmg_ret_raw_HWND
       (
          CreateWindow
-         (
-            TOOLTIPS_CLASS,
-            NULL,
-            dwStyle,
-            CW_USEDEFAULT,
-            CW_USEDEFAULT,
-            CW_USEDEFAULT,
-            CW_USEDEFAULT,
-            hwndParent,
-            ( HMENU ) NULL,
-            GetInstance(),
-            NULL
-         )
+            (
+               TOOLTIPS_CLASS,
+               NULL,
+               dwStyle,
+               CW_USEDEFAULT,
+               CW_USEDEFAULT,
+               CW_USEDEFAULT,
+               CW_USEDEFAULT,
+               hwndParent,
+               ( HMENU ) NULL,
+               GetInstance(),
+               NULL
+            )
       );
    }
    else
@@ -194,17 +193,17 @@ HB_FUNC( INITTOOLTIP )
 
 HB_FUNC( SETTOOLTIP )
 {
-   HWND hwndTool    = hmg_par_raw_HWND( 1 );
-   HWND hwndToolTip = hmg_par_raw_HWND( 3 );
+   HWND  hwndTool = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 3 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
       if( IsWindow( hwndTool ) )
       {
 #ifndef UNICODE
-         LPSTR lpText = ( LPSTR ) hb_parc( 2 );
+         LPSTR    lpText = ( LPSTR ) hb_parc( 2 );
 #else
-         LPWSTR lpText = AnsiToWide( ( char * ) hb_parc( 2 ) );
+         LPWSTR   lpText = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
          TOOLINFO ti;
 
@@ -212,12 +211,12 @@ HB_FUNC( SETTOOLTIP )
          memset( &ti, 0, sizeof( ti ) );
          ti.cbSize = sizeof( TOOLINFO );
          ti.uFlags = TTF_SUBCLASS | TTF_IDISHWND;
-         ti.hwnd   = GetParent( hwndTool );
-         ti.uId    = ( UINT_PTR ) hwndTool;
+         ti.hwnd = GetParent( hwndTool );
+         ti.uId = ( UINT_PTR ) hwndTool;
 
-         if( SendMessage( hwndToolTip, TTM_GETTOOLINFO, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) &ti ) )
+         if( SendMessage( hwndToolTip, TTM_GETTOOLINFO, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) & ti ) )
          {
-            SendMessage( hwndToolTip, TTM_DELTOOL, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) &ti );
+            SendMessage( hwndToolTip, TTM_DELTOOL, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) & ti );
          }
 
          if( hb_parclen( 2 ) > 0 )
@@ -225,7 +224,7 @@ HB_FUNC( SETTOOLTIP )
             ti.lpszText = lpText;
          }
 
-         hmg_ret_L( SendMessage( hwndToolTip, TTM_ADDTOOL, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) &ti ) );
+         hmg_ret_L( SendMessage( hwndToolTip, TTM_ADDTOOL, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) & ti ) );
 
          SendMessage( hwndToolTip, TTM_ACTIVATE, ( WPARAM ) ( BOOL ) g_bIsToolTipActive, 0 );
 #ifdef UNICODE
@@ -244,22 +243,22 @@ HB_FUNC( SETTOOLTIP )
  */
 HB_FUNC( SHOWBALLOONTIP )
 {
-   WCHAR Text[ 512 ];
-   WCHAR Title[ 512 ];
+   WCHAR          Text[512];
+   WCHAR          Title[512];
    EDITBALLOONTIP bl;
-   const char *   s;
-   int i, k;
+   const char     *s;
+   int            i, k;
 
-   PHB_CODEPAGE s_cdpHost = hb_vmCDP();
+   PHB_CODEPAGE   s_cdpHost = hb_vmCDP();
 
-   HWND hWnd = hmg_par_raw_HWND( 1 );
+   HWND           hWnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hWnd ) )
    {
       bl.cbStruct = sizeof( EDITBALLOONTIP );
       bl.pszTitle = NULL;
-      bl.pszText  = NULL;
-      bl.ttiIcon  = hb_parnidef( 4, 0 /*TTI_NONE*/ );
+      bl.pszText = NULL;
+      bl.ttiIcon = hb_parnidef( 4, 0 /*TTI_NONE*/ );
 
       if( HB_ISCHAR( 2 ) )
       {
@@ -268,7 +267,7 @@ HB_FUNC( SHOWBALLOONTIP )
          s = ( const char * ) hb_parc( 2 );
          for( i = 0; i < k; i++ )
          {
-            Text[ i ] = HB_cdpGetU16( s_cdpHost, TRUE, s[ i ] );
+            Text[i] = HB_cdpGetU16( s_cdpHost, TRUE, s[i] );
          }
 
          bl.pszText = Text;
@@ -281,7 +280,7 @@ HB_FUNC( SHOWBALLOONTIP )
          s = ( const char * ) hb_parc( 3 );
          for( i = 0; i < k; i++ )
          {
-            Title[ i ] = HB_cdpGetU16( s_cdpHost, TRUE, s[ i ] );
+            Title[i] = HB_cdpGetU16( s_cdpHost, TRUE, s[i] );
          }
 
          bl.pszTitle = Title;
@@ -293,7 +292,7 @@ HB_FUNC( SHOWBALLOONTIP )
 
 HB_FUNC( HIDEBALLOONTIP )
 {
-   HWND hWnd = hmg_par_raw_HWND( 1 );
+   HWND  hWnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hWnd ) )
    {
@@ -306,27 +305,27 @@ HB_FUNC( HIDEBALLOONTIP )
  */
 HB_FUNC( INITTOOLTIPEX )
 {
-   HWND hwndParent = hmg_par_raw_HWND( 1 );
+   HWND  hwndParent = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwndParent ) )
    {
-      PHB_ITEM aRect = hb_param( 2, HB_IT_ANY );
-      RECT     rect;
+      PHB_ITEM             aRect = hb_param( 2, HB_IT_ANY );
+      RECT                 rect;
 #ifndef UNICODE
-      LPSTR lpszText  = ( LPSTR ) NULL;
-      LPSTR lpszTitle = ( LPSTR ) ( HB_ISCHAR( 4 ) ? hb_parc( 4 ) : NULL );
+      LPSTR                lpszText = ( LPSTR ) NULL;
+      LPSTR                lpszTitle = ( LPSTR ) ( HB_ISCHAR( 4 ) ? hb_parc( 4 ) : NULL );
 #else
-      LPWSTR lpszText  = ( LPWSTR ) NULL;
-      LPWSTR lpszTitle = HB_ISCHAR( 4 ) ? AnsiToWide( ( char * ) hb_parc( 4 ) ) : NULL;
+      LPWSTR               lpszText = ( LPWSTR ) NULL;
+      LPWSTR               lpszTitle = HB_ISCHAR( 4 ) ? AnsiToWide( ( char * ) hb_parc( 4 ) ) : NULL;
 #endif
-      int      nIcon   = hb_parnidef( 5, TTI_NONE );
-      DWORD    dwStyle = WS_POPUP;
-      HWND     hwndToolTip;
-      TOOLINFO ti;
-      UINT     uFlags = 0;
+      int                  nIcon = hb_parnidef( 5, TTI_NONE );
+      DWORD                dwStyle = WS_POPUP;
+      HWND                 hwndToolTip;
+      TOOLINFO             ti;
+      UINT                 uFlags = 0;
       INITCOMMONCONTROLSEX icex = { sizeof( INITCOMMONCONTROLSEX ), ICC_BAR_CLASSES };
 
-      if( ! Array2Rect( aRect, &rect ) )
+      if( !Array2Rect( aRect, &rect ) )
       {
          GetClientRect( hwndParent, &rect );
       }
@@ -341,7 +340,7 @@ HB_FUNC( INITTOOLTIPEX )
       }
       else if( HB_ISNUM( 3 ) )
       {
-         lpszText = ( LPTSTR ) MAKEINTRESOURCE( hb_parni( 3 ) );
+         lpszText = MAKEINTRESOURCE( hb_parni( 3 ) );
       }
 
       if( HB_ISNUM( 6 ) )
@@ -358,35 +357,35 @@ HB_FUNC( INITTOOLTIPEX )
 
       /* Create a tooltip */
       hwndToolTip = CreateWindowEx
-                    (
-         WS_EX_TOPMOST,
-         TOOLTIPS_CLASS,
-         NULL,
-         dwStyle,
-         CW_USEDEFAULT,
-         CW_USEDEFAULT,
-         CW_USEDEFAULT,
-         CW_USEDEFAULT,
-         hwndParent,
-         ( HMENU ) NULL,
-         GetInstance(),
-         NULL
-                    );
+         (
+            WS_EX_TOPMOST,
+            TOOLTIPS_CLASS,
+            NULL,
+            dwStyle,
+            CW_USEDEFAULT,
+            CW_USEDEFAULT,
+            CW_USEDEFAULT,
+            CW_USEDEFAULT,
+            hwndParent,
+            ( HMENU ) NULL,
+            GetInstance(),
+            NULL
+         );
 
       SetWindowPos( hwndToolTip, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE );
 
       /* Set up "tool" information. In this case, the "tool" is the entire parent window. */
       memset( &ti, 0, sizeof( ti ) );
-      ti.cbSize   = sizeof( ti );
-      ti.uFlags   = uFlags;
-      ti.hwnd     = hwndParent;
-      ti.uId      = ( UINT_PTR ) hwndParent;
-      ti.rect     = rect;
-      ti.hinst    = GetInstance();
+      ti.cbSize = sizeof( ti );
+      ti.uFlags = uFlags;
+      ti.hwnd = hwndParent;
+      ti.uId = ( UINT_PTR ) hwndParent;
+      ti.rect = rect;
+      ti.hinst = GetInstance();
       ti.lpszText = lpszText;
 
       // Associate the tooltip with the "tool" window.
-      SendMessage( hwndToolTip, TTM_ADDTOOL, 0, ( LPARAM ) ( LPTOOLINFO ) &ti );
+      SendMessage( hwndToolTip, TTM_ADDTOOL, 0, ( LPARAM ) ( LPTOOLINFO ) & ti );
 
       if( NULL != lpszTitle )
       {
@@ -431,7 +430,7 @@ HB_FUNC( INITTOOLTIPEX )
  */
 HB_FUNC( TTM_ACTIVATE )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -474,7 +473,7 @@ HB_FUNC( TTM_ACTIVATE )
  */
 HB_FUNC( TTM_GETDELAYTIME )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -494,13 +493,13 @@ HB_FUNC( TTM_GETDELAYTIME )
  */
 HB_FUNC( TTM_GETMARGIN )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
-      RECT rect;
+      RECT  rect;
 
-      SendMessage( hwndToolTip, TTM_GETMARGIN, 0, ( LPARAM ) &rect );
+      SendMessage( hwndToolTip, TTM_GETMARGIN, 0, ( LPARAM ) & rect );
 
       hb_itemReturnRelease( Rect2Array( &rect ) );
    }
@@ -515,7 +514,7 @@ HB_FUNC( TTM_GETMARGIN )
  */
 HB_FUNC( TTM_GETMAXTIPWIDTH )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -537,7 +536,7 @@ HB_FUNC( TTM_GETMAXTIPWIDTH )
  */
 HB_FUNC( TTM_GETTIPBKCOLOR )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -554,7 +553,7 @@ HB_FUNC( TTM_GETTIPBKCOLOR )
  */
 HB_FUNC( TTM_GETTIPTEXTCOLOR )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -577,7 +576,7 @@ HB_FUNC( TTM_GETTIPTEXTCOLOR )
  */
 HB_FUNC( TTM_GETTOOLCOUNT )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -606,7 +605,7 @@ HB_FUNC( TTM_GETTOOLCOUNT )
  */
 HB_FUNC( TTM_POP )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -624,7 +623,7 @@ HB_FUNC( TTM_POP )
  */
 HB_FUNC( TTM_POPUP )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -647,11 +646,11 @@ HB_FUNC( TTM_POPUP )
  */
 HB_FUNC( TTM_SETDELAYTIME )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
-      int nMilliSec = hb_parnidef( 3, -1 );
+      int   nMilliSec = hb_parnidef( 3, -1 );
 
       if( nMilliSec < 0 )
       {
@@ -676,15 +675,15 @@ HB_FUNC( TTM_SETDELAYTIME )
  */
 HB_FUNC( TTM_SETMARGIN )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
-      RECT rect;
+      RECT  rect;
 
       if( Array2Rect( hb_param( 2, HB_IT_ANY ), &rect ) )
       {
-         SendMessage( hwndToolTip, TTM_SETMARGIN, 0, ( LPARAM ) &rect );
+         SendMessage( hwndToolTip, TTM_SETMARGIN, 0, ( LPARAM ) & rect );
       }
       else
       {
@@ -702,7 +701,7 @@ HB_FUNC( TTM_SETMARGIN )
  */
 HB_FUNC( TTM_SETMAXTIPWIDTH )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -719,7 +718,7 @@ HB_FUNC( TTM_SETMAXTIPWIDTH )
  */
 HB_FUNC( TTM_SETTIPBKCOLOR )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -750,7 +749,7 @@ HB_FUNC( TTM_SETTIPBKCOLOR )
  */
 HB_FUNC( TTM_SETTIPTEXTCOLOR )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -790,8 +789,8 @@ HB_FUNC( TTM_SETTIPTEXTCOLOR )
  */
 HB_FUNC( TTM_TRACKACTIVATE )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
-   HWND hwndTool    = hmg_par_raw_HWND( 2 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndTool = hmg_par_raw_HWND( 2 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) && IsWindow( hwndTool ) )
    {
@@ -799,10 +798,10 @@ HB_FUNC( TTM_TRACKACTIVATE )
 
       memset( &ti, 0, sizeof( ti ) );
       ti.cbSize = sizeof( TOOLINFO );
-      ti.hwnd   = hwndTool;
-      ti.uId    = ( UINT_PTR ) hwndTool;
+      ti.hwnd = hwndTool;
+      ti.uId = ( UINT_PTR ) hwndTool;
 
-      SendMessage( hwndToolTip, TTM_TRACKACTIVATE, ( WPARAM ) hb_parl( 3 ), ( LPARAM ) ( LPTOOLINFO ) &ti );
+      SendMessage( hwndToolTip, TTM_TRACKACTIVATE, ( WPARAM ) hb_parl( 3 ), ( LPARAM ) ( LPTOOLINFO ) & ti );
    }
    else
    {
@@ -815,8 +814,8 @@ HB_FUNC( TTM_TRACKACTIVATE )
  */
 HB_FUNC( TTM_TRACKPOSITION )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
-   HWND hwndTool    = hmg_par_raw_HWND( 2 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndTool = hmg_par_raw_HWND( 2 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) && IsWindow( hwndTool ) )
    {
@@ -844,7 +843,7 @@ HB_FUNC( TTM_TRACKPOSITION )
  */
 HB_FUNC( TTM_UPDATE )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) )
    {
@@ -859,30 +858,30 @@ HB_FUNC( TTM_UPDATE )
 /*
    TTM_UPDATETIPTEXT - sets the tooltip text for a tool
  */
-HB_FUNC( TTM_UPDATETIPTEXT )    //old HB_FUNC( UPDATETOOLTIPTEXT )
+HB_FUNC( TTM_UPDATETIPTEXT )  //old HB_FUNC( UPDATETOOLTIPTEXT )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
-   HWND hwndTool    = hmg_par_raw_HWND( 2 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndTool = hmg_par_raw_HWND( 2 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) && IsWindow( hwndTool ) )
    {
       if( hb_parclen( 3 ) > 0 )
       {
 #ifndef UNICODE
-         LPSTR lpszText = ( LPSTR ) hb_parc( 3 );
+         LPSTR    lpszText = ( LPSTR ) hb_parc( 3 );
 #else
-         LPWSTR lpszText = AnsiToWide( ( char * ) hb_parc( 3 ) );
+         LPWSTR   lpszText = AnsiToWide( ( char * ) hb_parc( 3 ) );
 #endif
          TOOLINFO ti;
 
          memset( &ti, 0, sizeof( ti ) );
-         ti.cbSize   = sizeof( TOOLINFO );
-         ti.hinst    = ( HINSTANCE ) 0;
-         ti.hwnd     = hwndTool;
-         ti.uId      = ( UINT_PTR ) hwndTool;
+         ti.cbSize = sizeof( TOOLINFO );
+         ti.hinst = ( HINSTANCE ) 0;
+         ti.hwnd = hwndTool;
+         ti.uId = ( UINT_PTR ) hwndTool;
          ti.lpszText = lpszText;
 
-         SendMessage( hwndToolTip, TTM_UPDATETIPTEXT, 0, ( LPARAM ) ( LPTOOLINFO ) &ti );
+         SendMessage( hwndToolTip, TTM_UPDATETIPTEXT, 0, ( LPARAM ) ( LPTOOLINFO ) & ti );
 #ifdef UNICODE
          if( lpszText != NULL )
          {
@@ -904,8 +903,8 @@ HB_FUNC( TTM_UPDATETIPTEXT )    //old HB_FUNC( UPDATETOOLTIPTEXT )
  */
 HB_FUNC( TTM_WINDOWFROMPOINT )
 {
-   HWND hwndToolTip = hmg_par_raw_HWND( 1 );
-   HWND hwndTool    = hmg_par_raw_HWND( 2 );
+   HWND  hwndToolTip = hmg_par_raw_HWND( 1 );
+   HWND  hwndTool = hmg_par_raw_HWND( 2 );
 
    if( _isValidCtrlClass( hwndToolTip, TOOLTIPS_CLASS ) && IsWindow( hwndTool ) )
    {

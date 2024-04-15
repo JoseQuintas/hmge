@@ -52,24 +52,23 @@
 #include "hbapierr.h"
 
 #ifndef __XHARBOUR__
-   #include "hbwinuni.h"
+#include "hbwinuni.h"
 #else
-typedef wchar_t HB_WCHAR;
+typedef wchar_t   HB_WCHAR;
 #endif
-#if ( ! defined( EM_GETCUEBANNER ) )
-   #if ( ! defined( ECM_FIRST ) )
-      #define ECM_FIRST     0x1500
-   #endif
-   #define EM_GETCUEBANNER  ( ECM_FIRST + 2 )
+#if ( !defined( EM_GETCUEBANNER ) )
+#if ( !defined( ECM_FIRST ) )
+#define ECM_FIRST 0x1500
 #endif
-
+#define EM_GETCUEBANNER ( ECM_FIRST + 2 )
+#endif
 HB_FUNC( GETCUEBANNERTEXT )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
-      HB_WCHAR * lpWCStr = ( HB_WCHAR * ) hb_xgrab( 256 * sizeof( HB_WCHAR ) );
+      HB_WCHAR *lpWCStr = ( HB_WCHAR * ) hb_xgrab( 256 * sizeof( HB_WCHAR ) );
 
       if( SendMessage( hwnd, EM_GETCUEBANNER, ( WPARAM ) ( LPWSTR ) lpWCStr, ( LPARAM ) 256 ) )
       {
@@ -94,11 +93,11 @@ HB_FUNC( GETCUEBANNERTEXT )
 
 HB_FUNC( SENDMESSAGESTRINGW )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
-      HB_WCHAR * lpWCStr = ( HB_WCHAR * ) ( hb_parclen( 4 ) == 0 ? NULL : hb_mbtowc( hb_parc( 4 ) ) );
+      HB_WCHAR *lpWCStr = ( HB_WCHAR * ) ( hb_parclen( 4 ) == 0 ? NULL : hb_mbtowc( hb_parc( 4 ) ) );
 
       SendMessage( hwnd, hmg_par_UINT( 2 ), ( WPARAM ) hb_parl( 3 ), ( LPARAM ) ( LPCWSTR ) lpWCStr );
       if( NULL != lpWCStr )

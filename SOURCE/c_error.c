@@ -51,29 +51,29 @@
 #include <mgdefs.h>
 
 #if defined( __WATCOMC__ )
-   #ifndef _RSIZE_T_DEFINED
-      #define _RSIZE_T_DEFINED
-typedef size_t rsize_t;
-   #endif
+#ifndef _RSIZE_T_DEFINED
+#define _RSIZE_T_DEFINED
+typedef size_t             rsize_t;
+#endif
 _WCRTLINK extern int       swprintf_s( wchar_t * __restrict __s, rsize_t __n, const wchar_t * __restrict __format, ... );
 #endif
-extern HB_SIZE             hmg_tstrlen( const TCHAR * pText );
+extern HB_SIZE             hmg_tstrlen( const TCHAR *pText );
 
 extern HB_EXPORT PHB_ITEM  hb_errRT_SubstParams
-(
-   const char *   szSubSystem,
-   HB_ERRCODE errGenCode,
-   HB_ERRCODE errSubCode,
-   const char *   szDescription,
-   const char *   szOperation
-);
+                           (
+                              const char  *szSubSystem,
+                              HB_ERRCODE  errGenCode,
+                              HB_ERRCODE  errSubCode,
+                              const char  *szDescription,
+                              const char  *szOperation
+                           );
 
 // fixed P.Ch. 16.12.
 void hmg_ErrorExit( LPCTSTR lpszMessage, DWORD dwError, BOOL bExit )
 {
-   LPVOID lpMsgBuf;
-   LPVOID lpDisplayBuf;
-   DWORD  nError;
+   LPVOID   lpMsgBuf;
+   LPVOID   lpDisplayBuf;
+   DWORD    nError;
 
    nError = ( 0 != dwError ) ? dwError : GetLastError();
 
@@ -83,7 +83,7 @@ void hmg_ErrorExit( LPCTSTR lpszMessage, DWORD dwError, BOOL bExit )
       NULL,
       nError,
       MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-      ( LPTSTR ) &lpMsgBuf,
+      ( LPTSTR ) & lpMsgBuf,
       0,
       NULL
    );

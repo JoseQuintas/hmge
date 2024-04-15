@@ -1,3 +1,71 @@
+2024/04/15: HMG Extended Edition version 24.04.
+  * Fixed: Program crash at the exit from a Preview window in a graph printing
+           module at using of xHarbour compiler (introduced in the build 17.06).
+           Contributed by Grigory Filatov
+           (see demo in folder \samples\Basic\Charts_3)
+  * Fixed: Problem with button's focus at a window activation when this button
+           was defined with the DEFAULT clause (introduced in the build 18.11).
+           Contributed by Grigory Filatov
+           (see demo.prg in folder \samples\Basic\Font)
+  * Modified: MiniGUI core has been updated for correct compiling with the new
+           Pelles C 12.0 and xHarbour compiler.
+           This also affected the following libraries:
+           miniprint, miniprint2, tsbrowse, hbvpdf and hmg_hpdf.
+           Based on the latest xHB package provided by Richard Vischer.
+           Contributed by Grigory Filatov
+  * Updated: Header file i_pseudofunc.ch for compatibility with xHarbour:
+           - added definitions of some missing pseudo-functions.
+           Contributed by Grigory Filatov
+           (see i_pseudofunc.ch in folder \include)
+  * Updated: hbmk2 utility is thread-aware during compilation in MT mode.
+           By default, the number of threads used is equal to the number of
+           processors. Borrowed from the Harbour fork 3.4.0.
+           Contributed by Grigory Filatov
+           (see source code in folder \harbour\utils\hbmk2) [PRO VERSION]
+  * Updated: Adaptation FiveWin Class TSBrowse 9.0 in HMG:
+           - minor correction in the method LoadFields().
+           Contributed by Sergej Kiselev
+           (see demo in folder \samples\Advanced\Tsb_SBrowse)
+  * Updated: HbSQLite3 library:
+           - update for using SQLITE3 version 3.46.0dev (from 3.45.2).
+           Contributed by Grigory Filatov
+  * New: 'Comparison of standard and professional MiniGUI builds' table.
+           Contributed by Grigory Filatov
+           (see in folder \Doc)
+  * New: 'C source code reformatter GreatCode' utility by Christophe Beaudet:
+           - added configuration files for processing the MiniGUI core code.
+           Contributed by Grigory Filatov
+           (see in folder \Utils\GreatCode) [PRO VERSION]
+  * New: 'File date changer utility' sample.
+           Contributed by Pierpaolo Martinello
+           (see in folder \samples\Advanced\Filedate)
+  * Updated: 'Dlu2Pixel Demo' sample.
+           Contributed by Sergej Kiselev
+           (see in folder \samples\Basic\GetBox_3)
+  * Updated: 'Set ShowRedAlert On' sample: improved Error Dialog output.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\ShowDetailError)
+  * Updated: 'Enable/Disable Window/Control Events' sample:
+           - updated for compatibility with the last Minigui changes.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\StopEvents)
+  * Updated: 'Five GUI libraries for testing' sample.
+           Contribution of Jose Quintas.
+           Revised for Minigui Extended by Grigory Filatov
+           (see in folder \samples\Advanced\FiveLibsTest)
+  * Updated: 'Using of TSBrowse for a table from an array' sample:
+           - added possibility to resize form.
+           Contributed by Sergej Kiselev and Verchenko Andrey
+           (see in folder \samples\Advanced\Tsb_array_3)
+  * Updated: 'Open array via SBrowse' sample:
+           - added saving of the memo field using the CTRL+W hotkey.
+           Contributed by Sergej Kiselev
+           (see demo2.prg in folder \samples\Advanced\Tsb_SBrowse)
+  * Updated: UnRar sample and HbUnrar library:
+           - updated unrar.dll to the current version 7.00 (from 6.24).
+           Contributed by Grigory Filatov
+           (see in folder \samples\Advanced\UnRar)
+
 2024/03/18: HMG Extended Edition version 24.03.
   * Enhanced: The internal OOP class THmgData was improved for Json support:
            - added the new method Json( cJson, lMode );

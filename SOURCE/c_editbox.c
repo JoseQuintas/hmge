@@ -48,10 +48,10 @@
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
-// Edit Class Name
-   #define WC_EDIT  "Edit"
-#endif
 
+// Edit Class Name
+#define WC_EDIT   "Edit"
+#endif
 extern LRESULT CALLBACK OwnEditProc( HWND hbutton, UINT msg, WPARAM wParam, LPARAM lParam );
 
 HINSTANCE               GetInstance( void );
@@ -59,7 +59,7 @@ HINSTANCE               GetInstance( void );
 HB_FUNC( INITEDITBOX )
 {
    HWND  hbutton;
-   DWORD Style   = ES_MULTILINE | ES_WANTRETURN | WS_CHILD;
+   DWORD Style = ES_MULTILINE | ES_WANTRETURN | WS_CHILD;
    DWORD ExStyle = hb_parl( 8 ) ? 0 : WS_EX_CLIENTEDGE;
 
    if( hb_parl( 10 ) )
@@ -67,17 +67,17 @@ HB_FUNC( INITEDITBOX )
       Style |= ES_READONLY;
    }
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 12 ) )
+   if( !hb_parl( 12 ) )
    {
       Style |= WS_TABSTOP;
    }
 
-   if( ! hb_parl( 13 ) )
+   if( !hb_parl( 13 ) )
    {
       Style |= WS_VSCROLL;
    }
@@ -86,26 +86,26 @@ HB_FUNC( INITEDITBOX )
       Style |= ES_AUTOVSCROLL;
    }
 
-   if( ! hb_parl( 14 ) )
+   if( !hb_parl( 14 ) )
    {
       Style |= WS_HSCROLL;
    }
 
    hbutton = CreateWindowEx
-             (
-      ExStyle,
-      WC_EDIT,
-      TEXT( "" ),
-      Style,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-             );
+      (
+         ExStyle,
+         WC_EDIT,
+         TEXT( "" ),
+         Style,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    SendMessage( hbutton, EM_LIMITTEXT, hmg_par_WPARAM( 9 ), ( LPARAM ) 0 );
 

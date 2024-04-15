@@ -44,7 +44,7 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE  0x0501
+#define _WIN32_IE 0x0501
 
 #include <mgdefs.h>
 
@@ -56,13 +56,12 @@ LPWSTR      AnsiToWide( LPCSTR );
 void pascal DelResource( HANDLE hResource );
 
 #ifndef HMG_LEGACY_OFF
-   #if ! defined( __MINGW32__ ) && ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x020000 ) && ( __HARBOUR__ - 0 < 0x030200 )
+#if !defined( __MINGW32__ ) && !defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x020000 ) && ( __HARBOUR__ - 0 < 0x030200 )
 HB_FUNC_TRANSLATE( HB_SETCODEPAGE, HB_CDPSELECT )
-   #endif
+#endif
 #endif \
-\
-/* HMG_LEGACY_OFF */
-
+ \
+   /* HMG_LEGACY_OFF */
 HB_FUNC( MAKELONG )
 {
    hmg_ret_LONG( MAKELONG( hb_parni( 1 ), hb_parni( 2 ) ) );
@@ -75,7 +74,7 @@ HB_FUNC( _ENABLESCROLLBARS )
 
 HB_FUNC( DELETEOBJECT )
 {
-   HANDLE hRes = hmg_par_raw_HANDLE( 1 );
+   HANDLE   hRes = hmg_par_raw_HANDLE( 1 );
 
    if( hRes )
    {
@@ -90,7 +89,7 @@ HB_FUNC( DELETEOBJECT )
 
 HB_FUNC( IMAGELIST_DESTROY )
 {
-   HIMAGELIST himl = hmg_par_raw_HIMAGELIST( 1 );
+   HIMAGELIST  himl = hmg_par_raw_HIMAGELIST( 1 );
 
    DelResource( himl );
    hb_retl( ImageList_Destroy( himl ) );
@@ -133,25 +132,25 @@ HB_FUNC( SYSTEMPARAMETERSINFO )
    hb_retl( SystemParametersInfoA( hmg_par_UINT( 1 ), hmg_par_UINT( 2 ), ( VOID * ) hb_parc( 3 ), hmg_par_UINT( 4 ) ) );
 }
 
-HB_FUNC( GETTEXTWIDTH )   // returns the width of a string in pixels
+HB_FUNC( GETTEXTWIDTH ) // returns the width of a string in pixels
 {
-   HDC   hDC        = hmg_par_raw_HDC( 1 );
-   HWND  hWnd       = ( HWND ) NULL;
-   BOOL  bDestroyDC = FALSE;
-   HFONT hFont      = hmg_par_raw_HFONT( 3 );
-   HFONT hOldFont   = ( HFONT ) NULL;
-   SIZE  sz;
+   HDC      hDC = hmg_par_raw_HDC( 1 );
+   HWND     hWnd = ( HWND ) NULL;
+   BOOL     bDestroyDC = FALSE;
+   HFONT    hFont = hmg_par_raw_HFONT( 3 );
+   HFONT    hOldFont = ( HFONT ) NULL;
+   SIZE     sz;
 
 #ifndef UNICODE
-   LPCSTR lpString = hb_parc( 2 );
+   LPCSTR   lpString = hb_parc( 2 );
 #else
-   LPCWSTR lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPCWSTR  lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   if( ! hDC )
+   if( !hDC )
    {
       bDestroyDC = TRUE;
-      hWnd       = GetActiveWindow();
-      hDC        = GetDC( hWnd );
+      hWnd = GetActiveWindow();
+      hDC = GetDC( hWnd );
    }
 
    if( hFont )
@@ -182,17 +181,17 @@ HB_FUNC( KEYBD_EVENT )
 {
    keybd_event
    (
-      hmg_par_BYTE( 1 ),                              // virtual-key code
+      hmg_par_BYTE( 1 ),   // virtual-key code
       ( BYTE ) MapVirtualKey( hmg_par_UINT( 1 ), 0 ), // hardware scan code
       hb_parl( 2 ) ? KEYEVENTF_KEYUP : 0,             // flags specifying various function options
-      0                                               // additional data associated with keystroke
+      0  // additional data associated with keystroke
    );
 }
 
 HB_FUNC( INSERTVKEY )
 {
-   keybd_event( hmg_par_BYTE( 1 ),    // virtual-key code
-                0, 0, 0 );
+   keybd_event( hmg_par_BYTE( 1 ), // virtual-key code
+   0, 0, 0 );
 }
 
 HB_FUNC( _HMG_SETVSCROLLVALUE )
@@ -243,7 +242,7 @@ HB_FUNC( CHANGESTYLE )
    int      iStyle = hb_parl( 4 ) ? GWL_EXSTYLE : GWL_STYLE;
    LONG_PTR dwStyle, dwNewStyle;
 
-   dwStyle    = GetWindowLongPtr( hWnd, iStyle );
+   dwStyle = GetWindowLongPtr( hWnd, iStyle );
    dwNewStyle = ( dwStyle & ( ~dwRemove ) ) | dwAdd;
 
    HB_RETNL( ( LONG_PTR ) SetWindowLongPtr( hWnd, iStyle, dwNewStyle ) );
@@ -251,20 +250,20 @@ HB_FUNC( CHANGESTYLE )
    SetWindowPos( hWnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER );
 }
 
-HB_FUNC( MOVEBTNTEXTBOX )    //MoveBtnTextBox(hEdit, hBtn1, hBtn2, fBtn2, BtnWidth, width, height)
+HB_FUNC( MOVEBTNTEXTBOX )  //MoveBtnTextBox(hEdit, hBtn1, hBtn2, fBtn2, BtnWidth, width, height)
 {
-   HWND hedit    = hmg_par_raw_HWND( 1 );
-   HWND hBtn1    = hmg_par_raw_HWND( 2 );
-   HWND hBtn2    = hmg_par_raw_HWND( 3 );
-   BOOL fBtn2    = hb_parl( 4 );
-   int  BtnWidth = ( int ) hb_parni( 5 );
-   int  BtnWidth2;
-   int  width  = ( int ) hb_parni( 6 );
-   int  height = ( int ) hb_parni( 7 );
-   BOOL fBtns  = ( hb_parnl( 2 ) > 0 );
+   HWND  hedit = hmg_par_raw_HWND( 1 );
+   HWND  hBtn1 = hmg_par_raw_HWND( 2 );
+   HWND  hBtn2 = hmg_par_raw_HWND( 3 );
+   BOOL  fBtn2 = hb_parl( 4 );
+   int   BtnWidth = ( int ) hb_parni( 5 );
+   int   BtnWidth2;
+   int   width = ( int ) hb_parni( 6 );
+   int   height = ( int ) hb_parni( 7 );
+   BOOL  fBtns = ( hb_parnl( 2 ) > 0 );
 
-   BtnWidth  = ( BtnWidth >= GetSystemMetrics( SM_CYSIZE ) ? BtnWidth : GetSystemMetrics( SM_CYSIZE ) - 1 );
-   BtnWidth  = fBtns ? BtnWidth : 0;
+   BtnWidth = ( BtnWidth >= GetSystemMetrics( SM_CYSIZE ) ? BtnWidth : GetSystemMetrics( SM_CYSIZE ) - 1 );
+   BtnWidth = fBtns ? BtnWidth : 0;
    BtnWidth2 = fBtn2 ? BtnWidth : 0;
 
    SetWindowPos( hedit, NULL, 0, 0, width, height, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER );
@@ -290,8 +289,8 @@ HB_FUNC( HB_DATE )
    hb_retd( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ) );
 }
 
-#if ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 < 0x030200 )
-   #define hb_cdppage  hb_vmCDP
+#if !defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 < 0x030200 )
+#define hb_cdppage   hb_vmCDP
 #endif
 HB_FUNC( HB_LEFTEQI )
 {

@@ -888,9 +888,16 @@ cFilePath( <cFile> ) + "\" + cFileNoExt( <cFile> ) + <cExt>
                                           => hb_AScan( <a>, <b>, <c>, <d>, <e> )
 #  xtranslate At( <a>, <b>, [<x,...>] )   => hb_At( <a>, <b>, <x> )
 #else
+#ifdef __XCC__
+#  xtranslate hb_FileExists( <c> )        => File( <c> )
+#endif
 #  xtranslate GetComputerName()           => NetName()
 #  xtranslate GetUserName()               => NetName( 1 )
 #  xtranslate GetExeFilename()            => ExeName()
+#  xtranslate hb_IsFunction( <c> )        => ( Type( <c> + "()" ) == "UI" )
+#  xtranslate hb_FNameDir( <cFile> )      => cFilePath( <cFile> ) + "\"
+#  xtranslate hb_MemoRead( [<x,...>] )    => MemoRead( <x> ) 
+#  xtranslate hb_Filedelete( [<x>] )      => FErase( <x> ) 
 #  xtranslate hb_ADel( [<x,...>] )        => ADel( <x> ) 
 #  xtranslate hb_default( @<v>, <x> )     => iif( StrTran( ValType( <v> ), "M", "C" ) == StrTran( ValType( <x> ), "M", "C" ), Nil, <v> := <x> )
 #  xtranslate hb_defaultValue( <v>, <x> ) => iif( StrTran( ValType( <v> ), "M", "C" ) == StrTran( ValType( <x> ), "M", "C" ), <v>, <x> )

@@ -47,14 +47,14 @@
 #include <mgdefs.h>
 
 #if defined( _MSC_VER )
-   #pragma warning( disable : 4996 )
+#pragma warning( disable : 4996 )
 #endif
 #include <commctrl.h>
 
 extern HB_PTRUINT wapi_GetProcAddress( HMODULE hModule, LPCSTR lpProcName );
 
-typedef BOOL ( WINAPI * VERIFYSCREENSAVEPWD )( HWND hwnd );
-typedef VOID ( WINAPI * PWDCHANGEPASSWORD )( LPCSTR lpcRegkeyname, HWND hwnd, UINT uiReserved1, UINT uiReserved2 );
+typedef BOOL ( WINAPI *VERIFYSCREENSAVEPWD ) ( HWND hwnd );
+typedef VOID ( WINAPI *PWDCHANGEPASSWORD ) ( LPCSTR lpcRegkeyname, HWND hwnd, UINT uiReserved1, UINT uiReserved2 );
 
 HB_FUNC( VERIFYPASSWORD )
 {
@@ -62,11 +62,11 @@ HB_FUNC( VERIFYPASSWORD )
    // and the system manages passwords. Under '95, we call VerifyScreenSavePwd.
    // This checks the appropriate registry key and, if necessary,
    // pops up a verify dialog.
-   HWND      hwnd;
-   HINSTANCE hpwdcpl;
-   VERIFYSCREENSAVEPWD VerifyScreenSavePwd;
-   BOOL bres;
-   OSVERSIONINFO osvi;
+   HWND                 hwnd;
+   HINSTANCE            hpwdcpl;
+   VERIFYSCREENSAVEPWD  VerifyScreenSavePwd;
+   BOOL                 bres;
+   OSVERSIONINFO        osvi;
 
    osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
    GetVersionEx( &osvi );
@@ -101,9 +101,9 @@ HB_FUNC( VERIFYPASSWORD )
 HB_FUNC( CHANGEPASSWORD )
 {
    // This only ever gets called under '95, when started with the /a option.
-   HWND hwnd;
+   HWND              hwnd;
 
-   HINSTANCE hmpr = LoadLibrary( TEXT( "MPR.DLL" ) );
+   HINSTANCE         hmpr = LoadLibrary( TEXT( "MPR.DLL" ) );
    PWDCHANGEPASSWORD PwdChangePassword;
 
    if( hmpr == NULL )

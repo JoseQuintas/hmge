@@ -11,10 +11,11 @@ FUNCTION gui_Init()
    //SET OOP ON
    SET WINDOW MAIN OFF
    //SET WINDOW MODAL PARENT HANDLE ON
+   SET GETBOX FOCUS BACKCOLOR TO {255,255,0}
 
    RETURN Nil
 
-FUNCTION gui_MainMenu( xDlg, aMenuList, aAllSetup, cTitle )
+FUNCTION gui_DlgMenu( xDlg, aMenuList, aAllSetup, cTitle )
 
    LOCAL aGroupList, cDBF
 
@@ -40,7 +41,7 @@ FUNCTION gui_MainMenu( xDlg, aMenuList, aAllSetup, cTitle )
 FUNCTION gui_ButtonCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, cCaption, cResName, bAction )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "BUTTON" )
+      xControl := gui_newctlname( "BTN" )
    ENDIF
    DEFINE BUTTONEX ( xControl )
       PARENT ( xDlg )
@@ -77,13 +78,13 @@ FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, ;
    LOCAL aHeaderList := {}, aWidthList := {}, aFieldList := {}, aItem
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "BROW" )
+      xControl := gui_newctlname( "BRW" )
    ENDIF
    FOR EACH aItem IN oTbrowse
       AAdd( aHeaderList, aItem[1] )
       AAdd( aFieldList, aItem[2] )
       AAdd( aWidthList, ( 1 + Max( Len( aItem[3] ), ;
-         Len( Transform( &( workarea )->( FieldGet( FieldNum( aItem[ 1 ] ) ) ), "" ) ) ) ) * 13 )
+         Len( Transform( ( workarea )->( FieldGet( FieldNum( aItem[ 1 ] ) ) ), "" ) ) ) ) * 13 )
    NEXT
 
    DEFINE BROWSE ( xControl )
@@ -107,6 +108,7 @@ FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, ;
       _DefineHotKey( xDlg, 0, aItem[ 1 ], ;
          { || gui_DlgKeyDown( xDlg, xControl, aItem[ 1 ], workarea, cField, xValue, aDlgKeyCodeList ) } )
    NEXT
+
 
    (xDlg);(cField);(xValue);(workarea);(aKeyCodeList)
 
@@ -134,8 +136,8 @@ FUNCTION gui_BrowseDblClick( xDlg, xControl, workarea, cField, xValue )
 
    IF ! Empty( cField )
       // without browsesync ON
-      // &(workarea)->( dbGoto( GetProperty( xDlg, xControl, "VALUE" ) ) )
-      xValue := &(workarea)->( FieldGet( FieldNum( cField ) ) )
+      // (workarea)->( dbGoto( GetProperty( xDlg, xControl, "VALUE" ) ) )
+      xValue := (workarea)->( FieldGet( FieldNum( cField ) ) )
    ENDIF
    (xControl)
    DoMethod( xDlg, "RELEASE" )
@@ -147,6 +149,50 @@ FUNCTION gui_BrowseRefresh( xDlg, xControl )
    SetProperty( xDlg, xControl, "VALUE", RecNo() )
    DoMethod( xDlg, xControl, "REFRESH" )
    (xDlg)
+
+   RETURN Nil
+
+FUNCTION gui_CheckboxCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight )
+
+   IF Empty( xControl )
+      xControl := gui_NewCtlName( "CHK" )
+   ENDIF
+   DEFINE CHECKBOX ( xControl )
+      PARENT ( xDlg )
+      Row nRow
+      COL nCol
+      WIDTH nWidth
+      HEIGHT nHeight
+      CAPTION ""
+   END CHECKBOX
+
+   RETURN Nil
+
+FUNCTION gui_ComboCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, aList )
+
+   IF Empty( xControl )
+      xControl := gui_newctlname( "CBO" )
+   ENDIF
+   DEFINE COMBOBOX ( xControl )
+      PARENT ( xDlg )
+      ROW nRow
+      COL nCol
+      VALUE 1
+      WIDTH nWidth
+      //HEIGHT nHeight // do not define height, it can limit list size to zero
+      ITEMS aList
+   END COMBOBOX
+   //hb_MemoWrit( "d:\temp\test.txt", ;
+   //   [DEFINE COMBOBOX ( "] + xControl + [" )] + hb_Eol() + ;
+   //   [   PARENT ( "] + xDlg + [" )] + hb_Eol() + ;
+   //   [   ROW ] + Ltrim( Str( nRow ) ) + hb_Eol() + ;
+   //   [   COL ] + Ltrim( Str( nCol ) ) + hb_Eol() + ;
+   //   [   VALUE 1] + hb_Eol() + ;
+   //   [   WIDTH ] + Ltrim( Str( nWidth ) ) + hb_Eol() + ;
+   //   [   HEIGHT ] + Ltrim( Str( nHeight ) ) + hb_Eol() + ;
+   //   [   ITEMS ] + hb_ValToExp( aList ) + hb_Eol() + ;
+   //   [END COMBOBOX] + hb_Eol() )
+   ( nHeight )
 
    RETURN Nil
 
@@ -174,7 +220,7 @@ FUNCTION gui_DialogClose( xDlg )
 FUNCTION gui_DialogCreate( xDlg, nRow, nCol, nWidth, nHeight, cTitle, bInit, xOldDlg )
 
    IF Empty( xDlg )
-      xDlg := gui_newctlname( "DIALOG" )
+      xDlg := gui_newctlname( "DLG" )
    ENDIF
 
    IF Empty( bInit )
@@ -201,7 +247,7 @@ FUNCTION gui_IsCurrentFocus( xDlg, xControl )
 FUNCTION gui_LabelCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, xValue, lBorder )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "LABEL" )
+      xControl := gui_newctlname( "LBL" )
    ENDIF
    // não mostra borda
    DEFINE LABEL ( xControl )
@@ -233,7 +279,7 @@ FUNCTION gui_LibName()
 FUNCTION gui_MLTextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, xValue )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "MLTEXT" )
+      xControl := gui_newctlname( "MLTXT" )
    ENDIF
    DEFINE EDITBOX ( xControl )
       PARENT ( xDlg )
@@ -261,7 +307,7 @@ FUNCTION gui_MsgYesNo( cText )
 FUNCTION gui_PanelCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "PANEL" )
+      xControl := gui_newctlname( "PAN" )
    ENDIF
    (xDlg); (xControl); (nRow); (nCol); (nWidth); (nHeight)
 
@@ -316,7 +362,7 @@ FUNCTION gui_TextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, ;
             xValue, cPicture, nMaxLength, bValid )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "TEXT" )
+      xControl := gui_newctlname( "TXT" )
    ENDIF
    DEFINE GETBOX ( xControl )
       PARENT ( xDlg )
@@ -337,13 +383,14 @@ FUNCTION gui_TextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, ;
          MAXLENGTH nMaxLength
       ENDIF
       VALUE xValue
-      ON LOSTFOCUS Eval( bValid )
+      //ON LOSTFOCUS Eval( bValid )
+      VALID bValid
    END GETBOX
    (bValid)
 
    RETURN Nil
 
-FUNCTION gui_TextEnable( xDlg, xControl, lEnable )
+FUNCTION gui_ControlEnable( xDlg, xControl, lEnable )
 
    SetProperty( xDlg, xControl, "ENABLED", lEnable )
 
@@ -373,3 +420,4 @@ STATIC FUNCTION gui_newctlname( cPrefix )
    hb_Default( @cPrefix, "ANY" )
 
    RETURN cPrefix + StrZero( nCount, 10 )
+

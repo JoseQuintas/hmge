@@ -52,9 +52,9 @@
 #include "hbapierr.h"
 #include "hbapiitm.h"
 
-extern HB_EXPORT BOOL   Array2Point( PHB_ITEM aPoint, POINT * pt );
+extern HB_EXPORT BOOL   Array2Point( PHB_ITEM aPoint, POINT *pt );
 #ifndef __XHARBOUR__
-HB_EXPORT PHB_ITEM      Rect2Hash( RECT * rc );
+HB_EXPORT PHB_ITEM      Rect2Hash( RECT *rc );
 BOOL CALLBACK           _MonitorEnumProc0( HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData );
 #endif
 static void             ClipOrCenterRectToMonitor( LPRECT prc, HMONITOR hMonitor, UINT flags );
@@ -89,7 +89,7 @@ HB_FUNC( ENUMDISPLAYMONITORS )
 BOOL CALLBACK _MonitorEnumProc0( HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData )
 {
    PHB_ITEM pMonitor = hb_itemArrayNew( 2 );
-   PHB_ITEM pRect    = Rect2Hash( lprcMonitor );
+   PHB_ITEM pRect = Rect2Hash( lprcMonitor );
 
    HB_SYMBOL_UNUSED( hdcMonitor );
 
@@ -115,7 +115,7 @@ HB_FUNC( GETMONITORINFO )
    {
       PHB_ITEM pMonInfo = hb_itemArrayNew( 3 );
       PHB_ITEM pMonitor = Rect2Hash( &mi.rcMonitor );
-      PHB_ITEM pWork    = Rect2Hash( &mi.rcWork );
+      PHB_ITEM pWork = Rect2Hash( &mi.rcWork );
 
       hb_itemArrayPut( pMonInfo, 1, pMonitor );
       hb_itemArrayPut( pMonInfo, 2, pWork );
@@ -139,7 +139,7 @@ HB_FUNC( MONITORFROMPOINT )
 
    if( HB_ISARRAY( 1 ) )
    {
-      if( ! Array2Point( hb_param( 1, HB_IT_ARRAY ), &pt ) )
+      if( !Array2Point( hb_param( 1, HB_IT_ARRAY ), &pt ) )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 5000, "MiniGUI Error", HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
       }
@@ -164,7 +164,7 @@ HB_FUNC( MONITORFROMPOINT )
 // HMONITOR MonitorFromWindow( HWND  hwnd, DWORD dwFlags )
 HB_FUNC( MONITORFROMWINDOW )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
@@ -187,20 +187,20 @@ HB_FUNC( MONITORFROMWINDOW )
 
    This shows how you use the multi-monitor functions to do the same thing.
  */
-#define MONITOR_CENTER    0x0001    // center rect to monitor
-#define MONITOR_CLIP      0x0000    // clip rect to monitor
-#define MONITOR_WORKAREA  0x0002    // use monitor work area
-#define MONITOR_AREA      0x0000 \
-   \
+#define MONITOR_CENTER     0x0001   // center rect to monitor
+#define MONITOR_CLIP       0x0000   // clip rect to monitor
+#define MONITOR_WORKAREA   0x0002   // use monitor work area
+#define MONITOR_AREA       0x0000 \
+ \
    // use monitor entire area
 HB_FUNC( WINDOWTOMONITOR )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
    if( IsWindow( hwnd ) )
    {
       HMONITOR hMonitor = HB_ISNUM( 2 ) ? hmg_par_raw_HMONITOR( 2 ) : NULL;
-      UINT     flags    = 0 | ( hmg_par_UINT_def( 3, ( MONITOR_CENTER | MONITOR_WORKAREA ) ) );
+      UINT     flags = 0 | ( hmg_par_UINT_def( 3, ( MONITOR_CENTER | MONITOR_WORKAREA ) ) );
       RECT     rc;
 
       GetWindowRect( hwnd, &rc );
@@ -236,25 +236,25 @@ static void ClipOrCenterRectToMonitor( LPRECT prc, HMONITOR hMonitor, UINT flags
    // center or clip the passed rect to the monitor rect
    if( flags & MONITOR_CENTER )
    {
-      prc->left   = rc.left + ( rc.right - rc.left - w ) / 2;
-      prc->top    = rc.top + ( rc.bottom - rc.top - h ) / 2;
-      prc->right  = prc->left + w;
+      prc->left = rc.left + ( rc.right - rc.left - w ) / 2;
+      prc->top = rc.top + ( rc.bottom - rc.top - h ) / 2;
+      prc->right = prc->left + w;
       prc->bottom = prc->top + h;
    }
    else
    {
-      prc->left   = HB_MAX( rc.left, HB_MIN( rc.right - w, prc->left ) );
-      prc->top    = HB_MAX( rc.top, HB_MIN( rc.bottom - h, prc->top ) );
-      prc->right  = prc->left + w;
+      prc->left = HB_MAX( rc.left, HB_MIN( rc.right - w, prc->left ) );
+      prc->top = HB_MAX( rc.top, HB_MIN( rc.bottom - h, prc->top ) );
+      prc->right = prc->left + w;
       prc->bottom = prc->top + h;
    }
 }
 
 #ifndef __XHARBOUR__
-HB_EXPORT PHB_ITEM Rect2Hash( RECT * rc )
+HB_EXPORT PHB_ITEM Rect2Hash( RECT *rc )
 {
    PHB_ITEM phRect = hb_hashNew( NULL );
-   PHB_ITEM pKey   = hb_itemPutCConst( NULL, "left" );
+   PHB_ITEM pKey = hb_itemPutCConst( NULL, "left" );
    PHB_ITEM pValue = hb_itemPutNL( NULL, rc->left );
 
    hb_hashAddNew( phRect, pKey, pValue );

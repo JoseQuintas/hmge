@@ -44,7 +44,7 @@
     Copyright 2001-2021 Alexander S.Kresin <alex@kresin.ru>
 
    ---------------------------------------------------------------------------*/
-#define _WIN32_IE  0x0501
+#define _WIN32_IE 0x0501
 
 #include <mgdefs.h>
 
@@ -54,13 +54,13 @@ HINSTANCE   GetInstance( void );
 
 HB_FUNC( INITPROGRESSBAR )
 {
-   HWND  hbutton;
-   DWORD Style = WS_CHILD;
+   HWND                 hbutton;
+   DWORD                Style = WS_CHILD;
 
    INITCOMMONCONTROLSEX i;
 
    i.dwSize = sizeof( INITCOMMONCONTROLSEX );
-   i.dwICC  = ICC_PROGRESS_CLASS;
+   i.dwICC = ICC_PROGRESS_CLASS;
    InitCommonControlsEx( &i );
 
    if( hb_parl( 9 ) )
@@ -73,26 +73,26 @@ HB_FUNC( INITPROGRESSBAR )
       Style |= PBS_SMOOTH;
    }
 
-   if( ! hb_parl( 11 ) )
+   if( !hb_parl( 11 ) )
    {
       Style |= WS_VISIBLE;
    }
 
    hbutton = CreateWindowEx
-             (
-      WS_EX_CLIENTEDGE,
-      PROGRESS_CLASS,
-      0,
-      Style,
-      hb_parni( 3 ),
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 2 ),
-      GetInstance(),
-      NULL
-             );
+      (
+         WS_EX_CLIENTEDGE,
+         PROGRESS_CLASS,
+         0,
+         Style,
+         hb_parni( 3 ),
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 2 ),
+         GetInstance(),
+         NULL
+      );
 
    SendMessage( hbutton, PBM_SETRANGE, 0, MAKELONG( hb_parni( 7 ), hb_parni( 8 ) ) );
    SendMessage( hbutton, PBM_SETPOS, ( WPARAM ) hb_parni( 12 ), 0 );

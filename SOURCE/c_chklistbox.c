@@ -48,25 +48,25 @@
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
-// Listbox Class Name
-   #define WC_LISTBOX  "ListBox"
-#endif
 
-#if ! defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x030000 )
-   #include "hbwinuni.h"
-#else
-   #define HB_STRLEN   strlen
+// Listbox Class Name
+#define WC_LISTBOX   "ListBox"
 #endif
-#define BUFFER         MAX_PATH
+#if !defined( __XHARBOUR__ ) && ( __HARBOUR__ - 0 > 0x030000 )
+#include "hbwinuni.h"
+#else
+#define HB_STRLEN strlen
+#endif
+#define BUFFER MAX_PATH
 
 #ifdef UNICODE
-LPWSTR      AnsiToWide( LPCSTR );
+LPWSTR                  AnsiToWide( LPCSTR );
 #endif
-HINSTANCE   GetInstance( void );
-extern HB_EXPORT BOOL Array2ColorRef( PHB_ITEM aCRef, COLORREF * cr );
+HINSTANCE               GetInstance( void );
+extern HB_EXPORT BOOL   Array2ColorRef( PHB_ITEM aCRef, COLORREF *cr );
 
-static int      m_nHeightItem = 16;
-static COLORREF m_crText, m_crBack;
+static int              m_nHeightItem = 16;
+static COLORREF         m_crText, m_crBack;
 
 HB_FUNC( INITCHKLISTBOX )
 {
@@ -74,12 +74,12 @@ HB_FUNC( INITCHKLISTBOX )
 
    m_nHeightItem = 16;
 
-   if( ! hb_parl( 9 ) )
+   if( !hb_parl( 9 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 10 ) )
+   if( !hb_parl( 10 ) )
    {
       Style |= WS_TABSTOP;
    }
@@ -94,12 +94,12 @@ HB_FUNC( INITCHKLISTBOX )
       m_nHeightItem = hb_parni( 12 );
    }
 
-   if( ! Array2ColorRef( hb_param( 13, HB_IT_ANY ), &m_crText ) )
+   if( !Array2ColorRef( hb_param( 13, HB_IT_ANY ), &m_crText ) )
    {
       m_crText = GetSysColor( COLOR_WINDOWTEXT );
    }
 
-   if( ! Array2ColorRef( hb_param( 14, HB_IT_ANY ), &m_crBack ) )
+   if( !Array2ColorRef( hb_param( 14, HB_IT_ANY ), &m_crBack ) )
    {
       m_crBack = GetSysColor( COLOR_WINDOW );
    }
@@ -107,43 +107,43 @@ HB_FUNC( INITCHKLISTBOX )
    hmg_ret_raw_HWND
    (
       CreateWindowEx
-      (
-         WS_EX_CLIENTEDGE,
-         WC_LISTBOX,
-         TEXT( "" ),
-         Style,
-         hb_parni( 3 ),
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 6 ),
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 2 ),
-         GetInstance(),
-         NULL
-      )
+         (
+            WS_EX_CLIENTEDGE,
+            WC_LISTBOX,
+            TEXT( "" ),
+            Style,
+            hb_parni( 3 ),
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hb_parni( 6 ),
+            hmg_par_raw_HWND( 1 ),
+            hmg_par_raw_HMENU( 2 ),
+            GetInstance(),
+            NULL
+         )
    );
 }
 
 HB_FUNC( INITMULTICHKLISTBOX )
 {
    DWORD Style = LBS_EXTENDEDSEL |
-                 WS_CHILD |
-                 WS_VSCROLL |
-                 LBS_DISABLENOSCROLL |
-                 LBS_NOTIFY |
-                 LBS_MULTIPLESEL |
-                 LBS_NOINTEGRALHEIGHT |
-                 LBS_OWNERDRAWFIXED |
-                 LBS_HASSTRINGS;
+      WS_CHILD |
+      WS_VSCROLL |
+      LBS_DISABLENOSCROLL |
+      LBS_NOTIFY |
+      LBS_MULTIPLESEL |
+      LBS_NOINTEGRALHEIGHT |
+      LBS_OWNERDRAWFIXED |
+      LBS_HASSTRINGS;
 
    m_nHeightItem = 16;
 
-   if( ! hb_parl( 9 ) )
+   if( !hb_parl( 9 ) )
    {
       Style |= WS_VISIBLE;
    }
 
-   if( ! hb_parl( 10 ) )
+   if( !hb_parl( 10 ) )
    {
       Style |= WS_TABSTOP;
    }
@@ -158,12 +158,12 @@ HB_FUNC( INITMULTICHKLISTBOX )
       m_nHeightItem = hb_parni( 12 );
    }
 
-   if( ! Array2ColorRef( hb_param( 13, HB_IT_ANY ), &m_crText ) )
+   if( !Array2ColorRef( hb_param( 13, HB_IT_ANY ), &m_crText ) )
    {
       m_crText = GetSysColor( COLOR_WINDOWTEXT );
    }
 
-   if( ! Array2ColorRef( hb_param( 14, HB_IT_ANY ), &m_crBack ) )
+   if( !Array2ColorRef( hb_param( 14, HB_IT_ANY ), &m_crBack ) )
    {
       m_crBack = GetSysColor( COLOR_WINDOW );
    }
@@ -171,34 +171,34 @@ HB_FUNC( INITMULTICHKLISTBOX )
    hmg_ret_raw_HWND
    (
       CreateWindowEx
-      (
-         WS_EX_CLIENTEDGE,
-         WC_LISTBOX,
-         TEXT( "" ),
-         Style,
-         hb_parni( 3 ),
-         hb_parni( 4 ),
-         hb_parni( 5 ),
-         hb_parni( 6 ),
-         hmg_par_raw_HWND( 1 ),
-         hmg_par_raw_HMENU( 2 ),
-         GetInstance(),
-         NULL
-      )
+         (
+            WS_EX_CLIENTEDGE,
+            WC_LISTBOX,
+            TEXT( "" ),
+            Style,
+            hb_parni( 3 ),
+            hb_parni( 4 ),
+            hb_parni( 5 ),
+            hb_parni( 6 ),
+            hmg_par_raw_HWND( 1 ),
+            hmg_par_raw_HMENU( 2 ),
+            GetInstance(),
+            NULL
+         )
    );
 }
 
 HB_FUNC( CHKLISTBOXINSERTITEM )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND     hwnd = hmg_par_raw_HWND( 1 );
 
 #ifndef UNICODE
-   LPTSTR lpString = ( LPTSTR ) hb_parc( 2 );
+   LPTSTR   lpString = ( LPTSTR ) hb_parc( 2 );
 #else
-   LPWSTR lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   int lbItem   = hb_parni( 3 ) - 1;
-   int bChecked = hb_parni( 4 );
+   int      lbItem = hb_parni( 3 ) - 1;
+   int      bChecked = hb_parni( 4 );
 
    SendMessage( hwnd, LB_INSERTSTRING, ( WPARAM ) lbItem, ( LPARAM ) lpString );
    SendMessage( hwnd, LB_SETITEMDATA, ( WPARAM ) ( int ) lbItem, ( LPARAM ) bChecked );
@@ -210,15 +210,15 @@ HB_FUNC( CHKLISTBOXINSERTITEM )
 
 HB_FUNC( CHKLISTBOXADDITEM )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND     hwnd = hmg_par_raw_HWND( 1 );
 
 #ifndef UNICODE
-   LPTSTR lpString = ( LPTSTR ) hb_parc( 2 );
+   LPTSTR   lpString = ( LPTSTR ) hb_parc( 2 );
 #else
-   LPWSTR lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpString = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   int bChecked = hb_parni( 3 );
-   int lbItem;
+   int      bChecked = hb_parni( 3 );
+   int      lbItem;
 
    m_nHeightItem = hb_parni( 4 );
 
@@ -230,19 +230,19 @@ HB_FUNC( CHKLISTBOXADDITEM )
 #endif
 }
 
-HB_FUNC( SETCHKLBITEMHEIGHT )   // set the height of a string in pixels
+HB_FUNC( SETCHKLBITEMHEIGHT ) // set the height of a string in pixels
 {
-   TCHAR achBuffer[ BUFFER ];
-   HWND  hwnd     = hmg_par_raw_HWND( 1 );
-   HDC   hdc      = GetDC( hwnd );
-   HFONT hFont    = hmg_par_raw_HFONT( 2 );
+   TCHAR achBuffer[BUFFER];
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
+   HDC   hdc = GetDC( hwnd );
+   HFONT hFont = hmg_par_raw_HFONT( 2 );
    HFONT hOldFont = ( HFONT ) NULL;
    SIZE  sz;
 
-   if( ! hdc )
+   if( !hdc )
    {
       hwnd = GetActiveWindow();
-      hdc  = GetDC( hwnd );
+      hdc = GetDC( hwnd );
    }
 
    SendMessage( hwnd, LB_GETTEXT, 0, ( LPARAM ) achBuffer );
@@ -271,14 +271,14 @@ HB_FUNC( SETCHKLBITEMHEIGHT )   // set the height of a string in pixels
 
 HB_FUNC( CHKLIST_SETCOLOR )
 {
-   HWND hwnd = hmg_par_raw_HWND( 1 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
 
-   if( ! Array2ColorRef( hb_param( 2, HB_IT_ANY ), &m_crText ) )
+   if( !Array2ColorRef( hb_param( 2, HB_IT_ANY ), &m_crText ) )
    {
       m_crText = GetSysColor( COLOR_WINDOWTEXT );
    }
 
-   if( ! Array2ColorRef( hb_param( 3, HB_IT_ANY ), &m_crBack ) )
+   if( !Array2ColorRef( hb_param( 3, HB_IT_ANY ), &m_crBack ) )
    {
       m_crBack = GetSysColor( COLOR_WINDOW );
    }
@@ -288,10 +288,10 @@ HB_FUNC( CHKLIST_SETCOLOR )
 
 HB_FUNC( CHKLIST_SETCHECKBOX )
 {
-   HWND  hwnd            = hmg_par_raw_HWND( 1 );
-   int   lbItem          = hb_parni( 2 ) - 1;
-   int   bChecked        = hb_parni( 3 );
-   TCHAR cString[ 1024 ] = { TEXT( "" ) };
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
+   int   lbItem = hb_parni( 2 ) - 1;
+   int   bChecked = hb_parni( 3 );
+   TCHAR cString[1024] = { TEXT( "" ) };
 
    SendMessage( hwnd, LB_GETTEXT, ( WPARAM ) lbItem, ( LPARAM ) cString );
    SendMessage( hwnd, LB_DELETESTRING, ( WPARAM ) lbItem, 0 );
@@ -301,16 +301,16 @@ HB_FUNC( CHKLIST_SETCHECKBOX )
 
 HB_FUNC( CHKLIST_GETCHECKBOX )
 {
-   HWND hwnd   = hmg_par_raw_HWND( 1 );
-   int  lbItem = hb_parni( 2 );
-   int  iCheck = ( int ) SendMessage( hwnd, LB_GETITEMDATA, ( WPARAM ) lbItem - 1, 0 );
+   HWND  hwnd = hmg_par_raw_HWND( 1 );
+   int   lbItem = hb_parni( 2 );
+   int   iCheck = ( int ) SendMessage( hwnd, LB_GETITEMDATA, ( WPARAM ) lbItem - 1, 0 );
 
    hb_retl( ( BOOL ) iCheck - 1 );
 }
 
 HB_FUNC( _ONMEASURELISTBOXITEM )
 {
-   LPMEASUREITEMSTRUCT lpmis;
+   LPMEASUREITEMSTRUCT  lpmis;
 
    lpmis = hmg_par_raw_MITEMSTRUCT( 1 );
 
@@ -320,13 +320,13 @@ HB_FUNC( _ONMEASURELISTBOXITEM )
 
 HB_FUNC( _ONDRAWLISTBOXITEM )
 {
-   PDRAWITEMSTRUCT pdis;
-   TCHAR      achBuffer[ BUFFER ];
-   int        cch;
-   int        yPos, iCheck, style = 0;
-   TEXTMETRIC tm;
-   RECT       rcCheck;
-   HBRUSH     hBackBrush;
+   PDRAWITEMSTRUCT   pdis;
+   TCHAR             achBuffer[BUFFER];
+   int               cch;
+   int               yPos, iCheck, style = 0;
+   TEXTMETRIC        tm;
+   RECT              rcCheck;
+   HBRUSH            hBackBrush;
 
    pdis = ( PDRAWITEMSTRUCT ) HB_PARNL( 1 );
 
@@ -359,9 +359,9 @@ HB_FUNC( _ONDRAWLISTBOXITEM )
             rcCheck = pdis->rcItem;
             if( iCheck )
             {
-               rcCheck.left   += 4;
-               rcCheck.top    += 2;
-               rcCheck.right   = rcCheck.left + ( pdis->rcItem.bottom - pdis->rcItem.top );
+               rcCheck.left += 4;
+               rcCheck.top += 2;
+               rcCheck.right = rcCheck.left + ( pdis->rcItem.bottom - pdis->rcItem.top );
                rcCheck.bottom -= 2;
 
                if( iCheck == 1 )
@@ -410,7 +410,7 @@ HB_FUNC( _ONDRAWLISTBOXITEM )
  */
 HB_FUNC( GETMISCTLTYPE )
 {
-   LPMEASUREITEMSTRUCT pmis = hmg_par_raw_MITEMSTRUCT( 1 );
+   LPMEASUREITEMSTRUCT  pmis = hmg_par_raw_MITEMSTRUCT( 1 );
 
    if( pmis )
    {

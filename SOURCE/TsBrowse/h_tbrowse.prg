@@ -9359,6 +9359,7 @@ METHOD LoadFields( lEditable, aColSel, cAlsSel, aNameSel, aHeadSel ) CLASS TSBro
       IF ( nType := AScan( aAdsType, {| e | e[ 1 ] == cType } ) ) > 0
          cType := aAdsType[ nType, 2 ]
       ENDIF
+      cPicture := NIL
       IF cType == "C"
          cPicture := "@K " + Replicate( 'X', aStru[ nE, 3 ] )
       ELSEIF cType == "N"
@@ -9393,7 +9394,7 @@ METHOD LoadFields( lEditable, aColSel, cAlsSel, aNameSel, aHeadSel ) CLASS TSBro
          ELSEIF cType == "M"
             nSize := iif( ::nMemoWV == NIL, 200, ::nMemoWV )
          ELSEIF cType $ "=@T"
-            cPicture := Nil
+            cPicture := NIL
             nSize := GetTextWidth( 0, Replicate( "9", 24 ), hFont )
          ELSEIF cType $ "^+"
             nSize := GetTextWidth( 0, Replicate( "9", 10 ), hFont )

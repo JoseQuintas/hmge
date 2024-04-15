@@ -55,12 +55,12 @@
 
 extern HB_PTRUINT wapi_GetProcAddress( HMODULE hModule, LPCSTR lpProcName );
 
-BOOL              Array2Rect( PHB_ITEM aRect, RECT * rc );
-BOOL              Array2Point( PHB_ITEM aPoint, POINT * pt );
-BOOL              Array2ColorRef( PHB_ITEM aCRef, COLORREF * cr );
+BOOL              Array2Rect( PHB_ITEM aRect, RECT *rc );
+BOOL              Array2Point( PHB_ITEM aPoint, POINT *pt );
+BOOL              Array2ColorRef( PHB_ITEM aCRef, COLORREF *cr );
 
-#if ( defined( _MSC_VER ) && ! defined( __POCC__ ) ) || defined( __MINGW32__ ) || ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
-   #include "uxtheme.h"
+#if ( defined( _MSC_VER ) && !defined( __POCC__ ) ) || defined( __MINGW32__ ) || ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
+#include "uxtheme.h"
 #endif
 #ifndef _UXTHEME_H_
 #define _UXTHEME_H_
@@ -68,15 +68,15 @@ BOOL              Array2ColorRef( PHB_ITEM aCRef, COLORREF * cr );
 #include <commctrl.h>
 
 #if defined( __XCC__ ) || ( defined( __POCC__ ) && __POCC__ >= 900 )
-   #ifndef _NO_W32_PSEUDO_MODIFIERS
-      #define IN
-      #define OUT
-      #ifndef OPTIONAL
-         #define OPTIONAL
-      #endif
-   #endif
+#ifndef _NO_W32_PSEUDO_MODIFIERS
+#define IN
+#define OUT
+#ifndef OPTIONAL
+#define OPTIONAL
 #endif
-typedef HANDLE HTHEME;
+#endif
+#endif
+typedef HANDLE    HTHEME;
 
 HRESULT WINAPI    CloseThemeData( HTHEME hTheme );
 HRESULT WINAPI    DrawThemeBackground( HTHEME, HDC, int, int, const RECT *, const RECT * );
@@ -88,35 +88,34 @@ HRESULT WINAPI    DrawThemeBackground( HTHEME, HDC, int, int, const RECT *, cons
 #define DTBG_COMPUTINGREGION  0x00000010
 #define DTBG_MIRRORDC         0x00000020
 
-typedef struct    _DTBGOPTS
+typedef struct _DTBGOPTS
 {
    DWORD dwSize;
    DWORD dwFlags;
    RECT  rcClip;
-}
-DTBGOPTS, * PDTBGOPTS;
+} DTBGOPTS, *PDTBGOPTS;
 
 HRESULT WINAPI DrawThemeBackgroundEx( HTHEME, HDC, int, int, const RECT *, const DTBGOPTS * );
 HRESULT WINAPI DrawThemeEdge( HTHEME, HDC, int, int, const RECT *, UINT, UINT, RECT * );
 HRESULT WINAPI DrawThemeIcon( HTHEME, HDC, int, int, const RECT *, HIMAGELIST, int );
 HRESULT WINAPI DrawThemeParentBackground( HWND, HDC, RECT * );
 
-#define DTT_GRAYED             0x1
+#define DTT_GRAYED   0x1
 
 HRESULT WINAPI DrawThemeText( HTHEME, HDC, int, int, LPCWSTR, int, DWORD, DWORD, const RECT * );
 
-#define ETDT_DISABLE           0x00000001
-#define ETDT_ENABLE            0x00000002
-#define ETDT_USETABTEXTURE     0x00000004
-#define ETDT_ENABLETAB         ( ETDT_ENABLE | ETDT_USETABTEXTURE )
+#define ETDT_DISABLE       0x00000001
+#define ETDT_ENABLE        0x00000002
+#define ETDT_USETABTEXTURE 0x00000004
+#define ETDT_ENABLETAB     ( ETDT_ENABLE | ETDT_USETABTEXTURE )
 
 HRESULT WINAPI EnableThemeDialogTexture( HWND, DWORD );
 HRESULT WINAPI EnableTheming( BOOL );
 HRESULT WINAPI GetCurrentThemeName( LPWSTR, int, LPWSTR, int, LPWSTR, int );
 
-#define STAP_ALLOW_NONCLIENT   ( 1 << 0 )
-#define STAP_ALLOW_CONTROLS    ( 1 << 1 )
-#define STAP_ALLOW_WEBCONTENT  ( 1 << 2 )
+#define STAP_ALLOW_NONCLIENT  ( 1 << 0 )
+#define STAP_ALLOW_CONTROLS   ( 1 << 1 )
+#define STAP_ALLOW_WEBCONTENT ( 1 << 2 )
 
 DWORD WINAPI GetThemeAppProperties( void );
 HRESULT WINAPI GetThemeBackgroundContentRect( HTHEME, HDC, int, int, const RECT *, RECT * );
@@ -134,26 +133,24 @@ HRESULT WINAPI GetThemeInt( HTHEME, int, int, int, int * );
 #define MAX_INTLIST_COUNT  10
 typedef struct _INTLIST
 {
-   int iValueCount;
-   int iValues[ MAX_INTLIST_COUNT ];
-}
-INTLIST, * PINTLIST;
+   int   iValueCount;
+   int   iValues[MAX_INTLIST_COUNT];
+} INTLIST, *PINTLIST;
 
 HRESULT WINAPI GetThemeIntList( HTHEME, int, int, int, INTLIST * );
 
 typedef struct _MARGINS
 {
-   int cxLeftWidth;
-   int cxRightWidth;
-   int cyTopHeight;
-   int cyBottomHeight;
-}
-MARGINS, * PMARGINS;
+   int   cxLeftWidth;
+   int   cxRightWidth;
+   int   cyTopHeight;
+   int   cyBottomHeight;
+} MARGINS, *PMARGINS;
 
 HRESULT WINAPI GetThemeMargins( HTHEME, HDC, int, int, int, RECT *, MARGINS * );
 HRESULT WINAPI GetThemeMetric( HTHEME, HDC, int, int, int, int * );
 
-#if ! ( defined( __POCC__ ) || defined( __WATCOMC__ ) )
+#if !( defined( __POCC__ ) || defined( __WATCOMC__ ) )
 typedef enum
 {
    TS_MIN,
@@ -168,7 +165,6 @@ enum THEMESIZE
    TS_DRAW,
 };
 #endif
-
 HRESULT WINAPI GetThemePartSize( HTHEME, HDC, int, int, RECT *, enum THEMESIZE, SIZE * );
 HRESULT WINAPI GetThemePosition( HTHEME, int, int, int, POINT * );
 
@@ -217,81 +213,81 @@ void WINAPI SetThemeAppProperties( DWORD );
 HRESULT WINAPI SetWindowTheme( HWND, LPCWSTR, LPCWSTR );
 #endif /* _UXTHEME_H_ */
 
-typedef HTHEME ( WINAPI * fnOpenThemeData )( HWND hwnd, LPCWSTR pszClassList );
-typedef HRESULT ( WINAPI * fnCloseThemeData )( HTHEME hTheme );
-typedef HRESULT ( WINAPI * fnDrawThemeBackground )( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT * pRect, const RECT * pClipRect );
-typedef HRESULT ( WINAPI * fnGetThemeBackgroundContentRect )
-(
-   HTHEME hTheme,
-   HDC hdc,
-   int iPartId,
-   int iStateId,
-   const RECT * pBoundingRect,
-   RECT * pContentRect
-);
-typedef HRESULT ( WINAPI * fnDrawThemeText )
-(
-   HTHEME hTheme,
-   HDC hdc,
-   int iPartId,
-   int iStateId,
-   LPCWSTR pszText,
-   int iCharCount,
-   DWORD dwTextFlags,
-   DWORD dwTextFlags2,
-   const RECT * pRect
-);
-typedef HRESULT ( WINAPI * fnHitTestThemeBackground )
-(
-   HTHEME hTheme,
-   OPTIONAL HDC hdc,
-   int iPartId,
-   int iStateId,
-   DWORD dwOptions,
-   const RECT * pRect,
-   OPTIONAL HRGN hrgn,
-   POINT ptTest,
-   OUT WORD * pwHitTestCode
-);
-typedef BOOL ( WINAPI * fnIsAppThemed )( void );
-typedef COLORREF ( WINAPI * fnGetThemeSysColor )( HTHEME hTheme, int iColorId );
-typedef HRESULT ( WINAPI * fnGetThemeSysFont )( HTHEME hTheme, int iFontId, OUT LOGFONT * plf );
-typedef HRESULT ( WINAPI * fnDrawThemeIcon )( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT * pRect, HIMAGELIST himl, int iImageIndex );
-typedef HRESULT ( WINAPI * fnGetThemeTextExtent )
-(
-   HTHEME hTheme,
-   HDC hdc,
-   int iPartId,
-   int iStateId,
-   LPCWSTR pszText,
-   int iCharCount,
-   DWORD dwTextFlags,
-   const RECT * pRect,
-   OUT RECT * pExtent
-);
-typedef HRESULT ( WINAPI * fnDrawThemeParentBackground )( HWND hwnd, HDC hdc, OPTIONAL RECT * prc );
-typedef HRESULT ( WINAPI * fnDrawThemeEdge )
-(
-   HTHEME hTheme,
-   HDC hdc,
-   int iPartId,
-   int iStateId,
-   const RECT * pDestRect,
-   UINT uEdge,
-   UINT uFlags,
-   OPTIONAL OUT RECT * pContentRect
-);
-typedef HRESULT ( WINAPI * fnGetThemeRect )( HTHEME hTheme, int iPartId, int iStateId, int iPropId, RECT * pPoint );
-typedef HRESULT ( WINAPI * fnGetThemePartSize )( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, RECT * prc, enum THEMESIZE eSize, SIZE * psz );
-typedef void ( WINAPI * fnSetThemeAppProperties )( DWORD dwFlags );
-typedef DWORD ( WINAPI * fnGetThemeAppProperties )( void );
-typedef HTHEME ( WINAPI * fnGetWindowTheme )( HWND hWnd );
-typedef BOOL ( WINAPI * fnIsThemeActive )( void );
-typedef HRESULT ( WINAPI * fnSetWindowTheme )( HWND hwnd, LPCWSTR pszSubAppName, LPCWSTR pszSubIdList );
-typedef HRESULT ( WINAPI * fnEnableThemeDialogTexture )( HWND hwnd, DWORD dwFlags );
-typedef HRESULT ( WINAPI * fnGetThemeColor )( HTHEME hTheme, int iPartId, int iStateId, int iPropId, COLORREF * pColor );
+typedef HTHEME ( WINAPI *fnOpenThemeData ) ( HWND hwnd, LPCWSTR pszClassList );
+typedef HRESULT ( WINAPI *fnCloseThemeData ) ( HTHEME hTheme );
+typedef HRESULT ( WINAPI *fnDrawThemeBackground ) ( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT * pRect, const RECT * pClipRect );
+typedef HRESULT ( WINAPI *fnGetThemeBackgroundContentRect )
+   (
+      HTHEME hTheme,
+      HDC hdc,
+      int iPartId,
+      int iStateId,
+      const RECT * pBoundingRect,
+      RECT * pContentRect
+   );
+typedef HRESULT ( WINAPI *fnDrawThemeText )
+   (
+      HTHEME hTheme,
+      HDC hdc,
+      int iPartId,
+      int iStateId,
+      LPCWSTR pszText,
+      int iCharCount,
+      DWORD dwTextFlags,
+      DWORD dwTextFlags2,
+      const RECT * pRect
+   );
+typedef HRESULT ( WINAPI *fnHitTestThemeBackground )
+   (
+      HTHEME hTheme,
+      OPTIONAL HDC hdc,
+      int iPartId,
+      int iStateId,
+      DWORD dwOptions,
+      const RECT * pRect,
+      OPTIONAL HRGN hrgn,
+      POINT ptTest,
+      OUT WORD * pwHitTestCode
+   );
+typedef BOOL ( WINAPI *fnIsAppThemed ) ( void );
+typedef COLORREF ( WINAPI *fnGetThemeSysColor ) ( HTHEME hTheme, int iColorId );
+typedef HRESULT ( WINAPI *fnGetThemeSysFont ) ( HTHEME hTheme, int iFontId, OUT LOGFONT * plf );
+typedef HRESULT ( WINAPI *fnDrawThemeIcon ) ( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT * pRect, HIMAGELIST himl, int iImageIndex );
+typedef HRESULT ( WINAPI *fnGetThemeTextExtent )
+   (
+      HTHEME hTheme,
+      HDC hdc,
+      int iPartId,
+      int iStateId,
+      LPCWSTR pszText,
+      int iCharCount,
+      DWORD dwTextFlags,
+      const RECT * pRect,
+      OUT RECT * pExtent
+   );
+typedef HRESULT ( WINAPI *fnDrawThemeParentBackground ) ( HWND hwnd, HDC hdc, OPTIONAL RECT * prc );
+typedef HRESULT ( WINAPI *fnDrawThemeEdge )
+   (
+      HTHEME hTheme,
+      HDC hdc,
+      int iPartId,
+      int iStateId,
+      const RECT * pDestRect,
+      UINT uEdge,
+      UINT uFlags,
+      OPTIONAL OUT RECT * pContentRect
+   );
+typedef HRESULT ( WINAPI *fnGetThemeRect ) ( HTHEME hTheme, int iPartId, int iStateId, int iPropId, RECT * pPoint );
+typedef HRESULT ( WINAPI *fnGetThemePartSize ) ( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, RECT * prc, enum THEMESIZE eSize, SIZE * psz );
+typedef void ( WINAPI *fnSetThemeAppProperties ) ( DWORD dwFlags );
+typedef DWORD ( WINAPI *fnGetThemeAppProperties ) ( void );
+typedef HTHEME ( WINAPI *fnGetWindowTheme ) ( HWND hWnd );
+typedef BOOL ( WINAPI *fnIsThemeActive ) ( void );
+typedef HRESULT ( WINAPI *fnSetWindowTheme ) ( HWND hwnd, LPCWSTR pszSubAppName, LPCWSTR pszSubIdList );
+typedef HRESULT ( WINAPI *fnEnableThemeDialogTexture ) ( HWND hwnd, DWORD dwFlags );
+typedef HRESULT ( WINAPI *fnGetThemeColor ) ( HTHEME hTheme, int iPartId, int iStateId, int iPropId, COLORREF * pColor );
 
-static HINSTANCE hUxTheme;
+static HINSTANCE  hUxTheme;
 
 HINSTANCE InitUxTheme( void )
 {
@@ -324,7 +320,7 @@ HB_FUNC( ENDUXTHEME )
 
 HB_FUNC( ISTHEMEACTIVE )
 {
-   BOOL bRet = HB_FALSE;
+   BOOL  bRet = HB_FALSE;
 
    if( hUxTheme == NULL )
    {
@@ -333,7 +329,7 @@ HB_FUNC( ISTHEMEACTIVE )
 
    if( hUxTheme )
    {
-      fnIsThemeActive pfn = ( fnIsThemeActive ) wapi_GetProcAddress( hUxTheme, "IsThemeActive" );
+      fnIsThemeActive   pfn = ( fnIsThemeActive ) wapi_GetProcAddress( hUxTheme, "IsThemeActive" );
       if( pfn )
       {
          bRet = ( BOOL ) pfn();
@@ -345,7 +341,7 @@ HB_FUNC( ISTHEMEACTIVE )
 
 HB_FUNC( ISAPPTHEMED )
 {
-   BOOL bRet = HB_FALSE;
+   BOOL  bRet = HB_FALSE;
 
    if( hUxTheme == NULL )
    {
@@ -354,7 +350,7 @@ HB_FUNC( ISAPPTHEMED )
 
    if( hUxTheme )
    {
-      fnIsAppThemed pfn = ( fnIsAppThemed ) wapi_GetProcAddress( hUxTheme, "IsAppThemed" );
+      fnIsAppThemed  pfn = ( fnIsAppThemed ) wapi_GetProcAddress( hUxTheme, "IsAppThemed" );
       if( pfn )
       {
          bRet = ( BOOL ) pfn();
@@ -366,10 +362,10 @@ HB_FUNC( ISAPPTHEMED )
 
 HB_FUNC( OPENTHEMEDATA )
 {
-   HTHEME nRet = ( HTHEME ) NULL;
-   HWND   hWnd = hmg_par_raw_HWND( 1 );
+   HTHEME   nRet = ( HTHEME ) NULL;
+   HWND     hWnd = hmg_par_raw_HWND( 1 );
 
-   LPCWSTR pszClassList = ( LPCWSTR ) hb_parc( 2 );
+   LPCWSTR  pszClassList = ( LPCWSTR ) hb_parc( 2 );
 
    if( hUxTheme == NULL )
    {
@@ -378,7 +374,7 @@ HB_FUNC( OPENTHEMEDATA )
 
    if( hUxTheme )
    {
-      fnOpenThemeData pfn = ( fnOpenThemeData ) wapi_GetProcAddress( hUxTheme, "OpenThemeData" );
+      fnOpenThemeData   pfn = ( fnOpenThemeData ) wapi_GetProcAddress( hUxTheme, "OpenThemeData" );
       if( pfn )
       {
          nRet = ( HTHEME ) pfn( hWnd, pszClassList );
@@ -397,9 +393,9 @@ HB_FUNC( OPENTHEMEDATA )
 
 HB_FUNC( CLOSETHEMEDATA )
 {
-   HRESULT nRet = S_FALSE;
+   HRESULT  nRet = S_FALSE;
 
-   HTHEME hTheme = hmg_par_raw_HTHEME( 1 );
+   HTHEME   hTheme = hmg_par_raw_HTHEME( 1 );
 
    if( hUxTheme == NULL )
    {
@@ -408,7 +404,7 @@ HB_FUNC( CLOSETHEMEDATA )
 
    if( hUxTheme )
    {
-      fnCloseThemeData pfn = ( fnCloseThemeData ) wapi_GetProcAddress( hUxTheme, "CloseThemeData" );
+      fnCloseThemeData  pfn = ( fnCloseThemeData ) wapi_GetProcAddress( hUxTheme, "CloseThemeData" );
       if( pfn )
       {
          nRet = ( HRESULT ) pfn( hTheme );
@@ -420,15 +416,15 @@ HB_FUNC( CLOSETHEMEDATA )
 
 HB_FUNC( DRAWTHEMEBACKGROUND )
 {
-   HRESULT nRet = S_FALSE;
+   HRESULT  nRet = S_FALSE;
 
-   HTHEME hTheme   = hmg_par_raw_HTHEME( 1 );
-   HDC    hDC      = hmg_par_raw_HDC( 2 );
-   int    iPartId  = hb_parni( 3 );
-   int    iStateId = hb_parni( 4 );
+   HTHEME   hTheme = hmg_par_raw_HTHEME( 1 );
+   HDC      hDC = hmg_par_raw_HDC( 2 );
+   int      iPartId = hb_parni( 3 );
+   int      iStateId = hb_parni( 4 );
 
-   RECT pRect;
-   RECT pClipRect;
+   RECT     pRect;
+   RECT     pClipRect;
 
    Array2Rect( hb_param( 5, HB_IT_ARRAY ), &pRect );
    Array2Rect( hb_param( 6, HB_IT_ARRAY ), &pClipRect );
@@ -440,7 +436,7 @@ HB_FUNC( DRAWTHEMEBACKGROUND )
 
    if( hUxTheme )
    {
-      fnDrawThemeBackground pfn = ( fnDrawThemeBackground ) wapi_GetProcAddress( hUxTheme, "DrawThemeBackground" );
+      fnDrawThemeBackground   pfn = ( fnDrawThemeBackground ) wapi_GetProcAddress( hUxTheme, "DrawThemeBackground" );
       if( pfn )
       {
          nRet = ( HRESULT ) pfn( hTheme, hDC, iPartId, iStateId, &pRect, &pClipRect );
@@ -452,11 +448,11 @@ HB_FUNC( DRAWTHEMEBACKGROUND )
 
 HB_FUNC( DRAWTHEMEPARENTBACKGROUND )
 {
-   HRESULT nRet = S_FALSE;
+   HRESULT  nRet = S_FALSE;
 
-   HWND hWnd = hmg_par_raw_HWND( 1 );
-   HDC  hDC  = hmg_par_raw_HDC( 2 );
-   RECT pRect;
+   HWND     hWnd = hmg_par_raw_HWND( 1 );
+   HDC      hDC = hmg_par_raw_HDC( 2 );
+   RECT     pRect;
 
    if( HB_ISARRAY( 7 ) )
    {
@@ -470,7 +466,7 @@ HB_FUNC( DRAWTHEMEPARENTBACKGROUND )
 
    if( hUxTheme )
    {
-      fnDrawThemeParentBackground pfn = ( fnDrawThemeParentBackground ) wapi_GetProcAddress( hUxTheme, "DrawThemeParentBackground" );
+      fnDrawThemeParentBackground   pfn = ( fnDrawThemeParentBackground ) wapi_GetProcAddress( hUxTheme, "DrawThemeParentBackground" );
       if( pfn )
       {
          nRet = ( HRESULT ) pfn( hWnd, hDC, &pRect );
@@ -482,11 +478,11 @@ HB_FUNC( DRAWTHEMEPARENTBACKGROUND )
 
 HB_FUNC( SETWINDOWTHEME )
 {
-   HRESULT nRet = S_FALSE;
+   HRESULT  nRet = S_FALSE;
 
-   HWND    hWnd = hmg_par_raw_HWND( 1 );
-   LPCWSTR pszSubAppName = ( LPCWSTR ) hb_parc( 2 );
-   LPCWSTR pszSubIdList  = ( LPCWSTR ) hb_parc( 3 );
+   HWND     hWnd = hmg_par_raw_HWND( 1 );
+   LPCWSTR  pszSubAppName = ( LPCWSTR ) hb_parc( 2 );
+   LPCWSTR  pszSubIdList = ( LPCWSTR ) hb_parc( 3 );
 
    if( hUxTheme == NULL )
    {
@@ -495,7 +491,7 @@ HB_FUNC( SETWINDOWTHEME )
 
    if( hUxTheme )
    {
-      fnSetWindowTheme pfn = ( fnSetWindowTheme ) wapi_GetProcAddress( hUxTheme, "SetWindowTheme" );
+      fnSetWindowTheme  pfn = ( fnSetWindowTheme ) wapi_GetProcAddress( hUxTheme, "SetWindowTheme" );
       if( pfn )
       {
          nRet = ( HRESULT ) pfn( hWnd, pszSubAppName, pszSubIdList );
@@ -507,10 +503,10 @@ HB_FUNC( SETWINDOWTHEME )
 
 HB_FUNC( ENABLETHEMEDIALOGTEXTURE )
 {
-   HRESULT nRet = S_FALSE;
+   HRESULT  nRet = S_FALSE;
 
-   HWND  hWnd  = hmg_par_raw_HWND( 1 );
-   DWORD flags = hmg_par_DWORD( 2 );
+   HWND     hWnd = hmg_par_raw_HWND( 1 );
+   DWORD    flags = hmg_par_DWORD( 2 );
 
    if( hUxTheme == NULL )
    {
@@ -544,13 +540,13 @@ HB_FUNC( PTINRECT )
    }
 }
 
-BOOL Array2Rect( PHB_ITEM aRect, RECT * rc )
+BOOL Array2Rect( PHB_ITEM aRect, RECT *rc )
 {
    if( HB_IS_ARRAY( aRect ) && hb_arrayLen( aRect ) == 4 )
    {
-      rc->left   = hb_arrayGetNI( aRect, 1 );
-      rc->top    = hb_arrayGetNI( aRect, 2 );
-      rc->right  = hb_arrayGetNI( aRect, 3 );
+      rc->left = hb_arrayGetNI( aRect, 1 );
+      rc->top = hb_arrayGetNI( aRect, 2 );
+      rc->right = hb_arrayGetNI( aRect, 3 );
       rc->bottom = hb_arrayGetNI( aRect, 4 );
 
       return TRUE;
@@ -559,7 +555,7 @@ BOOL Array2Rect( PHB_ITEM aRect, RECT * rc )
    return FALSE;
 }
 
-BOOL Array2Point( PHB_ITEM aPoint, POINT * pt )
+BOOL Array2Point( PHB_ITEM aPoint, POINT *pt )
 {
    if( HB_IS_ARRAY( aPoint ) && hb_arrayLen( aPoint ) == 2 )
    {
@@ -572,11 +568,11 @@ BOOL Array2Point( PHB_ITEM aPoint, POINT * pt )
    return FALSE;
 }
 
-BOOL Array2ColorRef( PHB_ITEM aCRef, COLORREF * cr )
+BOOL Array2ColorRef( PHB_ITEM aCRef, COLORREF *cr )
 {
    if( HB_IS_ARRAY( aCRef ) && hb_arrayLen( aCRef ) == 3 )
    {
-      USHORT r, g, b;
+      USHORT   r, g, b;
 
       r = ( USHORT ) HB_arrayGetNL( aCRef, 1 );
       g = ( USHORT ) HB_arrayGetNL( aCRef, 2 );
@@ -590,7 +586,7 @@ BOOL Array2ColorRef( PHB_ITEM aCRef, COLORREF * cr )
    return FALSE;
 }
 
-HB_EXPORT PHB_ITEM Rect2Array( RECT * rc )
+HB_EXPORT PHB_ITEM Rect2Array( RECT *rc )
 {
    PHB_ITEM aRect = hb_itemArrayNew( 4 );
 
@@ -602,7 +598,7 @@ HB_EXPORT PHB_ITEM Rect2Array( RECT * rc )
    return aRect;
 }
 
-HB_EXPORT PHB_ITEM Point2Array( POINT * pt )
+HB_EXPORT PHB_ITEM Point2Array( POINT *pt )
 {
    PHB_ITEM aPoint = hb_itemArrayNew( 2 );
 

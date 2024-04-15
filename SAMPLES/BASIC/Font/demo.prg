@@ -54,14 +54,14 @@ PROCEDURE Main
          WIDTH 250 HEIGHT 30 ;
          VALUE 'Default Font'
 
+      @ 300, 30 BUTTON Btn2 ;
+         CAPTION 'Exit' ;
+         ON CLICK thiswindow.RELEASE
+
       @ 300, 300 BUTTON Btn1 ;
          CAPTION 'Font in Dialog' ;
          ON CLICK DlgFont() ;
          WIDTH 120 HEIGHT 30 DEFAULT
-
-      @ 300, 30 BUTTON Btn2 ;
-         CAPTION 'Exit' ;
-         ON CLICK thiswindow.RELEASE
 
    END WINDOW
 
@@ -75,8 +75,8 @@ RETURN
 FUNCTION DlgFont()
 
    IF IsWindowDefined(dlg1)
-      Return nil
-   Endif
+      RETURN NIL
+   ENDIF
 
    DEFINE DIALOG DLG1 ;
       OF Form_Main ;

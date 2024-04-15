@@ -7268,14 +7268,13 @@ FUNCTION GetFormIndexByHandle ( hWnd , /*@*/nFormSubIndex1 , /*@*/nFormSubIndex2
 *-----------------------------------------------------------------------------*
    LOCAL FormHandle
    LOCAL nIndex := 0
-   LOCAL i
+   LOCAL x
 
-   FOR i = 1 TO Len ( _HMG_aFormHandles )
+   FOR EACH FormHandle IN _HMG_aFormHandles
 
-      FormHandle := _HMG_aFormHandles[ i ]
-
+      x := hb_enumindex( FormHandle )
       IF HMG_CompareHandle ( hWnd, FormHandle, @nFormSubIndex1, @nFormSubIndex2 ) == .T.
-         nIndex := i
+         nIndex := x
          EXIT
       ENDIF
 
@@ -7288,14 +7287,13 @@ FUNCTION GetControlIndexByHandle ( hWnd , /*@*/nControlSubIndex1 , /*@*/nControl
 *-----------------------------------------------------------------------------*
    LOCAL ControlHandle
    LOCAL nIndex := 0
-   LOCAL i
+   LOCAL x
 
-   FOR i = 1 TO Len ( _HMG_aControlHandles )
+   FOR EACH ControlHandle IN _HMG_aControlHandles
 
-      ControlHandle := _HMG_aControlHandles[ i ]
-
+      x := hb_enumindex( ControlHandle )
       IF HMG_CompareHandle ( hWnd, ControlHandle, @nControlSubIndex1, @nControlSubIndex2 ) == .T.
-         nIndex := i
+         nIndex := x
          EXIT
       ENDIF
 

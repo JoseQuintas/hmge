@@ -48,28 +48,29 @@
 
 #include <commctrl.h>
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 )
+
 // Static Class Name
-   #define WC_STATIC  "Static"
+#define WC_STATIC "Static"
 #endif
 #include "hbapiitm.h"
 #include "hbvm.h"
 
 LRESULT APIENTRY  ChkLabelFunc( HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam );
-static WNDPROC LabelOldWndProc;
+static WNDPROC    LabelOldWndProc;
 
 extern HBITMAP    HMG_LoadPicture
-(
-   const char *   FileName,
-   int New_Width,
-   int New_Height,
-   HWND hWnd,
-   int ScaleStretch,
-   int Transparent,
-   long BackgroundColor,
-   int AdjustImage,
-   HB_BOOL bAlphaFormat,
-   int iAlpfaConstant
-);
+                  (
+                     const char  *FileName,
+                     int         New_Width,
+                     int         New_Height,
+                     HWND        hWnd,
+                     int         ScaleStretch,
+                     int         Transparent,
+                     long        BackgroundColor,
+                     int         AdjustImage,
+                     HB_BOOL     bAlphaFormat,
+                     int         iAlpfaConstant
+                  );
 #ifdef UNICODE
 LPWSTR            AnsiToWide( LPCSTR );
 #endif
@@ -78,28 +79,27 @@ HINSTANCE         GetResources( void );
 
 typedef struct
 {
-   BOOL    lCheck;                     // is checked ?
-   int     cxLeftEdge, cxRightEdge;    // size of the current window borders.
-   int     cxButton;
-   int     cxSpace;
-   BOOL    lLeftCheck;
-   HBITMAP himage;
-   HBITMAP himagemask;
-   HBITMAP himage2;
-   HBITMAP himagemask2;
-}
-INSCHK, * PINSCHK;
+   BOOL     lCheck;                    // is checked ?
+   int      cxLeftEdge, cxRightEdge;   // size of the current window borders.
+   int      cxButton;
+   int      cxSpace;
+   BOOL     lLeftCheck;
+   HBITMAP  himage;
+   HBITMAP  himagemask;
+   HBITMAP  himage2;
+   HBITMAP  himagemask2;
+} INSCHK, *PINSCHK;
 
 HBITMAP CreateBitmapMask( HBITMAP hbmColour, COLORREF crTransparent )
 {
-   HDC     hdcMem, hdcMem2;
-   HBITMAP hbmMask;
-   BITMAP  bm;
+   HDC      hdcMem, hdcMem2;
+   HBITMAP  hbmMask;
+   BITMAP   bm;
 
    GetObject( hbmColour, sizeof( BITMAP ), &bm );
    hbmMask = CreateBitmap( bm.bmWidth, bm.bmHeight, 1, 1, NULL );
 
-   hdcMem  = CreateCompatibleDC( 0 );
+   hdcMem = CreateCompatibleDC( 0 );
    hdcMem2 = CreateCompatibleDC( 0 );
 
    SelectObject( hdcMem, hbmColour );
@@ -117,7 +117,7 @@ HBITMAP CreateBitmapMask( HBITMAP hbmColour, COLORREF crTransparent )
    return hbmMask;
 }
 
-void GetCheck( INSCHK * pbtn, RECT * rect )
+void GetCheck( INSCHK *pbtn, RECT *rect )
 {
    if( pbtn->lLeftCheck )
    {
@@ -136,11 +136,11 @@ void GetCheck( INSCHK * pbtn, RECT * rect )
 
 BOOL InsertCheck( HWND hWnd, HBITMAP himage, HBITMAP himage2, int BtnWidth, BOOL lCheck, BOOL lLeftCheck )
 {
-   INSCHK * pbtn;
+   INSCHK   *pbtn;
 
    pbtn = ( INSCHK * ) HeapAlloc( GetProcessHeap(), 0, sizeof( INSCHK ) );
 
-   if( ! pbtn )
+   if( !pbtn )
    {
       return FALSE;
    }
@@ -157,12 +157,12 @@ BOOL InsertCheck( HWND hWnd, HBITMAP himage, HBITMAP himage2, int BtnWidth, BOOL
       DeleteObject( pbtn->himagemask2 );
    }
 
-   pbtn->lCheck     = lCheck;
+   pbtn->lCheck = lCheck;
    pbtn->lLeftCheck = lLeftCheck;
-   pbtn->cxButton   = HB_MAX( BtnWidth, GetSystemMetrics( SM_CXVSCROLL ) );
-   pbtn->himage     = himage;
-   pbtn->himage2    = himage2;
-   pbtn->cxSpace    = GetSystemMetrics( SM_CXSIZEFRAME ) / 4;
+   pbtn->cxButton = HB_MAX( BtnWidth, GetSystemMetrics( SM_CXVSCROLL ) );
+   pbtn->himage = himage;
+   pbtn->himage2 = himage2;
+   pbtn->cxSpace = GetSystemMetrics( SM_CXSIZEFRAME ) / 4;
 
    if( himage != NULL )
    {
@@ -191,14 +191,14 @@ BOOL InsertCheck( HWND hWnd, HBITMAP himage, HBITMAP himage2, int BtnWidth, BOOL
    return TRUE;
 }
 
-static void DrawCheck( HWND hWnd, INSCHK * pbtn, RECT * prect )
+static void DrawCheck( HWND hWnd, INSCHK *pbtn, RECT *prect )
 {
-   HDC     hdc;
-   HBITMAP hBitmap      = pbtn->himage;
-   HBITMAP hBitmapMask  = pbtn->himagemask;
-   HBITMAP hBitmap2     = pbtn->himage2;
-   HBITMAP hBitmapMask2 = pbtn->himagemask2;
-   BITMAP  bm;
+   HDC      hdc;
+   HBITMAP  hBitmap = pbtn->himage;
+   HBITMAP  hBitmapMask = pbtn->himagemask;
+   HBITMAP  hBitmap2 = pbtn->himage2;
+   HBITMAP  hBitmapMask2 = pbtn->himagemask2;
+   BITMAP   bm;
 
    hdc = GetWindowDC( hWnd );
 
@@ -210,14 +210,14 @@ static void DrawCheck( HWND hWnd, INSCHK * pbtn, RECT * prect )
    }
    else
    {
-      int wRow = prect->top;
-      int wCol = prect->left;
+      int   wRow = prect->top;
+      int   wCol = prect->left;
 
-      HDC hdcMem = CreateCompatibleDC( hdc );
+      HDC   hdcMem = CreateCompatibleDC( hdc );
 
       if( pbtn->lCheck )
       {
-         HBITMAP hbmOld = ( HBITMAP ) SelectObject( hdcMem, hBitmapMask );
+         HBITMAP  hbmOld = ( HBITMAP ) SelectObject( hdcMem, hBitmapMask );
          GetObject( hBitmap, sizeof( bm ), &bm );
 
          BitBlt( hdc, wCol, wRow, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCAND );
@@ -228,7 +228,7 @@ static void DrawCheck( HWND hWnd, INSCHK * pbtn, RECT * prect )
       }
       else if( hBitmap2 != NULL )
       {
-         HBITMAP hbmOld = ( HBITMAP ) SelectObject( hdcMem, hBitmapMask2 );
+         HBITMAP  hbmOld = ( HBITMAP ) SelectObject( hdcMem, hBitmapMask2 );
          GetObject( hBitmap2, sizeof( bm ), &bm );
 
          BitBlt( hdc, wCol, wRow, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCAND );
@@ -246,19 +246,19 @@ static void DrawCheck( HWND hWnd, INSCHK * pbtn, RECT * prect )
 
 HB_FUNC( INITCHKLABEL )
 {
-   HWND    hbutton;
-   HBITMAP himage;
-   HBITMAP himage2;
+   HWND     hbutton;
+   HBITMAP  himage;
+   HBITMAP  himage2;
 
 #ifndef UNICODE
-   LPCSTR lpWindowName = hb_parc( 2 );
+   LPCSTR   lpWindowName = hb_parc( 2 );
 #else
-   LPWSTR lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+   LPWSTR   lpWindowName = AnsiToWide( ( char * ) hb_parc( 2 ) );
 #endif
-   int BtnWidth = hb_parni( 7 );
+   int      BtnWidth = hb_parni( 7 );
 
-   DWORD Style   = WS_CHILD | SS_NOTIFY;
-   DWORD ExStyle = hb_parl( 12 ) ? WS_EX_CLIENTEDGE : 0;
+   DWORD    Style = WS_CHILD | SS_NOTIFY;
+   DWORD    ExStyle = hb_parl( 12 ) ? WS_EX_CLIENTEDGE : 0;
 
    if( hb_parl( 11 ) )
    {
@@ -280,7 +280,7 @@ HB_FUNC( INITCHKLABEL )
       ExStyle |= WS_EX_TRANSPARENT;
    }
 
-   if( ! hb_parl( 16 ) )
+   if( !hb_parl( 16 ) )
    {
       Style |= WS_VISIBLE;
    }
@@ -301,20 +301,20 @@ HB_FUNC( INITCHKLABEL )
    }
 
    hbutton = CreateWindowEx
-             (
-      ExStyle,
-      WC_STATIC,
-      lpWindowName,
-      Style,
-      hb_parni( 4 ),
-      hb_parni( 5 ),
-      hb_parni( 6 ),
-      hb_parni( 7 ),
-      hmg_par_raw_HWND( 1 ),
-      hmg_par_raw_HMENU( 3 ),
-      GetInstance(),
-      NULL
-             );
+      (
+         ExStyle,
+         WC_STATIC,
+         lpWindowName,
+         Style,
+         hb_parni( 4 ),
+         hb_parni( 5 ),
+         hb_parni( 6 ),
+         hb_parni( 7 ),
+         hmg_par_raw_HWND( 1 ),
+         hmg_par_raw_HMENU( 3 ),
+         GetInstance(),
+         NULL
+      );
 
    if( hb_parc( 19 ) != NULL )
    {
@@ -349,7 +349,7 @@ HB_FUNC( INITCHKLABEL )
 HB_FUNC( SETCHKLABEL )
 {
    HWND     hWnd = hmg_par_raw_HWND( 1 );
-   INSCHK * pbtn = ( INSCHK * ) GetWindowLongPtr( hWnd, GWLP_USERDATA );
+   INSCHK   *pbtn = ( INSCHK * ) GetWindowLongPtr( hWnd, GWLP_USERDATA );
    RECT     rect;
 
    pbtn->lCheck = hb_parl( 2 );
@@ -367,15 +367,15 @@ HB_FUNC( SETCHKLABEL )
 HB_FUNC( GETCHKLABEL )
 {
    HWND     hWnd = hmg_par_raw_HWND( 1 );
-   INSCHK * pbtn = ( INSCHK * ) GetWindowLongPtr( hWnd, GWLP_USERDATA );
+   INSCHK   *pbtn = ( INSCHK * ) GetWindowLongPtr( hWnd, GWLP_USERDATA );
 
    hb_retl( ( BOOL ) pbtn->lCheck );
 }
 
 HB_FUNC( REPLACECHECKIMAGE )
 {
-   HBITMAP himage;
-   HBITMAP himage2;
+   HBITMAP  himage;
+   HBITMAP  himage2;
 
    if( hb_parc( 2 ) != NULL )
    {
@@ -400,14 +400,14 @@ HB_FUNC( REPLACECHECKIMAGE )
 
 LRESULT APIENTRY ChkLabelFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-   static PHB_SYMB pSymbol = NULL;
-   LRESULT         r;
-   RECT *          prect;
-   RECT oldrect;
-   RECT rect;
-   TRACKMOUSEEVENT tme;
+   static PHB_SYMB   pSymbol = NULL;
+   LRESULT           r;
+   RECT              *prect;
+   RECT              oldrect;
+   RECT              rect;
+   TRACKMOUSEEVENT   tme;
 
-   INSCHK * pbtn = ( INSCHK * ) GetWindowLongPtr( hWnd, GWLP_USERDATA );
+   INSCHK            *pbtn = ( INSCHK * ) GetWindowLongPtr( hWnd, GWLP_USERDATA );
 
    switch( Msg )
    {
@@ -426,27 +426,27 @@ LRESULT APIENTRY ChkLabelFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
          break;
 
       case WM_NCCALCSIZE:
-         prect   = ( RECT * ) lParam;
+         prect = ( RECT * ) lParam;
          oldrect = *prect;
 
          CallWindowProc( LabelOldWndProc, hWnd, Msg, wParam, lParam );
          SendMessage( hWnd, WM_SETREDRAW, 1, 0 );
-         if( ! pbtn )
+         if( !pbtn )
          {
             return 0;
          }
 
          if( pbtn->lLeftCheck )
          {
-            pbtn->cxLeftEdge  = prect->left - oldrect.left;
+            pbtn->cxLeftEdge = prect->left - oldrect.left;
             pbtn->cxRightEdge = oldrect.right - prect->right;
-            prect->left      += pbtn->cxButton + pbtn->cxSpace;
+            prect->left += pbtn->cxButton + pbtn->cxSpace;
          }
          else
          {
-            pbtn->cxLeftEdge  = prect->left - oldrect.left;
+            pbtn->cxLeftEdge = prect->left - oldrect.left;
             pbtn->cxRightEdge = oldrect.right - prect->right;
-            prect->right     -= pbtn->cxButton + pbtn->cxSpace;
+            prect->right -= pbtn->cxButton + pbtn->cxSpace;
          }
 
          return 0;
@@ -471,13 +471,13 @@ LRESULT APIENTRY ChkLabelFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
          return 0;
 
       case WM_MOUSEMOVE:
-         tme.cbSize      = sizeof( TRACKMOUSEEVENT );
-         tme.dwFlags     = TME_LEAVE;
-         tme.hwndTrack   = hWnd;
+         tme.cbSize = sizeof( TRACKMOUSEEVENT );
+         tme.dwFlags = TME_LEAVE;
+         tme.hwndTrack = hWnd;
          tme.dwHoverTime = HOVER_DEFAULT;
          _TrackMouseEvent( &tme );
 
-         if( ! pSymbol )
+         if( !pSymbol )
          {
             pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OLABELEVENTS" ) );
          }
@@ -495,10 +495,10 @@ LRESULT APIENTRY ChkLabelFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
          r = hmg_par_LRESULT( -1 );
 
-         return ( r != 0 ) ? r : CallWindowProc( LabelOldWndProc, hWnd, 0, 0, 0 );
+         return( r != 0 ) ? r : CallWindowProc( LabelOldWndProc, hWnd, 0, 0, 0 );
 
       case WM_MOUSELEAVE:
-         if( ! pSymbol )
+         if( !pSymbol )
          {
             pSymbol = hb_dynsymSymbol( hb_dynsymGet( "OLABELEVENTS" ) );
          }
@@ -516,7 +516,7 @@ LRESULT APIENTRY ChkLabelFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
          r = hmg_par_LRESULT( -1 );
 
-         return ( r != 0 ) ? r : CallWindowProc( LabelOldWndProc, hWnd, 0, 0, 0 );
+         return( r != 0 ) ? r : CallWindowProc( LabelOldWndProc, hWnd, 0, 0, 0 );
    }
 
    return CallWindowProc( LabelOldWndProc, hWnd, Msg, wParam, lParam );
