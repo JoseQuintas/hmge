@@ -214,9 +214,9 @@ HB_FUNC( SETTOOLTIP )
          ti.hwnd = GetParent( hwndTool );
          ti.uId = ( UINT_PTR ) hwndTool;
 
-         if( SendMessage( hwndToolTip, TTM_GETTOOLINFO, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) & ti ) )
+         if( SendMessage( hwndToolTip, TTM_GETTOOLINFO, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) &ti ) )
          {
-            SendMessage( hwndToolTip, TTM_DELTOOL, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) & ti );
+            SendMessage( hwndToolTip, TTM_DELTOOL, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) &ti );
          }
 
          if( hb_parclen( 2 ) > 0 )
@@ -224,7 +224,7 @@ HB_FUNC( SETTOOLTIP )
             ti.lpszText = lpText;
          }
 
-         hmg_ret_L( SendMessage( hwndToolTip, TTM_ADDTOOL, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) & ti ) );
+         hmg_ret_L( SendMessage( hwndToolTip, TTM_ADDTOOL, ( WPARAM ) 0, ( LPARAM ) ( LPTOOLINFO ) &ti ) );
 
          SendMessage( hwndToolTip, TTM_ACTIVATE, ( WPARAM ) ( BOOL ) g_bIsToolTipActive, 0 );
 #ifdef UNICODE
@@ -385,7 +385,7 @@ HB_FUNC( INITTOOLTIPEX )
       ti.lpszText = lpszText;
 
       // Associate the tooltip with the "tool" window.
-      SendMessage( hwndToolTip, TTM_ADDTOOL, 0, ( LPARAM ) ( LPTOOLINFO ) & ti );
+      SendMessage( hwndToolTip, TTM_ADDTOOL, 0, ( LPARAM ) ( LPTOOLINFO ) &ti );
 
       if( NULL != lpszTitle )
       {
@@ -499,7 +499,7 @@ HB_FUNC( TTM_GETMARGIN )
    {
       RECT  rect;
 
-      SendMessage( hwndToolTip, TTM_GETMARGIN, 0, ( LPARAM ) & rect );
+      SendMessage( hwndToolTip, TTM_GETMARGIN, 0, ( LPARAM ) &rect );
 
       hb_itemReturnRelease( Rect2Array( &rect ) );
    }
@@ -683,7 +683,7 @@ HB_FUNC( TTM_SETMARGIN )
 
       if( Array2Rect( hb_param( 2, HB_IT_ANY ), &rect ) )
       {
-         SendMessage( hwndToolTip, TTM_SETMARGIN, 0, ( LPARAM ) & rect );
+         SendMessage( hwndToolTip, TTM_SETMARGIN, 0, ( LPARAM ) &rect );
       }
       else
       {
@@ -801,7 +801,7 @@ HB_FUNC( TTM_TRACKACTIVATE )
       ti.hwnd = hwndTool;
       ti.uId = ( UINT_PTR ) hwndTool;
 
-      SendMessage( hwndToolTip, TTM_TRACKACTIVATE, ( WPARAM ) hb_parl( 3 ), ( LPARAM ) ( LPTOOLINFO ) & ti );
+      SendMessage( hwndToolTip, TTM_TRACKACTIVATE, ( WPARAM ) hb_parl( 3 ), ( LPARAM ) ( LPTOOLINFO ) &ti );
    }
    else
    {
@@ -881,7 +881,7 @@ HB_FUNC( TTM_UPDATETIPTEXT )  //old HB_FUNC( UPDATETOOLTIPTEXT )
          ti.uId = ( UINT_PTR ) hwndTool;
          ti.lpszText = lpszText;
 
-         SendMessage( hwndToolTip, TTM_UPDATETIPTEXT, 0, ( LPARAM ) ( LPTOOLINFO ) & ti );
+         SendMessage( hwndToolTip, TTM_UPDATETIPTEXT, 0, ( LPARAM ) ( LPTOOLINFO ) &ti );
 #ifdef UNICODE
          if( lpszText != NULL )
          {

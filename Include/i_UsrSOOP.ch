@@ -6,12 +6,12 @@
 #xtranslate <w> . \<c\> . Handle  := \<v\> => SetProperty ( <"w">, \<"c"\> , "Handle" , \<v\> ) ;;
 #undef SOOP_HMGBUTTON ;;
 #define SOOP_CLBUTTON ;;
-#xtranslate <w> . \<c\> . SetShield \[()\] => Domethod ( <"w">, \<"c"\> , "SetShield" ) ;;
+#xtranslate <w> . \<c\> . SetShield \[()] => Domethod ( <"w">, \<"c"\> , "SetShield" ) ;;
 #xtranslate <w> . \<c\> . NoteText => GetProperty ( <"w">, \<"c"\> , "NoteText" )  ;;
 #xtranslate <w> . \<c\> . NoteText := \<v\> => SetProperty ( <"w">, \<"c"\> , "NoteText" , \<v\> ) ;;
 #undef SOOP_CLBUTTON ;;
 #define SOOP_PRINT ;;
-#xtranslate <w> . \<c\> . Print \[()\] => Domethod ( <"w">, \<"c"\> , "Print" )  ;;
+#xtranslate <w> . \<c\> . Print \[()] => Domethod ( <"w">, \<"c"\> , "Print" )  ;;
 #undef SOOP_PRINT ;;
 #define SOOP_ANIMATERES ;;
 #xtranslate <w> . \<c\> . File  => GetProperty ( <"w">, \<"c"\> , "File" )  ;;
@@ -20,7 +20,7 @@
 #xtranslate <w> . \<c\> . ResId := \<v\> => SetProperty ( <"w">, \<"c"\> , "ResId" , \<v\> ) ;;
 #undef SOOP_ANIMATERES ;;
 #define SOOP_WEBCAM ;;
-#xtranslate <w> . \<c\> . Start \[()\] => Domethod ( <"w">, \<"c"\> , "Start" ) ;;
+#xtranslate <w> . \<c\> . Start \[()] => Domethod ( <"w">, \<"c"\> , "Start" ) ;;
 #undef SOOP_WEBCAM ;;
 #define SOOP_ACTIVEX ;;
 #xtranslate <w> . \<c\> . XObject  := \<v\> => SetProperty ( <"w">, \<"c"\> , "XObject" , \<v\> ) ;;

@@ -9,162 +9,162 @@
 
 PROCEDURE Main()
 
-	DEFINE WINDOW Form_1 ;
-		AT 0,0 ;
-		WIDTH 334 ;
-		HEIGHT 276 ;
-		TITLE 'Catchysoft Report Test' ;
-		MAIN ;
-		ON INIT RegActiveX() ;
-		ON RELEASE UnRegActiveX()
+   DEFINE WINDOW Form_1 ;
+         AT 0, 0 ;
+         WIDTH 334 ;
+         HEIGHT 276 ;
+         TITLE 'Catchysoft Report Test' ;
+         MAIN ;
+         ON INIT RegActiveX() ;
+         ON RELEASE UnRegActiveX()
 
-		DEFINE MAIN MENU
+      DEFINE MAIN MENU
 
-			DEFINE POPUP "Test"
-				MENUITEM 'Report Test' ACTION REPORT()
-				MENUITEM 'Report Test 2' ACTION REPORT2()
-				SEPARATOR
-                                ITEM 'Exit' ACTION Form_1.Release()
-			END POPUP
+         DEFINE POPUP "Test"
+            MENUITEM 'Report Test' ACTION REPORT()
+            MENUITEM 'Report Test 2' ACTION REPORT2()
+            SEPARATOR
+            ITEM 'Exit' ACTION Form_1.Release()
+         END POPUP
 
-		END MENU
+      END MENU
 
-	END WINDOW 
+   END WINDOW
 
-	Form_1.Center()
-	Form_1.Activate()
+   Form_1.Center()
+   Form_1.Activate()
 
 RETURN
 
 *------------------------------------------------------------------------------*
 STATIC PROCEDURE REPORT()
 *------------------------------------------------------------------------------*
-	local i, sum
-	local oreport := CreateObject( "CatchysoftReport.Report" )
+   LOCAL i, SUM
+   LOCAL oreport := CreateObject( "CatchysoftReport.Report" )
 
-	oreport:InitReport()
+   oreport:InitReport()
 
-	oreport:ColumnName  := "Column 1"
-	oreport:ColumnName  := "Column 2"
-	oreport:ColumnName  := "Column 3"
-	oreport:ColumnWidth  := 20
-	oreport:ColumnWidth  := 20
-	oreport:ColumnWidth  := 60
+   oreport:ColumnName := "Column 1"
+   oreport:ColumnName := "Column 2"
+   oreport:ColumnName := "Column 3"
+   oreport:ColumnWidth := 20
+   oreport:ColumnWidth := 20
+   oreport:ColumnWidth := 60
 
-	sum := 0
-	For i:=1 To 100
-		oreport:FieldText := hb_ntos(i)
-		oreport:FieldText := "test"
-		oreport:FieldText := "10"
-		sum += 10
-	Next
+   SUM := 0
+   FOR i := 1 TO 100
+      oreport:FieldText := hb_ntos( i )
+      oreport:FieldText := "test"
+      oreport:FieldText := "10"
+      SUM += 10
+   NEXT
 
-	oreport:Summary := ""
-	oreport:Summary := "Sum"
-	oreport:Summary := hb_ntos(Sum)
+   oreport:Summary := ""
+   oreport:Summary := "Sum"
+   oreport:Summary := hb_ntos( Sum )
 
-	oreport:ReportName := "Simple Report"
-	oreport:PrintPreview()
+   oreport:ReportName := "Simple Report"
+   oreport:PrintPreview()
 
-	oreport := Nil
+   oreport := NIL
 
 RETURN
 
 *------------------------------------------------------------------------------*
 STATIC PROCEDURE REPORT2()
 *------------------------------------------------------------------------------*
-	local i, total1, total2, aContinent := {}
-	local oreport := CreateObject( "CatchysoftReport.Report" )
+   LOCAL i, total1, total2, aContinent := {}
+   LOCAL oreport := CreateObject( "CatchysoftReport.Report" )
 
-	Memvar SelectList
-	Field Name, Capital, Area, Population, Continent
+   MEMVAR SelectList
+   FIELD NAME, Capital, Area, Population, Continent
 
-	USE ( hb_dirBase() + "country" ) EXCLUSIVE
-	IF !Used()
-		MsgStop("Can not connect to the table!", "Error")
-		Return
-	ENDIF
+   USE ( hb_DirBase() + "country" ) EXCLUSIVE
+   IF ! Used()
+      MsgStop( "Can not connect to the table!", "Error" )
+      RETURN
+   ENDIF
 
-	INDEX ON Continent TO temp2 UNIQUE
+   INDEX ON Continent TO temp2 UNIQUE
 
-	dbEval( { || aadd( aContinent, Continent ) } )
+   dbEval( {|| AAdd( aContinent, Continent ) } )
 
-	INDEX ON padr(CONTINENT, 20) + padr(NAME, 28) to temp1
+   INDEX ON PadR( CONTINENT, 20 ) + PadR( NAME, 28 ) TO temp1
 
-	oreport:InitReport()
+   oreport:InitReport()
 
-	// column header
-	oreport:ColumnName  := "Name"
-	oreport:ColumnName  := "Capital"
-	oreport:ColumnName  := "Area"
-	oreport:ColumnName  := "Population"
-	// column width (in percents)
-	oreport:ColumnWidth  := 30
-	oreport:ColumnWidth  := 30
-	oreport:ColumnWidth  := 20
-	oreport:ColumnWidth  := 20
+   // column header
+   oreport:ColumnName := "Name"
+   oreport:ColumnName := "Capital"
+   oreport:ColumnName := "Area"
+   oreport:ColumnName := "Population"
+   // column width (in percents)
+   oreport:ColumnWidth := 30
+   oreport:ColumnWidth := 30
+   oreport:ColumnWidth := 20
+   oreport:ColumnWidth := 20
 
-	For i:=1 To Len(aContinent)
-		total1 := 0
-		total2 := 0
-		// output of Continent name
-		oreport:FieldText := ""
-		oreport:FieldText := Upper(aContinent[i])
-		oreport:FieldText := ""
-		oreport:FieldText := ""
+   FOR i := 1 TO Len( aContinent )
+      total1 := 0
+      total2 := 0
+      // output of Continent name
+      oreport:FieldText := ""
+      oreport:FieldText := Upper( aContinent[ i ] )
+      oreport:FieldText := ""
+      oreport:FieldText := ""
 
-		oreport:FieldText := ""
-		oreport:FieldText := Repl("-", 30)
-		oreport:FieldText := ""
-		oreport:FieldText := ""
+      oreport:FieldText := ""
+      oreport:FieldText := Repl( "-", 30 )
+      oreport:FieldText := ""
+      oreport:FieldText := ""
 
-		// select of data for a current continent
-		@ SELECT Name, Capital, Area, Population FOR Continent = aContinent[i] FROM Country ALIAS temp
+      // select of data for a current continent
+      @ SELECT NAME, Capital, Area, Population FOR Continent = aContinent[ i ] FROM Country ALIAS temp
 
-		Go Top
-		Do while !eof()
-			oreport:FieldText := temp->Name
-			oreport:FieldText := temp->Capital
-			oreport:FieldText := transform(temp->Area, '999 999 999')
-			oreport:FieldText := transform(temp->Population, '99 999 999 999')
-			total1 += temp->Area
-			total2 += temp->Population
-			Skip
-		EndDo
+      GO TOP
+      DO WHILE ! Eof()
+         oreport:FieldText := temp->NAME
+         oreport:FieldText := temp->Capital
+         oreport:FieldText := Transform( temp->Area, '999 999 999' )
+         oreport:FieldText := Transform( temp->Population, '99 999 999 999' )
+         total1 += temp->Area
+         total2 += temp->Population
+         SKIP
+      ENDDO
 
-		// output of totals
-		oreport:FieldText := Repl("-", 30)
-		oreport:FieldText := Repl("-", 30)
-		oreport:FieldText := Repl("-", 20)
-		oreport:FieldText := Repl("-", 20)
+      // output of totals
+      oreport:FieldText := Repl( "-", 30 )
+      oreport:FieldText := Repl( "-", 30 )
+      oreport:FieldText := Repl( "-", 20 )
+      oreport:FieldText := Repl( "-", 20 )
 
-		oreport:FieldText := ""
-		oreport:FieldText := ""
-		oreport:FieldText := transform(total1, '999 999 999')
-		oreport:FieldText := transform(total2, '99 999 999 999')
+      oreport:FieldText := ""
+      oreport:FieldText := ""
+      oreport:FieldText := Transform( total1, '999 999 999' )
+      oreport:FieldText := Transform( total2, '99 999 999 999' )
 
-		dbCloseArea( "TEMP" )  // close a temporary table
-	Next
+      dbCloseArea( "TEMP" ) // close a temporary table
+   NEXT
 
-	DbDrop( "TEMP" )  // erase a temporary table
+   dbDrop( "TEMP" ) // erase a temporary table
 
-	total1 := 0
-	total2 := 0
-	Country->( dbEval( { || total1 += Area, total2 += Population } ) )
-	Country->( dbCloseArea() )
-	hb_FileDelete( "temp?.ntx" )
+   total1 := 0
+   total2 := 0
+   Country->( dbEval( {|| total1 += Area, total2 += Population } ) )
+   Country->( dbCloseArea() )
+   hb_FileDelete( "temp?.ntx" )
 
-	// output of summary
-	oreport:Summary := "Total:"
-	oreport:Summary := ""
-	oreport:Summary := transform(total1, '999 999 999')
-	oreport:Summary := transform(total2, '99 999 999 999')
+   // output of summary
+   oreport:Summary := "Total:"
+   oreport:Summary := ""
+   oreport:Summary := Transform( total1, '999 999 999' )
+   oreport:Summary := Transform( total2, '99 999 999 999' )
 
-	// report header (limitation is 13 symbols)
-	oreport:ReportName := "Countries Sum"
-	oreport:PrintPreview()
+   // report header (limitation is 13 symbols)
+   oreport:ReportName := "Countries Sum"
+   oreport:PrintPreview()
 
-	oreport := Nil
+   oreport := NIL
 
 RETURN
 
@@ -172,9 +172,9 @@ RETURN
 PROCEDURE RegActiveX()
 *------------------------------------------------------------------------------*
 
-	IF File( GetStartUpFolder() + '\CatchysoftReport.dll' )
-		EXECUTE FILE "regsvr32" PARAMETERS "/s CatchysoftReport.dll" HIDE
-	ENDIF
+   IF File( GetStartUpFolder() + '\CatchysoftReport.dll' )
+      EXECUTE FILE "regsvr32" PARAMETERS "/s CatchysoftReport.dll" HIDE
+   ENDIF
 
 RETURN
 
@@ -182,8 +182,8 @@ RETURN
 PROCEDURE UnRegActiveX()
 *------------------------------------------------------------------------------*
 
-	IF File( GetStartUpFolder() + '\CatchysoftReport.dll' )
-		EXECUTE FILE "regsvr32" PARAMETERS "/u /s CatchysoftReport.dll" HIDE
-	ENDIF
+   IF File( GetStartUpFolder() + '\CatchysoftReport.dll' )
+      EXECUTE FILE "regsvr32" PARAMETERS "/u /s CatchysoftReport.dll" HIDE
+   ENDIF
 
 RETURN

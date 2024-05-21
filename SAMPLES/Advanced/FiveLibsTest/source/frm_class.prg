@@ -17,46 +17,59 @@ CREATE CLASS frm_Class
    VAR cOptions        INIT "IED"
    VAR aOptionList     INIT {}
    VAR cSelected       INIT "NONE"
+   VAR lNavigate       INIT .T.
+   VAR lSingleEdit     INIT .F.
+   VAR nRecnoInit
+   VAR lModal          INIT .F.
 
-   VAR nEditStyle      INIT 1
-   VAR lWithTab        INIT .F.
-
-   VAR nDlgWidth       INIT 1024
-   VAR nDlgHeight      INIT 768
-   VAR nLineSpacing    INIT 21
-   VAR nLineHeight     INIT 20
-   VAR nButtonSize     INIT 50
-   VAR nButtonSpace    INIT 3
-   VAR nTextSize       INIT 15
+   VAR nLayout         INIT 2
+   VAR lWithTab        INIT .T.
 
    VAR xDlg
    VAR aControlList   INIT {}
    VAR aAllSetup      INIT {}
+   VAR aDlgKeyDown    INIT {}
 
    METHOD First()
    METHOD Last()
    METHOD Next()
    METHOD Previous()
    METHOD CreateControls()     INLINE frm_Buttons( Self ), frm_Edit( Self )
-   METHOD ButtonSaveOn()
+   METHOD ButtonSaveOn( lSave )
    METHOD ButtonSaveOff()
-   METHOD UpdateEdit()
+   METHOD DataLoad()
    METHOD EditKeyOn()
    METHOD EditOn()
    METHOD EditOff()
    METHOD Print()              INLINE frm_Print( Self )
    METHOD Execute()            INLINE frm_Dialog( Self )
-   METHOD View()               INLINE frm_Browse( Self, "", "", ::cFileDbf, Nil ), ::UpdateEdit()
+   METHOD View()               INLINE ::Browse( "", "", ::cFileDbf, Nil ), ::DataLoad()
    METHOD Edit()               INLINE ::cSelected := "EDIT", ::EditKeyOn()
    METHOD Delete()
    METHOD Insert()             INLINE ::cSelected := "INSERT", ::EditKeyOn()
    METHOD Exit()               INLINE gui_DialogClose( ::xDlg )
-   METHOD Save()
-   METHOD Cancel()             INLINE ::cSelected := "NONE", ::EditOff(), ::UpdateEdit()
-   METHOD Validate( aItem )    INLINE frm_Validate( aItem, Self )
+   METHOD DataSave()
+   METHOD Cancel()             INLINE ::cSelected := "NONE", ::EditOff(), ::DataLoad()
+   METHOD Validate( aItem )    INLINE frm_Valid( aItem, Self )
    METHOD Browse( ... )        INLINE frm_Browse( Self, ... )
+   METHOD BrowseAction( aItem, nKey ) INLINE frm_BrowseAction( aItem, nKey, Self )
+   METHOD DlgInit()
 
    ENDCLASS
+
+METHOD DlgInit() CLASS frm_Class
+
+   ::DataLoad()
+   IF ::lSingleEdit()
+      ::EditOn()
+   ELSE
+      ::EditOff()
+   ENDIF
+   IF ::nRecnoInit != Nil
+      GOTO ::nRecnoInit
+   ENDIF
+
+   RETURN Nil
 
 METHOD First() CLASS frm_Class
 
@@ -67,7 +80,7 @@ METHOD First() CLASS frm_Class
    ELSE
       GOTO TOP
    ENDIF
-   ::UpdateEdit()
+   ::DataLoad()
 
    RETURN Nil
 
@@ -80,7 +93,7 @@ METHOD Last() CLASS frm_Class
    ELSE
       GOTO BOTTOM
    ENDIF
-   ::UpdateEdit()
+   ::DataLoad()
 
    RETURN Nil
 
@@ -97,7 +110,7 @@ METHOD Next() CLASS frm_Class
          GOTO BOTTOM
       ENDIF
    ENDIF
-   ::UpdateEdit()
+   ::DataLoad()
 
    RETURN Nil
 
@@ -113,21 +126,24 @@ METHOD Previous() CLASS frm_Class
       IF Bof()
          GOTO TOP
       ENDIF
-      ::UpdateEdit()
+      ::DataLoad()
    ENDIF
 
    RETURN Nil
 
-METHOD ButtonSaveOn() CLASS frm_Class
+METHOD ButtonSaveOn( lSave ) CLASS frm_Class
 
    LOCAL aItem
 
+   hb_Default( @lSave, .T. )
    FOR EACH aItem IN ::aControlList
       IF aItem[ CFG_CTLTYPE ] == TYPE_BUTTON
-         IF aItem[ CFG_CAPTION ] $ "Save,Cancel"
-            gui_ButtonEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
+         IF lSave .AND. gui_LibName() == "HMGE" .AND. Left( aItem[ CFG_FCONTROL ], 6 ) == "BTNBRW"
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
+         ELSEIF aItem[ CFG_CAPTION ] $ "Cancel" + iif( lSave, ",Save", "" )
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
          ELSE
-            gui_ButtonEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
          ENDIF
       ENDIF
    NEXT
@@ -141,9 +157,11 @@ METHOD ButtonSaveOff() CLASS frm_Class
    FOR EACH aItem IN ::aControlList
       IF aItem[ CFG_CTLTYPE ] == TYPE_BUTTON
          IF aItem[ CFG_CAPTION ] $ "Save,Cancel"
-            gui_ButtonEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
+         ELSEIF gui_LibName() == "HMGE" .AND. Left( aItem[ CFG_FCONTROL ], 6 ) == "BTNBRW"
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
          ELSE
-            gui_ButtonEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
          ENDIF
       ENDIF
    NEXT
@@ -158,7 +176,7 @@ METHOD EditKeyOn() CLASS frm_Class
    FOR EACH aItem IN ::aControlList
       IF aItem[ CFG_CTLTYPE ] == TYPE_HWGUIBUG
             gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
-      ELSEIF aItem[ CFG_CTLTYPE ] == TYPE_EDIT .AND. aItem[ CFG_ISKEY ]
+      ELSEIF aItem[ CFG_CTLTYPE ] == TYPE_TEXT .AND. aItem[ CFG_ISKEY ] .AND. ! aItem[ CFG_SAVEONLY ]
          gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
          IF ! lFound .AND. aItem[ CFG_ISKEY ]
             lFound := .T.
@@ -167,7 +185,7 @@ METHOD EditKeyOn() CLASS frm_Class
       ENDIF
    NEXT
    IF lFound // have key field
-      ::ButtonSaveOn()
+      ::ButtonSaveOn(.F.)
       gui_SetFocus( ::xDlg, oKeyEdit )
    ELSE // do not have key field
       ::EditOn()
@@ -178,12 +196,17 @@ METHOD EditKeyOn() CLASS frm_Class
 METHOD EditOn() CLASS frm_Class
 
    LOCAL aItem, oFirstEdit, lFound := .F.
+   LOCAL aEnableList := { TYPE_TEXT, TYPE_MLTEXT, TYPE_COMBOBOX, TYPE_CHECKBOX, ;
+      TYPE_DATEPICKER, TYPE_SPINNER, TYPE_BROWSE }
 
    FOR EACH aItem IN ::aControlList
       IF aItem[ CFG_CTLTYPE ] == TYPE_HWGUIBUG
             gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
-      ELSEIF hb_AScan( { TYPE_EDIT, TYPE_COMBOBOX, TYPE_CHECKBOX }, { | e | e == aItem[ CFG_CTLTYPE ] } ) != 0
-         IF aItem[ CFG_ISKEY ]
+      ELSEIF gui_LibName() == "HMGE" .AND. aItem[ CFG_CTLTYPE ] == TYPE_BUTTON ;
+         .AND. Left( aItem[ CFG_FCONTROL ], 6 ) == "BTNBRW"
+            gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
+      ELSEIF hb_AScan( aEnableList, { | e | e == aItem[ CFG_CTLTYPE ] } ) != 0
+         IF aItem[ CFG_ISKEY ] .OR. aItem[ CFG_SAVEONLY ]
             gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
          ELSE
             gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .T. )
@@ -202,9 +225,11 @@ METHOD EditOn() CLASS frm_Class
 METHOD EditOff() CLASS frm_Class
 
    LOCAL aItem
+   LOCAL aDisableList := { TYPE_TEXT, TYPE_MLTEXT, TYPE_HWGUIBUG , TYPE_COMBOBOX, ;
+      TYPE_CHECKBOX, TYPE_DATEPICKER, TYPE_SPINNER, TYPE_BROWSE }
 
    FOR EACH aItem IN ::aControlList
-      IF hb_AScan( { TYPE_EDIT, TYPE_HWGUIBUG , TYPE_COMBOBOX, TYPE_CHECKBOX }, { | e | e == aItem[ CFG_CTLTYPE ] } ) != 0
+      IF hb_AScan( aDisableList, { | e | e == aItem[ CFG_CTLTYPE ] } ) != 0
          gui_ControlEnable( ::xDlg, aItem[ CFG_FCONTROL ], .F. )
       ENDIF
    NEXT
@@ -250,22 +275,23 @@ METHOD Delete() CLASS frm_Class
             IF Eof()
                SKIP -1
             ENDIF
-            ::UpdateEdit()
+            ::DataLoad()
          ENDIF
       ENDIF
    ENDIF
 
    RETURN Nil
 
-METHOD UpdateEdit() CLASS frm_Class
+METHOD DataLoad() CLASS frm_Class
 
-   LOCAL aItem, nSelect, xValue, cText, xScope, nLenScope
+   LOCAL aItem, nSelect, xValue, cText, xScope, nLenScope, xValueControl
 
    FOR EACH aItem IN ::aControlList
       DO CASE
-      CASE aItem[ CFG_CTLTYPE ] == TYPE_EDIT .AND. ! Empty( aItem[ CFG_FNAME ] )
+      CASE aItem[ CFG_SAVEONLY ]
+      CASE ! Empty( aItem[ CFG_FNAME ] ) .AND. hb_AScan( { TYPE_TEXT, TYPE_MLTEXT, TYPE_DATEPICKER, TYPE_SPINNER }, aItem[ CFG_CTLTYPE ] ) != 0
          xValue := FieldGet( FieldNum( aItem[ CFG_FNAME ] ) )
-         gui_TextSetValue( ::xDlg, aItem[ CFG_FCONTROL ], xValue )
+         gui_ControlSetValue( ::xDlg, aItem[ CFG_FCONTROL ], xValue )
          IF ! Empty( aItem[ CFG_VTABLE ] ) .AND. ! Empty( aItem[ CFG_VSHOW ] )
             nSelect := Select()
             SELECT ( Select( aItem[ CFG_VTABLE ] ) )
@@ -274,13 +300,28 @@ METHOD UpdateEdit() CLASS frm_Class
             SELECT ( nSelect )
             gui_LabelSetValue( ::xDlg, aItem[ CFG_VCONTROL ], cText )
          ENDIF
+
+      CASE aItem[ CFG_CTLTYPE ] == TYPE_CHECKBOX
+         xValue := FieldGet( FieldNum( aItem[ CFG_FNAME ] ) )
+         DO CASE
+         CASE aItem[ CFG_FTYPE ] == "L"
+         CASE aItem[ CFG_FTYPE ] == "N"
+            xValue := ( xValue == 1 )
+         CASE aItem[ CFG_FTYPE ] == "C"
+            xValue := ( xValue == "Y" )
+         ENDCASE
+         gui_LabelSetValue( ::xDlg, aItem[ CFG_FCONTROL ], xValue )
+
       CASE aItem[ CFG_CTLTYPE ] == TYPE_COMBOBOX
+         xValue := FieldGet( FieldNum( aItem[ CFG_FNAME ] ) )
+         xValueControl := hb_AScan( aItem[ CFG_COMBOLIST ], { | e | e == xValue } )
+         gui_ControlSetValue( ::xDLg, aItem[ CFG_FCONTROL ], xValueControl )
 
       CASE aItem[ CFG_CTLTYPE ] == TYPE_BROWSE
-         SELECT  ( Select( aItem[ CFG_BTABLE ] ) )
-         SET ORDER TO ( aItem[ CFG_BINDEXORD ] )
-         xScope := ( ::cFileDbf )->( FieldGet( FieldNum( aItem[ CFG_BKEYFROM ] ) ) )
-         nLenScope := ( ::cFileDbf )->( FieldLen( aItem[ CFG_BKEYFROM ] ) )
+         SELECT  ( Select( aItem[ CFG_BRWTABLE ] ) )
+         SET ORDER TO ( aItem[ CFG_BRWIDXORD ] )
+         xScope := ( ::cFileDbf )->( FieldGet( FieldNum( aItem[ CFG_BRWKEYFROM ] ) ) )
+         nLenScope := ( ::cFileDbf )->( FieldLen( aItem[ CFG_BRWKEYFROM ] ) )
          IF ValType( xScope ) == "C"
             SET SCOPE TO xScope
          ELSE
@@ -295,21 +336,36 @@ METHOD UpdateEdit() CLASS frm_Class
 
    RETURN Nil
 
-METHOD Save() CLASS frm_Class
+METHOD DataSave() CLASS frm_Class
 
-   LOCAL aItem
+   LOCAL aItem, xValue
 
    ::EditOff()
    IF RLock()
       FOR EACH aItem IN ::aControlList
          DO CASE
-         CASE aItem[ CFG_CTLTYPE ] == TYPE_COMBOBOX
-
-         CASE aItem[ CFG_CTLTYPE ] != TYPE_EDIT // not editable
          CASE Empty( aItem[ CFG_FNAME ] )       // do not have name
+         CASE aItem[ CFG_CTLTYPE ] == TYPE_COMBOBOX
+            xValue := gui_ControlGetValue( ::xDlg, aItem[ CFG_FCONTROL ] )
+            IF xValue == 0 .OR. xValue > Len( aItem[ CFG_COMBOLIST ] )
+               xValue := Space( aItem[ CFG_FLEN ] )
+            ELSE
+               xValue := aItem[ CFG_COMBOLIST ][ xValue ]
+            ENDIF
+            fieldput( FieldNum( aItem[ CFG_FNAME ] ), xValue )
+         CASE aItem[ CFG_CTLTYPE ] == TYPE_CHECKBOX
+            xValue := gui_ControlGetValue( ::xDlg, aItem[ CFG_FCONTROL ] )
+            DO CASE
+            CASE aItem[ CFG_FTYPE ] == "L"
+            CASE aItem[ CFG_FTYPE ] == "N"; xValue := iif( xValue, 1, 0 )
+            CASE aItem[ CFG_FTYPE ] == "C"; xValue := iif( xValue, "Y", "N" )
+            ENDCASE
+            FieldPut( FieldNum( aItem[ CFG_FNAME ] ), xValue )
+         CASE hb_AScan( { TYPE_TEXT, TYPE_MLTEXT, TYPE_DATEPICKER, TYPE_SPINNER }, { | e | e == aItem[ CFG_CTLTYPE ] } ) == 0 // not "value"
          CASE aItem[ CFG_ISKEY ]
          OTHERWISE
-            FieldPut( FieldNum( aItem[ CFG_FNAME ] ), gui_TextGetValue( ::xDlg, aItem[ CFG_FCONTROL ] ) )
+            xValue := gui_ControlGetValue( ::xDlg, aItem[ CFG_FCONTROL ] )
+            FieldPut( FieldNum( aItem[ CFG_FNAME ] ), xValue )
          ENDCASE
       NEXT
       SKIP 0
@@ -318,3 +374,38 @@ METHOD Save() CLASS frm_Class
    ::cSelected := "NONE"
 
    RETURN Nil
+
+FUNCTION EmptyFrmClassItem()
+
+   LOCAL aItem := Array(29)
+
+   aItem[ CFG_FNAME ]      := ""
+   aItem[ CFG_FTYPE ]      := "C"
+   aItem[ CFG_FLEN ]       := 1
+   aItem[ CFG_FDEC ]       := 0
+   aItem[ CFG_ISKEY ]      := .F.
+   aItem[ CFG_FPICTURE ]   := ""
+   aItem[ CFG_CAPTION ]    := ""
+   aItem[ CFG_VALID ]      := {}
+   aItem[ CFG_VTABLE ]     := ""
+   aItem[ CFG_VFIELD ]     := ""
+   aItem[ CFG_VSHOW ]      := ""
+   //aItem[ CFG_VALUE ]      := Nil
+   aItem[ CFG_VLEN ]       := 0
+   aItem[ CFG_CTLTYPE ]    := TYPE_NONE
+   aItem[ CFG_SAVEONLY ]   := .F.
+   //aItem[ CFG_FCONTROL ]   := Nil
+   //aItem[ CFG_CCONTROL ]   := Nil
+   //aItem[ CFG_VCONTROL ]   := Nil
+   //aItem[ CFG_ACTION ]     := Nil
+   //aItem[ CFG_BRWTABLE ]   := Nil
+   //aItem[ CFG_BRWKEYFROM ] := Nil
+   //aItem[ CFG_BRWIDXORD ]  := Nil
+   //aItem[ CFG_BRWKEYTO ]   := Nil
+   //aItem[ CFG_BRWKEYTO2 ]  := Nil
+   //aItem[ CFG_BRWVALUE ]   := Nil
+   //aItem[ CFG_BRWEDIT ]    := Nil
+   //aItem[ CFG_BRWTITLE ]   := Nil
+
+   RETURN aItem
+

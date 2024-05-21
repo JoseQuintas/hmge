@@ -183,11 +183,11 @@
 
 #xtranslate GetDefaultFontName () ;
    => ;
-	GetSystemFont() \[1\]
+	GetSystemFont() \[1]
 
 #xtranslate GetDefaultFontSize () ;
    => ;
-	GetSystemFont() \[2\]
+	GetSystemFont() \[2]
 
 ///////////////////////////////////////////////////////////////////////////////
 

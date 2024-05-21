@@ -1372,7 +1372,7 @@ HB_FUNC( INITSPLITBOX )
    rbi.cbSize = sizeof( REBARINFO );   // Required when using this struct.
    rbi.fMask = 0;
    rbi.himl = ( HIMAGELIST ) NULL;
-   SendMessage( hwndRB, RB_SETBARINFO, 0, ( LPARAM ) & rbi );
+   SendMessage( hwndRB, RB_SETBARINFO, 0, ( LPARAM ) &rbi );
 
    hmg_ret_raw_HWND( hwndRB );
 }

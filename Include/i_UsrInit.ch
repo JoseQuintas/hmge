@@ -92,6 +92,7 @@
 		[ WIDTH <w> ] ;
 		[ HEIGHT <h> ] ;
 		CAPTION <caption> ;
+		[ <dummy:IMAGE, ICON> <cicon> ] ;
 		ACTION <action> ;
 		[ FONT <font> ] ;
 		[ SIZE <size> ] ;
@@ -103,7 +104,7 @@
 		[ <default: DEFAULT> ] ;
 	=>;
 	_DefineSplitButton(<(name)>,<row>,<col>,<caption>,<{action}>,<(parent)>,<.default.>,<w>,<h>, ;
-		<tooltip>, <font>, <size>, <.bold.>, <.italic.>, <.underline.>, <.strikeout.>)
+		<tooltip>, <font>, <size>, <.bold.>, <.italic.>, <.underline.>, <.strikeout.>, <cicon>)
 
 #undef BASEDEF_SPBUTTON
 

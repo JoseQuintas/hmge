@@ -15025,7 +15025,10 @@ METHOD Enabled( lEnab ) CLASS TSBrowse
       IF ! lEnab
 
          IF ::lEnabled
-            ::aOldEnabled := { ::hBrush, {}, ::nClrPane, {}, ::nClrLine }
+            ::aOldEnabled := { ::hBrush, {}, ::nClrPane, {}, ::nClrLine, NIL }
+            IF ::lSelector .AND. ::lDrawSpecHd
+              ::aOldEnabled[ 6 ] := ::nClrSpcHdBack
+            ENDIF
             FOR nI := 1 TO Len( ::aColumns )
                AAdd( ::aOldEnabled[ 2 ], ::aColumns[ nI ]:Clone() )
                ::aColumns[ nI ]:SaveColor()
@@ -15049,6 +15052,9 @@ METHOD Enabled( lEnab ) CLASS TSBrowse
          ::nClrPane := ::nCLR_HGRAY
          ::nClrLine := ::nCLR_Lines
          ::hBrush := CreateSolidBrush( GetRed( ::nClrPane ), GetGreen( ::nClrPane ), GetBlue( ::nClrPane ) )
+         IF ::lSelector .AND. ::lDrawSpecHd
+            ::nClrSpcHdBack := ::nCLR_HGRAY
+         ENDIF
 
       ELSE
 
@@ -15071,6 +15077,9 @@ METHOD Enabled( lEnab ) CLASS TSBrowse
                      ::aSuperHead[ ns ][ 5 ] := AS[ 2 ], ;
                      ::aSuperHead[ ns ][ 11 ] := AS[ 3 ] } )
                ENDIF
+            ENDIF
+            IF ::lSelector .AND. ::lDrawSpecHd
+               ::nClrSpcHdBack := ::aOldEnabled[ 6 ]
             ENDIF
          ENDIF
 

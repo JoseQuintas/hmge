@@ -5,98 +5,99 @@
 
 #include "minigui.ch"
 
-Function Main
+FUNCTION Main()
 
-define window tabsample at 0,0 width 400 height 300 title 'Add control test' main
+   DEFINE WINDOW tabsample AT 0, 0 WIDTH 400 HEIGHT 300 TITLE 'Add control test' MAIN
 
-   define tab tab1 at 10,10 width 370 height 200
+      DEFINE TAB tab1 AT 10, 10 WIDTH 370 HEIGHT 200
 
-      define page 'Page1'
+         DEFINE PAGE 'Page1'
 
-         define button b1
-            row 30
-            col 10
-            caption 'Press here to add a control'
-            width 180
-            action addnewcontrols({'lbl1','text1'})
-         end button   
+            DEFINE BUTTON b1
+               ROW 30
+               COL 10
+               CAPTION 'Press here to add a control'
+               WIDTH 180
+               ACTION addnewcontrols( { 'lbl1', 'text1' } )
+            END BUTTON
 
-      end page
+         END PAGE
 
-      define page 'Page2'
-      
-         define button b2
-            row 30
-            col 10
-            caption 'Press here to add a control'
-            width 180
-            action addnewcontrol2('btn1')
-         end button   
+         DEFINE PAGE 'Page2'
 
-      end page
+            DEFINE BUTTON b2
+               ROW 30
+               COL 10
+               CAPTION 'Press here to add a control'
+               WIDTH 180
+               ACTION addnewcontrol2( 'btn1' )
+            END BUTTON
 
-   end tab
+         END PAGE
 
-   on key escape action thiswindow.release()
+      END TAB
 
-end window
+      ON KEY ESCAPE ACTION thiswindow.release()
 
-tabsample.center
-tabsample.activate
+   END WINDOW
 
-Return nil
+   tabsample.center()
+   tabsample.activate()
 
-
-function addnewcontrols(actrl)
-local c1, c2
-
-c1 := actrl[1]
-c2 := actrl[2]
-
-if iscontroldefined(&c1,tabsample)
-   tabsample.&(c1).release
-endif
-
-define label &c1
-   parent tabsample
-   row 50
-   col 10
-   width 40
-   value 'label'
-end label
-
-if iscontroldefined(&c2,tabsample)
-   tabsample.&(c2).release
-endif
-
-define textbox &c2
-   parent tabsample
-   row 50
-   col 50
-   width 100
-end textbox
-
-tabsample.tab1.addcontrol(c1,1,84,10)
-tabsample.tab1.addcontrol(c2,1,80,50)
-
-return nil
+RETURN NIL
 
 
-function addnewcontrol2(ctrl)
+FUNCTION addnewcontrols( actrl )
 
-if iscontroldefined(&ctrl,tabsample)
-   tabsample.&(ctrl).release
-endif
+   LOCAL c1, c2
 
-define buttonex &ctrl
-   parent tabsample
-   row 10
-   col 10
-   width 180
-   caption 'Click me'
-   action MsgBox('Button action','Result')
-end buttonex
+   c1 := actrl[ 1 ]
+   c2 := actrl[ 2 ]
 
-tabsample.tab1.addcontrol(ctrl,2,80,10)
+   IF iscontroldefined( &c1, tabsample )
+      tabsample.&( c1 ).release()
+   ENDIF
 
-return nil
+   DEFINE LABEL &c1
+      parent tabsample
+      ROW 50
+      COL 10
+      WIDTH 40
+      VALUE 'label'
+   END LABEL
+
+   IF iscontroldefined( &c2, tabsample )
+      tabsample.&( c2 ).RELEASE
+   ENDIF
+
+   DEFINE TEXTBOX &c2
+      parent tabsample
+      ROW 50
+      COL 50
+      WIDTH 100
+   END TEXTBOX
+
+   tabsample.tab1.addcontrol( c1, 1, 84, 10 )
+   tabsample.tab1.addcontrol( c2, 1, 80, 50 )
+
+RETURN NIL
+
+
+FUNCTION addnewcontrol2( ctrl )
+
+   IF iscontroldefined( &ctrl, tabsample )
+      tabsample.&( ctrl ).release()
+   ENDIF
+
+   DEFINE BUTTONEX &ctrl
+      parent tabsample
+      ROW 10
+      COL 10
+      WIDTH 180
+      CAPTION 'Click me'
+      ACTION MsgBox( 'Button action', 'Result' )
+   END BUTTONEX
+
+   tabsample.tab1.addcontrol( ctrl, 2, 80, 10 )
+
+RETURN NIL

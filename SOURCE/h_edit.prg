@@ -682,8 +682,8 @@ STATIC FUNCTION ABMRefresh( nEstado )
       NEXT
 
       // Numero de registro y total.
-      wndABM.lblRegistro.VALUE := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
-      wndABM.lblTotales.VALUE := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
+      wndABM.lblRegistro.Value := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
+      wndABM.lblTotales.Value := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
 
       // Modo de edición.----------------------------------------------------
    CASE nEstado == ABM_MODO_EDITAR
@@ -707,8 +707,8 @@ STATIC FUNCTION ABMRefresh( nEstado )
       NEXT
 
       // Numero de registro y total.
-      wndABM.lblRegistro.VALUE := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
-      wndABM.lblTotales.VALUE := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
+      wndABM.lblRegistro.Value := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
+      wndABM.lblTotales.Value := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
 
       // Control de error.---------------------------------------------------
    OTHERWISE
@@ -745,7 +745,7 @@ STATIC FUNCTION ABMEventos( nEvento )
    CASE nEvento == ABM_EVENTO_NUEVO
       _lEditar := .F.
       cModo := _HMG_aABMLangLabel[ 3 ]
-      wndABM.TITLE := wndABM.TITLE + cModo
+      wndABM.Title := wndABM.Title + cModo
 
       // Pasa a modo de edición.
       ABMRefresh( ABM_MODO_EDITAR )
@@ -773,7 +773,7 @@ STATIC FUNCTION ABMEventos( nEvento )
    CASE nEvento == ABM_EVENTO_EDITAR
       _lEditar := .T.
       cModo := _HMG_aABMLangLabel[ 4 ]
-      wndABM.TITLE := wndABM.TITLE + cModo
+      wndABM.Title := wndABM.Title + cModo
 
       // Pasa a modo de edicion.
       ABMRefresh( ABM_MODO_EDITAR )
@@ -809,7 +809,7 @@ STATIC FUNCTION ABMEventos( nEvento )
 
       // Refresca.
       wndABM.brwBrowse.Refresh
-      wndABM.brwBrowse.VALUE := ( _cArea )->( RecNo() )
+      wndABM.brwBrowse.Value := ( _cArea )->( RecNo() )
 
       // Pulsación del botón BUSCAR.-----------------------------------------
    CASE nEvento == ABM_EVENTO_BUSCAR
@@ -821,7 +821,7 @@ STATIC FUNCTION ABMEventos( nEvento )
          ENDIF
       ELSE
          Eval( _bBuscar )
-         wndABM.brwBrowse.VALUE := ( _cArea )->( RecNo() )
+         wndABM.brwBrowse.Value := ( _cArea )->( RecNo() )
       ENDIF
 
       // Pulsación del botón IR AL REGISTRO.---------------------------------
@@ -831,7 +831,7 @@ STATIC FUNCTION ABMEventos( nEvento )
          nRegistro := Val( cRegistro )
          IF ( nRegistro != 0 ) .AND. ( nRegistro <= ( _cArea )->( RecCount() ) )
             ( _cArea )->( dbGoto( nRegistro ) )
-            wndABM.brwBrowse.VALUE := nRegistro
+            wndABM.brwBrowse.Value := nRegistro
          ENDIF
       ENDIF
 
@@ -842,30 +842,30 @@ STATIC FUNCTION ABMEventos( nEvento )
       // Pulsación del botón PRIMERO.----------------------------------------
    CASE nEvento == ABM_EVENTO_PRIMERO
       ( _cArea )->( dbGoTop() )
-      wndABM.brwBrowse.VALUE := ( _cArea )->( RecNo() )
-      wndABM.lblRegistro.VALUE := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
-      wndABM.lblTotales.VALUE := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
+      wndABM.brwBrowse.Value := ( _cArea )->( RecNo() )
+      wndABM.lblRegistro.Value := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
+      wndABM.lblTotales.Value := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
 
       // Pulsación del botón ANTERIOR.---------------------------------------
    CASE nEvento == ABM_EVENTO_ANTERIOR
       ( _cArea )->( dbSkip( -1 ) )
-      wndABM.brwBrowse.VALUE := ( _cArea )->( RecNo() )
-      wndABM.lblRegistro.VALUE := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
-      wndABM.lblTotales.VALUE := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
+      wndABM.brwBrowse.Value := ( _cArea )->( RecNo() )
+      wndABM.lblRegistro.Value := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
+      wndABM.lblTotales.Value := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
 
       // Pulsación del botón SIGUIENTE.--------------------------------------
    CASE nEvento == ABM_EVENTO_SIGUIENTE
       ( _cArea )->( dbSkip( 1 ) )
-      wndABM.brwBrowse.VALUE := ( _cArea )->( RecNo() )
-      wndABM.lblRegistro.VALUE := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
-      wndABM.lblTotales.VALUE := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
+      wndABM.brwBrowse.Value := ( _cArea )->( RecNo() )
+      wndABM.lblRegistro.Value := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
+      wndABM.lblTotales.Value := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
 
       // Pulsación del botón ULTIMO.-----------------------------------------
    CASE nEvento == ABM_EVENTO_ULTIMO
       ( _cArea )->( dbGoBottom() )
-      wndABM.brwBrowse.VALUE := ( _cArea )->( RecNo() )
-      wndABM.lblRegistro.VALUE := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
-      wndABM.lblTotales.VALUE := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
+      wndABM.brwBrowse.Value := ( _cArea )->( RecNo() )
+      wndABM.lblRegistro.Value := AllTrim( Str( ( _cArea )->( RecNo() ) ) )
+      wndABM.lblTotales.Value := AllTrim( Str( ( _cArea )->( RecCount() ) ) )
 
       // Pulsación del botón GUARDAR.----------------------------------------
    CASE nEvento == ABM_EVENTO_GUARDAR
@@ -886,9 +886,9 @@ STATIC FUNCTION ABMEventos( nEvento )
             ( _cArea )->( dbUnlock() )
 
             // Refresca el browse.
-            wndABM.brwBrowse.VALUE := ( _cArea )->( RecNo() )
+            wndABM.brwBrowse.Value := ( _cArea )->( RecNo() )
             wndABM.brwBrowse.Refresh
-            wndABM.TITLE := SubStr( wndABM.TITLE, 1, Len( wndABM.Title ) - 12 )
+            wndABM.Title := SubStr( wndABM.Title, 1, Len( wndABM.Title ) - 12 )
 
          ELSE
 
@@ -908,9 +908,9 @@ STATIC FUNCTION ABMEventos( nEvento )
             ( _cArea )->( dbCommit() )
 
             // Refresca el browse.
-            wndABM.brwBrowse.VALUE := ( _cArea )->( RecNo() )
+            wndABM.brwBrowse.Value := ( _cArea )->( RecNo() )
             wndABM.brwBrowse.Refresh
-            wndABM.TITLE := SubStr( wndABM.TITLE, 1, Len( wndABM.Title ) - 12 )
+            wndABM.Title := SubStr( wndABM.Title, 1, Len( wndABM.Title ) - 12 )
          ENDIF
       ENDIF
 
@@ -919,8 +919,8 @@ STATIC FUNCTION ABMEventos( nEvento )
 
       // Pasa a modo de visualización.
       ABMRefresh( ABM_MODO_VER )
-      IF "(" $ wndABM.TITLE
-         wndABM.TITLE := SubStr( wndABM.TITLE, 1, Len( wndABM.Title ) - 12 )
+      IF "(" $ wndABM.Title
+         wndABM.Title := SubStr( wndABM.Title, 1, Len( wndABM.Title ) - 12 )
       ENDIF
       DoMethod( "wndABM", "brwBrowse", "SetFocus" )
 
@@ -1069,7 +1069,7 @@ STATIC FUNCTION ABMBusqueda()
 
    // Cierra y actualiza.---------------------------------------------------------
    wndABMBuscar.RELEASE
-   wndABM.brwBrowse.VALUE := nRegistro
+   wndABM.brwBrowse.Value := nRegistro
 
 RETURN ( nil )
 
@@ -1263,24 +1263,24 @@ FUNCTION ABMListadoEvento( nEvento )
       // Añadir columna.-----------------------------------------------------
    CASE nEvento == ABM_LISTADO_MAS
       IF .NOT. ( wndABMListado.lbxCampos.ItemCount == 0 .OR. ;
-            wndABMListado.lbxCampos.VALUE == 0 )
-         nItem := wndABMListado.lbxCampos.VALUE
+            wndABMListado.lbxCampos.Value == 0 )
+         nItem := wndABMListado.lbxCampos.Value
          cItem := wndABMListado.lbxCampos.Item( nItem )
          wndABMListado.lbxListado.addItem( cItem )
          DELETE ITEM nItem FROM lbxCampos OF wndABMListado
-         wndABMListado.lbxCampos.VALUE := iif( nItem < wndABMListado.lbxCampos.ItemCount, nItem, wndABMListado.lbxCampos.ItemCount )
+         wndABMListado.lbxCampos.Value := iif( nItem < wndABMListado.lbxCampos.ItemCount, nItem, wndABMListado.lbxCampos.ItemCount )
          wndABMListado.lbxCampos.setFocus
       ENDIF
 
       // Quitar columna.-----------------------------------------------------
    CASE nevento == ABM_LISTADO_MENOS
       IF .NOT. ( wndABMListado.lbxListado.ItemCount == 0 .OR. ;
-            wndABMListado.lbxListado.VALUE == 0 )
-         nItem := wndABMListado.lbxListado.VALUE
+            wndABMListado.lbxListado.Value == 0 )
+         nItem := wndABMListado.lbxListado.Value
          cItem := wndABMListado.lbxListado.Item( nItem )
          wndABMListado.lbxCampos.addItem( cItem )
          DELETE ITEM nItem FROM lbxListado OF wndABMListado
-         wndABMListado.lbxListado.VALUE := iif( nItem < wndABMListado.lbxListado.ItemCount, nItem, wndABMListado.lbxListado.ItemCount )
+         wndABMListado.lbxListado.Value := iif( nItem < wndABMListado.lbxListado.ItemCount, nItem, wndABMListado.lbxListado.ItemCount )
          wndABMListado.lbxListado.setFocus
       ENDIF
 

@@ -352,7 +352,7 @@ HB_FUNC( COMBOADDSTRINGEX )
    cbei.iOverlay = ( nImage - 1 ) * 3 + 2;
    cbei.iIndent = 0;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), CBEM_INSERTITEM, 0, ( LPARAM ) & cbei );
+   SendMessage( hmg_par_raw_HWND( 1 ), CBEM_INSERTITEM, 0, ( LPARAM ) &cbei );
 #ifdef UNICODE
    hb_xfree( lpText );
 #endif
@@ -377,7 +377,7 @@ HB_FUNC( COMBOINSERTSTRINGEX )
    cbei.iOverlay = ( nImage - 1 ) * 3 + 2;
    cbei.iIndent = 0;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), CBEM_INSERTITEM, 0, ( LPARAM ) & cbei );
+   SendMessage( hmg_par_raw_HWND( 1 ), CBEM_INSERTITEM, 0, ( LPARAM ) &cbei );
 #ifdef UNICODE
    hb_xfree( lpText );
 #endif
@@ -401,7 +401,7 @@ HB_FUNC( COMBOADDDATASTRINGEX )
    cbei.iOverlay = 2;
    cbei.iIndent = 0;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), CBEM_INSERTITEM, 0, ( LPARAM ) & cbei );
+   SendMessage( hmg_par_raw_HWND( 1 ), CBEM_INSERTITEM, 0, ( LPARAM ) &cbei );
 #ifdef UNICODE
    hb_xfree( lpText );
 #endif

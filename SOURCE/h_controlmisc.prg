@@ -251,11 +251,16 @@ FUNCTION _GetValue ( ControlName, ParentForm, Index )
    CASE T == "GETBOX"
       oGet := _HMG_aControlHeadClick [ix]
       retval := oGet:VarGet()
+
 #ifdef _TSBROWSE_
    CASE T == "TBROWSE"
       oGet := _HMG_aControlIds [ix]
       retval := oGet:GetValue( oGet:nCell )
 #endif
+
+   CASE T == "HYPERLINK"
+      retval := _GetCaption ( ControlName , ParentForm )
+
    CASE T == "HOTKEYBOX"
       retval := C_GetHotKey ( c )
 
@@ -2689,7 +2694,15 @@ FUNCTION _SetControlCaption ( ControlName , ParentForm , Value )
          // This assignment should be placed before a caption setting
          _HMG_aControlCaption [i] := cValue
 
-         SetWindowText ( GetControlHandle ( ControlName , ParentForm ) , cValue )
+         IF _HMG_aControlType [i] $ 'MENU,POPUP'
+            IF IsExtendedMenuStyleActive ()
+               _SetMenuItemCaption ( ControlName , ParentForm , cValue )
+            ELSE
+               _ChangeMenuItemCaption ( ControlName , ParentForm , cValue )
+            ENDIF
+         ELSE
+            SetWindowText ( GetControlHandle ( ControlName , ParentForm ) , cValue )
+         ENDIF
 
       ENDIF
 
@@ -8188,10 +8201,14 @@ FUNCTION _EnableListViewUpdate ( ControlName, ParentForm, lEnable )
    t := _HMG_aControlType [i]
 
    IF "GRID" $ t .OR. t == "COMBO" .OR. "BROWSE" $ t .OR. t == "TREE"
+
       SendMessage ( _HMG_aControlHandles [i], WM_SETREDRAW, iif( lEnable, 1, 0 ), 0 )
       _HMG_aControlEnabled [i] := lEnable
+
    ELSE
+
       MsgMiniGuiError ( "Method " + iif( lEnable, "En", "Dis" ) + "ableUpdate is not available for control " + ControlName )
+
    ENDIF
 
 RETURN NIL
@@ -8214,6 +8231,7 @@ FUNCTION _ExtDisableControl ( ControlName, ParentForm )
       IF icp <> icpe
          SendMessage ( hWnd , EM_SETSEL , icpe , icpe )
       ENDIF
+
       HideCaret ( hWnd )
 #ifdef _DBFBROWSE_
       IF GetControlType ( ControlName, ParentForm ) == "BROWSE"
@@ -8237,6 +8255,7 @@ FUNCTION _ExtEnableControl ( ControlName, ParentForm )
    IF ! IsWindowEnabled ( hWnd )
 
       ChangeStyle ( hWnd, , WS_DISABLED, .F. )
+
       ShowCaret ( hWnd )
 #ifdef _DBFBROWSE_
       IF GetControlType ( ControlName, ParentForm ) == "BROWSE"
@@ -8322,9 +8341,7 @@ FUNCTION _GetId ( nMax )
    hb_default( @nMax, 65536 )
 
    REPEAT
-
       nRetVal := Random ( nMax )
-
    UNTIL ( AScan ( _HMG_aControlIds, nRetVal ) <> 0 )
 
 RETURN nRetVal
@@ -8443,11 +8460,8 @@ STATIC FUNCTION _SetGetImageHBitmap ( ControlName , ParentForm , hBitmap )
    IF ( i := GetControlIndex ( ControlName , ParentForm ) ) > 0 .AND. _HMG_aControlType [i] == "IMAGE"
 
       IF PCount() == 2
-
          RetVal := _HMG_aControlBrushHandle [i]
-
       ELSE
-
          IF GetObjectType( _HMG_aControlBrushHandle [i] ) == OBJ_BITMAP
             DeleteObject ( _HMG_aControlBrushHandle [i] )
          ENDIF
@@ -8461,7 +8475,6 @@ STATIC FUNCTION _SetGetImageHBitmap ( ControlName , ParentForm , hBitmap )
             _HMG_aControlWidth [i] := GetWindowWidth ( hWnd )
             _HMG_aControlHeight [i] := GetWindowHeight ( hWnd )
          ENDIF
-
       ENDIF
 
    ENDIF
@@ -8488,8 +8501,14 @@ FUNCTION _GetCaption ( ControlName , ParentForm )
    IF ( i := GetControlIndex ( ControlName , ParentForm ) ) > 0
 
       IF _HMG_aControlType [i] == 'TOOLBAR' .OR. _HMG_aControlType [i] == 'TOOLBUTTON' .OR. ;
-         _HMG_aControlType [i] == 'MENU' .OR. _HMG_aControlType [i] == 'RADIOGROUP'
-         cRetVal := _HMG_aControlCaption [i]
+         _HMG_aControlType [i] $ 'MENU,POPUP' .OR. _HMG_aControlType [i] == 'RADIOGROUP'
+
+         IF _HMG_aControlType [i] $ 'MENU,POPUP' .AND. IsExtendedMenuStyleActive ()
+            cRetVal := _GetMenuItemCaption ( ControlName , ParentForm )
+         ELSE
+            cRetVal := _HMG_aControlCaption [i]
+         ENDIF
+
       ELSE
          cRetVal := GetWindowText ( _HMG_aControlHandles [i] )
       ENDIF
@@ -8522,10 +8541,8 @@ FUNCTION _IsControlEnabled ( ControlName, ParentForm, Position )
 
    IF t == 'MENU'
       RetVal := _IsMenuItemEnabled ( ControlName, ParentForm )
-
    ELSEIF t == 'RADIOGROUP'
       RetVal := IsWindowEnabled( _HMG_aControlHandles [i] [hb_defaultValue( Position, 1 )] )
-
    ELSEIF t == 'TAB' .AND. ISNUMBER( Position )
       FOR EACH w IN _HMG_aControlPageMap [i] [Position]
 
@@ -8545,10 +8562,8 @@ FUNCTION _IsControlEnabled ( ControlName, ParentForm, Position )
          ENDIF
 
       NEXT
-
    ELSE
       RetVal := _HMG_aControlEnabled [i]
-
    ENDIF
 
 RETURN RetVal

@@ -254,7 +254,7 @@ RETURN ( GetMajorVersion() == 10 .AND. GetBuildNumber() < 22000 )
 FUNCTION IsWin11()
 *--------------------------------------------------------*
 
-RETURN iif( GetMajorVersion() == 10, '11' $ GetWinVersionString(), .F. )
+RETURN hb_osIsWin11()
 
 
 #pragma BEGINDUMP

@@ -1,0 +1,32 @@
+# Keys compile
+-prgflag=-w2 -es1 
+
+# Enable multi/single-thread Harbour VM
+-mt 
+
+# Incremental-compilation mode
+-inc
+
+# folder where are all * .obj
+-workdir=OBJ
+
+# Name EXE-module
+-odemo
+
+# to list all * .prg
+demo.prg
+Column_TSB.prg
+demo_tsb.prg
+demo_menu.prg
+demo_menu_find.prg
+demo_print.prg
+demos_util.prg
+demos_about.prg
+demos_use.prg
+demo2_tsb_func.prg
+util_button.prg
+util_keychar.prg
+cell_edit_memo.prg
+
+# project Resources
+#demo.rc

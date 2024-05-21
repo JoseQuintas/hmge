@@ -65,6 +65,7 @@ INIT PROCEDURE ClipInit()
 
    ENDIF
 
+   AltD( 1 )
    Init()
 
 RETURN
@@ -111,7 +112,7 @@ STATIC FUNCTION HMG_GenError( cMsg )
 
 RETURN oError
 
-#define MG_VERSION "Harbour MiniGUI Extended Edition 24.04 ("
+#define MG_VERSION "Harbour MiniGUI Extended Edition 24.05 ("
 
 *-----------------------------------------------------------------------------*
 FUNCTION MiniGuiVersion( nVer )
@@ -124,6 +125,10 @@ FUNCTION MiniGuiVersion( nVer )
    LOCAL anOfs
 
    cVer += " " + HMG_CharsetName()
+
+   IF Set( _SET_DEBUG )
+      cVer += " (DEBUG)"
+   ENDIF
 #ifdef _LITE_
    cVer += " (Lite)"
 #endif

@@ -4,11 +4,10 @@ frm_buttons - create the buttons
 
 #include "frm_class.ch"
 
-FUNCTION frm_Buttons( Self, lDefault )
+FUNCTION frm_Buttons( Self )
 
    LOCAL nRow, nCol, nRowLine := 1, aItem, aList := {}
 
-   hb_Default( @lDefault, .T. )
    IF "I" $ ::cOptions
       AAdd( aList, { "Insert",   { || ::Insert() } } )
    ENDIF
@@ -18,7 +17,7 @@ FUNCTION frm_Buttons( Self, lDefault )
    IF "D" $ ::cOptions
       AAdd( aList, { "Delete",   { || ::Delete() } } )
    ENDIF
-   IF lDefault
+   IF ::lNavigate
       AAdd( aList, { "View",     { || ::View() } } )
       AAdd( aList, { "First",    { || ::First() } } )
       AAdd( aList, { "Previous", { || ::Previous() } } )
@@ -31,8 +30,8 @@ FUNCTION frm_Buttons( Self, lDefault )
    FOR EACH aItem IN ::aOptionList
       AAdd( aList, { aItem[1], aItem[2] } )
    NEXT
-   IF "E" $ ::cOptions
-      AAdd( aList, { "Save",     { || ::Save() } } )
+   IF "E" $ ::cOptions .OR. "S" $ ::cOptions
+      AAdd( aList, { "Save",     { || ::DataSave() } } )
       AAdd( aList, { "Cancel",   { || ::Cancel() } } )
    ENDIF
    AAdd( aList, { "Exit",     { || ::Exit() } } )
@@ -40,7 +39,7 @@ FUNCTION frm_Buttons( Self, lDefault )
    nCol := 10
    nRow := 10
    FOR EACH aItem IN aList
-      AAdd( ::aControlList, CFG_EMPTY )
+      AAdd( ::aControlList, EmptyFrmClassItem() )
       Atail( ::aControlList )[ CFG_CTLTYPE ]  := TYPE_BUTTON
       Atail( ::aControlList )[ CFG_CAPTION ] := aItem[1]
       Atail( ::aControlList )[ CFG_ACTION ]   := aItem[ 2 ]
@@ -49,15 +48,15 @@ FUNCTION frm_Buttons( Self, lDefault )
       IF aItem[ CFG_CTLTYPE ] != TYPE_BUTTON
          LOOP
       ENDIF
-      gui_ButtonCreate( ::xDlg, @aItem[ CFG_FCONTROL ], nRow, nCol, ::nButtonSize, ::nButtonSize, ;
+      gui_ButtonCreate( ::xDlg, @aItem[ CFG_FCONTROL ], nRow, nCol, APP_BUTTON_SIZE, APP_BUTTON_SIZE, ;
          aItem[ CFG_CAPTION ], IconFromCaption( aItem[ CFG_CAPTION ] ), aItem[ CFG_ACTION ] )
 
-      IF nCol > ::nDlgWidth - ( ::nButtonSize - ::nButtonSpace ) * 2
+      IF nCol > APP_DLG_WIDTH - ( APP_BUTTON_SIZE - APP_BUTTON_BETWEEN ) * 2
          nRowLine += 1
-         nRow += ::nButtonSize + ::nButtonSpace
-         nCol := ::nDlgWidth - ::nButtonSize - ::nButtonSpace
+         nRow += APP_BUTTON_SIZE + APP_BUTTON_BETWEEN
+         nCol := APP_DLG_WIDTH - APP_BUTTON_SIZE - APP_BUTTON_BETWEEN
       ENDIF
-      nCol += iif( nRowLine == 1, 1, -1 ) * ( ::nButtonSize + ::nButtonSpace )
+      nCol += iif( nRowLine == 1, 1, -1 ) * ( APP_BUTTON_SIZE + APP_BUTTON_BETWEEN )
    NEXT
 
    RETURN Nil

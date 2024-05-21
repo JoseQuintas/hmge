@@ -3,15 +3,17 @@ lib_hmge - HMG Extended source selected by lib.prg
 */
 
 #include "frm_class.ch"
+#include "hmg.ch"
 #include "i_winuser.ch"
 
 FUNCTION gui_Init()
 
-   SET NAVIGATION EXTENDED
-   //SET OOP ON
-   SET WINDOW MAIN OFF
-   //SET WINDOW MODAL PARENT HANDLE ON
+#ifdef DLGAUTO_AS_LIB
+   Init()
+#endif
    SET GETBOX FOCUS BACKCOLOR TO {255,255,0}
+   SET MENUSTYLE EXTENDED
+   SET NAVIGATION EXTENDED
 
    RETURN Nil
 
@@ -19,19 +21,25 @@ FUNCTION gui_DlgMenu( xDlg, aMenuList, aAllSetup, cTitle )
 
    LOCAL aGroupList, cDBF
 
-   gui_DialogCreate( @xDlg, 0, 0,1024, 768, cTitle )
+   gui_DialogCreate( @xDlg, 0, 0,1024, 768, cTitle,,,.T. )
 
    DEFINE MAIN MENU OF ( xDlg )
       FOR EACH aGroupList IN aMenuList
          DEFINE POPUP "Data" + Ltrim( Str( aGroupList:__EnumIndex ) )
             FOR EACH cDBF IN aGroupList
-               MENUITEM cDBF ACTION frm_Main( cDBF, aAllSetup )
+               MENUITEM cDBF ACTION frm_Main( cDBF, aAllSetup ) ICON "ICOWINDOW"
             NEXT
          END POPUP
       NEXT
       DEFINE POPUP "Sair"
-         MENUITEM "Sair" ACTION gui_DialogClose( xDlg )
+         MENUITEM "Sair" ACTION gui_DialogClose( xDlg ) ICON "ICODOOR"
       END POPUP
+      DEFINE MONTHCALENDAR ( gui_NewName( "MON" ) )
+         PARENT ( xDlg )
+         COL 400
+         ROW 400
+         VALUE Date()
+      END MONTHCALENDAR
    END MENU
 
    gui_DialogActivate( xDlg )
@@ -41,8 +49,9 @@ FUNCTION gui_DlgMenu( xDlg, aMenuList, aAllSetup, cTitle )
 FUNCTION gui_ButtonCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, cCaption, cResName, bAction )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "BTN" )
+      xControl := gui_NewName( "BTN" )
    ENDIF
+
    DEFINE BUTTONEX ( xControl )
       PARENT ( xDlg )
       ROW         nRow
@@ -54,8 +63,8 @@ FUNCTION gui_ButtonCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, cCaption
       IMAGEHEIGHT -1
       CAPTION     cCaption
       ACTION      Eval( bAction )
-      FONTNAME    DEFAULT_FONTNAME
-      FONTSIZE    9
+      FONTNAME    APP_FONTNAME
+      FONTSIZE    7
       FONTBOLD    .T.
       FONTCOLOR   COLOR_BLACK
       VERTICAL   .T.
@@ -66,19 +75,16 @@ FUNCTION gui_ButtonCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, cCaption
 
    RETURN Nil
 
-FUNCTION gui_ButtonEnable( xDlg, xControl, lEnable )
+FUNCTION gui_Browse( xDlg, xParent, xControl, nRow, nCol, nWidth, ;
+   nHeight, oTbrowse, cField, xValue, workarea, aKeyDownList, Self )
 
-   SetProperty( xDlg, xControl, "ENABLED", lEnable )
-
-   RETURN Nil
-
-FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, ;
-   cField, xValue, workarea, aKeyCodeList, aDlgKeyCodeList )
-
-   LOCAL aHeaderList := {}, aWidthList := {}, aFieldList := {}, aItem
+   LOCAL aHeaderList := {}, aWidthList := {}, aFieldList := {}, aItem, aThisKey
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "BRW" )
+      xControl := gui_NewName( "BRW" )
+   ENDIF
+   IF ValType( aKeyDownList ) != "A"
+      aKeyDownList := {}
    ENDIF
    FOR EACH aItem IN oTbrowse
       AAdd( aHeaderList, aItem[1] )
@@ -88,13 +94,12 @@ FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, ;
    NEXT
 
    DEFINE BROWSE ( xControl )
-      PARENT ( xDlg )
+      PARENT ( xParent )
       ROW nRow
       COL nCol
       WIDTH nWidth - 20
       HEIGHT nHeight - 20
-      IF ValType( aKeyCodeList ) != "A"
-         aKeyCodeList := {}
+      IF Len( aKeyDownList ) == 0
          ONDBLCLICK gui_BrowseDblClick( xDlg, xControl, workarea, cField, @xValue )
       ENDIF
       HEADERS aHeaderList
@@ -103,32 +108,47 @@ FUNCTION gui_Browse( xDlg, xControl, nRow, nCol, nWidth, nHeight, oTbrowse, ;
       FIELDS aFieldList
       SET BROWSESYNC ON
    END BROWSE
-   FOR EACH aItem IN aKeyCodeList
-      AAdd( aDlgKeyCodeList, { xControl, aItem[ 1 ], aItem[ 2 ] } )
-      _DefineHotKey( xDlg, 0, aItem[ 1 ], ;
-         { || gui_DlgKeyDown( xDlg, xControl, aItem[ 1 ], workarea, cField, xValue, aDlgKeyCodeList ) } )
+   /* create buttons on browse for defined keys */
+   IF Len( aKeyDownList ) != 0
+      FOR EACH aThisKey IN aKeyDownList
+         AAdd( ::aControlList, EmptyFrmClassItem() )
+         Atail( ::aControlList )[ CFG_CTLTYPE ] := TYPE_BUTTON
+         Atail( ::aControlList )[ CFG_FCONTROL ] := gui_NewName( "BTNBRW" )
+         gui_ButtonCreate( xDlg, @Atail( ::aControlList )[ CFG_FCONTROL ], ;
+         nRow - APP_LINE_SPACING, 200 + aThisKey:__EnumIndex() * APP_LINE_HEIGHT, APP_LINE_HEIGHT - 2, APP_LINE_HEIGHT - 2, "", ;
+         iif( aThisKey[1] == VK_INSERT, "ICOPLUS", ;
+         iif( aThisKey[1] == VK_DELETE, "ICOTRASH", ;
+         iif( aThiskey[1] == VK_RETURN, "ICOEDIT", Nil ) ) ), aThisKey[2] )
+      NEXT
+   ENDIF
+   /* redefine keys with cumulative actions */
+   FOR EACH aItem IN aKeyDownList
+      AAdd( ::aDlgKeyDown, { xControl, aItem[ 1 ], aItem[ 2 ] } )
    NEXT
 
-
-   (xDlg);(cField);(xValue);(workarea);(aKeyCodeList)
+   (xDlg);(cField);(xValue);(workarea);(aKeyDownList)
 
    RETURN Nil
 
-STATIC FUNCTION gui_DlgKeyDown( xDlg, xControl, nKey, workarea, cField, xValue, aDlgKeyCodeList )
+STATIC FUNCTION gui_DlgKeyDown( xControl, nKey, Self )
 
-   LOCAL nPos, cType
+   LOCAL nPos, cType, cFocusedControl
 
-   nPos := hb_AScan( aDlgKeyCodeList, { | e | GetProperty( xDlg, "FOCUSEDCONTROL" ) == e[1] .AND. nKey == e[ 2 ] } )
+   cFocusedControl := GetProperty( ::xDlg, "FOCUSEDCONTROL" )
+   nPos := hb_AScan( ::aDlgKeyDown, { | e | cFocusedControl == e[1] .AND. nKey == e[ 2 ] } )
    IF nPos != 0
-      Eval( aDlgKeyCodeList[ nPos ][ 3 ], cField, @xValue, xDlg, xControl )
+      IF GetProperty( ::xDlg, cFocusedControl, "ENABLED" )
+         Eval( ::aDlgKeyDown[ nPos ][ 3 ] )
+      ENDIF
    ENDIF
-   IF nKey == VK_RETURN .AND. hb_ASCan( aDlgKeyCodeList, { | e | e[ 2 ] == VK_RETURN } ) != 0
-      cType := GetProperty( xDlg, GetProperty( xDlg, "FOCUSEDCONTROL" ), "TYPE" )
-      IF hb_AScan( { "GETBOX", "MASKEDTEXT", "TEXT" }, { | e | e == cType } ) != 0
+   IF nKey == VK_RETURN .AND. hb_ASCan( ::aDlgKeyDown, { | e | e[ 2 ] == VK_RETURN } ) != 0
+      cType := GetProperty( ::xDlg, cFocusedControl, "TYPE" )
+      /* ENTER next focus, because a defined key can change default */
+      IF hb_AScan( { "GETBOX", "MASKEDTEXT", "TEXT", "SPINNER", "DATEPICKER", "CHECKBOX" }, { | e | e == cType } ) != 0
          _SetNextFocus()
       ENDIF
    ENDIF
-   (xControl); (workarea)
+   (xControl)
 
    RETURN .T.
 
@@ -146,6 +166,7 @@ FUNCTION gui_BrowseDblClick( xDlg, xControl, workarea, cField, xValue )
 
 FUNCTION gui_BrowseRefresh( xDlg, xControl )
 
+   // on older hmge versions, need to set browse value/recno()
    SetProperty( xDlg, xControl, "VALUE", RecNo() )
    DoMethod( xDlg, xControl, "REFRESH" )
    (xDlg)
@@ -155,8 +176,9 @@ FUNCTION gui_BrowseRefresh( xDlg, xControl )
 FUNCTION gui_CheckboxCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight )
 
    IF Empty( xControl )
-      xControl := gui_NewCtlName( "CHK" )
+      xControl := gui_NewName( "CHK" )
    ENDIF
+
    DEFINE CHECKBOX ( xControl )
       PARENT ( xDlg )
       Row nRow
@@ -171,8 +193,9 @@ FUNCTION gui_CheckboxCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight )
 FUNCTION gui_ComboCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, aList )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "CBO" )
+      xControl := gui_NewName( "CBO" )
    ENDIF
+
    DEFINE COMBOBOX ( xControl )
       PARENT ( xDlg )
       ROW nRow
@@ -182,30 +205,63 @@ FUNCTION gui_ComboCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, aList )
       //HEIGHT nHeight // do not define height, it can limit list size to zero
       ITEMS aList
    END COMBOBOX
-   //hb_MemoWrit( "d:\temp\test.txt", ;
-   //   [DEFINE COMBOBOX ( "] + xControl + [" )] + hb_Eol() + ;
-   //   [   PARENT ( "] + xDlg + [" )] + hb_Eol() + ;
-   //   [   ROW ] + Ltrim( Str( nRow ) ) + hb_Eol() + ;
-   //   [   COL ] + Ltrim( Str( nCol ) ) + hb_Eol() + ;
-   //   [   VALUE 1] + hb_Eol() + ;
-   //   [   WIDTH ] + Ltrim( Str( nWidth ) ) + hb_Eol() + ;
-   //   [   HEIGHT ] + Ltrim( Str( nHeight ) ) + hb_Eol() + ;
-   //   [   ITEMS ] + hb_ValToExp( aList ) + hb_Eol() + ;
-   //   [END COMBOBOX] + hb_Eol() )
+
    ( nHeight )
+
+   RETURN Nil
+
+FUNCTION gui_SpinnerCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, nValue, aList )
+
+   IF Empty( xControl )
+      xControl := gui_NewName( "SPI" )
+   ENDIF
+
+   DEFINE SPINNER ( xControl )
+      PARENT ( xDlg )
+      ROW nRow
+      COL nCol
+      VALUE nValue
+      WIDTH nWidth
+      ON GOTFOCUS  SetProperty( xDlg, xControl, "BACKCOLOR", HMG_n2RGB( COLOR_YELLOW ) )
+      ON LOSTFOCUS SetProperty( xDlg, xControl, "BACKCOLOR", HMG_n2RGB( COLOR_WHITE ) )
+      RANGEMIN aList[ 1 ]
+      RANGEMAX aList[ 2 ]
+   END SPINNER
+   ( nHeight )
+
+   RETURN Nil
+
+FUNCTION gui_DatePickerCreate( xDlg, xControl, ;
+            nRow, nCol, nWidth, nHeight, dValue )
+
+   IF Empty( xControl )
+      xControl := gui_NewName( "DTP" )
+   ENDIF
+
+   DEFINE DATEPICKER ( xControl )
+      PARENT ( xDlg )
+      ROW	nRow
+      COL	nCol
+      VALUE dValue
+      //ON GOTFOCUS SetProperty( xDlg, xControl, "BACKCOLOR", COLOR_YELLOW )
+      //ON LOSTFOCUS SetProperty( xDlg, xControl, "BACKCOLOR", COLOR_WHITE )
+      //DATEFORMAT "99/99/9999"
+      TOOLTIP 'DatePicker Control'
+      SHOWNONE .F.
+      TITLEBACKCOLOR BLACK
+      TITLEFONTCOLOR YELLOW
+      TRAILINGFONTCOLOR PURPLE
+   END DATEPICKER
+
+   (nWidth);(nHeight)
 
    RETURN Nil
 
 FUNCTION gui_DialogActivate( xDlg, bCode )
 
-   //LOCAL xControl
-
    IF ! Empty( bCode )
       Eval( bCode )
    ENDIF
-   //FOR EACH xControl IN HMG_GetFormControls( xDlg, "BUTTONEX" )
-   //   SetHandCursor( GetControlHandle( xControl, xDlg ) )
-   //NEXT
    DoMethod( xDlg, "CENTER" )
    DoMethod( xDlg, "ACTIVATE" )
 
@@ -217,26 +273,54 @@ FUNCTION gui_DialogClose( xDlg )
 
    RETURN Nil
 
-FUNCTION gui_DialogCreate( xDlg, nRow, nCol, nWidth, nHeight, cTitle, bInit, xOldDlg )
+FUNCTION gui_DialogCreate( xDlg, nRow, nCol, nWidth, nHeight, cTitle, bInit, lModal, lMain )
 
    IF Empty( xDlg )
-      xDlg := gui_newctlname( "DLG" )
+      xDlg := gui_NewName( "DLG" )
    ENDIF
 
    IF Empty( bInit )
       bInit := { || Nil }
    ENDIF
-   DEFINE WINDOW ( xDlg ) ;
-      AT nCol, nRow ;
-      WIDTH nWidth ;
-      HEIGHT nHeight ;
-      TITLE cTitle ;
-      ON INIT Eval( bInit ) ;
-      ON RELEASE iif( Empty( xOldDlg ), Nil, DoMethod( xOldDlg, "SETFOCUS" ) )
-      IF ! Empty( xOldDlg )
-         ON KEY ALT+F4 ACTION doMethod( xOldDlg, "SETFOCUS" )
-      ENDIF
-   END WINDOW
+   hb_Default( @lModal, .T. )
+   hb_Default( @lMain, .F. )
+
+   IF lMain
+      DEFINE WINDOW ( xDlg ) ;
+         AT nCol, nRow ;
+         WIDTH nWidth ;
+         HEIGHT nHeight ;
+         TITLE cTitle ;
+         ICON "APPICON" ;
+         FONT APP_FONTNAME SIZE APP_FONTSIZE_NORMAL ;
+         MAIN ;
+         ON INIT Eval( bInit )
+         gui_Statusbar( xDlg, "" )
+      END WINDOW
+   ELSEIF lModal
+      DEFINE WINDOW ( xDlg ) ;
+         AT nCol, nRow ;
+         WIDTH nWidth ;
+         HEIGHT nHeight ;
+         TITLE cTitle ;
+         ICON "APPICON" ;
+         FONT APP_FONTNAME SIZE APP_FONTSIZE_NORMAL ;
+         MODAL ;
+         ON INIT Eval( bInit )
+         gui_Statusbar( xDlg, "" )
+      END WINDOW
+   ELSE
+      DEFINE WINDOW ( xDlg ) ;
+         AT nCol, nRow ;
+         WIDTH nWidth ;
+         HEIGHT nHeight ;
+         TITLE cTitle ;
+         ICON "APPICON" ;
+         FONT APP_FONTNAME SIZE APP_FONTSIZE_NORMAL ;
+         ON INIT Eval( bInit )
+         gui_Statusbar( xDlg, "" )
+      END WINDOW
+   ENDIF
 
    RETURN Nil
 
@@ -244,12 +328,12 @@ FUNCTION gui_IsCurrentFocus( xDlg, xControl )
 
       RETURN GetProperty( xDlg, "FOCUSEDCONTROL" )  == xControl
 
-FUNCTION gui_LabelCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, xValue, lBorder )
+FUNCTION gui_LabelCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, xValue, lBorder, nFontSize )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "LBL" )
+      xControl := gui_NewName( "LBL" )
    ENDIF
-   // não mostra borda
+
    DEFINE LABEL ( xControl )
       PARENT ( xDlg )
       COL nCol
@@ -257,12 +341,13 @@ FUNCTION gui_LabelCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, xValue, l
       WIDTH nWidth
       HEIGHT nHeight
       VALUE xValue
+      FONTNAME "Arial"
+      FONTSIZE nFontSize
       IF lBorder
          BORDER lBorder
          BACKCOLOR HMG_n2RGB( COLOR_GREEN )
       ENDIF
    END LABEL
-
 
    RETURN Nil
 
@@ -279,19 +364,18 @@ FUNCTION gui_LibName()
 FUNCTION gui_MLTextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, xValue )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "MLTXT" )
+      xControl := gui_NewName( "MLTXT" )
    ENDIF
+
    DEFINE EDITBOX ( xControl )
       PARENT ( xDlg )
       COL nCol
       ROW nRow
-      WIDTH nWidth
+      WIDTH nWidth - 30 /* scrollbar */
       HEIGHT nHeight
       VALUE xValue
       FONTNAME PREVIEW_FONTNAME
-      /* MAXLENGTH 510000 */
       TOOLTIP 'EditBox'
-      /* NOHSCROLLBAR .T. */
    END EDITBOX
 
    RETURN Nil
@@ -304,31 +388,40 @@ FUNCTION gui_MsgYesNo( cText )
 
    RETURN MsgYesNo( cText )
 
-FUNCTION gui_PanelCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight )
-
-   IF Empty( xControl )
-      xControl := gui_newctlname( "PAN" )
-   ENDIF
-   (xDlg); (xControl); (nRow); (nCol); (nWidth); (nHeight)
-
-   RETURN Nil
-
 FUNCTION gui_SetFocus( xDlg, xControl )
 
    DoMethod( xDlg, xControl, "SETFOCUS" )
 
    RETURN Nil
 
+FUNCTION gui_Statusbar( xDlg, xControl )
+
+   IF Empty( xControl )
+      xControl := gui_NewName( "STA" )
+   ENDIF
+
+	DEFINE STATUSBAR FONT 'MS Sans Serif' SIZE 8 PARENT ( xDlg )
+		STATUSITEM "DlgAuto/FiveLibs" // ACTION MsgInfo('Click! 1')
+		CLOCK
+		DATE
+	END STATUSBAR
+   (xDlg); (xControl)
+
+   RETURN Nil
+
 FUNCTION gui_TabCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "TAB" )
+      xControl := gui_NewName( "TAB" )
    ENDIF
+
    DEFINE TAB ( xControl ) ;
       PARENT ( xDlg ) ;
       AT nRow, nCol;
       WIDTH nWidth ;
-      HEIGHT nHeight
+      HEIGHT nHeight ;
+      ; // BACKCOLOR { 226, 220, 213 } ;
+      HOTTRACK
 
    RETURN Nil
 
@@ -338,39 +431,46 @@ FUNCTION gui_TabEnd()
 
    RETURN Nil
 
-FUNCTION gui_TabNavigate( xDlg, oTab, aList )
+FUNCTION gui_TabNavigate( xDlg, xTab, aList )
 
-   (xDlg);(oTab);(aList)
+   (xDlg);(xTab);(aList)
 
    RETURN Nil
 
-FUNCTION gui_TabPageBegin( xDlg, xControl, cText )
+FUNCTION gui_TabPageBegin( xDlg, xControl, xPage, nPageCount, cText )
 
-   PAGE ( cText )
-   (xDlg); (xControl); (cText)
+   PAGE ( cText ) IMAGE "bmpfolder"
+
+   xPage := xDlg
+   // BACKCOLOR { 50, 50, 50 }
+   (xDlg); (xControl); (cText); (nPageCount)
 
    RETURN Nil
 
 FUNCTION gui_TabPageEnd( xDlg, xControl )
 
    END PAGE
+
    (xDlg); (xControl)
 
    RETURN Nil
 
 FUNCTION gui_TextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, ;
-            xValue, cPicture, nMaxLength, bValid )
+            xValue, cPicture, nMaxLength, bValid, bAction, cImage, ;
+            aItem, Self )
 
    IF Empty( xControl )
-      xControl := gui_newctlname( "TXT" )
+      xControl := gui_NewName( "TEXT" )
    ENDIF
+
    DEFINE GETBOX ( xControl )
       PARENT ( xDlg )
       ROW nRow
       COL nCol
       HEIGHT nHeight
       WIDTH nWidth
-      FONTNAME DEFAULT_FONTNAME
+      FONTNAME APP_FONTNAME
+      FONTSIZE APP_FONTSIZE_NORMAL
       IF ValType( xValue ) == "N"
          NUMERIC .T.
          INPUTMASK cPicture
@@ -383,9 +483,21 @@ FUNCTION gui_TextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, ;
          MAXLENGTH nMaxLength
       ENDIF
       VALUE xValue
-      //ON LOSTFOCUS Eval( bValid )
-      VALID bValid
+      IF ! Empty( bAction )
+         ACTION Eval( bAction )
+      ENDIF
+      IF ! Empty( cImage )
+         IMAGE cImage
+      ENDIF
+      ON LOSTFOCUS Eval( bValid )
+      //VALID bValid // bug on HMG Extended
    END GETBOX
+
+   /* F9 on key fields will make a browse */
+   IF aItem[ CFG_ISKEY ] .OR. ! Empty( aItem[ CFG_VTABLE ] )
+      AAdd( ::aDlgKeyDown, { xControl, VK_F9, ;
+         { || ::Browse( xDlg, xControl, iif( aItem[ CFG_ISKEY ], ::cFileDbf, aItem[ CFG_VTABLE ] ) ) } } )
+   ENDIF
    (bValid)
 
    RETURN Nil
@@ -396,7 +508,7 @@ FUNCTION gui_ControlEnable( xDlg, xControl, lEnable )
 
    RETURN Nil
 
-FUNCTION gui_TextGetValue( xDlg, xControl )
+FUNCTION gui_ControlGetValue( xDlg, xControl )
 
    LOCAL xValue
 
@@ -405,14 +517,15 @@ FUNCTION gui_TextGetValue( xDlg, xControl )
 
    RETURN xValue
 
-FUNCTION gui_TextSetValue( xDlg, xControl, xValue )
+FUNCTION gui_ControlSetValue( xDlg, xControl, xValue )
 
    // NOTE: textbox string value, except if declared different on textbox creation
+   // getbox????
    SetProperty( xDlg, xControl, "VALUE", xValue )
 
    RETURN Nil
 
-STATIC FUNCTION gui_newctlname( cPrefix )
+STATIC FUNCTION gui_NewName( cPrefix )
 
    STATIC nCount := 0
 
@@ -421,3 +534,13 @@ STATIC FUNCTION gui_newctlname( cPrefix )
 
    RETURN cPrefix + StrZero( nCount, 10 )
 
+FUNCTION gui_DlgSetKey( Self )
+
+   LOCAL aItem
+
+   FOR EACH aItem IN ::aDlgKeyDown
+         _DefineHotKey( ::xDlg, 0, aItem[ 2 ], { || gui_DlgKeyDown( aItem[1], ;
+            aItem[ 2 ], Self ) } )
+   NEXT
+
+   RETURN Nil

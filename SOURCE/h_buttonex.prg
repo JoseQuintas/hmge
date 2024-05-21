@@ -156,11 +156,11 @@ FUNCTION _DefineOwnerButton ( ControlName, ParentForm, x, y, Caption, ProcedureN
       image := cPicture [1]
    ENDIF
 
-   IF aRGB_bk !=NIL .AND. ! IsArrayRGB ( aRGB_bk )
+   IF aRGB_bk != NIL .AND. ! IsArrayRGB ( aRGB_bk )
       aRGB_bk := nRGB2Arr( aRGB_bk )
    ENDIF
 
-   IF aRGB_font !=NIL .AND. ! IsArrayRGB ( aRGB_font )
+   IF aRGB_font != NIL .AND. ! IsArrayRGB ( aRGB_font )
       aRGB_font := nRGB2Arr( aRGB_font )
    ENDIF
 

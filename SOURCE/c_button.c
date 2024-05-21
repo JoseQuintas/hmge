@@ -261,7 +261,7 @@ HB_FUNC( INITIMAGEBUTTON )
 
          if( GetIconInfo( hIcon, &sIconInfo ) )
          {
-            GetObject( sIconInfo.hbmColor, sizeof( BITMAP ), ( LPVOID ) & bm );
+            GetObject( sIconInfo.hbmColor, sizeof( BITMAP ), ( LPVOID ) &bm );
 
             if( sIconInfo.hbmMask )
             {
@@ -286,7 +286,7 @@ HB_FUNC( INITIMAGEBUTTON )
             bi.margin.right = 10;
             bi.uAlign = BUTTON_IMAGELIST_ALIGN_CENTER;
 
-            SendMessage( ( HWND ) hbutton, BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) & bi );
+            SendMessage( ( HWND ) hbutton, BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) &bi );
 
             hb_reta( 2 );
             hmg_storvnl_HANDLE( hbutton, -1, 1 );
@@ -547,7 +547,7 @@ HB_FUNC( _SETMIXEDBTNICON )
 
    GetIconInfo( hIcon, &sIconInfo );
 
-   GetObject( sIconInfo.hbmColor, sizeof( BITMAP ), ( LPVOID ) & bm );
+   GetObject( sIconInfo.hbmColor, sizeof( BITMAP ), ( LPVOID ) &bm );
 
    if( sIconInfo.hbmMask )
    {
@@ -572,7 +572,7 @@ HB_FUNC( _SETMIXEDBTNICON )
    bi.margin.right = 10;
    bi.uAlign = 4;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) & bi );
+   SendMessage( hmg_par_raw_HWND( 1 ), BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) &bi );
 
    RegisterResource( himl, "IMAGELIST" );
    hmg_ret_raw_HANDLE( himl );
@@ -893,7 +893,7 @@ HIMAGELIST HMG_SetButtonImageList( HWND hButton, const char *FileName, int Trans
    bi.margin.right = 10;
    bi.uAlign = uAlign;
 
-   SendMessage( hButton, BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) & bi );
+   SendMessage( hButton, BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) &bi );
 
    return hImageList;
 }

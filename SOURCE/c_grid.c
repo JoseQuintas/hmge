@@ -1070,7 +1070,7 @@ HB_FUNC( LISTVIEW_SETSORTHEADER )
    {
       hdItem.mask = HDI_FORMAT;
 
-      SendMessage( hWndHD, HDM_GETITEM, nItem, ( LPARAM ) & hdItem );
+      SendMessage( hWndHD, HDM_GETITEM, nItem, ( LPARAM ) &hdItem );
 
       if( hdItem.fmt & HDF_SORTUP )
       {
@@ -1102,14 +1102,14 @@ HB_FUNC( LISTVIEW_SETSORTHEADER )
             hdItem.fmt = ( hdItem.fmt &~HDF_SORTUP ) | HDF_SORTDOWN;
          }
 
-         SendMessage( hWndHD, HDM_SETITEM, nItem, ( LPARAM ) & hdItem );
+         SendMessage( hWndHD, HDM_SETITEM, nItem, ( LPARAM ) &hdItem );
       }
    }
    else
    {
       hdItem.mask = HDI_BITMAP | HDI_FORMAT;
 
-      SendMessage( hWndHD, HDM_GETITEM, nItem, ( LPARAM ) & hdItem );
+      SendMessage( hWndHD, HDM_GETITEM, nItem, ( LPARAM ) &hdItem );
 
       nType = hb_parni( 3 );
 
@@ -1156,7 +1156,7 @@ HB_FUNC( LISTVIEW_SETSORTHEADER )
          }
       }
 
-      SendMessage( hWndHD, HDM_SETITEM, nItem, ( LPARAM ) & hdItem );
+      SendMessage( hWndHD, HDM_SETITEM, nItem, ( LPARAM ) &hdItem );
    }
 }
 

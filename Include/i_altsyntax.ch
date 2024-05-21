@@ -1866,6 +1866,7 @@ Split Button
         _HMG_ActiveControlFontItalic        := .f.      ;;
         _HMG_ActiveControlFontStrikeOut     := .f.      ;;
         _HMG_ActiveControlFontUnderLine     := .f.      ;;
+        _HMG_ActiveControlIcon              := Nil      ;;
         _HMG_ActiveControlDefault           := .f.
 
 #xcommand END SPLITBUTTON ;
@@ -1886,7 +1887,8 @@ Split Button
           _HMG_ActiveControlFontBold ,;
           _HMG_ActiveControlFontItalic,;
           _HMG_ActiveControlFontUnderLine,;
-          _HMG_ActiveControlFontStrikeOut )
+          _HMG_ActiveControlFontStrikeOut,;
+          _HMG_ActiveControlIcon )
 
 /*----------------------------------------------------------------------------
 Image

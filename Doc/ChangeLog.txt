@@ -1,3 +1,127 @@
+2024/05/21: HMG Extended Edition version 24.05.
+  * Fixed: GetBox control: the cursor shape in insert/overwrite mode was incorrect
+           when using GetBox together with TBrowse.
+           Sample code:
+           #include "minigui.ch"
+           #include "tsbrowse.ch"
+           FUNCTION Main()
+              LOCAL aItems := {}
+              AAdd( aItems, { Space( 10 ), Space( 10 ), Space( 10 ) } )
+              DEFINE WINDOW main AT 0, 0 WIDTH 250 HEIGHT 270 NOSIZE MAIN
+                 @ 15, 20 LABEL lbGetBox VALUE "GetBox:" AUTOSIZE
+                 @ 10, 70 GETBOX gbGetBox VALUE "" PICT Replicate( "X", 30 ) ;
+                    WIDTH 150
+                 DEFINE TBROWSE tBrw AT 50, 20 ALIAS aItems WIDTH 200 HEIGHT 150 ;
+                       HEADERS { "Col 1", "Col 2", "Col 3" } EDIT
+                 END TBROWSE
+                 DEFINE STATUSBAR
+                    KEYBOARD
+                 END STATUSBAR
+              END WINDOW
+              main.center()
+              main.activate()
+           RETURN NIL
+           Bug was reported by Dusko Radojcin.
+           This was a last minute fix for the 24.04 build.
+           Contributed by Grigory Filatov
+  * Fixed: uCharToVal( cText, [cType] ) function had an issue with date conversion.
+           Example:
+           uVal := uCharToVal( "01/01/2024", "D" )
+           ? uVal, valtype( uVal ) --> 01.01.2024 D
+           Based upon a code borrowed from public Fivewin forum.
+  * Enhanced: POPUP and MENUITEM menus support the CAPTION property.
+           You can set/get this property at runtime with:
+           - function syntax:
+             SetProperty ( Form, MenuName, 'Caption', cNewValue )
+             GetProperty ( Form, MenuName, 'Caption' )
+           - pseudo-OOP syntax:
+             Form.MenuName.Caption := cNewValue
+             Form.MenuName.Caption --> cNewValue
+           It was a postponed modification.
+           Contributed by Grigory Filatov
+           (see menudemo2.prg in folder \samples\Basic\Menu)
+  * Enhanced: The Split Button control supports an optional ICON clause.
+           Syntax:
+           @ 10, 10 SPLITBUTTON SPButton_1 ;
+             CAPTION 'Split Button' ;
+             ICON cFileOrIconResource ;
+             ACTION MsgInfo( "Split Button", "Pressed" )
+           Contributed by Grigory Filatov
+           (see demo in folder \samples\Advanced\SplitButton)
+  * Enhanced: The Label control now accepts the numeric color definitions
+           as well as the RGB arrays for BACKCOLOR and FONTCOLOR clauses.
+           Contributed by Grigory Filatov
+  * Modified: Some internal pseudo-functions are defined as public functions.
+           Now they can be dynamically loaded from scripts.
+           Note: this reduction in optimization results in an increase in
+           application size. [STANDARD VERSION]
+           Contributed by Grigory Filatov
+  * Modified: The useful HMG_FileCopy() function for copying a file to a new file
+           has been updated to use the new Harbour function hb_vfCopyFileEx().
+           Syntax:
+             HMG_FileCopy( <cSourceFile>, <cTargetFile>, [<nBuffer>], [<bEval>] )
+             --> lSuccess
+           Note. This function will preserve the date and time of the copied file.
+           Contributed by Grigory Filatov
+           (see demo in folder \samples\Basic\Filecopy) [PRO VERSION]
+  * Updated: Adaptation FiveWin Class TSBrowse 9.0 in HMG:
+           - minor correction of the selector background in the Enabled() method.
+           Contributed by Sergej Kiselev
+  * Updated: HbSQLite3 library:
+           - update for using SQLITE3 version 3.45.3 (from 3.45.2). [STANDARD]
+           - update for using latest SQLITE3 version 3.46.0dev. [PRO VERSION]
+           Contributed by Grigory Filatov
+  * Updated: Harbour Compiler 3.2.0dev (SVN 2024-05-09 23:23).
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+           (look at ReadMe.txt in folder \harbour) [PRO VERSION]
+  * Updated: Roberto Lopez's HMG IDE tool binary.
+           Contributed by Grigory Filatov
+           (see in folder \HMG-IDE) [PRO VERSION]
+  * New: 'Data Generation utility' sample.
+           Contributed by Marcos Jarrin
+           (see in folder \samples\Advanced\data_generation)
+  * New: 'Pub Pricing analysis with MySQL via SQLRDD' sample.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Advanced\SQLRDD\Pubs) [PRO VERSION]
+  * New: 'xBase Package 2024' examples: using MySQL through the TMySql class.
+           * School (registration, cources, finance)
+           * Football School (using DBFCDX)
+           * Real estate (Leasing)
+           * Meter (small restaurants)
+           * Service Order
+           * SysFood (food companies)
+           * CRUD (create, read, update and delete) example with MySQL
+           Note. You will need a fully working MySQL server installation and
+           the correct connection parameters.
+           Contributed by Marcelo Neves
+           (see in folder \samples\Applications\pacote_xbase) [PRO VERSION]
+  * Updated: 'Grid Row Height workaround' sample.
+           Based upon a contribution of HMG user Edward.
+           Adapted for Minigui Extended by Grigory Filatov
+           (see in folder \samples\Basic\Grid_RowHeight)
+  * Updated: 'File date changer utility' sample:
+           - implemented more efficient error reporting.
+           Contributed by Pierpaolo Martinello
+           (see in folder \samples\Advanced\Filedate)
+  * Updated: 'Five GUI libraries for testing' sample.
+           Contribution of Jose Quintas.
+           Revised for Minigui Extended by Grigory Filatov
+           (see in folder \samples\Advanced\FiveLibsTest)
+  * Updated: 'Set Themes' sample: modified the StatusBar color assignment.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Advanced\SetThemes)
+  * Updated: 'TsBrowse Colors Settings' sample:
+           - minor correction in the ColorPicker() function.
+           Contributed by Pierpaolo Martinello
+           (see in folder \samples\Advanced\Tsb_colors_2)
+  * Updated: 'USB Stick Arrive / Remove' sample.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Advanced\USB_Detect)
+  * Updated: 'Windows Version' sample:
+           - corrected Windows 11 detection.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Advanced\WinVersion)
+
 2024/04/15: HMG Extended Edition version 24.04.
   * Fixed: Program crash at the exit from a Preview window in a graph printing
            module at using of xHarbour compiler (introduced in the build 17.06).

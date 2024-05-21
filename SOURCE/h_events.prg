@@ -271,7 +271,6 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
                         RETURN GetTabbedControlBrush ( wParam , lParam , z , _HMG_aControlBrushHandle [r] )
                      ENDIF
                   ENDIF
-
                ENDIF
 
                IF _HMG_aControlFontColor [i] != Nil
@@ -331,8 +330,10 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
                IF ISLOGICAL ( _HMG_aControlInputMask [i] )
                   IF _HMG_aControlInputMask [i] == .T.
-                     SetBkMode( wParam , TRANSPARENT )
-                     RETURN GetStockObject ( NULL_BRUSH )
+                     IF _HMG_aControlContainerRow [i] == -1 .AND. _HMG_aControlContainerCol [i] == -1 .AND. TmpStr != "CHECKBOX"
+                        SetBkMode( wParam , TRANSPARENT )
+                        RETURN GetStockObject ( NULL_BRUSH )
+                     ENDIF
                   ENDIF
                ENDIF
 
@@ -365,20 +366,16 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
                ENDIF
 
                IF _HMG_aControlBkColor [i] != Nil
-
                   SetBkColor( wParam , _HMG_aControlBkColor [i] [1] , _HMG_aControlBkColor [i] [2] , _HMG_aControlBkColor [i] [3] )
                   DeleteObject ( _HMG_aControlBrushHandle [i] )
                   _HMG_aControlBrushHandle [i] := CreateSolidBrush( _HMG_aControlBkColor [i] [1] , _HMG_aControlBkColor [i] [2] , _HMG_aControlBkColor [i] [3] )
                   RETURN _HMG_aControlBrushHandle [i]
-
                ELSE
-
                   a := nRGB2Arr ( GetSysColor ( COLOR_3DFACE ) )
                   SetBkColor( wParam , a [1] , a [2] , a [3] )
                   DeleteObject ( _HMG_aControlBrushHandle [i] )
                   _HMG_aControlBrushHandle [i] := CreateSolidBrush( a [1] , a [2] , a [3] )
                   RETURN _HMG_aControlBrushHandle [i]
-
                ENDIF
 
             ENDIF

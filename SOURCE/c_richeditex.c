@@ -579,7 +579,7 @@ HB_FUNC( RICHEDITBOX_SETFONT )
    CharFormat2.dwMask = Mask;
    CharFormat2.dwEffects = Effects;
 
-   hmg_ret_L( SendMessage( hWndControl, EM_SETCHARFORMAT, SCF_SELECTION, ( LPARAM ) & CharFormat2 ) );
+   hmg_ret_L( SendMessage( hWndControl, EM_SETCHARFORMAT, SCF_SELECTION, ( LPARAM ) &CharFormat2 ) );
 }
 
 //        RichEditBox_GetFont( hWndControl, @cFontName, @nFontSize, @lBold, @lItalic, @lUnderline, @lStrikeout, @aTextColor, @aBackColor, @nScript, @lLink )
@@ -598,7 +598,7 @@ HB_FUNC( RICHEDITBOX_GETFONT )
    CharFormat2.cbSize = sizeof( CHARFORMAT2 );
    Mask = CFM_FACE | CFM_SIZE | CFM_BOLD | CFM_ITALIC | CFM_UNDERLINE | CFM_STRIKEOUT | CFM_COLOR | CFM_BACKCOLOR | CFM_SUBSCRIPT | CFM_SUPERSCRIPT | CFM_LINK;
    CharFormat2.dwMask = Mask;
-   SendMessage( hWndControl, EM_GETCHARFORMAT, SCF_SELECTION, ( LPARAM ) & CharFormat2 );
+   SendMessage( hWndControl, EM_GETCHARFORMAT, SCF_SELECTION, ( LPARAM ) &CharFormat2 );
    Effects = CharFormat2.dwEffects;
 
    if( HB_ISBYREF( 2 ) )
@@ -685,7 +685,7 @@ HB_FUNC( RICHEDITBOX_SETSELRANGE )
    CharRange.cpMin = hmg_parv_LONG( 2, 1 );
    CharRange.cpMax = hmg_parv_LONG( 2, 2 );
 
-   SendMessage( hmg_par_raw_HWND( 1 ), EM_EXSETSEL, 0, ( LPARAM ) & CharRange );
+   SendMessage( hmg_par_raw_HWND( 1 ), EM_EXSETSEL, 0, ( LPARAM ) &CharRange );
 }
 
 //        RichEditBox_GetSelRange ( hWndControl ) --> return { nMin, nMax }
@@ -693,7 +693,7 @@ HB_FUNC( RICHEDITBOX_GETSELRANGE )
 {
    CHARRANGE   CharRange;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), EM_EXGETSEL, 0, ( LPARAM ) & CharRange );
+   SendMessage( hmg_par_raw_HWND( 1 ), EM_EXGETSEL, 0, ( LPARAM ) &CharRange );
    hb_reta( 2 );
    HB_STORVNL( ( LONG ) CharRange.cpMin, -1, 1 );
    HB_STORVNL( ( LONG ) CharRange.cpMax, -1, 2 );
@@ -755,7 +755,7 @@ HB_FUNC( RICHEDITBOX_GETTEXT )
    GT.lpDefaultChar = NULL;
    GT.lpUsedDefChar = NULL;
 
-   SendMessage( hWndControl, EM_GETTEXTEX, ( WPARAM ) & GT, ( LPARAM ) cBuffer );
+   SendMessage( hWndControl, EM_GETTEXTEX, ( WPARAM ) &GT, ( LPARAM ) cBuffer );
 
 #ifndef UNICODE
    hb_retc( cBuffer );
@@ -778,7 +778,7 @@ HB_FUNC( RICHEDITBOX_GETTEXTLENGTH )
 #else
    GTL.codepage = CP_ACP;
 #endif
-   nLength = ( LONG ) SendMessage( hmg_par_raw_HWND( 1 ), EM_GETTEXTLENGTHEX, ( WPARAM ) & GTL, 0 );
+   nLength = ( LONG ) SendMessage( hmg_par_raw_HWND( 1 ), EM_GETTEXTLENGTHEX, ( WPARAM ) &GTL, 0 );
 
    hmg_ret_LONG( nLength );
 }
@@ -797,7 +797,7 @@ HB_FUNC( RICHEDITBOX_GETTEXTRANGE )
    TextRange.chrg.cpMin = hmg_parv_LONG( 2, 1 );
    TextRange.chrg.cpMax = hmg_parv_LONG( 2, 2 );
 
-   SendMessage( hmg_par_raw_HWND( 1 ), EM_GETTEXTRANGE, 0, ( LPARAM ) & TextRange );
+   SendMessage( hmg_par_raw_HWND( 1 ), EM_GETTEXTRANGE, 0, ( LPARAM ) &TextRange );
 
 #ifndef UNICODE
    hb_retc( TextRange.lpstrText );
@@ -846,7 +846,7 @@ HB_FUNC( RICHEDITBOX_FINDTEXT )
       Options = Options | FR_WHOLEWORD;
    }
 
-   SendMessage( hWndControl, EM_EXGETSEL, 0, ( LPARAM ) & CharRange );
+   SendMessage( hWndControl, EM_EXGETSEL, 0, ( LPARAM ) &CharRange );
 
    if( Down )
    {
@@ -1257,7 +1257,7 @@ HB_FUNC( RICHEDITBOX_GETRECT )
 {
    RECT  rc;
 
-   SendMessage( hmg_par_raw_HWND( 1 ), EM_GETRECT, ( WPARAM ) 0, ( LPARAM ) & rc );
+   SendMessage( hmg_par_raw_HWND( 1 ), EM_GETRECT, ( WPARAM ) 0, ( LPARAM ) &rc );
 
    hb_reta( 4 );
    HB_STORNI( rc.left, -1, 1 );
@@ -1276,7 +1276,7 @@ HB_FUNC( RICHEDITBOX_SETRECT )
    rc.right = HB_PARNI( 2, 3 );
    rc.bottom = HB_PARNI( 2, 4 );
 
-   SendMessage( hmg_par_raw_HWND( 1 ), EM_SETRECT, ( WPARAM ) 1, ( LPARAM ) & rc );
+   SendMessage( hmg_par_raw_HWND( 1 ), EM_SETRECT, ( WPARAM ) 1, ( LPARAM ) &rc );
 }
 
 //        RichEditBox_PastEspecial ( hWndControl , ClipboardFormat )

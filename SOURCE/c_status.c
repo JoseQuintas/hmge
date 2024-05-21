@@ -388,7 +388,7 @@ HB_FUNC( REFRESHPROGRESSITEM )   // RefreshProgressItem( HwndStatus, NrItem, hPr
    HWND  hwndStatus = hmg_par_raw_HWND( 1 );
    RECT  rc;
 
-   SendMessage( hwndStatus, SB_GETRECT, ( WPARAM ) hb_parni( 2 ) - 1, ( LPARAM ) & rc );
+   SendMessage( hwndStatus, SB_GETRECT, ( WPARAM ) hb_parni( 2 ) - 1, ( LPARAM ) &rc );
    SetWindowPos( hmg_par_raw_HWND( 3 ), 0, rc.left, rc.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE );
 }
 
@@ -399,7 +399,7 @@ HB_FUNC( CREATEPROGRESSBARITEM ) // CreateProgressBarItem( HwndStatus, NrItem )
    RECT  rc;
    DWORD Style = WS_CHILD | PBS_SMOOTH;
 
-   SendMessage( hwndStatus, SB_GETRECT, ( WPARAM ) hb_parni( 2 ) - 1, ( LPARAM ) & rc );
+   SendMessage( hwndStatus, SB_GETRECT, ( WPARAM ) hb_parni( 2 ) - 1, ( LPARAM ) &rc );
    if( hb_parni( 3 ) )
    {
       Style |= WS_VISIBLE;

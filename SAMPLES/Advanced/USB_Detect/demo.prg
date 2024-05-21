@@ -6,7 +6,7 @@
 
 #include "hmg.ch"
 
-FUNCTION MAIN
+FUNCTION Main()
 
    DEFINE WINDOW Form_1 ;
          WIDTH 400 ;
@@ -61,16 +61,18 @@ FUNCTION USB_Detect( nHWnd, nMsg, nWParam, nLParam )
       DO CASE
       CASE nWParam == DBT_DEVICEARRIVAL
          nMask := DeviceChangeInfo( nLParam )
-         if ! Empty( nMask ) .AND. nMask > 0
+         IF ! Empty( nMask ) .AND. nMask > 0
             cDevice := GetDrive( nMask )
          ENDIF
-         MSGINFO ( "Inserted drive " + cDevice + " with S/N: " + WMI_Info( cDevice ) )
+
+         MSGINFO ( "Inserted drive " + cDevice + CRLF + WMI_Info( cDevice ) )
 
       CASE nWParam == DBT_DEVICEREMOVECOMPLETE
          nMask := DeviceChangeInfo( nLParam )
-         if ! Empty( nMask ) .AND. nMask > 0
+         IF ! Empty( nMask ) .AND. nMask > 0
             cDevice := GetDrive( nMask )
          ENDIF
+
          MSGINFO ( "Removed drive " + cDevice )
 
       END CASE
@@ -82,8 +84,8 @@ RETURN NIL
 
 STATIC FUNCTION GetDrive( nMask )
 
-   LOCAL cBin := NToC ( nMask, 2 )
-   LOCAL nBit := Len ( cBin ) - hb_At( '1', cBin )
+   LOCAL cBin := NToC( nMask, 2 )
+   LOCAL nBit := Len( cBin ) - hb_At( '1', cBin )
 
 RETURN Chr( nBit + 65 ) + ":"
 
@@ -91,9 +93,9 @@ RETURN Chr( nBit + 65 ) + ":"
 STATIC FUNCTION WMI_Info( cDrive )
 
    LOCAL oProcesses
-   LOCAL oProcess
-   LOCAL cSN := "N/A"
+   LOCAL oDrive
    LOCAL oWMI, lSuccess := .F.
+   LOCAL cInfo := ""
 
    oWMI := WMIService()
 
@@ -109,16 +111,21 @@ STATIC FUNCTION WMI_Info( cDrive )
       ENDDO
 
       IF oProcesses:Count > 0
-         FOR EACH oProcess IN oProcesses
-            IF oProcess:DeviceID = cDrive
-               cSN := oProcess:VolumeSerialNumber
+         FOR EACH oDrive IN oProcesses
+            IF oDrive:DeviceID = cDrive
+               cInfo += "Name: " + oDrive:Description + CRLF
+               cInfo += "Type: " + iif( oDrive:DriveType == 2, "Removable", "N/A" ) + CRLF
+               cInfo += "File System: " + cValToChar( oDrive:FileSystem ) + CRLF
+               cInfo += "Size: " + cValToChar( Val( oDrive:Size ) / ( 1024 * 1024 * 1024 ) ) + "GB" + CRLF
+               cInfo += "Free Space: " + cValToChar( Val( oDrive:FreeSpace ) / ( 1024 * 1024 * 1024 ) ) + "GB" + CRLF
+               cInfo += "Serial Number: " + cValToChar( oDrive:VolumeSerialNumber )
                EXIT
             ENDIF
          NEXT
       ENDIF
    ENDIF
 
-RETURN cSN
+RETURN cInfo
 
 
 STATIC FUNCTION WMIService()

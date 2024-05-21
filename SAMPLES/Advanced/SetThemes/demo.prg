@@ -182,7 +182,7 @@ FUNCTION SetThemes( theme, bInvalidate ) // modified
    LOCAL aColors_Office2003Orange := { RGB( 251, 230, 148 ), RGB( 251, 230, 148 ), RGB( 239, 150, 21 ) }
    LOCAL aColors_Office2003Silver := { RGB( 225, 226, 236 ), RGB( 225, 226, 236 ), RGB( 150, 148, 178 ) }
    LOCAL aColors_Azure := { RGB( 222, 218, 202 ), RGB( 222, 218, 202 ), RGB( 192, 185, 154 ) }
-   LOCAL aColors_DarkBlue := { RGB( 89, 135, 214 ), RGB( 89, 135, 214 ), RGB( 4, 57, 148 ) }, h
+   LOCAL aColors_DarkBlue := { RGB( 89, 135, 214 ), RGB( 89, 135, 214 ), RGB( 4, 57, 148 ) }
    LOCAL aColors_LightGreen := { RGB( 235, 245, 214 ), RGB( 235, 245, 214 ), RGB( 195, 224, 133 ) }
    LOCAL aColorsTable := { ;
       aColors_Office2003Blue, ;
@@ -201,8 +201,8 @@ FUNCTION SetThemes( theme, bInvalidate ) // modified
          SetColorMenu( aColors, IF( IsWinNT(), FALSE, TRUE ) )
          // JR
          SetButtonColor( aColors )
-         IF ( h := MyGetControlHandle( 'StatusBar' ) ) > 0
-            SetSbBkColor( h, nRGB2Arr( aColors[ 1 ] ) )
+         IF MyGetControlHandle( 'StatusBar' ) > 0
+            SetSbBkColor( nRGB2Arr( aColors[ 1 ] ) )
          ENDIF
          // --------
       ENDIF
@@ -214,22 +214,12 @@ FUNCTION SetThemes( theme, bInvalidate ) // modified
 
 RETURN theme
 
-FUNCTION SetSbBkColor( ParentHandle, aColor )
+FUNCTION SetSbBkColor( aColor )
 // ********************************************
-   LOCAL h, i
+   LOCAL nItem
 
-   FOR EACH h IN _HMG_aControlContainerHandle
-
-#ifndef __XHARBOUR__
-      i := h:__enumIndex()
-
-#else
-      i := hb_enumindex()
-
-#endif
-      IF _HMG_aControlType[ i ] == "ITEMMESSAGE" .AND. h == ParentHandle
-         _HMG_aControlBkColor[ i ] := aColor
-      ENDIF
+   FOR nItem := 1 TO 3
+      SET STATUSITEM nItem OF Form_Main BACKCOLOR TO aColor
    NEXT
 
 RETURN NIL
@@ -239,7 +229,7 @@ FUNCTION SbAction()
 // ******************
    STATIC nActiveTheme := 1
 
-   IF++ nActiveTheme > CLR_LIGHTGREEN
+   IF ++nActiveTheme > CLR_LIGHTGREEN
       nActiveTheme := 1
    ENDIF
 
@@ -357,13 +347,12 @@ RETURN NIL
 
 FUNCTION OwnButtonPaint( pdis ) // modified
 // *******************************
-   LOCAL hDC, itemState, itemAction, i, rgbTrans, hWnd, lFlat, lNotrans
-   LOCAL oldBkMode, oldTextColor, hOldFont, nFreeSpace := 0
-   LOCAL x1 := 0, y1 := 0, x2 := 0, y2 := 0, xp1 := 0, yp1 := 0, xp2 := 0, yp2 := 0
-   LOCAL aBmp := {}, aMetr := {}, aBtnRc := {}
+   LOCAL hDC, itemState, itemAction, i, rgbTrans, hWnd, /*lFlat,*/ lNotrans
+   LOCAL oldBkMode, oldTextColor, hOldFont, nFreeSpace
+   LOCAL x1, y1, x2, y2, xp1 := 0, yp1, xp2 := 0, yp2
+   LOCAL aBmp := {}, aMetr, aBtnRc
    LOCAL lDisabled, lSelected, lFocus, lDrawEntire, loFocus, loSelect
-   LOCAL lnoxpstyle := .F.
-   LOCAL pozYpic := 0, pozYtext := 0, xPoz := 0, dState := 0
+   LOCAL pozYpic, pozYtext := 0, xPoz
    LOCAL nCRLF, lXPThemeActive := .F.
 
    hDC := GETOWNBTNDC( pdis )
@@ -398,9 +387,9 @@ FUNCTION OwnButtonPaint( pdis ) // modified
    lDisabled := AND( itemState, ODS_DISABLED ) == ODS_DISABLED
    lSelected := AND( itemState, ODS_SELECTED ) == ODS_SELECTED
    lFocus := AND( itemState, ODS_FOCUS ) == ODS_FOCUS
-   lFlat := AND( _HMG_aControlSpacing[ i ], OBT_FLAT ) == OBT_FLAT
+   //lFlat := AND( _HMG_aControlSpacing[ i ], OBT_FLAT ) == OBT_FLAT
    lNotrans := AND( _HMG_aControlSpacing[ i ], OBT_NOTRANSPARENT ) == OBT_NOTRANSPARENT
-   lnoxpstyle := AND( _HMG_aControlSpacing[ i ], OBT_NOXPSTYLE ) == OBT_NOXPSTYLE
+   //lnoxpstyle := AND( _HMG_aControlSpacing[ i ], OBT_NOXPSTYLE ) == OBT_NOXPSTYLE
 
    if ! lNotrans
       rgbTrans := NIL
@@ -455,12 +444,12 @@ FUNCTION OwnButtonPaint( pdis ) // modified
 
       // vertical text/picture aspect
 
-      x1 := aBtnRc[ 1 ] + 2
+      //x1 := aBtnRc[ 1 ] + 2
       y2 := aMetr[ 1 ] * nCRLF
       y1 := Round( ( aBtnRc[ 4 ] - aBtnRc[ 2 ] - aMetr[ 1 ] ) / 2, 0 )
       x2 := aBtnRc[ 3 ] - 2
 
-      yp1 := Round( y1 / 2, 0 )
+      //yp1 := Round( y1 / 2, 0 )
       xp2 := iif( ! Empty( aBmp ), aBmp[ 1 ], 0 ) // picture width
       yp2 := iif( ! Empty( aBmp ), aBmp[ 2 ], 0 ) // picture height
       xp1 := Round( ( aBtnRc[ 3 ] / 2 ) - ( xp2 / 2 ), 0 )
@@ -470,7 +459,7 @@ FUNCTION OwnButtonPaint( pdis ) // modified
          nFreeSpace := Round( ( aBtnRc[ 4 ] - 4 - ( aMetr[ 4 ] + yp2 ) ) / 3, 0 )
          nCRLF := 1
       ELSE
-         y1 := Max( ( ( aBtnRc[ 4 ] ) / 2 ) - ( nCRLF * aMetr[ 1 ] ) / 2, 1 )
+         //y1 := Max( ( ( aBtnRc[ 4 ] ) / 2 ) - ( nCRLF * aMetr[ 1 ] ) / 2, 1 )
          nFreeSpace := Round( ( aBtnRc[ 4 ] - 4 - ( y2 + yp2 ) ) / 3, 0 )
       ENDIF
 
@@ -609,8 +598,8 @@ FUNCTION OwnButtonPaint( pdis ) // modified
       if !( AND( _HMG_aControlSpacing[ i ], OBT_ADJUST ) == OBT_ADJUST )
          y1 := Max( ( ( ( aBtnRc[ 4 ] ) / 2 ) - ( nCRLF * aMetr[ 1 ] ) / 2 ) - 1, 1 )
          y2 := ( aMetr[ 1 ] + aMetr[ 5 ] ) * nCRLF
-      ELSE
-         pozYpic := 1
+      //ELSE
+         //pozYpic := 1
       ENDIF
 
       if ! lDisabled
@@ -624,7 +613,7 @@ FUNCTION OwnButtonPaint( pdis ) // modified
                yp1++
             ELSE
                // y1 := 1
-               xPoz := 0
+               //xPoz := 0
             ENDIF
 
             if !( AND( _HMG_aControlSpacing[ i ], OBT_ADJUST ) == OBT_ADJUST )
@@ -670,7 +659,7 @@ RETURN ( 1 )
 
 STATIC FUNCTION CountIt( cText )
 // *****************************
-   LOCAL nPoz := 1, nCount := 0
+   LOCAL nPoz, nCount := 0
 
    IF At( CRLF, cText ) > 0
       DO WHILE .T.

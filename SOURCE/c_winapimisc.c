@@ -1164,7 +1164,7 @@ HB_FUNC( WINVERSION )
             {
                if( osvi.wProductType == VER_NT_WORKSTATION )
                {
-                  if( osvi.dwMajorVersion == 10 && osvi.dwBuildNumber == 22000 )
+                  if( osvi.dwMajorVersion == 10 && osvi.dwBuildNumber >= 22000 )
                   {
                      szVersion = TEXT( "Windows 11 " );
                   }

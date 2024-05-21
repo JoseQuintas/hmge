@@ -113,6 +113,14 @@ FUNCTION _DefineLabel ( ControlName, ParentFormName, x, y, Caption, w, h, ;
       Caption := cValToChar ( Caption )
    ENDIF
 
+   IF aRGB_bk != NIL .AND. ! IsArrayRGB ( aRGB_bk )
+      aRGB_bk := nRGB2Arr( aRGB_bk )
+   ENDIF
+
+   IF aRGB_font != NIL .AND. ! IsArrayRGB ( aRGB_font )
+      aRGB_font := nRGB2Arr( aRGB_font )
+   ENDIF
+
    mVar := '_' + ParentFormName + '_' + ControlName
    k := _GetControlFree()
 

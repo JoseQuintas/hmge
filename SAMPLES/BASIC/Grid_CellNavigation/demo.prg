@@ -10,9 +10,10 @@
 
 MEMVAR aRows
 
-FUNCTION MAIN
+FUNCTION Main()
 
    LOCAL i
+
    PUBLIC aRows[ 21 ][ 3 ]
 
    aRows[ 1 ] := { 'Simpson', 'Homer', '555-5555' }
@@ -74,6 +75,7 @@ FUNCTION MAIN
 
 RETURN NIL
 
+
 FUNCTION QueryTest()
 
    LOCAL i := This.QueryRowIndex
@@ -82,6 +84,7 @@ FUNCTION QueryTest()
    This.QueryData := aRows[ i, j ]
 
 RETURN NIL
+
 
 FUNCTION ChangeGridCell()
 
@@ -94,6 +97,7 @@ FUNCTION ChangeGridCell()
    aRows[ nRow ][ nCol ] := xValue
 
 RETURN .T.
+
 
 FUNCTION OnF9Key()
 

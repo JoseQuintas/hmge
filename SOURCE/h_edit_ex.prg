@@ -1136,7 +1136,7 @@ STATIC FUNCTION ABM2ConFoco()
    LOCAL acControl /*as array*/ // Matriz con los nombre de los controles.
 
    // ------- Inicialización de variables.----------------------------------------
-   cControl := This.NAME
+   cControl := This.Name
    acControl := {}
    FOR i := 1 TO Len( _aControl )
       AAdd( acControl, _aControl[ i, ABM_CON_NAME ] )

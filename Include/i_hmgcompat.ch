@@ -318,10 +318,10 @@ _ColorMenu ( <hWnd>, <argb> [, <lSubMenu> ] )
 
 
 #xcommand  SET TOOLTIPBACKCOLOR <aColor> => ;
-   SendMessage( GetFormToolTipHandle(Application.FormName), TTM_SETTIPBKCOLOR, RGB(<aColor>\[1\], <aColor>\[2\], <aColor>\[3\]), 0 )
+   SendMessage( GetFormToolTipHandle(Application.FormName), TTM_SETTIPBKCOLOR, RGB(<aColor>\[1], <aColor>\[2], <aColor>\[3]), 0 )
 
 #xcommand  SET TOOLTIPFORECOLOR <aColor> => ;
-   SendMessage( GetFormToolTipHandle(Application.FormName), TTM_SETTIPTEXTCOLOR, RGB(<aColor>\[1\], <aColor>\[2\], <aColor>\[3\]), 0 )
+   SendMessage( GetFormToolTipHandle(Application.FormName), TTM_SETTIPTEXTCOLOR, RGB(<aColor>\[1], <aColor>\[2], <aColor>\[3]), 0 )
 
 
 #ifndef LWA_ALPHA
@@ -336,7 +336,7 @@ _ColorMenu ( <hWnd>, <argb> [, <lSubMenu> ] )
    SetLayeredWindowAttributes( GetFormHandle( <"FormName"> ), 0, 255, LWA_ALPHA )
 
 #xtranslate SET WINDOW <FormName> TRANSPARENT TO COLOR <aColor> => ;
-   SetLayeredWindowAttributes( GetFormHandle( <"FormName"> ), RGB(<aColor>\[1\], <aColor>\[2\], <aColor>\[3\]), 0, LWA_COLORKEY )
+   SetLayeredWindowAttributes( GetFormHandle( <"FormName"> ), RGB(<aColor>\[1], <aColor>\[2], <aColor>\[3]), 0, LWA_COLORKEY )
 
 
 #define FLASHW_CAPTION 1

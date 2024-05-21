@@ -265,7 +265,7 @@ TreeItemSort (<(control)>, <(parent)>, <nItem>, <lRecursive>, <lCaseSensitive>, 
 
 #translate TreeView_SetBkColor ( <hWnd>, <aColor> ) ;
 => ;
-SendMessage( <hWnd>, TVM_SETBKCOLOR, 0, RGB(<aColor>\[1\], <aColor>\[2\], <aColor>\[3\]) )
+SendMessage( <hWnd>, TVM_SETBKCOLOR, 0, RGB(<aColor>\[1], <aColor>\[2], <aColor>\[3]) )
 
 #translate TreeView_GetBkColor ( <hWnd> ) ;
 => ;
@@ -273,7 +273,7 @@ nRGB2Arr( SendMessage( <hWnd>, TVM_GETBKCOLOR, 0, 0 ) )
 
 #translate TreeView_SetTextColor ( <hWnd>, <aColor> ) ;
 => ;
-SendMessage( <hWnd>, TVM_SETTEXTCOLOR, 0, RGB(<aColor>\[1\], <aColor>\[2\], <aColor>\[3\]) )
+SendMessage( <hWnd>, TVM_SETTEXTCOLOR, 0, RGB(<aColor>\[1], <aColor>\[2], <aColor>\[3]) )
 
 #translate TreeView_GetTextColor ( <hWnd> ) ;
 => ;
@@ -281,7 +281,7 @@ nRGB2Arr( SendMessage( <hWnd>, TVM_GETTEXTCOLOR, 0, 0 ) )
 
 #translate TreeView_SetLineColor ( <hWnd>, <aColor> ) ;
 => ;
-SendMessage( <hWnd>, TVM_SETLINECOLOR, 0, RGB(<aColor>\[1\], <aColor>\[2\], <aColor>\[3\]) )
+SendMessage( <hWnd>, TVM_SETLINECOLOR, 0, RGB(<aColor>\[1], <aColor>\[2], <aColor>\[3]) )
 
 #translate TreeView_GetLineColor ( <hWnd> ) ;
 => ;

@@ -142,7 +142,7 @@ HB_FUNC( DOEVENTS )
 {
    MSG   Msg;
 
-   while( PeekMessage( ( LPMSG ) & Msg, 0, 0, 0, PM_REMOVE ) )
+   while( PeekMessage( ( LPMSG ) &Msg, 0, 0, 0, PM_REMOVE ) )
    {
       hDlgModeless = GetActiveWindow();
 
@@ -918,7 +918,7 @@ HB_FUNC( ADDSPLITBOXITEM )
       }
    }
 
-   SendMessage( hmg_par_raw_HWND( 2 ), RB_INSERTBAND, ( WPARAM ) - 1, ( LPARAM ) & rbBand );
+   SendMessage( hmg_par_raw_HWND( 2 ), RB_INSERTBAND, ( WPARAM ) - 1, ( LPARAM ) &rbBand );
 
 #ifdef UNICODE
    hb_xfree( lpText );

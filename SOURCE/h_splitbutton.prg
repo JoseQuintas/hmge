@@ -12,15 +12,17 @@ INIT PROCEDURE _InitSPButton
 *------------------------------------------------------------------------------*
 
    InstallEventHandler  ( 'SPButtonEventHandler' )
+   InstallMethodHandler ( 'Release', 'ReleaseSPButtonImageList' )
    InstallMethodHandler ( 'SetFocus', 'SPButtonSetFocus' )
    InstallMethodHandler ( 'Enable', 'SPButtonEnable' )
    InstallMethodHandler ( 'Disable', 'SPButtonDisable' )
+   InstallPropertyHandler ( 'Icon', 'SetSPButtonPicture', 'GetSPButtonPicture' )
 
 RETURN
 
 *------------------------------------------------------------------------------*
 PROCEDURE _DefineSplitButton ( cName, nRow, nCol, cCaption, bAction, cParent, ;
-   lDefault, w, h, tooltip, fontname, fontsize, bold, italic, underline, strikeout )
+   lDefault, w, h, tooltip, fontname, fontsize, bold, italic, underline, strikeout, cIcon )
 *------------------------------------------------------------------------------*
    LOCAL hControlHandle, hParentFormHandle
    LOCAL FontHandle
@@ -139,6 +141,11 @@ PROCEDURE _DefineSplitButton ( cName, nRow, nCol, cCaption, bAction, cParent, ;
       SetToolTip ( hControlHandle , tooltip , GetFormToolTipHandle ( cParent ) )
    ENDIF
 
+   IF ! Empty( cIcon )
+      _HMG_aControlPicture [k] := cIcon
+      _HMG_aControlBrushHandle [k] := SPButton_SetIcon( hControlHandle, cIcon )
+   ENDIF
+
 RETURN
 
 #define WM_COMMAND   0x0111
@@ -253,6 +260,76 @@ PROCEDURE SPButtonDisable ( cWindow, cControl )
 RETURN
 
 *------------------------------------------------------------------------------*
+PROCEDURE SetSPButtonPicture ( cWindow, cControl, cProperty, cIcon )
+*------------------------------------------------------------------------------*
+   LOCAL i
+   cProperty := NIL // Unused variable
+
+   IF GetControlType ( cControl, cWindow ) == 'SPBUTTON'
+
+      i := GetControlIndex ( cControl, cWindow )
+
+      _HMG_aControlPicture[ i ] := cIcon
+
+      IF ! Empty( _HMG_aControlBrushHandle[ i ] )
+         IMAGELIST_DESTROY ( _HMG_aControlBrushHandle[ i ] )
+      ENDIF
+
+      _HMG_aControlBrushHandle[ i ] := SPButton_SetIcon( GetControlHandle ( cControl, cWindow ), cIcon )
+
+      _HMG_UserComponentProcess := .T.
+
+   ELSE
+
+      _HMG_UserComponentProcess := .F.
+
+   ENDIF
+
+RETURN
+
+*------------------------------------------------------------------------------*
+FUNCTION GetSPButtonPicture ( cWindow, cControl )
+*------------------------------------------------------------------------------*
+   LOCAL RetVal
+
+   IF GetControlType ( cControl, cWindow ) == 'SPBUTTON'
+
+      _HMG_UserComponentProcess := .T.
+
+      RetVal := _GetPicture ( cControl, cWindow )
+
+   ELSE
+
+      _HMG_UserComponentProcess := .F.
+
+   ENDIF
+
+RETURN RetVal
+
+*------------------------------------------------------------------------------*
+PROCEDURE ReleaseSPButtonImageList ( cWindow, cControl )
+*------------------------------------------------------------------------------*
+   LOCAL i
+
+   IF _IsControlDefined ( cControl, cWindow ) .AND. GetControlType ( cControl, cWindow ) == 'SPBUTTON'
+
+      i := GetControlIndex ( cControl, cWindow )
+
+      IF ! Empty( _HMG_aControlBrushHandle[ i ] )
+         IMAGELIST_DESTROY ( _HMG_aControlBrushHandle[ i ] )
+      ENDIF
+
+      _HMG_UserComponentProcess := .T.
+
+   ELSE
+
+      _HMG_UserComponentProcess := .F.
+
+   ENDIF
+
+RETURN
+
+*------------------------------------------------------------------------------*
 STATIC FUNCTION LaunchDropdownMenu( nHwnd )
 *------------------------------------------------------------------------------*
    LOCAL aPos := {0, 0, 0, 0}
@@ -288,6 +365,8 @@ RETURN NIL
 LPWSTR AnsiToWide( LPCSTR );
 #endif
 
+HINSTANCE GetResources( void );
+
 HB_FUNC( INITSPLITBUTTON )
 {
 #ifndef UNICODE
@@ -304,7 +383,7 @@ HB_FUNC( INITSPLITBUTTON )
             (
          WC_BUTTON,
          lpWindowName,
-         Style | WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | BS_PUSHBUTTON | WS_VISIBLE | WS_TABSTOP,
+         Style | WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | BS_PUSHBUTTON | BS_CENTER | BS_TEXT | WS_VISIBLE | WS_TABSTOP,
          hb_parni( 3 ),
          hb_parni( 2 ),
          hb_parni( 6 ),
@@ -315,6 +394,73 @@ HB_FUNC( INITSPLITBUTTON )
          NULL
             )
       );
+}
+
+#ifndef BCM_FIRST
+#define BCM_FIRST         0x1600
+#define BCM_SETIMAGELIST  ( BCM_FIRST + 0x0002 )
+#endif
+
+#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 ) || ( defined ( __MINGW32__ ) && defined ( __MINGW32_VERSION ) )
+typedef struct
+{
+   HIMAGELIST himl;
+   RECT       margin;
+   UINT       uAlign;
+} BUTTON_IMAGELIST, * PBUTTON_IMAGELIST;
+#endif
+
+HB_FUNC( SPBUTTON_SETICON )
+{
+   HICON            hIcon;
+   BITMAP           bm;
+   ICONINFO         sIconInfo;
+   HIMAGELIST       himl = ( HIMAGELIST ) NULL;
+   BUTTON_IMAGELIST bi;
+#ifndef UNICODE
+   LPCTSTR lpIconName = hb_parc( 2 );
+#else
+   LPWSTR  lpIconName = AnsiToWide( ( char * ) hb_parc( 2 ) );
+#endif
+
+   hIcon = ( HICON ) LoadImage( GetResources(), lpIconName, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR );
+
+   if( hIcon == NULL )
+   {
+      hIcon = ( HICON ) LoadImage( 0, lpIconName, IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTCOLOR );
+   }
+
+   if( GetIconInfo( hIcon, &sIconInfo ) )
+   {
+      GetObject( sIconInfo.hbmColor, sizeof( BITMAP ), ( LPVOID ) &bm );
+
+      if( sIconInfo.hbmMask )
+      {
+         DeleteObject( sIconInfo.hbmMask );
+      }
+
+      if( sIconInfo.hbmColor )
+      {
+         DeleteObject( sIconInfo.hbmColor );
+      }
+
+      himl = ImageList_Create( bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0 );
+
+      ImageList_AddIcon( himl, hIcon );
+
+      DestroyIcon( hIcon );
+
+      bi.himl          = himl;
+      bi.margin.top    = 4;
+      bi.margin.bottom = 4;
+      bi.margin.left   = 4;
+      bi.margin.right  = 4;
+      bi.uAlign        = BUTTON_IMAGELIST_ALIGN_LEFT;
+
+      SendMessage( hmg_par_raw_HWND( 1 ), ( UINT ) BCM_SETIMAGELIST, ( WPARAM ) 0, ( LPARAM ) &bi );
+   }
+
+   hmg_ret_raw_HANDLE( himl );
 }
 
 #pragma ENDDUMP

@@ -684,7 +684,7 @@ HB_FUNC( TREEVIEW_SORTCHILDRENRECURSIVECB )
 
    TVSortCB.hParent = ( HTREEITEM ) ItemHandle;
    TVSortCB.lpfnCompare = ( PFNTVCOMPARE ) TreeViewCompareFunc;
-   TVSortCB.lParam = ( LPARAM ) & TreeViewCompareInfo;
+   TVSortCB.lParam = ( LPARAM ) &TreeViewCompareInfo;
 
    if( fRecurse == FALSE )
    {

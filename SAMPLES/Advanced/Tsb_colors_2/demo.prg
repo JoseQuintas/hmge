@@ -163,11 +163,12 @@ FUNCTION ColorPicker( oBrw )
 
    LOCAL aColor
 
-   aColor := n2RGB( oBrw:aArray[ oBrw:nAt ][ oBrw:nCell ] ) // получить цвет из текущей €чейки
+   aColor := HMG_n2RGB( oBrw:aArray[ oBrw:nAt ][ oBrw:nCell ] ) // получить цвет из текущей €чейки
    aColor := GetColor( aColor )            // стандартное меню цвета
    IF aColor[ 1 ] # NIL
       // поместить новый цвет в текущую €чейку
       oBrw:aArray[ oBrw:nAt ][ oBrw:nCell ] := RGB( aColor[ 1 ], aColor[ 2 ], aColor[ 3 ] )
+      oBrw:DrawSelect()
    ENDIF
 
 RETURN NIL
@@ -176,18 +177,6 @@ RETURN NIL
 FUNCTION SetNewColor( oBrw, nCol )
 
 RETURN oBrw:aArray[ oBrw:nAt ][ nCol ]
-
-///////////////////////////////////////////////////////////////////
-FUNCTION n2RGB( nColor )
-
-   LOCAL nR, nG, nB
-   LOCAL cColor := NTOC( nColor, 16 )
-
-   nR := CTON( SubStr( cColor, 5, 2 ), 16 )
-   nG := CTON( SubStr( cColor, 3, 2 ), 16 )
-   nB := CTON( SubStr( cColor, 1, 2 ), 16 )
-
-RETURN { nR, nG, nB }
 
 ///////////////////////////////////////////////////////////////////
 FUNCTION ViewColorTbrws( oBrw, nCol, aVar )

@@ -389,7 +389,7 @@ HB_FUNC( GETFONTRTF )
       SelText = SCF_DEFAULT;
    }
 
-   SendMessage( hmg_par_raw_HWND( 1 ), EM_GETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) & cF );
+   SendMessage( hmg_par_raw_HWND( 1 ), EM_GETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) &cF );
 
    PointSize = cF.yHeight / 20;
 
@@ -430,7 +430,7 @@ HB_FUNC( SETFONTRTF )
 #endif
    cF.cbSize = sizeof( CHARFORMAT );
 
-   Mask = ( DWORD ) SendMessage( hmg_par_raw_HWND( 1 ), EM_GETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) & cF );
+   Mask = ( DWORD ) SendMessage( hmg_par_raw_HWND( 1 ), EM_GETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) &cF );
 
    if( hb_parni( 10 ) > 0 )
    {
@@ -481,7 +481,7 @@ HB_FUNC( SETFONTRTF )
       lstrcpy( cF.szFaceName, szFaceName );
    }
 
-   lResult = SendMessage( hmg_par_raw_HWND( 1 ), EM_SETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) & cF );
+   lResult = SendMessage( hmg_par_raw_HWND( 1 ), EM_SETCHARFORMAT, ( WPARAM ) SelText, ( LPARAM ) &cF );
 
    hmg_ret_L( lResult );
 }

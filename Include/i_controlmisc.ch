@@ -297,8 +297,8 @@ iif ( _HMG_IsMultiple , ( iif ( <.warning.> , AlertStop( _HMG_MESSAGE\[4] ) , ) 
 
 #xtranslate SET WINDOW THIS TO [<w>] => _SetThisFormInfo( [<w>] )
 
-#xtranslate SET SCROLLSTEP TO <step> => _HMG_aScrollStep \[1\] := <step>
-#xtranslate SET SCROLLPAGE TO <step> => _HMG_aScrollStep \[2\] := <step>
+#xtranslate SET SCROLLSTEP TO <step> => _HMG_aScrollStep \[1] := <step>
+#xtranslate SET SCROLLPAGE TO <step> => _HMG_aScrollStep \[2] := <step>
 
 #translate SET AUTOSCROLL <x:ON,OFF> => _HMG_AutoScroll := ( Upper(<(x)>) == "ON" )
 

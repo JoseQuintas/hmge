@@ -555,8 +555,8 @@
        => ;
     <oBrw>:AddColumn( TSColumn():New( ;
              [ If(<.oem.>, OemToAnsi(<cHead>), <cHead>) ], ;
-             \{|x| If(PCount() > 0, <oBrw>:aArray\[<oBrw>:nAt, <elm>\] := x, ;
-                      <oBrw>:aArray\[<oBrw>:nAt, <elm>\])\}, [ <cPicture> ], ;
+             \{|x| If(PCount() > 0, <oBrw>:aArray\[<oBrw>:nAt, <elm>] := x, ;
+                      <oBrw>:aArray\[<oBrw>:nAt, <elm>])\}, [ <cPicture> ], ;
              [ \{<aColors>\} ], [ \{<aAlign>\} ], [ <nWidth> ], ;
              [ Upper(<(bit)>) ], [ <.edit.> ], ;
              [ \{|uVar,This| <uValid> \}], ;
@@ -639,9 +639,9 @@
 *=============================================================================
 
 #xcommand ENABLE EDIT [ CONTROL ] [ TBROWSE ] <oBrw> COLUMN <nColumn> ;
-            =>  <oBrw>:aColumns\[ <nColumn> \]:lEdit  := .T.
+            =>  <oBrw>:aColumns\[ <nColumn> ]:lEdit  := .T.
 #xcommand DISABLE EDIT [ CONTROL ][ TBROWSE ] <oBrw> COLUMN <nColumn> ;
-            =>  <oBrw>:aColumns\[ <nColumn> \]:lEdit  := .F.
+            =>  <oBrw>:aColumns\[ <nColumn> ]:lEdit  := .F.
 
 #xcommand ENABLE NORESETPOS [ CONTROL ] [ TBROWSE ] <oBrw> ;
             => <oBrw>:lNoResetPos( .T. )
@@ -685,9 +685,9 @@
             => <oBrw>:nFreeze := <nFreeze>
 
 #xcommand MODIFY [ CONTROL ] [ TBROWSE ] <oBrw> COLUMN <nColumn> [ PROPERTY ] DATA TO <bData>;
-            => <oBrw>:aColumns\[ <nColumn> \]:bData := <bData>
+            => <oBrw>:aColumns\[ <nColumn> ]:bData := <bData>
 #xcommand MODIFY [ CONTROL ] [ TBROWSE ] <oBrw> COLUMN <nColumn> [ PROPERTY ] VALID TO <bValid>;
-            => <oBrw>:aColumns\[ <nColumn> \]:bValid := <bValid>
+            => <oBrw>:aColumns\[ <nColumn> ]:bValid := <bValid>
 
 #xcommand MODIFY [ CONTROL ] [ TBROWSE ] <oBrw> COLUMN <nColumn> [ PROPERTY ] ALIGN TO <ConstAlign>;
             => <oBrw>:SetAlign( <nColumn>, 1, <ConstAlign> )

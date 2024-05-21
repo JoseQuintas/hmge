@@ -6,7 +6,7 @@
 
 #include "hmg.ch"
 
-FUNCTION MAIN
+FUNCTION Main()
 
    LOCAL aRows := { ;
       { 113.12, Date() + 1, 1, 1, .T. }, ;
@@ -69,7 +69,7 @@ FUNCTION MAIN
             MENUITEM 'Set Height' ACTION ( Form_1.Grid_1.HEIGHT := Val( InputBox( 'Enter new Height', , hb_ntos ( Form_1.Grid_1.Height ) ) ), AutoFit( 2 ) )
             MENUITEM 'AutoFit' ACTION ( Form_1.AutoFit.Checked := ! Form_1.AutoFit.Checked ) NAME AutoFit CHECKED
             SEPARATOR
-            MENUITEM 'Exit' ACTION Form_1.RELEASE
+            MENUITEM 'Exit' ACTION Form_1.Release()
          END POPUP
       END MENU
 

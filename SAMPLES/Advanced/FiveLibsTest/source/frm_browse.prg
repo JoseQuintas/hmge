@@ -19,7 +19,7 @@ FUNCTION frm_Browse( Self, xDlg, xControl, cTable )
    ENDIF
    // check end
    FOR EACH aItem IN ::aAllSetup[ nPos, 2 ]
-      IF aItem[ CFG_CTLTYPE ] == TYPE_EDIT
+      IF aItem[ CFG_CTLTYPE ] == TYPE_TEXT
          AAdd( oTBrowse, { aItem[ CFG_CAPTION ], aItem[ CFG_FNAME ], aItem[ CFG_FPICTURE ] } )
          IF aItem[ CFG_ISKEY ]
             cField := aItem[ CFG_FNAME ]
@@ -30,7 +30,7 @@ FUNCTION frm_Browse( Self, xDlg, xControl, cTable )
    DialogBrowse( oTBrowse, cTable, cField, @xValue )
 
    IF ! Empty( xValue ) .AND. ! Empty( xControl )
-      gui_TextSetValue( xDlg, xControl, xValue )
+      gui_ControlSetValue( xDlg, xControl, xValue )
    ENDIF
    SET ORDER TO ( nIndexOrd )
 
@@ -45,15 +45,14 @@ FUNCTION DialogBrowse( oTBrowse, cTable, cField, xValue )
 
    oThisForm := frm_Class():New()
    oThisForm:cOptions := ""
-   gui_DialogCreate( @oThisForm:xDlg, 0, 0, oThisForm:nDlgWidth, oThisForm:nDlgHeight, gui_libName() + " " + cTable, { || Nil } )
+   gui_DialogCreate( @oThisForm:xDlg, 0, 0, APP_DLG_WIDTH, APP_DLG_HEIGHT, gui_libName() + " " + cTable,, .T. )
    frm_Buttons( oThisForm, .F. )
-   AAdd( oThisForm:aControlList, CFG_EMPTY )
+   AAdd( oThisForm:aControlList, EmptyFrmClassItem() )
    aItem := Atail( oThisForm:aControlList )
    aItem[ CFG_CTLTYPE ] := TYPE_BROWSE
-
-   gui_Browse( oThisForm:xDlg, @aItem[ CFG_FCONTROL ], 70, 5, ;
-      oThisForm:nDlgWidth - 10, oThisForm:nDlgHeight - 80, ;
-      oTbrowse, cField, @xValue, cTable )
+   gui_Browse( oThisForm:xDlg, oThisForm:xDlg, @aItem[ CFG_FCONTROL ], 70, 5, ;
+      APP_DLG_WIDTH - 10, APP_DLG_HEIGHT - 80, ;
+      oTbrowse, cField, @xValue, cTable, {}, oThisForm )
    // works for hmge from button
    gui_SetFocus( oThisForm:xDlg, aItem[ CFG_FCONTROL ] )
    gui_DialogActivate( oThisForm:xDlg, { || gui_SetFocus( oThisForm:xDlg, aItem[ CFG_FCONTROL ] ) } )

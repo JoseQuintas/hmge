@@ -133,7 +133,7 @@ HB_FUNC( SAVEWINDOWBYHANDLE )
 
       bmfHdr.bfOffBits = ( DWORD ) sizeof( BITMAPFILEHEADER ) + lpBI->biSize + ( GetDIBColors( ( LPSTR ) lpBI ) * sizeof( RGBTRIPLE ) );
 
-      WriteFile( filehandle, ( LPSTR ) & bmfHdr, sizeof( BITMAPFILEHEADER ), &dwWritten, NULL );
+      WriteFile( filehandle, ( LPSTR ) &bmfHdr, sizeof( BITMAPFILEHEADER ), &dwWritten, NULL );
 
       WriteFile( filehandle, ( LPSTR ) lpBI, dwDIBSize, &dwWritten, NULL );
    }
@@ -209,7 +209,7 @@ HB_FUNC( WNDCOPY )
 
       bmfHdr.bfOffBits = ( DWORD ) sizeof( BITMAPFILEHEADER ) + lpBI->biSize + ( GetDIBColors( ( LPSTR ) lpBI ) * sizeof( RGBTRIPLE ) );
 
-      WriteFile( filehandle, ( LPSTR ) & bmfHdr, sizeof( BITMAPFILEHEADER ), &dwWritten, NULL );
+      WriteFile( filehandle, ( LPSTR ) &bmfHdr, sizeof( BITMAPFILEHEADER ), &dwWritten, NULL );
 
       WriteFile( filehandle, ( LPSTR ) lpBI, dwDIBSize, &dwWritten, NULL );
    }
@@ -312,7 +312,7 @@ HANDLE DibFromBitmap( HBITMAP hbm, HPALETTE hpal )
       hpal = ( HPALETTE ) GetStockObject( DEFAULT_PALETTE );
    }
 
-   GetObject( hbm, sizeof( bm ), ( LPSTR ) & bm );
+   GetObject( hbm, sizeof( bm ), ( LPSTR ) &bm );
 
    biBits = ( WORD ) ( bm.bmPlanes * bm.bmBitsPixel );
 
@@ -466,7 +466,7 @@ HBITMAP Icon2Bmp( HICON hIcon )
    HBITMAP  hOldBmp;
 
    GetIconInfo( hIcon, &icon );
-   GetObject( icon.hbmColor, sizeof( BITMAP ), ( LPVOID ) & bitmap );
+   GetObject( icon.hbmColor, sizeof( BITMAP ), ( LPVOID ) &bitmap );
    hBmp = CreateCompatibleBitmap( hDC, bitmap.bmWidth, bitmap.bmHeight );
    hOldBmp = ( HBITMAP ) SelectObject( hMemDC, hBmp );
 
@@ -495,7 +495,7 @@ HBITMAP IconMask2Bmp( HICON hIcon )
    HBITMAP  hOldBmp;
 
    GetIconInfo( hIcon, &icon );
-   GetObject( icon.hbmColor, sizeof( BITMAP ), ( LPVOID ) & bitmap );
+   GetObject( icon.hbmColor, sizeof( BITMAP ), ( LPVOID ) &bitmap );
    hBmp = CreateCompatibleBitmap( hDC, bitmap.bmWidth, bitmap.bmHeight );
    hOldBmp = ( HBITMAP ) SelectObject( hMemDC, hBmp );
 
@@ -549,7 +549,7 @@ HB_FUNC( DRAWGLYPH )
    }
 
    // is it a bitmap?
-   if( ( UINT ) GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) & bitmap ) != sizeof( BITMAP ) )
+   if( ( UINT ) GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) &bitmap ) != sizeof( BITMAP ) )
    {
       // is it an icon?
       if( !GetIconInfo( ( HICON ) hBmp, &icon ) )
@@ -590,7 +590,7 @@ HB_FUNC( DRAWGLYPH )
          // ignore colour given by the user, if any
          rgbTransparent = RGB( 255, 255, 255 );
          bHasBkColor = TRUE;
-         GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) & bitmap );
+         GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) &bitmap );
       }
    }
 
@@ -700,7 +700,7 @@ HB_FUNC( DRAWGLYPHMASK )
 
    BITMAP   bitmap;
 
-   GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) & bitmap );
+   GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) &bitmap );
 
    SetBkColor( hDC, RGB( 255, 255, 255 ) );        //White
    SetTextColor( hDC, RGB( 0, 0, 0 ) );            //Black
@@ -789,7 +789,7 @@ VOID DrawGlyph( HDC hDC, int x, int y, int dx, int dy, HBITMAP hBmp, COLORREF rg
    BOOL     bHasBkColor = !HB_ISNIL( 7 );
 
    // is it a bitmap?
-   if( ( UINT ) GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) & bitmap ) != sizeof( BITMAP ) )
+   if( ( UINT ) GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) &bitmap ) != sizeof( BITMAP ) )
    {
       // is it an icon?
       if( !GetIconInfo( ( HICON ) hBmp, &icon ) )
@@ -828,7 +828,7 @@ VOID DrawGlyph( HDC hDC, int x, int y, int dx, int dy, HBITMAP hBmp, COLORREF rg
          // ignore colour given by the user, if any
          rgbTransparent = RGB( 255, 255, 255 );
          bHasBkColor = TRUE;
-         GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) & bitmap );
+         GetObject( hBmp, sizeof( BITMAP ), ( LPVOID ) &bitmap );
       }
    }
 

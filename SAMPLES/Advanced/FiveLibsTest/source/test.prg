@@ -14,67 +14,38 @@ REQUEST DBFCDX
    PROCEDURE Main()
 #endif
 
+   LOCAL aKeyList := {}, aSeekList := {}, aBrowseList := {}, aTypeList := {}
    LOCAL aAllSetup, aList, aFile, aField, aStru, cFile, aItem, aDBF, nKeyPos, nSeekPos
-   LOCAL aKeyList, aSeekList, aBrowseList, aBrowse, nPos, aComboList, aCheckList
+   LOCAL cFieldName, aBrowse, nPos, aSetup
 
    SET CONFIRM OFF
+   SET CENTURY ON
    SET DATE    BRITISH
    SET DELETED ON
    SET EPOCH TO Year( Date() ) - 90
    SET EXCLUSIVE OFF
    SET FILECASE LOWER
    SET DIRCASE  LOWER
-#ifdef DLGAUTO_AS_LIB
-   #ifdef HBMK_HAS_HMGE
-      Init()
-   #endif
-#endif
    gui_Init()
    RddSetDefault( "DBFCDX" )
    test_DBF()
-   /* table, key, browse index */
-   aKeyList := { ;
-      { "DBCLIENT",    "IDCLIENT", 2 }, ;
-      { "DBPRODUCT",   "IDPRODUCT", 2 }, ;
-      { "DBUNIT",      "IDUNIT", 2 }, ;
-      { "DBSELLER",    "IDSELLER", 2 }, ;
-      { "DBBANK",      "IDBANK", 2 }, ;
-      { "DBGROUP",     "IDGROUP", 2 }, ;
-      { "DBSTOCK",     "IDSTOCK" }, ;
-      { "DBFINANC",    "IDFINANC" }, ;
-      { "DBSTATE",     "IDSTATE", 2 }, ;
-      { "DBTICKET",    "IDTICKET" }, ;
-      { "DBTICKETPRO", "IDTICKETPRO" }, ;
-      { "DBDBF",       "IDDBF", 2 }, ;
-      { "DBFIELDS",    "IDFIELD", 2 } }
-
-   /* table, field, table to search, key field, field to show */
-   aSeekList := { ;
-      { "DBCLIENT",  "CLSELLER",  "DBSELLER",  "IDSELLER",  "SENAME" }, ;
-      { "DBCLIENT",  "CLBANK",    "DBBANK",    "IDBANK",    "BANAME" }, ;
-      ; // { "DBCLIENT",  "CLSTATE",   "DBSTATE",   "IDSTATE",   "STNAME" }, ;
-      { "DBPRODUCT", "IEUNIT",    "DBUNIT",    "IDUNIT",    "UNNAME" }, ;
-      { "DBSTOCK",   "STCLIENT",  "DBCLIENT",  "IDCLIENT",  "CLNAME" }, ;
-      { "DBSTOCK",   "STPRODUCT", "DBPRODUCT", "IDPRODUCT", "PRNAME" }, ;
-      { "DBSTOCK",   "STGROUP",   "DBGROUP",   "IDGROUP",   "GRNAME" }, ;
-      { "DBFINANC",  "FICLIENT",  "DBCLIENT",  "IDCLIENT",  "CLNAME" }, ;
-      { "DBFINANC",  "FIBANK",    "DBBANK",    "IDBANK",    "BANAME" } }
-
-   /* Related browse */
-   aBrowseList := { ;
-      { "DBTICKET", "IDTICKET", "DBTICKETPRO", 2, "TPTICKET", "IDTICKEDPRO", .F. }, ;
-      { "DBDBF",    "NAME",     "DBFIELDS",    2, "DBF",  "IDFIELD", .F. } , ;
-      { "DBCLIENT", "IDCLIENT", "DBSTOCK",     2, "STCLIENT", "IDSTOCK", .F. }, ;
-      { "DBCLIENT", "IDCLIENT", "DBFINANC",    2, "FICLIENT", "IDFINANC", .T. }, ;
-      { "DBCLIENT", "IDCLIENT", "DBTICKET",    2, "TICLIENT", "IDTICKET", .F. } }
-
-   /* Combotext */
-   aComboList := { ;
-      { "DBCLIENT", "CLSTATE", { "AC", "RS", "SP", "RJ", "PR", "RN" } } }
-
-   /* checkbox */
-   aCheckList := { ;
-     { "DBCLIENT", "CLSTATUS" } }
+   IF ! File( "dlgauto.json" )
+      hb_MemoWrit( "dlgauto.json", test_Setup() )
+   ENDIF
+   aSetup := hb_JsonDecode( MemoRead( "dlgauto.json" ) )
+   IF ValType( aSetup ) == "A" // test if valid setup
+      FOR EACH aItem IN aSetup
+         DO CASE
+         CASE ValType( aItem ) != "A"         // test if valid setup
+         CASE Len( aItem ) != 2               // test if valid setup
+         CASE ValType( aItem[ 2 ] ) != "A"    // test if valid setup
+         CASE aItem[ 1 ] == "KEYLIST";        aKeyList        := aItem[ 2 ]
+         CASE aItem[ 1 ] == "SEEKLIST";       aSeekList       := aItem[ 2 ]
+         CASE aItem[ 1 ] == "BROWSELIST";     aBrowseList     := aItem[ 2 ]
+         CASE aItem[ 1 ] == "TYPELIST";       aTypeList       := aItem[ 2 ]
+         ENDCASE
+      NEXT
+   ENDIF
 
    aAllSetup := {}
    aList := Directory( "*.dbf" )
@@ -85,47 +56,61 @@ REQUEST DBFCDX
       USE ( cFile )
       aStru := dbStruct()
       FOR EACH aField IN aStru
-         aItem := CFG_EMPTY
+         aItem := EmptyFrmClassItem()
+         aItem[ CFG_CTLTYPE ]  := TYPE_TEXT
          aItem[ CFG_FNAME ]    := aField[ DBS_NAME ]
          aItem[ CFG_FTYPE ]    := aField[ DBS_TYPE ]
          aItem[ CFG_FLEN ]     := aField[ DBS_LEN ]
          aItem[ CFG_FDEC ]     := aField[ DBS_DEC ]
-         aItem[ CFG_VALUE ]    := aField[ DBS_NAME ]
+         aItem[ CFG_VALUE ]    := FieldGet( aField:__EnumIndex )
          aItem[ CFG_CAPTION ]  := aField[ DBS_NAME ]
          aItem[ CFG_FPICTURE ] := PictureFromValue( aItem )
+         cFieldName := aItem[ CFG_FNAME ]
          /* is key */
-         IF hb_ASCan( aKeyList, { | e | e[1] == cFile .AND. e[2] == aItem[ CFG_FNAME ] } ) != 0
+         IF hb_ASCan( aKeyList, { | e | e[1] == cFile .AND. e[2] == cFieldName } ) != 0
             aItem[ CFG_ISKEY ] := .T.
          ENDIF
          /* to search */
-         IF ( nSeekPos := hb_ASCan( aSeekList, { | e | e[1] == cFile .AND. e[2] == aItem[ CFG_FNAME ] } ) ) != 0
-            aItem[ CFG_VTABLE ] := aSeekList[ nSeekPos, 3 ]
-            aItem[ CFG_VFIELD ] := aSeekList[ nSeekPos, 4 ]
-            aItem[ CFG_VSHOW ]  := aSeekList[ nSeekPos, 5 ]
+         IF ( nPos := hb_ASCan( aSeekList, { | e | e[1] == cFile .AND. e[2] == cFieldName } ) ) != 0
+            aItem[ CFG_VTABLE ] := aSeekList[ nPos, 3 ]
+            aItem[ CFG_VFIELD ] := aSeekList[ nPos, 4 ]
+            aItem[ CFG_VSHOW ]  := aSeekList[ nPos, 5 ]
          ENDIF
-         /* combotext */
-         IF ( nSeekPos := hb_Ascan( aComboList, { | e | e[1] == cFile .AND. e[2] == aItem[ CFG_FNAME ] } ) ) != 0
-            aItem[ CFG_COMBOLIST ] := aComboList[ nSeekPos, 3 ]
-            aItem[ CFG_CTLTYPE ] := TYPE_COMBOBOX
+         /* TypeList */
+         IF ( nPos := hb_Ascan( aTypeList, { | e | e[1] == cFile .AND. e[2] == cFieldName } ) ) != 0
+            DO CASE
+            CASE aTypeList[ nPos, 3 ] == "COMBOBOX"
+               aItem[ CFG_COMBOLIST ] := AClone( aTypeList[ nPos, 4 ] )
+               aItem[ CFG_CTLTYPE ] := TYPE_COMBOBOX
+            CASE aTypeList[ nPos, 3 ] == "CHECKBOX"
+               aItem[ CFG_CTLTYPE ] := TYPE_CHECKBOX
+            CASE aTypeList[ nPos, 3 ] == "DATEPICKER"
+               aItem[ CFG_CTLTYPE ] := TYPE_DATEPICKER
+            CASE aTypeList[ nPos, 3 ] == "SPINNER"
+               aItem[ CFG_SPINNER ] := AClone( aTypeList[ nPos, 4 ] )
+               aItem[ CFG_CTLTYPE ] := TYPE_SPINNER
+            ENDCASE
          ENDIF
-         /* checkbox */
-         IF hb_Ascan( aCheckList, { | e | e[1] == cFile .AND. e[2] == aItem[ CFG_FNAME ] } ) != 0
-            aItem[ CFG_CTLTYPE ] := TYPE_CHECKBOX
-         ENDIF
+
          AAdd( Atail( aAllSetup )[ 2 ], aItem )
       NEXT
       /* in browse */
       FOR EACH aBrowse IN aBrowseList
          IF aBrowse[ 1 ] == cFile
-            aItem := CFG_EMPTY
-            aItem[ CFG_CTLTYPE ]   := TYPE_BROWSE
-            aItem[ CFG_BKEYFROM ]  := aBrowse[ 2 ]
-            aItem[ CFG_BTABLE ]    := aBrowse[ 3 ]
-            aItem[ CFG_BINDEXORD ] := aBrowse[ 4 ]
-            aItem[ CFG_BKEYTO ]    := aBrowse[ 5 ]
-            aItem[ CFG_BKEYTO2 ]   := aBrowse[ 6 ]
-            aItem[ CFG_BVALUE ]    := FieldGet( FieldNum( aItem[ CFG_BKEYFROM  ] ) )
-            aItem[ CFG_BEDIT ]     := aBrowse[ 7 ]
+            aItem := EmptyFrmClassItem()
+            aItem[ CFG_CTLTYPE ]    := TYPE_BROWSE
+            aItem[ CFG_BRWKEYFROM ] := aBrowse[ 2 ]
+            aItem[ CFG_BRWTABLE ]   := aBrowse[ 3 ]
+            aItem[ CFG_BRWIDXORD ]  := aBrowse[ 4 ]
+            aItem[ CFG_BRWKEYTO ]   := aBrowse[ 5 ]
+            aItem[ CFG_BRWKEYTO2 ]  := aBrowse[ 6 ]
+            aItem[ CFG_BRWVALUE ]   := FieldGet( FieldNum( aItem[ CFG_BRWKEYFROM  ] ) )
+            aItem[ CFG_BRWEDIT ]    := aBrowse[ 7 ]
+            IF Len( aBrowse) > 7
+               aItem[ CFG_BRWTITLE ] := aBrowse[ 8 ]
+            ELSE
+               aItem[ CFG_BRWTITLE ] := aItem[ CFG_BRWTABLE ] + " LIST"
+            ENDIF
             AAdd( Atail( aAllSetup )[ 2 ], aItem )
          ENDIF
       NEXT
@@ -177,8 +162,10 @@ STATIC FUNCTION PictureFromValue( oValue )
 
    RETURN cPicture
 
+#ifndef DLGAUTO_AS_LIB
 FUNCTION AppVersaoExe(); RETURN ""
 FUNCTION AppUserName(); RETURN ""
+#endif
 
 /* above functions not in use, for tests purpose */
 
@@ -219,3 +206,13 @@ CREATE CLASS ADOClass
    METHOD QueryExecuteUpdate() INLINE Nil
    ENDCLASS
 */
+
+#ifdef HBMK_HAS_GTWVG
+
+PROCEDURE HB_GTSYS
+
+   REQUEST HB_GT_WVG_DEFAULT
+   REQUEST HB_GT_WVG
+
+   RETURN
+#endif

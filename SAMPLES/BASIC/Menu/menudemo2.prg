@@ -4,7 +4,7 @@
 
 #include "minigui.ch"
 
-PROCEDURE MAIN
+PROCEDURE Main( ... )
 
    LOCAL n
    LOCAL m_char
@@ -33,13 +33,13 @@ PROCEDURE MAIN
 
          SEPARATOR
 
-         MENUITEM Space( 4 ) + 'E&xit' ACTION Win_1.Release
+         MENUITEM Space( 4 ) + 'E&xit' ACTION Win_1.Release NAME item_exit
 
       END POPUP
 
       POPUP '&Help'
 
-         MENUITEM Space( 8 ) + '&About' + Space( 30 ) ACTION MsgInfo ( MiniGuiVersion(1) )
+         MENUITEM Space( 8 ) + '&About' + Space( 30 ) ACTION MsgInfo ( MiniGuiVersion(1) ) NAME item_about
 
       END POPUP
 
@@ -53,6 +53,13 @@ PROCEDURE MAIN
 
    IF IsExtendedMenuStyleActive()
       Set MenuTheme User GetWin7Theme() Of Win_1
+   ELSE
+      FOR n := 1 TO 3
+         m_char := StrZero( n, 2 )
+         Win_1.(m_char).Caption := AllTrim( Win_1.(m_char).Caption )
+      NEXT
+      Win_1.item_exit.Caption  := AllTrim( Win_1.item_exit.Caption )
+      Win_1.item_about.Caption := AllTrim( Win_1.item_about.Caption )
    ENDIF
 
    CENTER WINDOW Win_1
@@ -66,12 +73,15 @@ PROCEDURE MenuProc()
    LOCAL cTitle := Left( StrTran( LTrim( This.Caption ), "&", "" ), 6 )
 
    IF This.Name == '01'
+
       MsgInfo ( 'Action 01', cTitle )
 
    ELSEIF This.Name == '02'
+
       MsgInfo ( 'Action 02', cTitle )
 
    ELSEIF This.Name == '03'
+
       MsgInfo ( 'Action 03', cTitle )
 
    ENDIF

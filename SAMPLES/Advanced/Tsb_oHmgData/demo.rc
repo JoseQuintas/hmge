@@ -1,0 +1,92 @@
+//
+// Resource     Resource         Resource
+// Name          Type             FileName
+//            
+1MG             ICON            res\1MG.ico
+2MG_64          ICON            res\2MG64.ico
+bMinus32        BITMAP          res\bMinus32.bmp
+bPlus32         BITMAP          res\bPlus32.bmp
+bZero32         BITMAP          res\bZero32.bmp
+bFCalc32        BITMAP          res\bFCalc32.bmp
+bFCSV32         BITMAP          res\bFCSV32.bmp
+bFExcel32       BITMAP          res\bFExcel32.bmp
+bFText32        BITMAP          res\bFText32.bmp
+bFWord32        BITMAP          res\bFWord32.bmp
+bFZero32        BITMAP          res\bFZero32.bmp
+// demo.prg
+HmgClipper      PNG             res\Hmg_clipper.png
+iMg1x64         ICON            res\iLogoMg1x64.ico
+iMg2x64         ICON            res\iLogoMg2x64.ico
+iMg3x64         ICON            res\iLogoMg3x64.ico
+iEdit64x1       ICON            res\iEdit64x1.ico   
+iEdit64x2       ICON            res\iEdit64x2.ico 
+iDelete48x1     ICON            res\iDelete48x1.ico
+iDelete48x2     ICON            res\iDelete48x2.ico
+iInsert48x1     ICON            res\iInsert48x1.ico
+iInsert48x2     ICON            res\iInsert48x2.ico
+iExit48x1       ICON            res\iExit48x1.ico
+iExit48x2       ICON            res\iExit48x2.ico
+iRHelp48x1      ICON            res\iRHelp48x1.ico
+iRHelp48x2      ICON            res\iRHelp48x2.ico
+iFind48x1       ICON            res\iFind48x1.ico
+iFind48x2       ICON            res\iFind48x2.ico
+iPrint48x1      ICON            res\iPrint48x1.ico
+iPrint48x2      ICON            res\iPrint48x2.ico
+bRecDel16       BITMAP          res\bRecDel.bmp
+bFind32         BITMAP          res\bFind32.bmp
+iRuble24        ICON            res\iRuble24.ico
+iBank24         ICON            res\iBank24.ico
+iFirma24        ICON            res\iFirma24.ico
+iDelVal32       ICON            res\iDelVal32.ico
+iUser32         ICON            res\iUser32.ico
+iVOAnten48      ICON            res\iVOAntenna48.ico
+iVOMetla48      ICON            res\iVOMetla48.ico
+iVOTelef48      ICON            res\iVOTelefon48.ico
+iVODmfn48       ICON            res\iVODomofon48.ico
+iDelVal48       ICON            res\iDelVal48.ico
+iEnter48x1      ICON            res\iEnter48x1.ico 
+iEnter48x2      ICON            res\iEnter48x2.ico
+iExcel48x1      ICON            res\iExcel48x1.ico 
+iExcel48x2      ICON            res\iExcel48x2.ico 
+iExitM48x1      ICON            res\iExitM48x1.ico 
+iExitM48x2      ICON            res\iExitM48x2.ico 
+// demo.prg                     
+i1Delete48      ICON            res\i1Delete48.ico
+i1Insert48      ICON            res\i1Insert48.ico
+i1Exit48        ICON            res\i1Exit48.ico
+i1Help48        ICON            res\i1Help48.ico
+i1Find48        ICON            res\i1Find48.ico
+i1Print48       ICON            res\i1Print48.ico
+b_empty32       BITMAP          res\b_empty32.bmp
+
+
+1 VERSIONINFO
+FILEVERSION 1,0
+PRODUCTVERSION 1,0
+FILEOS 0x4
+FILETYPE 0x1
+{
+BLOCK "StringFileInfo"
+{
+  BLOCK "040904b0"
+  {
+    VALUE "FileDescription", "Demo MiniGui\000"
+    VALUE "FileVersion", "1.0."
+    VALUE "InternalName", "demo.exe\000"
+    VALUE "LegalCopyright", "(c) Copyright 2024 Verchenko Andrey (Dmitrov)\000"
+    VALUE "LegalTrademarks", "Harbour + MiniGui\000"
+    VALUE "OriginalFilename", "demo.exe\000"
+    VALUE "CompanyName", "V-Soft Dmitrov, Moscow region\000"
+    VALUE "ProductName", "Demo MiniGui Harbour\000"
+    VALUE "ProductVersion", "1.0."
+    VALUE "Comments", "Created by Verchenko Andrey <verchenkoag@gmail.com>\000"
+  }
+}
+
+BLOCK "VarFileInfo"
+{
+  VALUE "Translation", 0x0409 0x04B0
+}
+}
+
+

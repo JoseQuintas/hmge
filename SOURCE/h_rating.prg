@@ -132,8 +132,8 @@ FUNCTION _InitRating ( ParentForm, ControlName, x, y, w, h, nValue, aImages, nCn
 
    FOR i := 1 TO nCnt
       img_name := ParentForm + "_" + ControlName + "_" + hb_ntos( i )
-      DEFINE IMAGE &img_name
-         PARENT &ParentForm
+      DEFINE IMAGE ( img_name )
+         PARENT ( ParentForm )
          ROW y
          COL col
          WIDTH w
@@ -143,7 +143,7 @@ FUNCTION _InitRating ( ParentForm, ControlName, x, y, w, h, nValue, aImages, nCn
          ONMOUSEHOVER iif( readonly, NIL, OnHoverRate( ParentForm, ControlName ) )
          ONMOUSELEAVE iif( readonly, NIL, OnLeaveRate( ParentForm, ControlName, onchangeprocedure ) )
          ONCLICK iif( readonly, NIL, ( SetProperty( ParentForm, ControlName, 'Value', ;
-            Val( SubStr( This.NAME, RAt('_', This.Name ) + 1 ) ) ), ;
+            Val( SubStr( This.Name, RAt( '_', This.Name ) + 1 ) ) ), ;
             OnSelectRate( ParentForm, ControlName, onchangeprocedure ) ) )
          INVISIBLE invisible
       END IMAGE

@@ -32,6 +32,8 @@ Procedure Main
 				MENUITEM 'Set Font to Bold'        ACTION Win1.Test.FontBold := .T.
 				MENUITEM 'Set Font Size to 12'     ACTION Win1.Test.FontSize := 12
 				MENUITEM 'Get Font Size'           ACTION MsgInfo( Win1.Test.FontSize )
+				MENUITEM 'Get Icon Property'       ACTION MsgInfo ( Win1.Test_2.Icon )
+				MENUITEM 'Set Icon Property'       ACTION ChangeSPBIcon( "2MG64.ico" )
 			END POPUP
 		END MENU
 
@@ -49,7 +51,10 @@ Procedure Main
 		DEFINE SPLITBUTTON test_2
 			ROW    100
 			COL    10
+			WIDTH  148
+			HEIGHT 38
 			CAPTION 'Split Button 2'
+			ICON 'MG32'
 			ACTION MsgInfo( "Split Button 2", "Pressed" )
 			TOOLTIP 'Split Button 2'
 		END SPLITBUTTON
@@ -84,5 +89,21 @@ FUNCTION LaunchMenu( i )
          aPos[ 2 ] + _HMG_aControlHeight[ i ], _HMG_aControlParentHandles[ i ] )
 
    ENDIF
+
+RETURN Nil
+
+
+*------------------------------------------------------------------------------*
+FUNCTION ChangeSPBIcon( cIcon )
+*------------------------------------------------------------------------------*
+
+   Win1.Test_2.Height := 38*2
+   Win1.Test_2.Width := 108*2
+
+   Win1.Test_2.Icon := cIcon
+
+   Win1.Test_2.FontBold := .T.
+
+   Win1.Test_2.Redraw
 
 RETURN Nil

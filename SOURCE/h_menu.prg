@@ -1028,6 +1028,15 @@ FUNCTION _RemoveMenuItem ( ItemName , FormName  )
 RETURN RemoveMenuItem ( a [1] , a [2] )
 
 *-----------------------------------------------------------------------------*
+PROCEDURE _ChangeMenuItemCaption ( ItemName , FormName , Caption )
+*-----------------------------------------------------------------------------*
+   LOCAL a := _GetMenuIds ( ItemName , FormName )
+
+   ModifyMenuItem ( a [1] , a [2] , _HMG_aControlIds [ GetControlIndex ( ItemName , FormName ) ] , Caption )
+
+RETURN
+
+*-----------------------------------------------------------------------------*
 FUNCTION HMG_SetMenuTheme ( nType , cFormName , aUserDefined )
 *-----------------------------------------------------------------------------*
    LOCAL aColors := GetMenuColors()

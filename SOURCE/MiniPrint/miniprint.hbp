@@ -20,7 +20,7 @@
 
 -hbx=../../include/miniprint.hbx
 
-{!DEBUG}-cflag=-D_ERRORMSG_
+{DEBUG}-cflag=-D_ERRORMSG_
 
 h_miniprint.prg
 c_miniprint.c

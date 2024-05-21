@@ -356,7 +356,7 @@ HB_FUNC( INITMDICLIENTWINDOW )
          hwndparent,
          ( HMENU ) 0xCAC,
          GetInstance(),
-         ( LPSTR ) & ccs
+         ( LPSTR ) &ccs
       );
 
    ShowWindow( hwndMDIClient, SW_SHOW );
@@ -469,7 +469,7 @@ HB_FUNC( SIZECLIENTWINDOW )
    if( HB_PARNL( 2 ) )
    {
       GetWindowRect( ( HWND ) HB_PARNL( 2 ), &rc );
-      ScreenToClient( ( HWND ) HB_PARNL( 1 ), ( LPPOINT ) & rc.left );
+      ScreenToClient( ( HWND ) HB_PARNL( 1 ), ( LPPOINT ) &rc.left );
       rcClient.bottom = rc.top;
    }
 

@@ -1048,7 +1048,7 @@ static UINT WriteIconHeader( HANDLE hFile, int nImages )
    iconheader.idCount = ( WORD ) nImages;       // number of ICONDIRs
 
    // Write the header to disk
-   WriteFile( hFile, ( LPVOID ) & iconheader, sizeof( iconheader ), ( LPDWORD ) & nWritten, NULL );
+   WriteFile( hFile, ( LPVOID ) &iconheader, sizeof( iconheader ), ( LPDWORD ) &nWritten, NULL );
 
    // following ICONHEADER is a series of ICONDIR structures (idCount of them, in fact)
    return nWritten;
@@ -1095,7 +1095,7 @@ static UINT WriteIconImageHeader( HANDLE hFile, BITMAP *pbmpColor, BITMAP *pbmpM
    biHeader.biSizeImage = nImageBytes;
 
    // write the BITMAPINFOHEADER
-   WriteFile( hFile, ( LPVOID ) & biHeader, sizeof( biHeader ), ( LPDWORD ) & nWritten, NULL );
+   WriteFile( hFile, ( LPVOID ) &biHeader, sizeof( biHeader ), ( LPDWORD ) &nWritten, NULL );
 
    return nWritten;
 }
@@ -1162,7 +1162,7 @@ static UINT WriteIconDirectoryEntry( HANDLE hFile, HICON hIcon, UINT nImageOffse
    iconDir.dwImageOffset = nImageOffset;
 
    // Write to disk
-   WriteFile( hFile, ( LPVOID ) & iconDir, sizeof( iconDir ), ( LPDWORD ) & nWritten, NULL );
+   WriteFile( hFile, ( LPVOID ) &iconDir, sizeof( iconDir ), ( LPDWORD ) &nWritten, NULL );
 
    // Free resources
    DeleteObject( iconInfo.hbmColor );
@@ -1200,7 +1200,7 @@ static UINT WriteIconData( HANDLE hFile, HBITMAP hBitmap )
          hFile,
          pIconData + ( i * bmp.bmWidthBytes ),  // calculate offset to the line
          bmp.bmWidthBytes, // 1 line of BYTES
-         ( LPDWORD ) & nWritten,
+         ( LPDWORD ) &nWritten,
          NULL
       );
 
@@ -1208,7 +1208,7 @@ static UINT WriteIconData( HANDLE hFile, HBITMAP hBitmap )
       if( bmp.bmWidthBytes & 3 )
       {
          DWORD padding = 0;
-         WriteFile( hFile, ( LPVOID ) & padding, 4 - bmp.bmWidthBytes, ( LPDWORD ) & nWritten, NULL );
+         WriteFile( hFile, ( LPVOID ) &padding, 4 - bmp.bmWidthBytes, ( LPDWORD ) &nWritten, NULL );
       }
    }
 
@@ -1348,7 +1348,7 @@ BOOL bmp_SaveFile( HBITMAP hBitmap, TCHAR *FileName )
 
    memDC = CreateCompatibleDC( NULL );
    SelectObject( memDC, hBitmap );
-   GetObject( hBitmap, sizeof( BITMAP ), ( LPBYTE ) & bm );
+   GetObject( hBitmap, sizeof( BITMAP ), ( LPBYTE ) &bm );
 
    bm.bmBitsPixel = 24;
    bm.bmWidthBytes = ( bm.bmWidth * bm.bmBitsPixel + 31 ) / 32 * 4;
@@ -1386,8 +1386,8 @@ BOOL bmp_SaveFile( HBITMAP hBitmap, TCHAR *FileName )
 
    if( hFile != INVALID_HANDLE_VALUE )
    {
-      WriteFile( hFile, ( LPBYTE ) & BIFH, sizeof( BITMAPFILEHEADER ), &nBytes_Written, NULL );
-      WriteFile( hFile, ( LPBYTE ) & Bitmap_Info.bmiHeader, sizeof( BITMAPINFOHEADER ), &nBytes_Written, NULL );
+      WriteFile( hFile, ( LPBYTE ) &BIFH, sizeof( BITMAPFILEHEADER ), &nBytes_Written, NULL );
+      WriteFile( hFile, ( LPBYTE ) &Bitmap_Info.bmiHeader, sizeof( BITMAPINFOHEADER ), &nBytes_Written, NULL );
       WriteFile( hFile, ( LPBYTE ) lp_hBits, nBytes_Bits, &nBytes_Written, NULL );
       CloseHandle( hFile );
       ret = TRUE;

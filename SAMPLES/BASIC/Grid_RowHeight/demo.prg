@@ -1,47 +1,75 @@
 #include <hmg.ch>
 
-Function Main
-Local aItems := { ;
-                { 1, 'Row1, Column1', 'Row1, Column2' }, ;
-                { 1, 'Row2, Column1', 'Row2, Column2' }, ;
-                { 1, 'Row3, Column1', 'Row3, Column2' }, ;
-                { 1, 'Row4, Column1', 'Row4, Column2' }, ;
-                { 1, 'Row5, Column1', 'Row5, Column2' }, ;
-                { 1, 'Row6, Column1', 'Row6, Column2' }, ;
-                { 1, 'Row7, Column1', 'Row7, Column2' }, ;
-                { 1, 'Row8, Column1', 'Row8, Column2' }, ;
-                { 1, 'Row9, Column1', 'Row9, Column2' }  ;
-                }
+FUNCTION Main()
 
-   define window main at 0, 0 width 640 height 480 title 'Grid Row Height demo' main
+   LOCAL aItems := { ;
+      { 'Row1, Column1', 'Row1, Column2' }, ;
+      { 'Row2, Column1', 'Row2, Column2' }, ;
+      { 'Row3, Column1', 'Row3, Column2' }, ;
+      { 'Row4, Column1', 'Row4, Column2' }, ;
+      { 'Row5, Column1', 'Row5, Column2' }, ;
+      { 'Row6, Column1', 'Row6, Column2' }, ;
+      { 'Row7, Column1', 'Row7, Column2' }, ;
+      { 'Row8, Column1', 'Row8, Column2' }, ;
+      { 'Row9, Column1', 'Row9, Column2' } ;
+      }
 
-      define grid grid_1
-         row 10
-         col 10
-         width 545
-         height 200
-         headers { '', 'Column1', 'Column2'  }
-         widths { 0, 200, 200 }
-         justify { 2, 0, 0 }
-         image { 'redbullet.bmp', 'whitebullet.bmp', 'greenbullet.bmp' }
-         items aItems
-      end grid
+   SET FONT TO "Tahoma", 12
 
-      define grid grid_2
-         row 230
-         col 10
-         width 545
-         height 200
-         headers { '', 'Column1', 'Column2'  }
-         widths { 0, 200, 200 }
-         justify { 2, 0, 0 }
-         image { 'redbullet1.bmp', 'whitebullet1.bmp', 'greenbullet1.bmp' }
-         items aItems
-      end grid
+   DEFINE WINDOW MAIN AT 0, 0 WIDTH 640 HEIGHT 480 TITLE 'Grid Row Height demo' MAIN
 
-      on key escape action thiswindow.release
-   end window
-   main.center
-   main.activate
+      DEFINE GRID grid_1
+         ROW 10
+         COL 10
+         WIDTH 545
+         HEIGHT 200
+         HEADERS { 'Column1', 'Column2' }
+         WIDTHS { 200, 200 }
+         JUSTIFY { 0, 0 }
+         ITEMS aItems
+         FONTSIZE 9
+      END GRID
 
-Return nil
+      SetGridRowHeight ( this.Name, "Grid_1", 20 )
+
+      DEFINE GRID grid_2
+         ROW 230
+         COL 10
+         WIDTH 545
+         HEIGHT 200
+         HEADERS { 'Column1', 'Column2' }
+         WIDTHS { 200, 200 }
+         JUSTIFY { 0, 0 }
+         ITEMS aItems
+      END GRID
+
+      SetGridRowHeight ( this.Name, "Grid_2", 40 )
+
+      ON KEY ESCAPE ACTION thiswindow.Release()
+
+   END WINDOW
+
+   MAIN.center()
+   MAIN.activate()
+
+RETURN NIL
+
+FUNCTION SetGridRowHeight ( cFormName, cGridName, nHeight )
+
+   LOCAL idx
+   LOCAL cDummyPNG := "__Dummy_" + cFormName + "_" + cGridName + ".png"
+   LOCAL hBitmap := BT_BitmapCreateNew ( 1, nHeight, { 255, 255, 255 } )
+   LOCAL Ret := BT_BitmapSaveFile ( hBitmap, cDummyPNG, BT_FILEFORMAT_PNG )
+
+   BT_BitmapRelease ( hBitmap )
+
+   IF Ret
+      idx := GetProperty ( cFormName, cGridName, "Index" )
+      _HMG_aControlBkColor[ idx ] := { cDummyPNG }
+      AddListViewBitmap( _HMG_aControlHandles[ idx ], _HMG_aControlBkColor[ idx ] )
+   ENDIF
+
+   DO EVENTS
+   hb_FileDelete ( cDummyPNG )
+
+RETURN Ret

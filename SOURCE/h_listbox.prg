@@ -341,12 +341,12 @@ FUNCTION InitDialogListBox( ParentName, ControlHandle, k )
 FUNCTION LB_Array2String( aData, Sep )
 *-----------------------------------------------------------------------------*
    LOCAL cData := ""
-   LOCAL n
 
    hb_default( @Sep, Chr( 9 ) )
 
-   FOR n := 1 TO Len( aData )
-      cData += iif( n == 1, "", Sep ) + aData [n]
-   NEXT
+   IF ! Empty( aData )
+      cData := aData[ 1 ]
+      AEval( aData, { | x | cData += ( Sep + x ) }, 2 )
+   ENDIF
 
 RETURN cData

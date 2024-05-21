@@ -49,7 +49,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include "i_winuser.ch"
 
 #ifndef __XHARBOUR__
-   SET PROCEDURE TO statics.prg
+   SET PROCEDURE TO \minigui\source\statics.prg
 #endif
 
 STATIC nCtEfeito := 0, cDescEfeito := ""

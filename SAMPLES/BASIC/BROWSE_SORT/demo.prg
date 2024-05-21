@@ -7,7 +7,7 @@
 #include "minigui.ch"
 #include "dbstruct.ch"
 
-PROCEDURE MAIN
+PROCEDURE Main()
 
    LOCAL aHead, aWidth, aFld, aSort, i
    LOCAL lInit := .F.
@@ -52,21 +52,21 @@ PROCEDURE MAIN
       ON GOTFOCUS iif(lInit, , (HMG_SetOrder( 1, .F. ), lInit := .T.)) ;
       COLUMNSORT aSort
 */
-   DEFINE BROWSE Brw_1
-      ROW 10
-      COL 10
-      WIDTH 600
-      HEIGHT 420
-      WORKAREA TEST
-      HEADERS aHead
-      WIDTHS aWidth
-      FIELDS aFld
-      VALUE 1
-      ON GOTFOCUS iif( lInit, , ( HMG_SetOrder( 1, .F. ), lInit := .T. ) )
-      COLUMNSORT aSort
-   END BROWSE
+      DEFINE BROWSE Brw_1
+         ROW 10
+         COL 10
+         WIDTH 600
+         HEIGHT 420
+         WORKAREA TEST
+         HEADERS aHead
+         WIDTHS aWidth
+         FIELDS aFld
+         VALUE 1
+         ON GOTFOCUS iif( lInit, , ( HMG_SetOrder( 1, .F. ), lInit := .T. ) )
+         COLUMNSORT aSort
+      END BROWSE
 
-   ON KEY ESCAPE ACTION ThisWindow.RELEASE
+      ON KEY ESCAPE ACTION ThisWindow.Release()
 
    END WINDOW
 

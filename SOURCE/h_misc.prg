@@ -48,7 +48,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include 'minigui.ch'
 
 #ifndef __XHARBOUR__
-   SET PROCEDURE TO h_cdomail.prg
+   SET PROCEDURE TO \minigui\source\h_cdomail.prg
 #endif
 
 *-----------------------------------------------------------------------------*
@@ -587,26 +587,30 @@ RETURN u
 *-----------------------------------------------------------------------------*
 STATIC FUNCTION dCharToDate( cDate )
 *-----------------------------------------------------------------------------*
-   LOCAL cFormat, cc
+   LOCAL cc
+   LOCAL cFormat
+   LOCAL cFmt
    LOCAL dDate
 
    IF ( cc := Upper( cDate ) ) != Lower( cDate )
-
       RETURN dAlphaToDate( cc )
-
    ENDIF
 
-   IF Len( cDate ) >= 8 .AND. ! Empty( dDate := SToD( Left( cDate, 8 ) ) )
-
+   IF Len( cDate ) >= 8 .AND. IsDigit( SubStr( cDate, 3 ) ) .AND. IsDigit( SubStr( cDate, 5 ) ) .AND. ! Empty( dDate := SToD( Left( cDate, 8 ) ) )
       RETURN dDate
-
    ENDIF
 
-   IF Len( cDate ) >= 10 .AND. ;
+   IF Len( cDate ) >= 10 .AND. IsDigit( SubStr( cDate, 3 ) ) .AND. !IsDigit( SubStr( cDate, 5 ) ) .AND. ! IsDigit( SubStr( cDate, 8 ) ) .AND. ;
          ! Empty( dDate := SToD( Left( cDate, 4 ) + SubStr( cDate, 6, 2 ) + SubStr( cDate, 9, 2 ) ) )
-
       RETURN dDate
+   ENDIF
 
+   IF ! IsDigit( SubStr( cDate, 2 ) )
+      cDate := "0" + cDate
+   ENDIF
+
+   IF ! IsDigit( SubStr( cDate, 5 ) )
+      cDate := Left( cDate, 3 ) + "0" + SubStr( cDate, 4 )
    ENDIF
 
    cFormat := Set( _SET_DATEFORMAT )
@@ -616,12 +620,19 @@ STATIC FUNCTION dCharToDate( cDate )
    IF Empty( dDate )
 
       cc := Lower( Left( cFormat, 2 ) )
-      Set( _SET_DATEFORMAT, iif( cc == 'dd', 'mm/dd/yy', 'dd/mm/yy' ) )
-      dDate := CToD( cDate )
-      IF cc == 'yy' .AND. Empty( dDate )
-         SET DATE AMERICAN
-         dDate := CToD( cDate )
-      ENDIF
+
+      FOR EACH cFmt IN { "dd/mm/yy", "mm/dd/yy", "yy/mm/dd" }
+
+         IF ! ( Left( cFmt, 2 ) == cc )
+
+            SET( _SET_DATEFORMAT, cFmt )
+            IF ! Empty( dDate := CToD( cDate ) )
+               EXIT
+            ENDIF
+
+         ENDIF
+
+      NEXT
 
    ENDIF
 

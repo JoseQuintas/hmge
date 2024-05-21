@@ -8,6 +8,7 @@
 
 #include "minigui.ch"
 #include <Fileio.ch>
+Memvar cerrType
 
 FUNCTION Main()
 
@@ -38,7 +39,7 @@ FUNCTION Main()
 
       This.OnDropFiles := {| aFiles | ResolveDrop( "Form_1", HMG_GetFormControls( "Form_1" ), aFiles ) }
 
-      y := 80
+      y := 90
       x := nG + 10
 
       cSay := "FileName(s):"
@@ -54,6 +55,10 @@ FUNCTION Main()
                NOLINES NOHEADERS SIZE nFsize - 3 ON GOTFOCUS SeeProperty() ON CHANGE SeeProperty()
 
       Y := 290
+
+      @ y-135 , x  Label Lbl_Rpt VALUE "Request the" AUTOSIZE
+      @ y-145+nHObj , x  CHECKBOX CK_Rpt CAPTION "error report" WIDTH 140 HEIGHT nHObj TOOLTIP "Request a detailed report of erroneous changes" LEFTJUSTIFY
+
       cSay := "Created Date:"
       @ y, x LABEL Label_1 VALUE cSay WIDTH 150 HEIGHT nHObj
 
@@ -254,7 +259,9 @@ RETURN NIL
 
 STATIC FUNCTION ChangeDate()
 
-   LOCAL aList := Form_1.GRID1.GetArray, aSect, n, nF, aRef := { "1", "2", "3" }, nErr := 0
+   LOCAL aList   := Form_1.GRID1.GetArray, aSect, n, nF, aRef := { "1", "2", "3" }
+   Local aCtnErr := {}, nErr := 0 , nAN :=0, cEtitle := ""
+   Private cErrType := ""
    aSect := { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } }
 
    nF := Len( aList )
@@ -274,7 +281,7 @@ STATIC FUNCTION ChangeDate()
    ENDIF
 
    // check for Selected action
-   AEval( ASECT, {| X | IF ( hb_AScan( X, 1 ) > 0, nErr++, NIL ) } )
+   aEval( ASECT, {| X | IF ( hb_AScan( X, 1 ) > 0, nErr++, NIL ) } )
    IF nErr == 0
       MsgExclamation( "No date type chosen !", "Abort" )
       RETURN NIL
@@ -283,13 +290,22 @@ STATIC FUNCTION ChangeDate()
 
    FOR n := 1 TO nF
       // Execute only the selected changes
-      AEval( aRef, {| x, y | IF ( AScan( aSect[ y ], 1 ) = y, if( SetFileDateTime(aList[ n,1 ], DT2A(x ), aSect[ y ] ), NIL, nErr++ ), NIL ) } )
+      aEval(aRef,{|x,y| IF (ascan(aSect[y],1)=y, if(SetFileDateTime(aList[n,1], DT2A(x), aSect[y] ),NIL,( nErr++ , IF ( hb_AScan( aCtnErr , alist[n,1] ) < 1, aadd( aCtnErr ,alist[n,1] ) ,NIL ) ) ) , NIL )  } )
+      nAN := len(aCtnErr)
+      if nAN > 0 .and. !Empty(cErrType)
+         aCtnErr[nAN] += " [ "+cErrType +" ]"
+         cErrType :=""
+      Endif
    NEXT
    IF nErr = 0
       MsgInfo ( "Successfully changed the dates of file(s)", "FileDate Changer" )
       Form_1.GRID1.DeleteAllitems()
       ONOFF()
+   Else
+      cEtitle := "Edit successful but there are errors for:"
+      MSGExclamation(aEval(aCtnErr,{|X,Y| aCtnErr[Y] +=crlf} ) ,cEtitle )
    ENDIF
+   RELEASE cErrType
 
 RETURN NIL
 
@@ -330,15 +346,22 @@ FUNCTION SetFileDateTime( cFilename, aDateTime, aSet )
       DO CASE
       CASE cTime = 1
          cTerr := "Creation Date of:"
+         cErrType +="C"
 
       CASE lATimec = 1
          cTerr := "Accessed Date of:"
+         cErrType +="A"
 
       CASE lWTime = 1
          cTerr := "Modified Date of:"
+         cErrType +="M"
 
       ENDCASE
-      MsgExclamation( "It was not possible to change the " + cTerr + CRLF + CRLF + cFIlename, "FileDate Changer Action Error" )
+
+      if Form_1.CK_Rpt.value
+         MsgExclamation( "It was not possible to change the " + cTerr + CRLF + CRLF + cFIlename, "FileDate Changer Single Action Error" )
+      Endif
+
    ENDIF
 
 RETURN lSuccess

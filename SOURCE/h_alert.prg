@@ -48,7 +48,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #ifdef __XHARBOUR__
 #define __MINIPRINT__
 #else
- SET PROCEDURE TO alerts.prg
+ SET PROCEDURE TO \minigui\source\alerts.prg
 #endif
 
 #include "hmg.ch"
