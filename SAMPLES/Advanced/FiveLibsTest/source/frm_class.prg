@@ -18,9 +18,11 @@ CREATE CLASS frm_Class
    VAR aOptionList     INIT {}
    VAR cSelected       INIT "NONE"
    VAR lNavigate       INIT .T.
-   VAR lSingleEdit     INIT .F.
-   VAR nRecnoInit
    VAR lModal          INIT .F.
+   VAR nInitRecno
+   VAR aInitValue1
+   VAR aInitValue2
+   VAR bActivate
 
    VAR nLayout         INIT 2
    VAR lWithTab        INIT .T.
@@ -59,14 +61,32 @@ CREATE CLASS frm_Class
 
 METHOD DlgInit() CLASS frm_Class
 
+   LOCAL nPos
+
+   IF ::nInitRecno != Nil
+      GOTO ::nInitRecno
+   ENDIF
    ::DataLoad()
-   IF ::lSingleEdit()
-      ::EditOn()
+   IF Empty( ::cFileDbf )
+      AEval( ::aControlList, { | e | ;
+         iif( e[ CFG_CTLTYPE ] == TYPE_TEXT, gui_ControlEnable( ::xDlg, e[ CFG_FCONTROL ], .T. ), Nil ) } )
    ELSE
       ::EditOff()
    ENDIF
-   IF ::nRecnoInit != Nil
-      GOTO ::nRecnoInit
+   IF ::aInitValue1 != Nil .AND. ::aInitValue2 != Nil
+      IF ( nPos := hb_AScan( ::aControlList, { | e | e[ CFG_FNAME ] == ::aInitValue1[1] } ) ) != 0
+         ::aControlList[ nPos ][ CFG_VALUE ]    := ::aInitValue1[2]
+         ::aControlList[ nPos ][ CFG_SAVEONLY ] := .T.
+         gui_ControlSetValue( ::xDlg, ::aControlList[ nPos ][ CFG_FCONTROL ], ::aInitValue1[2] )
+      ENDIF
+      IF ( nPos := hb_AScan( ::aControlList, { | e | e[ CFG_FNAME ] == ::aInitValue2[1] } ) ) != 0
+         ::aControlList[ nPos ][ CFG_VALUE ] := ::aInitValue2[2]
+         ::aControlList[ nPos ][ CFG_SAVEONLY ] := .T.
+         gui_ControlSetValue( ::xDlg, ::aControlList[ nPos ][ CFG_FCONTROL ], ::aInitValue2[2] )
+      ENDIF
+   ENDIF
+   IF ! Empty( ::bActivate )
+      Eval( ::bActivate )
    ENDIF
 
    RETURN Nil
@@ -285,12 +305,29 @@ METHOD Delete() CLASS frm_Class
 METHOD DataLoad() CLASS frm_Class
 
    LOCAL aItem, nSelect, xValue, cText, xScope, nLenScope, xValueControl
+   LOCAL aCommonList := { TYPE_TEXT, TYPE_MLTEXT, TYPE_DATEPICKER, TYPE_SPINNER }
 
    FOR EACH aItem IN ::aControlList
       DO CASE
+      CASE aItem[ CFG_CTLTYPE ] == TYPE_BROWSE
+         SELECT  ( Select( aItem[ CFG_BRWTABLE ] ) )
+         SET ORDER TO ( aItem[ CFG_BRWIDXORD ] )
+         xScope := ( ::cFileDbf )->( FieldGet( FieldNum( aItem[ CFG_BRWKEYFROM ] ) ) )
+         nLenScope := ( ::cFileDbf )->( FieldLen( aItem[ CFG_BRWKEYFROM ] ) )
+         IF ValType( xScope ) == "C"
+            SET SCOPE TO xScope
+         ELSE
+            SET SCOPE TO Str( xScope, nLenScope )
+         ENDIF
+         GOTO TOP
+         gui_BrowseRefresh( ::xDlg, aItem[ CFG_FCONTROL ] )
+         SELECT ( Select( ::cFileDbf ) ) // not all libraries need this
+      CASE Empty( aItem[ CFG_FNAME ] ) // not a field
       CASE aItem[ CFG_SAVEONLY ]
-      CASE ! Empty( aItem[ CFG_FNAME ] ) .AND. hb_AScan( { TYPE_TEXT, TYPE_MLTEXT, TYPE_DATEPICKER, TYPE_SPINNER }, aItem[ CFG_CTLTYPE ] ) != 0
-         xValue := FieldGet( FieldNum( aItem[ CFG_FNAME ] ) )
+      CASE hb_AScan( aCommonList, aItem[ CFG_CTLTYPE ] ) != 0
+         IF ! aItem[ CFG_SAVEONLY ]
+            xValue := FieldGet( FieldNum( aItem[ CFG_FNAME ] ) )
+         ENDIF
          gui_ControlSetValue( ::xDlg, aItem[ CFG_FCONTROL ], xValue )
          IF ! Empty( aItem[ CFG_VTABLE ] ) .AND. ! Empty( aItem[ CFG_VSHOW ] )
             nSelect := Select()
@@ -312,24 +349,11 @@ METHOD DataLoad() CLASS frm_Class
          ENDCASE
          gui_LabelSetValue( ::xDlg, aItem[ CFG_FCONTROL ], xValue )
 
-      CASE aItem[ CFG_CTLTYPE ] == TYPE_COMBOBOX
+      CASE ! Empty( aItem[ CFG_FNAME ] ) .AND. aItem[ CFG_CTLTYPE ] == TYPE_COMBOBOX
          xValue := FieldGet( FieldNum( aItem[ CFG_FNAME ] ) )
          xValueControl := hb_AScan( aItem[ CFG_COMBOLIST ], { | e | e == xValue } )
          gui_ControlSetValue( ::xDLg, aItem[ CFG_FCONTROL ], xValueControl )
 
-      CASE aItem[ CFG_CTLTYPE ] == TYPE_BROWSE
-         SELECT  ( Select( aItem[ CFG_BRWTABLE ] ) )
-         SET ORDER TO ( aItem[ CFG_BRWIDXORD ] )
-         xScope := ( ::cFileDbf )->( FieldGet( FieldNum( aItem[ CFG_BRWKEYFROM ] ) ) )
-         nLenScope := ( ::cFileDbf )->( FieldLen( aItem[ CFG_BRWKEYFROM ] ) )
-         IF ValType( xScope ) == "C"
-            SET SCOPE TO xScope
-         ELSE
-            SET SCOPE TO Str( xScope, nLenScope )
-         ENDIF
-         GOTO TOP
-         gui_BrowseRefresh( ::xDlg, aItem[ CFG_FCONTROL ] )
-         SELECT ( Select( ::cFileDbf ) ) // HMG Extended
       ENDCASE
    NEXT
    (cText)
@@ -339,12 +363,13 @@ METHOD DataLoad() CLASS frm_Class
 METHOD DataSave() CLASS frm_Class
 
    LOCAL aItem, xValue
+   LOCAL aCommonList := { TYPE_TEXT, TYPE_MLTEXT, TYPE_DATEPICKER, TYPE_SPINNER }
 
    ::EditOff()
    IF RLock()
       FOR EACH aItem IN ::aControlList
          DO CASE
-         CASE Empty( aItem[ CFG_FNAME ] )       // do not have name
+         CASE Empty( aItem[ CFG_FNAME ] ) // not a field
          CASE aItem[ CFG_CTLTYPE ] == TYPE_COMBOBOX
             xValue := gui_ControlGetValue( ::xDlg, aItem[ CFG_FCONTROL ] )
             IF xValue == 0 .OR. xValue > Len( aItem[ CFG_COMBOLIST ] )
@@ -361,7 +386,7 @@ METHOD DataSave() CLASS frm_Class
             CASE aItem[ CFG_FTYPE ] == "C"; xValue := iif( xValue, "Y", "N" )
             ENDCASE
             FieldPut( FieldNum( aItem[ CFG_FNAME ] ), xValue )
-         CASE hb_AScan( { TYPE_TEXT, TYPE_MLTEXT, TYPE_DATEPICKER, TYPE_SPINNER }, { | e | e == aItem[ CFG_CTLTYPE ] } ) == 0 // not "value"
+         CASE hb_AScan( aCommonList, { | e | e == aItem[ CFG_CTLTYPE ] } ) == 0 // not "value"
          CASE aItem[ CFG_ISKEY ]
          OTHERWISE
             xValue := gui_ControlGetValue( ::xDlg, aItem[ CFG_FCONTROL ] )
@@ -379,21 +404,22 @@ FUNCTION EmptyFrmClassItem()
 
    LOCAL aItem := Array(29)
 
-   aItem[ CFG_FNAME ]      := ""
-   aItem[ CFG_FTYPE ]      := "C"
-   aItem[ CFG_FLEN ]       := 1
-   aItem[ CFG_FDEC ]       := 0
-   aItem[ CFG_ISKEY ]      := .F.
-   aItem[ CFG_FPICTURE ]   := ""
-   aItem[ CFG_CAPTION ]    := ""
-   aItem[ CFG_VALID ]      := {}
-   aItem[ CFG_VTABLE ]     := ""
-   aItem[ CFG_VFIELD ]     := ""
-   aItem[ CFG_VSHOW ]      := ""
+   aItem[ CFG_FNAME ]       := ""
+   aItem[ CFG_FTYPE ]       := "C"
+   aItem[ CFG_FLEN ]        := 1
+   aItem[ CFG_FDEC ]        := 0
+   aItem[ CFG_ISKEY ]       := .F.
+   aItem[ CFG_FPICTURE ]    := ""
+   aItem[ CFG_CAPTION ]     := ""
+   aItem[ CFG_VALID ]       := {}
+   aItem[ CFG_VTABLE ]      := ""
+   aItem[ CFG_VFIELD ]      := ""
+   aItem[ CFG_VSHOW ]       := ""
+   aItem[ CFG_VLEN ]        := 0
+   aItem[ CFG_CTLTYPE ]     := TYPE_NONE
+   aItem[ CFG_SAVEONLY ]    := .F.
+   // default
    //aItem[ CFG_VALUE ]      := Nil
-   aItem[ CFG_VLEN ]       := 0
-   aItem[ CFG_CTLTYPE ]    := TYPE_NONE
-   aItem[ CFG_SAVEONLY ]   := .F.
    //aItem[ CFG_FCONTROL ]   := Nil
    //aItem[ CFG_CCONTROL ]   := Nil
    //aItem[ CFG_VCONTROL ]   := Nil

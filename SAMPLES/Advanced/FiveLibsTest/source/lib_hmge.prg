@@ -6,6 +6,8 @@ lib_hmge - HMG Extended source selected by lib.prg
 #include "hmg.ch"
 #include "i_winuser.ch"
 
+STATIC nWindow := 0
+
 FUNCTION gui_Init()
 
 #ifdef DLGAUTO_AS_LIB
@@ -14,6 +16,9 @@ FUNCTION gui_Init()
    SET GETBOX FOCUS BACKCOLOR TO {255,255,0}
    SET MENUSTYLE EXTENDED
    SET NAVIGATION EXTENDED
+   SET WINDOW MODAL PARENT HANDLE ON
+   SET WINDOW MAIN OFF
+   Set( _SET_DEBUG, .F. )
 
    RETURN Nil
 
@@ -31,8 +36,13 @@ FUNCTION gui_DlgMenu( xDlg, aMenuList, aAllSetup, cTitle )
             NEXT
          END POPUP
       NEXT
-      DEFINE POPUP "Sair"
-         MENUITEM "Sair" ACTION gui_DialogClose( xDlg ) ICON "ICODOOR"
+      DEFINE POPUP "NoData"
+         MENUITEM "NoData Layout 1" ACTION test_noDatabase(1)
+         MENUITEM "NoData Layout 2" ACTION test_noDatabase(2)
+         MENUITEM "NoData Layout 3" ACTION test_noDatabase(3)
+      END POPUP
+      DEFINE POPUP "Exit"
+         MENUITEM "Exit" ACTION gui_DialogClose( xDlg ) ICON "ICODOOR"
       END POPUP
       DEFINE MONTHCALENDAR ( gui_NewName( "MON" ) )
          PARENT ( xDlg )
@@ -79,18 +89,23 @@ FUNCTION gui_Browse( xDlg, xParent, xControl, nRow, nCol, nWidth, ;
    nHeight, oTbrowse, cField, xValue, workarea, aKeyDownList, Self )
 
    LOCAL aHeaderList := {}, aWidthList := {}, aFieldList := {}, aItem, aThisKey
+   LOCAL aBrowseBackColor := {}, aBrowseForeColor := {}, nPos
 
    IF Empty( xControl )
       xControl := gui_NewName( "BRW" )
    ENDIF
+
    IF ValType( aKeyDownList ) != "A"
       aKeyDownList := {}
    ENDIF
+
    FOR EACH aItem IN oTbrowse
       AAdd( aHeaderList, aItem[1] )
       AAdd( aFieldList, aItem[2] )
       AAdd( aWidthList, ( 1 + Max( Len( aItem[3] ), ;
          Len( Transform( ( workarea )->( FieldGet( FieldNum( aItem[ 1 ] ) ) ), "" ) ) ) ) * 13 )
+      AAdd( aBrowseBackColor, { || iif( OrdKeyNo() / 2 == Int( OrdKeyNo() / 2 ), { 222,222,222 }, { 250,250,250 } ) } )
+      AAdd( aBrowseForeColor, { || iif( OrdKeyNo() / 2 == Int( OrdKeyNo() / 2 ), { 0,0,0 }, { 0,0,0 } ) } )
    NEXT
 
    DEFINE BROWSE ( xControl )
@@ -101,12 +116,16 @@ FUNCTION gui_Browse( xDlg, xParent, xControl, nRow, nCol, nWidth, ;
       HEIGHT nHeight - 20
       IF Len( aKeyDownList ) == 0
          ONDBLCLICK gui_BrowseDblClick( xDlg, xControl, workarea, cField, @xValue )
+      ELSEIF ( nPos := hb_AScan( aKeyDownList, { | e | e[1] == VK_RETURN } ) ) != 0
+         ONDBLCLICK Eval( aKeyDownList[ nPos ][ 2 ] )
       ENDIF
       HEADERS aHeaderList
       WIDTHS aWidthList
       WORKAREA ( workarea )
       FIELDS aFieldList
-      SET BROWSESYNC ON
+      DYNAMICBACKCOLOR aBrowseBackColor
+      DYNAMICFORECOLOR aBrowseForeColor
+      SET BROWSESYNC ON // if remove, browse action and DLG keydown on wrong record
    END BROWSE
    /* create buttons on browse for defined keys */
    IF Len( aKeyDownList ) != 0
@@ -202,7 +221,8 @@ FUNCTION gui_ComboCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, aList )
       COL nCol
       VALUE 1
       WIDTH nWidth
-      //HEIGHT nHeight // do not define height, it can limit list size to zero
+      // do not define height, it can limit list size to zero
+      // HEIGHT nHeight
       ITEMS aList
    END COMBOBOX
 
@@ -243,9 +263,10 @@ FUNCTION gui_DatePickerCreate( xDlg, xControl, ;
       ROW	nRow
       COL	nCol
       VALUE dValue
-      //ON GOTFOCUS SetProperty( xDlg, xControl, "BACKCOLOR", COLOR_YELLOW )
-      //ON LOSTFOCUS SetProperty( xDlg, xControl, "BACKCOLOR", COLOR_WHITE )
-      //DATEFORMAT "99/99/9999"
+      // Depending Windows version ?, do not accepts to change color
+      // ON GOTFOCUS SetProperty( xDlg, xControl, "BACKCOLOR", COLOR_YELLOW )
+      // ON LOSTFOCUS SetProperty( xDlg, xControl, "BACKCOLOR", COLOR_WHITE )
+      // DATEFORMAT "99/99/9999"
       TOOLTIP 'DatePicker Control'
       SHOWNONE .F.
       TITLEBACKCOLOR BLACK
@@ -273,7 +294,9 @@ FUNCTION gui_DialogClose( xDlg )
 
    RETURN Nil
 
-FUNCTION gui_DialogCreate( xDlg, nRow, nCol, nWidth, nHeight, cTitle, bInit, lModal, lMain )
+FUNCTION gui_DialogCreate( xDlg, nRow, nCol, nWidth, nHeight, cTitle, bInit, lModal )
+
+   //nWindow += 1
 
    IF Empty( xDlg )
       xDlg := gui_NewName( "DLG" )
@@ -282,10 +305,10 @@ FUNCTION gui_DialogCreate( xDlg, nRow, nCol, nWidth, nHeight, cTitle, bInit, lMo
    IF Empty( bInit )
       bInit := { || Nil }
    ENDIF
-   hb_Default( @lModal, .T. )
-   hb_Default( @lMain, .F. )
 
-   IF lMain
+   hb_Default( @lModal, .T. )
+
+   IF nWindow == 1
       DEFINE WINDOW ( xDlg ) ;
          AT nCol, nRow ;
          WIDTH nWidth ;
@@ -333,6 +356,9 @@ FUNCTION gui_LabelCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, xValue, l
    IF Empty( xControl )
       xControl := gui_NewName( "LBL" )
    ENDIF
+
+   hb_Default( @lBorder, .F. )
+   hb_Default( @nFontSize, APP_FONTSIZE_NORMAL )
 
    DEFINE LABEL ( xControl )
       PARENT ( xDlg )
@@ -390,7 +416,11 @@ FUNCTION gui_MsgYesNo( cText )
 
 FUNCTION gui_SetFocus( xDlg, xControl )
 
-   DoMethod( xDlg, xControl, "SETFOCUS" )
+   IF Empty( xControl )
+      DoMethod( xDlg, "SETFOCUS" )
+   ELSE
+      DoMethod( xDlg, xControl, "SETFOCUS" )
+   ENDIF
 
    RETURN Nil
 
@@ -401,7 +431,7 @@ FUNCTION gui_Statusbar( xDlg, xControl )
    ENDIF
 
 	DEFINE STATUSBAR FONT 'MS Sans Serif' SIZE 8 PARENT ( xDlg )
-		STATUSITEM "DlgAuto/FiveLibs" // ACTION MsgInfo('Click! 1')
+		STATUSITEM "DlgAuto/FiveLibs" // ACTION MsgInfo( "Click! 1" )
 		CLOCK
 		DATE
 	END STATUSBAR
@@ -420,8 +450,8 @@ FUNCTION gui_TabCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight )
       AT nRow, nCol;
       WIDTH nWidth ;
       HEIGHT nHeight ;
-      ; // BACKCOLOR { 226, 220, 213 } ;
       HOTTRACK
+      // BACKCOLOR { 226, 220, 213 }
 
    RETURN Nil
 
@@ -457,11 +487,13 @@ FUNCTION gui_TabPageEnd( xDlg, xControl )
 
 FUNCTION gui_TextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, ;
             xValue, cPicture, nMaxLength, bValid, bAction, cImage, ;
-            aItem, Self )
+            aItem, Self, lPassword )
 
    IF Empty( xControl )
       xControl := gui_NewName( "TEXT" )
    ENDIF
+
+   hb_Default( @lPassword, .F. )
 
    DEFINE GETBOX ( xControl )
       PARENT ( xDlg )
@@ -489,11 +521,17 @@ FUNCTION gui_TextCreate( xDlg, xControl, nRow, nCol, nWidth, nHeight, ;
       IF ! Empty( cImage )
          IMAGE cImage
       ENDIF
-      ON LOSTFOCUS Eval( bValid )
-      //VALID bValid // bug on HMG Extended
+      IF ! Empty( bValid )
+         ON LOSTFOCUS Eval( bValid )
+      ENDIF
+      /* when call a dialog from bvalid, valid on next dialog does not works */
+      // VALID bValid
+      IF lPassword
+         PASSWORD .T.
+         UPPERCASE .T.
+      ENDIF
    END GETBOX
-
-   /* F9 on key fields will make a browse */
+   /* F9 on key fields will make a browse but click on button does the same */
    IF aItem[ CFG_ISKEY ] .OR. ! Empty( aItem[ CFG_VTABLE ] )
       AAdd( ::aDlgKeyDown, { xControl, VK_F9, ;
          { || ::Browse( xDlg, xControl, iif( aItem[ CFG_ISKEY ], ::cFileDbf, aItem[ CFG_VTABLE ] ) ) } } )
@@ -519,8 +557,7 @@ FUNCTION gui_ControlGetValue( xDlg, xControl )
 
 FUNCTION gui_ControlSetValue( xDlg, xControl, xValue )
 
-   // NOTE: textbox string value, except if declared different on textbox creation
-   // getbox????
+   /* textbox string value, but depends textbox creation */
    SetProperty( xDlg, xControl, "VALUE", xValue )
 
    RETURN Nil

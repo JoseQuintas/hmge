@@ -29,6 +29,10 @@ FUNCTION _DefineAniGif ( cControlName, cParentForm, cFilename, nRow, nCol, nWidt
       MsgMiniGuiError ( "Window: " + cParentForm + " is not defined." )
    ENDIF
 
+   IF ISCHAR ( cControlName ) .AND. cControlName == "0"
+      cControlName := HMG_GetUniqueName()
+   ENDIF
+
    IF _IsControlDefined ( cControlName, cParentForm )
       MsgMiniGuiError ( "Control: " + cControlName + " Of " + cParentForm + " Already defined." )
    ENDIF

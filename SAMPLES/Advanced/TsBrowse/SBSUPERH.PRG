@@ -77,6 +77,7 @@ Function fSuperBit()
    Local oBrw, hBmp
 
    Field First, Last
+
    Select("Employee")
    Employee->(dbgotop())
 
@@ -90,12 +91,12 @@ Function fSuperBit()
          ICON "Demo.ico" ;
          CHILD
 
-
          DEFINE TBROWSE oBrw AT 0,0 GRID ALIAS "Employee" ;
             WIDTH 490 HEIGHT 350  ;
             COLORS {CLR_BLACK, CLR_WHITE} ;
 
          oBrw:LoadFields( .T. )
+         oBrw:lDestroyAll := .T.
 
          ADD SUPER HEADER TO oBrw FROM COLUMN 1 TO COLUMN 4 ;
              BITMAP hBmp NOLINES

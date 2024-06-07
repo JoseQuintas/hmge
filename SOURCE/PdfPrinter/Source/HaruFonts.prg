@@ -15,17 +15,18 @@ STATIC cFontDir
 FUNCTION SetHaruFontDir(cDir)
 //------------------------------------------------------------------------------
    LOCAL cPrevValue:= cFontDir
+
    IF ValType( cDir ) == 'C' .AND. HB_DirExists( cDir )
       cFontDir:= cDir
    ENDIF
+
 RETURN cPrevValue
+
+#define CSIDL_FONTS 0x0014
 
 //------------------------------------------------------------------------------
 FUNCTION GetHaruFontDir()
 //------------------------------------------------------------------------------
-
-#define CSIDL_FONTS 0x0014
-
    IF cFontDir == NIL
       cFontDir:= HaruGetSpecialFolder( CSIDL_FONTS )
    ENDIF
@@ -38,10 +39,12 @@ FUNCTION GetHaruFontList()
    IF aTtfFontList == NIL
       InitTtfFontList()
    ENDIF
+
 RETURN aTtfFontList
 
 //------------------------------------------------------------------------------
 STATIC FUNCTION InitTtfFontList()
+//------------------------------------------------------------------------------
    LOCAL aDfltList:= { { 'Arial', 'arial.ttf' } ;
                      , { 'Verdana', 'verdana.ttf' } ;
                      , { 'Courier New', 'cour.ttf' } ;
@@ -58,6 +61,7 @@ RETURN NIL
 FUNCTION HaruAddFont( cFontName, cTtfFile )
 //------------------------------------------------------------------------------
    LOCAL aList := GetHaruFontList()
+
    IF !File( cTtfFile ) .AND. File( GetHaruFontDir() + '\' + cTtfFile )
       cTtfFile:= GetHaruFontDir() + '\' + cTtfFile
    ENDIF
@@ -68,8 +72,6 @@ FUNCTION HaruAddFont( cFontName, cTtfFile )
    ENDIF
 
 RETURN NIL
-
-
 
 
 
@@ -128,6 +130,5 @@ HB_FUNC( HARUSHELLEXECUTEC )
 	   hb_retnll( ( LONGLONG ) ShellExecute( ( HWND ) hb_parnll( 1 ), hb_parc( 2 ), hb_parc( 3 ), hb_parc( 4 ), hb_parc( 5 ), hb_parnl( 6 ) ) );
   #endif 	
 }
-
 
 #pragma ENDDUMP

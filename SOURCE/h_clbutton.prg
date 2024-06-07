@@ -2,7 +2,7 @@
  * MINIGUI - Harbour Win32 GUI library source code
  *
  * Copyright 2016 Grigory Filatov <gfilatov@gmail.com>
- */
+*/
 
 #include "minigui.ch"
 
@@ -46,6 +46,10 @@ PROCEDURE _DefineCLButton ( cName, nRow, nCol, cCaption, cNotes, bAction, cParen
 
    IF .NOT. _IsWindowDefined ( cParent )
       MsgMiniGuiError( "Window: " + cParent + " is not defined." )
+   ENDIF
+
+   IF ISCHAR ( cName ) .AND. cName == "0"
+      cName := HMG_GetUniqueName()
    ENDIF
 
    IF _IsControlDefined ( cName, cParent )

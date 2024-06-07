@@ -1,3 +1,102 @@
+2024/06/12: HMG Extended Edition version 24.06.
+  * Fixed: HYPERLINK control: program crashes when changing VALUE property
+           at runtime (introduced in build 24.05).
+           Bug was reported by Ivanil Marcelino
+           (see demo in folder \samples\Basic\HYPERLINK)
+  * New: Implementation of automatic naming of controls in the MiniGUI core:
+           - added new function HMG_GetUniqueName( [<NamePrefix>] ) and
+             empty name identifier NUL;
+           - updated the all basic controls;
+           - updated the TSBrowse library.
+           Based upon an idea borrowed from OOHG.
+           Adapted for Minigui Extended by Grigory Filatov
+           (see demo in folder \samples\Basic\MoveResizeControl)
+  * Updated: Adaptation FiveWin Class TSBrowse 9.0 in HMG:
+           - fixed use of the recordset object provided by win_oleCreateObject().
+             Bug was reported by Luis R. Stach on the Minigui forum.
+           - fixed a resource leakage with usage of the Minigui Resources
+             control system.
+           This was a postponed major modification.
+           Contributed by Sergej Kiselev
+           (see demo in folder \samples\Advanced\TSBrowse)
+  * Updated: 'PDF Printer' library (see source in folder \Source\PdfPrinter)
+           Based upon a contribution of Carlos Mora for FiveWin.
+           Adapted for Minigui Extended by Grigory Filatov
+           (see demo in folder \samples\Advanced\PdfPrinter_Test)
+  * Updated: HbSQLite3 library:
+           - update for using SQLITE3 version 3.46.0 (from 3.45.3).
+           Contributed by Grigory Filatov
+  * Updated: The SQLRDD Harbour library has been modified to reduce the number
+           of unused variables in the source code.
+           Revised for Minigui Extended by Grigory Filatov
+           (see SQLRDD Manual in folder \Doc) [PRO VERSION]
+  * Updated: Harbour Compiler 3.2.0dev (SVN 2024-05-31 11:55).
+           Contributed by Grigory Filatov <gfilatov@gmail.com>
+           (look at ReadMe.txt in folder \harbour) [PRO VERSION]
+  * New: 'Program protection' sample.
+           Don't miss this very interesting example!
+           Based upon a contribution of HMG user Edward
+           (see in folder \samples\Advanced\GetPCProperties)
+  * New: 'Grid Query Test' sample.
+           Based upon a contribution of Jayadev
+           (see in folder \samples\Advanced\GridQuery)
+  * New: 'TsBrowse Dynamic Filter Test' sample.
+           Based upon a contribution of G. N. Rao for FiveWin.
+           Adapted for Minigui Extended by Grigory Filatov
+           (see in folder \samples\Advanced\Tsb_filter_2)
+  * Updated: 'Disabled Buttons Test' sample:
+           - updated for compatibility with the last Minigui changes.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\BUTTON_4)
+  * Updated: 'Character Colors Test' sample:
+           - updated for compatibility with the last Minigui changes.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\Color_4)
+  * Updated: 'Data-Bound Controls' sample:
+           - updated for compatibility with the last Minigui changes.
+           Contributed by Grigory Filatov
+           (see demo2.prg in folder \samples\Basic\DATA_BOUND)
+  * Updated: 'HMG Drag and Drop' sample:
+           - updated for compatibility with the last Minigui changes.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\Drag_And_Drop)
+  * Updated: 'Get Windows By Type' sample.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\GetWindowsByType)
+  * Updated: 'Display of Main, Child and Modal windows without sizes' sample.
+           Contributed by Grigory Filatov
+           (see hello2.prg in folder \samples\Basic\Hello)
+  * Updated: 'Center Image From Resource' sample.
+           Contributed by Grigory Filatov
+           (see demo.prg in folder \samples\Basic\IMAGE)
+  * Updated: 'Labels as buttons' sample.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\LABEL_5)
+  * Updated: MenuDBF sample with Menu Editor.
+           Contributed by Marcos Jarrin Pita
+           (see in folder \samples\Basic\MenuDBF)
+  * Updated: 'ON MOUSEHOVER and ON MOUSELEAVE events for controls' samples.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\ON_MOUSEHOVER)
+  * Updated: 'Tab pages with the PNG images' sample.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\Tab_4)
+  * Updated: 'Vista UI buttons' sample:
+           - updated for compatibility with the last Minigui changes.
+           Contributed by Grigory Filatov
+           (see in folder \samples\Basic\VistaUI)
+  * Updated: 'Vista Command Link Component' sample.
+           Contributed by Grigory Filatov
+           (see demo.prg in folder \samples\Advanced\CommandLink)
+  * Updated: 'Five GUI libraries for testing' sample.
+           Contribution of Jose Quintas.
+           Revised for Minigui Extended by Grigory Filatov
+           (see in folder \samples\Advanced\FiveLibsTest)
+  * Updated: UnRar sample and HbUnrar library:
+           - updated unrar.dll to the current version 7.01 (from 7.00).
+           Contributed by Grigory Filatov
+           (see in folder \samples\Advanced\UnRar)
+
 2024/05/21: HMG Extended Edition version 24.05.
   * Fixed: GetBox control: the cursor shape in insert/overwrite mode was incorrect
            when using GetBox together with TBrowse.

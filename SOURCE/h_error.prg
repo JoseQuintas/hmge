@@ -112,7 +112,7 @@ STATIC FUNCTION HMG_GenError( cMsg )
 
 RETURN oError
 
-#define MG_VERSION "Harbour MiniGUI Extended Edition 24.05 ("
+#define MG_VERSION "Harbour MiniGUI Extended Edition 24.06 ("
 
 *-----------------------------------------------------------------------------*
 FUNCTION MiniGuiVersion( nVer )
@@ -129,9 +129,7 @@ FUNCTION MiniGuiVersion( nVer )
    IF Set( _SET_DEBUG )
       cVer += " (DEBUG)"
    ENDIF
-#ifdef _LITE_
-   cVer += " (Lite)"
-#endif
+
    anOfs := { Len( cVer ), 38, 15 }
 
    hb_default( @nVer, 0 )

@@ -2,7 +2,7 @@
  * MINIGUI - Harbour Win32 GUI library source code
  *
  * Copyright 2017 Grigory Filatov <gfilatov@gmail.com>
- */
+*/
 
 #include "minigui.ch"
 
@@ -44,6 +44,10 @@ PROCEDURE _DefineSplitButton ( cName, nRow, nCol, cCaption, bAction, cParent, ;
 
    IF .NOT. _IsWindowDefined ( cParent )
       MsgMiniGuiError( "Window: " + cParent + " is not defined." )
+   ENDIF
+
+   IF ISCHAR ( cName ) .AND. cName == "0"
+      cName := HMG_GetUniqueName()
    ENDIF
 
    IF _IsControlDefined ( cName, cParent )
@@ -408,6 +412,14 @@ typedef struct
    RECT       margin;
    UINT       uAlign;
 } BUTTON_IMAGELIST, * PBUTTON_IMAGELIST;
+
+#if (_WIN32_WINNT >= 0x501)
+#define BUTTON_IMAGELIST_ALIGN_LEFT     0
+#define BUTTON_IMAGELIST_ALIGN_RIGHT    1
+#define BUTTON_IMAGELIST_ALIGN_TOP      2
+#define BUTTON_IMAGELIST_ALIGN_BOTTOM   3
+#define BUTTON_IMAGELIST_ALIGN_CENTER   4       // Doesn't draw text
+#endif
 #endif
 
 HB_FUNC( SPBUTTON_SETICON )

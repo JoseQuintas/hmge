@@ -69,6 +69,7 @@ FUNCTION _DefineChkLabel ( ControlName, ParentFormName, x, y, Caption, w, h, ;
    LOCAL blInit
    LOCAL lDialogInMemory
    LOCAL oc := NIL, ow := NIL
+
 #ifdef _OBJECT_
    ow := oDlu2Pixel()
 #endif
@@ -102,6 +103,7 @@ FUNCTION _DefineChkLabel ( ControlName, ParentFormName, x, y, Caption, w, h, ;
       __defaultNIL( @FontName, _HMG_ActiveFontName )
       __defaultNIL( @FontSize, _HMG_ActiveFontSize )
    ENDIF
+
    IF _HMG_FrameLevel > 0 .AND. !_HMG_ParentWindowActive
       x    := x + _HMG_ActiveFrameCol [_HMG_FrameLevel]
       y    := y + _HMG_ActiveFrameRow [_HMG_FrameLevel]
@@ -110,10 +112,15 @@ FUNCTION _DefineChkLabel ( ControlName, ParentFormName, x, y, Caption, w, h, ;
          Transparent := .T.
       ENDIF
    ENDIF
+
    lDialogInMemory := _HMG_DialogInMemory
 
    IF .NOT. _IsWindowDefined ( ParentFormName ) .AND. .NOT. lDialogInMemory
       MsgMiniGuiError( "Window: " + IFNIL( ParentFormName, "Parent", ParentFormName ) + " is not defined." )
+   ENDIF
+
+   IF ISCHAR ( ControlName ) .AND. ControlName == "0"
+      ControlName := HMG_GetUniqueName()
    ENDIF
 
    IF _IsControlDefined ( ControlName, ParentFormName ) .AND. .NOT. lDialogInMemory

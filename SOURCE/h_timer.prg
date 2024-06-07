@@ -64,6 +64,10 @@ FUNCTION _DefineTimer ( ControlName , ParentForm , Interval , ProcedureName , On
       MsgMiniGuiError( "Window: " + IFNIL( ParentForm, "Parent", ParentForm ) + " is not defined." )
    ENDIF
 
+   IF ISCHAR ( ControlName ) .AND. ControlName == "0"
+      ControlName := HMG_GetUniqueName()
+   ENDIF
+
    IF _IsControlDefined ( ControlName, ParentForm )
       MsgMiniGuiError ( "Control: " + ControlName + " Of " + ParentForm + " Already defined." )
    ENDIF

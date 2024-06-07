@@ -46,7 +46,7 @@
 ---------------------------------------------------------------------------*/
 
 #ifdef __XHARBOUR__
-  #define _BT_
+   #define _BT_
 #endif
 
 #include "hmg.ch"
@@ -54,6 +54,7 @@
 #ifdef _HMG_COMPAT_
 
 #include "fileio.ch"
+#xtranslate Alltrim( Str( <i> ) ) => hb_NtoS( <i> )
 
 * Main ************************************************************************
 

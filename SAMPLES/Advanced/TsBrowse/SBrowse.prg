@@ -30,11 +30,11 @@ Return .T.
 Function TBrwTest()
 
    Local oBrw, ;
-         cForm := GetUniqueName( "wMain" )
+         cForm := HMG_GetUniqueName( "wMain" )
 
    DbSelectArea( "Employee" )
 
-   DEFINE WINDOW &cForm TITLE "Customer List" CHILD NOSIZE
+   DEFINE WINDOW (cForm) TITLE "Customer List" CHILD NOSIZE
 
        oBrw := _TBrowse()
 
@@ -44,7 +44,7 @@ Function TBrwTest()
 
    END WINDOW
 
-   CENTER WINDOW &cForm
-   ACTIVATE WINDOW &cForm
+   CENTER WINDOW (cForm)
+   ACTIVATE WINDOW (cForm)
 
 Return Nil

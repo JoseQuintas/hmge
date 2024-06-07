@@ -422,6 +422,8 @@ METHOD End() CLASS TControl
       ix := GetControlIndex ( ::cControlName, ::oWnd:cParentWnd )
       IF ix > 0
          ReleaseControl( _HMG_aControlHandles[ ix ] )
+         DeleteObject ( _HMG_aControlFontHandle [ix] )
+         DeleteObject ( _HMG_aControlBrushHandle [ix] )
          _HMG_aControlDeleted[ ix ] := .T.
       ENDIF
    ENDIF

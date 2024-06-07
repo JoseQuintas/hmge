@@ -2,11 +2,14 @@
 test - main program
 */
 REQUEST DBFCDX
+REQUEST HB_CODEPAGE_PT850
 
 #include "hbclass.ch"
 #include "directry.ch"
 #include "dbstruct.ch"
 #include "frm_class.ch"
+
+MEMVAR lLogin, cUser, cPass
 
 #ifdef DLGAUTO_AS_LIB
    PROCEDURE DlgAuto()
@@ -16,7 +19,8 @@ REQUEST DBFCDX
 
    LOCAL aKeyList := {}, aSeekList := {}, aBrowseList := {}, aTypeList := {}
    LOCAL aAllSetup, aList, aFile, aField, aStru, cFile, aItem, aDBF, nKeyPos, nSeekPos
-   LOCAL cFieldName, aBrowse, nPos, aSetup
+   LOCAL cFieldName, aBrowse, nPos, aSetup, lMakeLogin, aAddOptionList, aButton
+   PRIVATE lLogin := .F., cUser := "", cPass := ""
 
    SET CONFIRM OFF
    SET CENTURY ON
@@ -26,9 +30,15 @@ REQUEST DBFCDX
    SET EXCLUSIVE OFF
    SET FILECASE LOWER
    SET DIRCASE  LOWER
+   Set( _SET_CODEPAGE, "PT850" )
    gui_Init()
    RddSetDefault( "DBFCDX" )
+
+   /* create dbfs */
    test_DBF()
+
+   /* setup */
+
    IF ! File( "dlgauto.json" )
       hb_MemoWrit( "dlgauto.json", test_Setup() )
    ENDIF
@@ -43,8 +53,21 @@ REQUEST DBFCDX
          CASE aItem[ 1 ] == "SEEKLIST";       aSeekList       := aItem[ 2 ]
          CASE aItem[ 1 ] == "BROWSELIST";     aBrowseList     := aItem[ 2 ]
          CASE aItem[ 1 ] == "TYPELIST";       aTypeList       := aItem[ 2 ]
+         CASE aItem[ 1 ] == "LOGIN";          lMakeLogin      := aItem[ 2 ][ 1 ]
          ENDCASE
       NEXT
+   ENDIF
+   hb_Default( @lMakeLogin, .F. )
+
+   /* another setup with codeblock, can't be on json */
+   aAddOptionList := { ;
+      { "DBCLIENT", "History",  { || gui_MsgBox( "History of changes, not available" ) } } }
+
+   IF lMakeLogin
+      Test_DlgLogin()
+      IF ! lLogin
+         RETURN
+      ENDIF
    ENDIF
 
    aAllSetup := {}
@@ -115,6 +138,17 @@ REQUEST DBFCDX
          ENDIF
       NEXT
       USE
+      /* extra button */
+      FOR EACH aButton IN aAddOptionList
+         IF aButton[1] == cFile
+            aItem := EmptyFrmClassItem()
+            aItem[ CFG_CTLTYPE ] := TYPE_ADDBUTTON
+            aItem[ CFG_CAPTION ] := aButton[2]
+            aItem[ CFG_ACTION ]  := aButton[3]
+            AAdd( Atail( aAllSetup )[ 2 ], aItem )
+         ENDIF
+      NEXT
+      /* browse order for key */
       nPos := hb_AScan( aKeyList, { | e | e[1] == cFile } )
       IF nPos != 0
          IF Len( aKeyList[ nPos ] ) > 2
@@ -161,51 +195,6 @@ STATIC FUNCTION PictureFromValue( oValue )
    ENDCASE
 
    RETURN cPicture
-
-#ifndef DLGAUTO_AS_LIB
-FUNCTION AppVersaoExe(); RETURN ""
-FUNCTION AppUserName(); RETURN ""
-#endif
-
-/* above functions not in use, for tests purpose */
-
-/*
-FUNCTION AppVersaoExe(); RETURN ""
-FUNCTION AppUserName(); RETURN ""
-
-FUNCTION AppConexao()
-
-   STATIC cnConexao
-
-   IF Empty( cnConexao )
-      cnConexao := win_OleCreateObject( "ADODB.Connection" )
-   ENDIF
-
-   RETURN cnConexao
-
-FUNCTION ADOLocal()
-
-   LOCAL cnSQL
-
-   cnSQL := ADOClass():New()
-   cnSQL:cn := AppConexao()
-
-   RETURN cnSQL
-
-CREATE CLASS ADOClass
-   VAR  cn
-   VAR rs
-   METHOD Open() INLINE Nil
-   METHOD CloseRecordset() INLINE Nil
-   METHOD CloseConnection() INLINE Nil
-   METHOD Execute() INLINE Nil
-   METHOD ExecuteNoReturn() INLINE Nil
-   METHOD QueryCreate() INLINE Nil
-   METHOD QueryAdd() INLINE Nil
-   METHOD QueryExecuteInsert() INLINE Nil
-   METHOD QueryExecuteUpdate() INLINE Nil
-   ENDCLASS
-*/
 
 #ifdef HBMK_HAS_GTWVG
 

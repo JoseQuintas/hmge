@@ -23,7 +23,7 @@ PROCEDURE Main
 		HEIGHT 400 ;
 		TITLE 'Hello PDF Report' ;
 		WINDOWTYPE MAIN ;
-		ONINIT ReciboImprime()
+		ONINIT ReciboImprime( hb_dirBase() + "Recibo.pdf" )
 
 		DEFINE MAIN MENU
 			POPUP 'File'
@@ -66,10 +66,11 @@ PROCEDURE ReciboImprime( cFileToSave )
    // separar muy bien la declaración del objeto TPrinter y las fuentes del resto
    // del código de impresión
 
-   oPrint := THaruPdf():New()
+   oPrint := PrtMgrObject( THaruPdf():New() )
    //oPrint:SetCompression( HPDF_COMP_ALL )
 
    oPrint:cFileName := cFileToSave
+
    // Define Preview mode
    oPrint:lPreview := .T.
 
@@ -82,7 +83,7 @@ PROCEDURE ReciboImprime( cFileToSave )
    oFontPrintR := oPrint:DefineFont( 'Courier', 8 )
    oFont2of5 := oPrint:DefineFont( 'i2of5txt', 14, .T. )
 
-   oPrint:StartPage()
+   PrtMgrStartPage()
 
    FOR nOffset := 0 TO 14.85 STEP 14.85
 
@@ -232,9 +233,10 @@ PROCEDURE ReciboImprime( cFileToSave )
    NEXT
 
    oPrint:CmDashLine( 14.85, 0.5, 14.85, 20.5 )
-   oPrint:EndPage()
 
-   IF oPrint:End() != 0 // End object and start Preview of PDF
+   PrtMgrEndPage()
+
+   IF PrtMgrEnd() != 0 // End object and start Preview of PDF
       MsgDebug( "0x" + hb_NumToHex( HPDF_GetError( oPrint:hpdf ), 4 ), ;
                 hb_HPDF_GetErrorString( HPDF_GetError( oPrint:hpdf ) ), ;
                 HPDF_GetErrorDetail( oPrint:hpdf ) )

@@ -196,26 +196,18 @@ RETURN
 FUNCTION ColorPicker(oBrwClr)
     LOCAL aColor := {}
 
-    aColor := n2RGB(oBrwClr:aArray[oBrwClr:nAt][oBrwClr:nCell] ) // receive color from the current cell
+    aColor := HMG_n2RGB(oBrwClr:aArray[oBrwClr:nAt][oBrwClr:nCell] ) // receive color from the current cell
     aColor := GetColor(aColor)   // standard menu Windows-color
     IF aColor[1] # NIL
        // put a new color in the current cell
        oBrwClr:aArray[oBrwClr:nAt][oBrwClr:nCell] := RGB(aColor[1], aColor[2], aColor[3] ) 
+       oBrwClr:DrawSelect()
     ENDIF
 RETURN NIL
 
 ///////////////////////////////////////////////////////////////////
 FUNCTION NEWColor(oBrwClr, nCol)
 RETURN oBrwClr:aArray[oBrwClr:nAt][nCol] 
-
-///////////////////////////////////////////////////////////////////
-FUNCTION n2RGB(nColor)
-   LOCAL nR := 0, nG := 0, nB := 0, cColor := NTOC(nColor, 16)
-
-   nR := CTON(SUBSTR( cColor, 5, 2 ), 16)
-   nG := CTON(SUBSTR( cColor, 3, 2 ), 16)
-   nB := CTON(SUBSTR( cColor, 1, 2 ), 16)
-RETURN {nR, nG, nB }
 
 ///////////////////////////////////////////////////////////////////
 FUNCTION ViewColorTbrws(oBrwClr, nCol, aVar)

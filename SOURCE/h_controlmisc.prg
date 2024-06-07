@@ -298,7 +298,7 @@ FUNCTION _SetValue ( ControlName, ParentForm, Value, index )
          ENDIF
       ENDIF
 
-   ELSEIF !( "LABEL" $ T ) .AND. T != "RICHEDIT" .AND. T != "TREE"
+   ELSEIF !( "LABEL" $ T .OR. T == "HYPERLINK" ) .AND. T != "RICHEDIT" .AND. T != "TREE"
 
       xPreviousValue := _GetValue ( , , ix )
 
@@ -3950,7 +3950,7 @@ FUNCTION _EraseControl ( i, p )
       ENDIF
       IF ISARRAY( _HMG_aControlPicture [i] )  // erase CheckLabel bitmap
          x := _HMG_aControlPicture [i] [1]
-         IF File( x ) .AND. cFilePath ( x ) == GetTempFolder()
+         IF File ( x ) .AND. cFilePath ( x ) == GetTempFolder()
             FErase( x )
          ENDIF
       ENDIF
@@ -3996,7 +3996,11 @@ FUNCTION _EraseControl ( i, p )
 
    CASE t == 'TOOLBUTTON'
       DeleteObject ( _HMG_aControlHandles [i] )
-
+#ifdef _TSBROWSE_
+   CASE t == "TBROWSE"
+      hWnd := _HMG_aControlIds [i]
+      hWnd:Destroy()
+#endif
    CASE t == 'PAGER'
       // Remove Pager Child Controls
       hWnd := _HMG_aControlHandles [i]
@@ -9089,6 +9093,15 @@ FUNCTION cNumToChar( nVal )
    ENDIF
 
 RETURN cVal
+
+*-----------------------------------------------------------------------------*
+FUNCTION HMG_GetUniqueName( cName )
+*-----------------------------------------------------------------------------*
+   STATIC nCount := 1
+
+   hb_default( @cName, "CTL_" )
+
+RETURN( cName + hb_ntos( nCount++ ) )
 
 #ifdef __XHARBOUR__
 *-----------------------------------------------------------------------------*

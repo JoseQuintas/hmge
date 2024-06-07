@@ -281,7 +281,7 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
                   IF ( a := _GetBackColor ( _HMG_aControlRangeMin [i] , _HMG_aControlRangeMax [i] ) ) != Nil
                      IF ISLOGICAL ( _HMG_aControlInputMask [i] ) .AND. _HMG_aControlInputMask [i] == .T.
-                        SetBkColor( wParam , a [1] , a [2] , a [3] )
+                        SetBkColor ( wParam , a [1] , a [2] , a [3] )
                         DeleteObject ( _HMG_aControlBrushHandle [i] )
                         _HMG_aControlBrushHandle [i] := CreateSolidBrush( a [1] , a [2] , a [3] )
                         RETURN _HMG_aControlBrushHandle [i]
@@ -330,8 +330,10 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
                IF ISLOGICAL ( _HMG_aControlInputMask [i] )
                   IF _HMG_aControlInputMask [i] == .T.
-                     IF _HMG_aControlContainerRow [i] == -1 .AND. _HMG_aControlContainerCol [i] == -1 .AND. TmpStr != "CHECKBOX"
-                        SetBkMode( wParam , TRANSPARENT )
+                     IF _HMG_aControlContainerRow [i] == -1 .AND. _HMG_aControlContainerCol [i] == -1 .AND. TmpStr == "CHECKBOX"
+                        // this case is handled in the checkbox code
+                     ELSE
+                        SetBkMode ( wParam , TRANSPARENT )
                         RETURN GetStockObject ( NULL_BRUSH )
                      ENDIF
                   ENDIF
@@ -392,14 +394,15 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
          FOR i := 1 TO ControlCount
 
-            Tmp := _HMG_aControlHandles [i]
-            IF ISARRAY ( Tmp )
+            IF ISARRAY ( _HMG_aControlHandles [i] )
 
                IF _HMG_aControlType [i] == 'RADIOGROUP'
 
-                  FOR x := 1 TO Len ( Tmp )
+                  Tmp := Len ( _HMG_aControlHandles [i] )
 
-                     IF Tmp [x] == lParam
+                  FOR x := 1 TO Tmp
+
+                     IF _HMG_aControlHandles [i] [x] == lParam
 
                         IF _HMG_aControlFontColor [i] != Nil
                            SetTextColor( wParam , _HMG_aControlFontColor [i] [1] , _HMG_aControlFontColor [i] [2] , _HMG_aControlFontColor [i] [3] )
@@ -811,19 +814,28 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
       IF i > 0
 
-         IF LoWord ( wParam ) == 0  /*WA_INACTIVE*/
+         IF LoWord ( wParam ) == WA_INACTIVE
+
             IF ! _HMG_GlobalHotkeys
+
                FOR EACH r IN _HMG_aControlType
+
                   IF r == 'HOTKEY'
                      x := hb_enumindex ( r )
                      ReleaseHotKey ( _HMG_aControlParentHandles [x] , _HMG_aControlIds [x] )
                   ENDIF
+
                NEXT
+
             ENDIF
+
             _HMG_aFormFocusedControl [i] := GetFocus()
             _DoWindowEventProcedure ( _HMG_aFormLostFocusProcedure [i] , i , 'WINDOW_LOSTFOCUS' )
+
          ELSE
+
             UpdateWindow ( hWnd )
+
          ENDIF
 
       ENDIF
@@ -1563,8 +1575,6 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
          hb_default( @lEnterSizeMove, .T. )
 
-         ControlCount := Len ( _HMG_aControlHandles )
-
          i := AScan ( _HMG_aFormHandles , hWnd )
 
          IF i > 0
@@ -1576,23 +1586,27 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
                RedrawWindow ( k )
             ENDIF
 
-            FOR x := 1 TO ControlCount
+            FOR EACH z IN _HMG_aControlHandles
+
+               x := hb_enumindex ( z )
 
                IF _HMG_aControlParentHandles [x] == hWnd
 
                   IF _HMG_aControlType [x] == "MESSAGEBAR"
-                     MoveWindow( _HMG_aControlHandles [x] , 0 , 0 , 0 , 0 , .T. )
-                     RefreshItemBar ( _HMG_aControlHandles [x] , _GetStatusItemWidth( hWnd, 1 ) )
+
+                     MoveWindow( z , 0 , 0 , 0 , 0 , .T. )
+                     RefreshItemBar ( z , _GetStatusItemWidth( hWnd, 1 ) )
 
                      IF ( k := GetControlIndex( 'ProgressMessage', GetParentFormName( x ) ) ) != 0
-                        RefreshProgressItem ( _HMG_aControlMiscData1 [k, 1], _HMG_aControlHandles [k], _HMG_aControlMiscData1 [k, 2] )
+                        RefreshProgressItem ( _HMG_aControlMiscData1 [k, 1], z, _HMG_aControlMiscData1 [k, 2] )
                      ENDIF
                      EXIT
+
                   ENDIF
 
                ENDIF
 
-            NEXT x
+            NEXT
 
             IF _HMG_MainClientMDIHandle != 0
 
@@ -1639,13 +1653,17 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
          ENDIF
 
-         FOR i := 1 TO ControlCount
+         FOR EACH x IN _HMG_aControlHandles
+
+            i := hb_enumindex ( x )
+
             IF _HMG_aControlParentHandles [i] == hWnd
                IF _HMG_aControlType [i] == "TOOLBAR"
-                  SendMessage ( _HMG_aControlHandles [i], TB_AUTOSIZE, 0, 0 )
+                  SendMessage ( x, TB_AUTOSIZE, 0, 0 )
                ENDIF
             ENDIF
-         NEXT i
+
+         NEXT
 
          IF _HMG_MainClientMDIHandle != 0
             RETURN 1
@@ -3425,18 +3443,33 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
          IF _HMG_aControlType [i] == "MESSAGEBAR"
 
             IF GetNotifyCode ( lParam ) == NM_CLICK  // StatusBar Click
+
                DefWindowProc( hWnd, NM_CLICK, wParam, lParam )
+
                x := GetItemPos( lParam ) + 1
+
                FOR EACH r IN _HMG_aControlHandles
+
                   i := hb_enumindex ( r )
-                  IF _HMG_aControlType [i] == "ITEMMESSAGE" .AND. _HMG_aControlParentHandles [i] == hWnd
-                     IF r == x
-                        IF _DoControlEventProcedure ( _HMG_aControlProcedures [i] , i )
-                           RETURN 0
+
+                  IF _HMG_aControlParentHandles [i] == hWnd
+
+                     IF _HMG_aControlType [i] == "ITEMMESSAGE"
+
+                        IF r == x
+
+                           IF _DoControlEventProcedure ( _HMG_aControlProcedures [i] , i )
+                              RETURN 0
+                           ENDIF
+
                         ENDIF
+
                      ENDIF
+
                   ENDIF
+
                NEXT
+
             ENDIF
 
          ENDIF
@@ -3520,8 +3553,11 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
 
          // If Not AutoRelease Then Destroy Window
          IF _HMG_aFormType [i] == 'A'
+
             ReleaseAllWindows()
+
          ELSE
+
             IF ISBLOCK( _HMG_aFormReleaseProcedure [i] )
                _HMG_InteractiveCloseStarted := .T.
                _DoWindowEventProcedure ( _HMG_aFormReleaseProcedure [i] , i , 'WINDOW_RELEASE' )
@@ -3532,6 +3568,11 @@ FUNCTION Events ( hWnd, nMsg, wParam, lParam )
             ENDIF
 
             _hmg_OnHideFocusManagement ( i )
+
+            IF lParam == 1
+               DestroyWindow ( hWnd )
+            ENDIF
+
          ENDIF
 
       ENDIF

@@ -9,7 +9,7 @@
 
 #include "hmg.ch"
 
-FUNCTION MAIN
+FUNCTION Main()
 
    LOCAL i, cLabelName
 
@@ -20,9 +20,9 @@ FUNCTION MAIN
       TITLE "Move and Resize Control With Cursor";
       MAIN
 
-   @ 300, 10 LABEL Label_0 VALUE "Put the cursor over control and press F3 (Info), F5 (Move) or F9 (Resize), while Move or Resize ESC -> Undo" AUTOSIZE
+   @ 300, 10 LABEL NUL VALUE "Put the cursor over control and press F3 (Info), F5 (Move) or F9 (Resize), while Move or Resize ESC -> Undo" AUTOSIZE
 
-   @ 320, 10 LABEL Label_00 VALUE "Press F7 - Toggle On/Off for Move and Resize Control With Cursor" AUTOSIZE
+   @ 320, 10 LABEL NUL VALUE "Press F7 - Toggle On/Off for Move and Resize Control With Cursor" AUTOSIZE
 
    DEFINE button Button_1
       ROW 120
@@ -35,7 +35,7 @@ FUNCTION MAIN
 
 
    FOR i := 1 TO 3
-      cLabelName := "Label_" + hb_ntos( i, 1 )
+      cLabelName := HMG_GetUniqueName( "Label_" )
 
       DEFINE LABEL &cLabelName
          PARENT Form_1

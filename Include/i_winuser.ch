@@ -61,6 +61,14 @@
 #define WM_MOVE                3
 #define WM_SIZE		       5
 #define WM_ACTIVATE	       6
+
+/*
+ * WM_ACTIVATE state values
+ */
+#define     WA_INACTIVE     0
+#define     WA_ACTIVE       1
+#define     WA_CLICKACTIVE  2
+
 #define WM_SETFOCUS	       7
 #define WM_KILLFOCUS	       8
 #define WM_ENABLE             10 // 0x000A

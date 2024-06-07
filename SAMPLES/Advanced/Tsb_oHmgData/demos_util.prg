@@ -254,10 +254,6 @@ hb_retnl( ( LONG ) Icon2Bmp( hIcon ) );
 DestroyIcon(hIcon);
 }
 
-HB_FUNC( DESTROYICON)
-{HICON hIcon = (HICON) hb_parnl( 1 );
-DestroyIcon(hIcon);
-}
 HB_FUNC( ICON_EXEREAD )
 {
 SHFILEINFO sfi;

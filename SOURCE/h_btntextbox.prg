@@ -75,6 +75,7 @@ FUNCTION _DefineBtnTextBox ( ControlName, ParentFormName, x, y, w, h, ;
    LOCAL WorkArea, blInit
    LOCAL lDialogInMemory
    LOCAL oc := NIL, ow := NIL
+
 #ifdef _OBJECT_
    ow := oDlu2Pixel()
 #endif
@@ -139,12 +140,16 @@ FUNCTION _DefineBtnTextBox ( ControlName, ParentFormName, x, y, w, h, ;
    ENDIF
    lDialogInMemory := _HMG_DialogInMemory
 
-// Check if the window/form is defined.
+   // Check if the window/form is defined.
    IF .NOT. _IsWindowDefined( ParentFormName ) .AND. .NOT. lDialogInMemory
       MsgMiniGuiError( "Window " + IFNIL( ParentFormName, "Parent", ParentFormName ) + " is not defined." )
    ENDIF
 
-// Check if the control is already defined.
+   IF ISCHAR ( ControlName ) .AND. ControlName == "0"
+      ControlName := HMG_GetUniqueName()
+   ENDIF
+
+   // Check if the control is already defined.
    IF _IsControlDefined( ControlName, ParentFormName ) .AND. .NOT. lDialogInMemory
       MsgMiniGuiError( "Control " + ControlName + " of " + ParentFormName + " already defined." )
    ENDIF
@@ -342,14 +347,14 @@ FUNCTION InitDialogBtnTextBox( ParentName, ControlHandle, k )
       SendMessage( aControlHandle [1] , EM_LIMITTEXT , nMaxLength , 0 )
    ENDIF
 
-// With NUMERIC clause, transform numeric value into a string.
+   // With NUMERIC clause, transform numeric value into a string.
    IF lNumeric
       IF ! ISCHARACTER( cValue )
          cValue := hb_ntos( cValue )
       ENDIF
    ENDIF
 
-// Fill the TEXTBOX with the text given.
+   // Fill the TEXTBOX with the text given.
    IF Len( cValue ) > 0
       SetWindowText ( aControlHandle [1] , cValue )
    ENDIF
@@ -359,7 +364,7 @@ FUNCTION InitDialogBtnTextBox( ParentName, ControlHandle, k )
    ENDIF
 
    ReDefBtnTextBox( ControlHandle, abitmap [1], BtnWidth, abitmap [2], lBtn2 )
-// JP 62
+   // JP 62
    IF Len( _HMG_aDialogTemplate ) != 0 .AND. _HMG_aDialogTemplate[3]   // Modal
       _HMG_aControlDeleted [k] := .T.
    ENDIF

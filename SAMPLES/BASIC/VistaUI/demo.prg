@@ -37,25 +37,25 @@ FUNCTION Main()
 
       IF isVistaCompatible()
 
-         @ 60, 100 CLBUTTON ID_BTN0 WIDTH 250 HEIGHT 80 ;
+         @ 60, 100 CLBUTTON NUL WIDTH 250 HEIGHT 80 ;
             CAPTION "Vista DEF_Command Link" ;
             NOTETEXT "Note" ;
             ACTION MsgInfo( This.Name ) ;
             DEFAULT
 
-         @ 145, 100 CLBUTTON ID_BTN1 WIDTH 250 HEIGHT 40 ;
+         @ 145, 100 CLBUTTON NUL WIDTH 250 HEIGHT 40 ;
             CAPTION "Vista Command Link" ;
             NOTETEXT NIL ;
             ACTION MsgInfo( This.Name )
 
-         @ 190, 100 SPLITBUTTON ID_BTN2 WIDTH 250 HEIGHT 40 ;
+         @ 190, 100 SPLITBUTTON NUL WIDTH 250 HEIGHT 40 ;
             CAPTION "Split Button" ;
             ACTION MsgInfo( This.Name ) ;
             FONT "ObjFONT2" ;
             TOOLTIP "Vista Split Button" + CRLF + ;
               "Multi line tooltip"
 
-         DEFINE DROPDOWN MENU BUTTON ID_BTN2
+         DEFINE DROPDOWN MENU BUTTON ( HMG_GetFormControls( This.Name, "SPBUTTON" )[ 1 ] )
             MENUITEM "Drop Down Menu 1" ACTION MsgInfo( "Button Drop Down Menu 1" )
             MENUITEM "Drop Down Menu 2" ACTION MsgInfo( "Button Drop Down Menu 2" )
          END MENU

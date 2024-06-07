@@ -88,6 +88,10 @@ FUNCTION _DefineAnimateRes ( ControlName, ParentForm, x, y, w, h, cFile, nRes, ;
       MsgMiniGuiError( "Window: " + ParentForm + " is not defined." )
    ENDIF
 
+   IF ISCHAR ( ControlName ) .AND. ControlName == "0"
+      ControlName := HMG_GetUniqueName()
+   ENDIF
+
    IF _IsControlDefined ( ControlName, ParentForm )
       MsgMiniGuiError ( "Control: " + ControlName + " Of " + ParentForm + " Already defined." )
    ENDIF

@@ -11,7 +11,7 @@ ANNOUNCE RDDSYS
 //-------------------------------------------------------------------\\
 FUNCTION Main()
 //-------------------------------------------------------------------\\
-   LOCAL i, cItemName, WIDTH, HEIGHT
+   LOCAL i, width, height
    LOCAL HBtn1DropMenu, HBtn2DropMenu, HBtn3DropMenu, HBtn4DropMenu
    LOCAL cResPath := GetStartupFolder() + "\images\"
 
@@ -46,30 +46,30 @@ FUNCTION Main()
       This.Cargo:aButStyles := App.Cargo:aButStyles
       This.Cargo:cResPath := cResPath
 
-      WIDTH := WinMain.WIDTH
-      HEIGHT := WinMain.HEIGHT
+      width := WinMain.WIDTH
+      height := WinMain.HEIGHT
 
       //-------------------------------------------------------------------\\
       // Window Border
       //-------------------------------------------------------------------\\
 
       DRAW LINE IN WINDOW WinMain ;
-         AT 0, 0 TO 0, WIDTH ;
+         AT 0, 0 TO 0, width ;
          PENCOLOR BLACK ;
          PENWIDTH 2
 
       DRAW LINE IN WINDOW WinMain ;
-         AT HEIGHT, 0 TO HEIGHT, WIDTH ;
+         AT height, 0 TO height, width ;
          PENCOLOR BLACK ;
          PENWIDTH 2
 
       DRAW LINE IN WINDOW WinMain ;
-         AT 0, 0 TO HEIGHT, 0 ;
+         AT 0, 0 TO height, 0 ;
          PENCOLOR BLACK ;
          PENWIDTH 2
 
       DRAW LINE IN WINDOW WinMain ;
-         AT 0, WIDTH TO HEIGHT, WIDTH ;
+         AT 0, width to height, width ;
          PENCOLOR BLACK ;
          PENWIDTH 2
 
@@ -97,64 +97,60 @@ FUNCTION Main()
       @ 25, 01 IMAGE FWMenu PICTURE cResPath + 'FW1.bmp' WIDTH WIDTH - 2 HEIGHT 24 STRETCH
 
       @ 26, 02 BUTTONEX MenuBut1 WIDTH 80 HEIGHT 22 CAPTION 'Menu-1' ;
-         ACTION ShowBtnDropMenu( 'WinMain', This.NAME, HBtn1DropMenu ) ;
+         ACTION ShowBtnDropMenu( 'WinMain', This.Name, HBtn1DropMenu ) ;
          TOOLTIP 'Menu-1' ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:cButMisc := '1', ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles }
       DEFINE CONTEXT MENU CONTROL MenuBut1
          FOR i = 1 TO 4
-            cItemName := 'MenuBut1_' + hb_ntos( i )
             MENUITEM 'MenuBut1_' + hb_ntos( i ) ;
-               ACTION MsgInfo( This.Name ) NAME &cItemName
+               ACTION MsgInfo( This.Caption )
          NEXT
       END MENU
       HBtn1DropMenu := _HMG_xContextMenuHandle
       SET CONTEXT MENU CONTROL MenuBut1 OF WinMain OFF
 
       @ 26, 82 BUTTONEX MenuBut2 WIDTH 80 HEIGHT 22 CAPTION 'Menu-2' ;
-         ACTION ShowBtnDropMenu( 'WinMain', This.NAME, HBtn2DropMenu ) ;
+         ACTION ShowBtnDropMenu( 'WinMain', This.Name, HBtn2DropMenu ) ;
          TOOLTIP 'Menu-2' ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:cButMisc := '1', ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles }
       DEFINE CONTEXT MENU CONTROL MenuBut2
          FOR i = 1 TO 4
-            cItemName := 'MenuBut2_' + hb_ntos( i )
             MENUITEM 'MenuBut2_' + hb_ntos( i ) ;
-               ACTION MsgInfo( This.Name ) NAME &cItemName
+               ACTION MsgInfo( This.Caption )
          NEXT
       END MENU
       HBtn2DropMenu := _HMG_xContextMenuHandle
       SET CONTEXT MENU CONTROL MenuBut2 OF WinMain OFF
 
       @ 26, 162 BUTTONEX MenuBut3 WIDTH 80 HEIGHT 22 CAPTION 'Menu-3' ;
-         ACTION ShowBtnDropMenu( 'WinMain', This.NAME, HBtn3DropMenu ) ;
+         ACTION ShowBtnDropMenu( 'WinMain', This.Name, HBtn3DropMenu ) ;
          TOOLTIP 'Menu-3' ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:cButMisc := '1', ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles }
       DEFINE CONTEXT MENU CONTROL MenuBut3
          FOR i = 1 TO 4
-            cItemName := 'MenuBut3_' + hb_ntos( i )
             MENUITEM 'MenuBut3_' + hb_ntos( i ) ;
-               ACTION MsgInfo( This.Name ) NAME &cItemName
+               ACTION MsgInfo( This.Caption )
          NEXT
       END MENU
       HBtn3DropMenu := _HMG_xContextMenuHandle
       SET CONTEXT MENU CONTROL MenuBut3 OF WinMain OFF
 
       @ 26, 242 BUTTONEX MenuBut4 WIDTH 80 HEIGHT 22 CAPTION 'Menu-4' ;
-         ACTION ShowBtnDropMenu( 'WinMain', This.NAME, HBtn4DropMenu ) ;
+         ACTION ShowBtnDropMenu( 'WinMain', This.Name, HBtn4DropMenu ) ;
          TOOLTIP 'Menu-4' ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:cButMisc := '1', ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles }
       DEFINE CONTEXT MENU CONTROL MenuBut4
          FOR i = 1 TO 4
-            cItemName := 'MenuBut4_' + hb_ntos( i )
             MENUITEM 'MenuBut4_' + hb_ntos( i ) ;
-               ACTION MsgInfo( This.Name ) NAME &cItemName
+               ACTION MsgInfo( This.Caption )
          NEXT
       END MENU
       HBtn4DropMenu := _HMG_xContextMenuHandle
@@ -225,37 +221,37 @@ FUNCTION Main()
       /////////////////////////////////////////////////////////////////
 
       @ 160, 20 BUTTONEX But1 HEIGHT 22 WIDTH 120 CAPTION 'Button-1' ;
-         ACTION MsgInfo( This.Name ) ;
+         ACTION MsgInfo( This.Caption ) ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles, ;
          This.Cargo:cButMisc := '4' }
 
       @ 160, 160 BUTTONEX But2 HEIGHT 22 WIDTH 120 CAPTION 'Button-2' ;
-         ACTION MsgInfo( This.Name ) ;
+         ACTION MsgInfo( This.Caption ) ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles, ;
          This.Cargo:cButMisc := '5' }
 
       @ 160, 300 BUTTONEX But3 HEIGHT 22 WIDTH 120 CAPTION 'Button-3' ;
-         ACTION MsgInfo( This.Name ) ;
+         ACTION MsgInfo( This.Caption ) ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles, ;
          This.Cargo:cButMisc := '6' }
 
       @ 190, 20 BUTTONEX But4 HEIGHT 22 WIDTH 120 CAPTION 'Button-4' ;
-         ACTION MsgInfo( This.Name ) ;
+         ACTION MsgInfo( This.Caption ) ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles, ;
          This.Cargo:cButMisc := '7' }
 
       @ 190, 160 BUTTONEX But5 HEIGHT 22 WIDTH 120 CAPTION 'Button-5' ;
-         ACTION MsgInfo( This.Name ) ;
+         ACTION MsgInfo( This.Caption ) ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles, ;
          This.Cargo:cButMisc := '8' }
 
       @ 190, 300 BUTTONEX But6 HEIGHT 22 WIDTH 120 CAPTION 'Button-6' ;
-         ACTION MsgInfo( This.Name ) ;
+         ACTION MsgInfo( This.Caption ) ;
          ON INIT {|| This.Cargo := oHmgData(), ;
          This.Cargo:aButStyles := ThisWindow.Cargo:aButStyles, ;
          This.Cargo:cButMisc := '9' }

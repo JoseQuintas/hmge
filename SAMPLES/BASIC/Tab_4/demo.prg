@@ -5,7 +5,9 @@
 
 #include "hmg.ch"
 
-FUNCTION Main
+FUNCTION Main()
+
+   LOCAL cTabCtl
 
    DEFINE WINDOW oWindow1 ;
       Row     10 ;
@@ -13,41 +15,41 @@ FUNCTION Main
       Width  400 ;
       Height 400 ;
       Title  'Tab Pages Demo' ;
-      WindowType MAIN ;
+      WindowType Main ;
       OnInit oWindow1.Center()
 
       DEFINE MAIN MENU
 
          POPUP 'Page Tests'
-            ITEM 'SET Page1 Caption'   ACTION oWindow1.Tab1.Caption( 1 ) := 'New'
-            ITEM 'SET Page1 Image'     ACTION oWindow1.Tab1.Image( 1 )   := 'save.png'
-            ITEM 'SET Page1 ToolTip'   ACTION oWindow1.Tab1.ToolTip( 1 ) := 'Page ToolTip'
+            ITEM 'Set Page1 Caption'   ACTION oWindow1.(cTabCtl).Caption( 1 ) := 'New'
+            ITEM 'Set Page1 Image'     ACTION oWindow1.(cTabCtl).Image( 1 )   := 'save.png'
+            ITEM 'Set Page1 ToolTip'   ACTION oWindow1.(cTabCtl).ToolTip( 1 ) := 'Page ToolTip'
             SEPARATOR
-            ITEM 'SET Page1 Disable'   ACTION oWindow1.Tab1.Enabled( 1 ) := .F.
-            ITEM 'SET Page1 Enable'    ACTION oWindow1.Tab1.Enabled( 1 ) := .T.
+            ITEM 'Set Page1 Disable'   ACTION oWindow1.(cTabCtl).Enabled( 1 ) := .F.
+            ITEM 'Set Page1 Enable'    ACTION oWindow1.(cTabCtl).Enabled( 1 ) := .T.
             SEPARATOR
-            MENUITEM 'Get Button1 Caption' ACTION MsgInfo ( oWindow1.Tab1( 1 ).Button1.Caption )
-            MENUITEM 'Set Button1 Caption' ACTION oWindow1.Tab1( 1 ).Button1.Caption := 'New Caption'
+            MENUITEM 'Get Button1 Caption' ACTION MsgInfo ( oWindow1.&cTabCtl.( 1 ).Button1.Caption )
+            MENUITEM 'Set Button1 Caption' ACTION oWindow1.&cTabCtl.( 1 ).Button1.Caption := 'New Caption'
             SEPARATOR
-            MENUITEM 'Show Button1' ACTION oWindow1.Tab1( 1 ).Button1.Show()
-            MENUITEM 'Hide Button1' ACTION oWindow1.Tab1( 1 ).Button1.Hide()
+            MENUITEM 'Show Button1' ACTION oWindow1.&cTabCtl.( 1 ).Button1.Show()
+            MENUITEM 'Hide Button1' ACTION oWindow1.&cTabCtl.( 1 ).Button1.Hide()
          END POPUP
 
          POPUP 'Tab Tests'
-            ITEM 'SET Active Page TO 1'        ACTION oWindow1.Tab1.Value := 1
-            ITEM 'SET Active Page TO 2'        ACTION oWindow1.Tab1.Value := 2
+            ITEM 'Set Active Page To 1'        ACTION oWindow1.(cTabCtl).Value := 1
+            ITEM 'Set Active Page To 2'        ACTION oWindow1.(cTabCtl).Value := 2
             SEPARATOR
-            ITEM 'SET OnChange Event'          ACTION oWindow1.Tab1.OnChange := { || MsgInfo( 'Changed' ) }
-            ITEM 'Clear OnChange Event'        ACTION oWindow1.Tab1.OnChange := { || NIL }
+            ITEM 'Set OnChange Event'          ACTION oWindow1.(cTabCtl).OnChange := { || MsgInfo( 'Changed' ) }
+            ITEM 'Clear OnChange Event'        ACTION oWindow1.(cTabCtl).OnChange := { || NIL }
             SEPARATOR
-            ITEM 'DELETE Page 2'               ACTION oWindow1.Tab1.DeletePage( 2 )
-            ITEM 'Add Page At Position 2'      ACTION ( oWindow1.Tab1.Image( 1 )   := 'save.png', ;
-                                                      oWindow1.Tab1.AddPage( 2, 'New Page', 'open.png' ) )
+            ITEM 'Delete Page 2'               ACTION oWindow1.(cTabCtl).DeletePage( 2 )
+            ITEM 'Add Page At Position 2'      ACTION ( oWindow1.(cTabCtl).Image( 1 )   := 'save.png', ;
+                                                      oWindow1.(cTabCtl).AddPage( 2, 'New Page', 'open.png' ) )
          END POPUP
 
       END MENU
 
-      DEFINE TAB Tab1 AT 20, 10 Width 350 Height 300
+      DEFINE TAB NUL AT 20, 10 Width 350 Height 300
 
          DEFINE PAGE 'One'
 
@@ -74,6 +76,8 @@ FUNCTION Main
          END PAGE
 
       END TAB
+
+      cTabCtl := HMG_GetFormControls( This.Name, "TAB" )[ 1 ]
 
    END WINDOW
 

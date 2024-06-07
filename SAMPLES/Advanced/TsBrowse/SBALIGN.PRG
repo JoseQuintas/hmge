@@ -7,12 +7,13 @@
 Function SBAlign()
 
    Local oBrw
-
-   Local ahBmp:= {LoadImage( "Bitmaps\Level1.bmp" ), ;
-                  LoadImage( "Bitmaps\Level3.bmp" ), ;
-                  LoadImage( "Bitmaps\Level2.bmp" ) }
+   Local ahBmp
 
    IF !_IsControlDefined ("oBrw","Form_2")
+
+      ahBmp:= {LoadImage( "Bitmaps\Level1.bmp" ), ;
+                  LoadImage( "Bitmaps\Level3.bmp" ), ;
+                  LoadImage( "Bitmaps\Level2.bmp" ) }
 
       // to see how SetDeleteMode() works:
       Set( _SET_DELETED, .T. )
@@ -27,7 +28,10 @@ Function SBAlign()
                            "Alignable BitMaps" ;
          ICON "Demo.ico" ;
          FONT "Arial" SIZE 9 ;
-         CHILD
+         CHILD ;
+         ON RELEASE ( ;
+            AEval( ahBmp, { | x | DeleteObject( x ) } ) ;
+         )
 
          DEFINE TBROWSE oBrw AT 10,15 ALIAS "Test2" ;
             OF "Form_2" WIDTH 340 HEIGHT 240 CELLED;
@@ -66,7 +70,6 @@ Function SBAlign()
             COLOR CLR_BLACK, CLR_NBLUE ;
             SIZE 45 BITMAP
 
-
       // delete rows by pressing Del key
          oBrw:SetDeleteMode( .T., .T. )  // ( lOnOff, lConfirm, bDelete)
 
@@ -91,6 +94,5 @@ Function SBAlign()
       ACTIVATE WINDOW Form_2
 
    endif
-   AEval( ahBmp,{ | x | DeleteObject( x ) } )
 
 Return Nil

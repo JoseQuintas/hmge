@@ -14,8 +14,8 @@ Static cTextIsx
 FUNCTION FORMA_MEMO(cTitle,cField) 
    LOCAL nDesktopWidth  := GetDesktopWidth()
    LOCAL nDesktopHeight := GetDesktopHeight() - GetTaskBarHeight()
-   LOCAL aBackColor := n2RGB( M->nTbrwColorPane )
-   LOCAL aTextColor := n2RGB( M->nTbrwColorText )
+   LOCAL aBackColor := HMG_n2RGB( M->nTbrwColorPane )
+   LOCAL aTextColor := HMG_n2RGB( M->nTbrwColorText )
    LOCAL cFont := M->aFontEdit[1], nFontSize := M->aFontEdit[2]
    LOCAL lFBold := M->aFontEdit[3], lFItalic := M->aFontEdit[4]
    LOCAL cText

@@ -10,7 +10,7 @@
 #define CLR_BLUE1 { 218, 229, 243 }
 #define CLR_BLUE2 { 000, 120, 187 }
 
-STATIC lOver := .F.
+STATIC lOver := .F., oStatus
 
 FUNCTION Main
    LOCAL i, cLblName
@@ -28,10 +28,10 @@ FUNCTION Main
 
       FOR i:=1 TO 6
 
-         cLblName := 'Lbl_' + hb_ntos(i)
+         cLblName := HMG_GetUniqueName( "BTN_" )
 
-         @ 30 + 28 * (i - 1),10 LABEL &cLblName ;
-           VALUE "Opcion " + hb_ntos(i) ;
+         @ 30 + 28 * (i - 1),10 LABEL (cLblName) ;
+           VALUE "Opcion " + hb_ntos( i ) ;
            WIDTH 200 HEIGHT 23 ;
            FONTCOLOR WHITE BACKCOLOR CLR_BLUE2 ;
            CENTERALIGN VCENTERALIGN ;
@@ -39,9 +39,13 @@ FUNCTION Main
            ON MOUSEHOVER SelectLabel( ThisWindow.Name, This.Name ) ;
            ON MOUSELEAVE LeaveLabel( ThisWindow.Name, This.Name )
 
+         DO EVENTS
+
       NEXT
 
-      @ 250,10 LABEL Lbl_7 VALUE "" WIDTH 200 HEIGHT 20 CENTERALIGN TRANSPARENT 
+      @ 250,10 LABEL NUL VALUE "" WIDTH 200 HEIGHT 20 CENTERALIGN TRANSPARENT
+
+      oStatus := ATail( HMG_GetFormControls( ThisWindow.NAME, "LABEL" ) )
 
    END WINDOW
 
@@ -53,7 +57,7 @@ RETURN Nil
 
 FUNCTION SelectLabel( cForm, cCtrl )
 
-   Win_1.Lbl_7.Value := 'Control ' + cCtrl + " of " + cForm
+   Win_1.(oStatus).Value := 'Control ' + cCtrl + " of " + cForm
 
    CursorHand()
 
@@ -72,7 +76,7 @@ RETURN Nil
 
 FUNCTION LeaveLabel( cForm, cCtrl )
 
-   Win_1.Lbl_7.Value := 'Form ' + cForm
+   Win_1.(oStatus).Value := 'Form ' + cForm
 
    SetProperty(cForm, cCtrl, 'FontBold', .F.)
    SetProperty(cForm, cCtrl, 'FontSize', 9)

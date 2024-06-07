@@ -64,6 +64,7 @@ FUNCTION _DefineTree ( ControlName, ParentFormName, row, col, width, height, ;
    LOCAL blInit
    LOCAL i
    LOCAL oc := NIL, ow := NIL
+
 #ifdef _OBJECT_
    ow := oDlu2Pixel()
 #endif
@@ -84,6 +85,7 @@ FUNCTION _DefineTree ( ControlName, ParentFormName, row, col, width, height, ;
       __defaultNIL( @FontName, _HMG_ActiveFontName )
       __defaultNIL( @FontSize, _HMG_ActiveFontSize )
    ENDIF
+
    IF _HMG_FrameLevel > 0 .AND. !_HMG_ParentWindowActive
       col := col + _HMG_ActiveFrameCol[ _HMG_FrameLevel ]
       row := row + _HMG_ActiveFrameRow[ _HMG_FrameLevel ]
@@ -93,10 +95,15 @@ FUNCTION _DefineTree ( ControlName, ParentFormName, row, col, width, height, ;
    IF _SetGetGlobal( "_HMG_aNodeItemCargo" ) == NIL
       STATIC _HMG_aNodeItemCargo AS GLOBAL VALUE {}
    ENDIF
+
    STATIC _HMG_lDialogInMemory AS GLOBAL VALUE _HMG_DialogInMemory
 
    IF .NOT. _IsWindowDefined ( ParentFormName ) .AND. .NOT. _HMG_DialogInMemory
       MsgMiniGuiError( "Window: " + IFNIL( ParentFormName, "Parent", ParentFormName ) + " is not defined." )
+   ENDIF
+
+   IF ISCHAR ( ControlName ) .AND. ControlName == "0"
+      ControlName := HMG_GetUniqueName()
    ENDIF
 
    IF _IsControlDefined ( ControlName, ParentFormName ) .AND. .NOT. _HMG_DialogInMemory

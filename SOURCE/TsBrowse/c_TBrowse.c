@@ -109,7 +109,6 @@ HB_FUNC( REGISTER_CLASS )
    const char  *lpClassName = hb_parc( 1 );
 #endif
    WNDCLASS    WndClass;
-   HBRUSH      hbrush;
 
    WndClass.style = CS_DBLCLKS;
    hwndMDIClient = HB_ISNIL( 3 ) ? 0 : hmg_par_raw_HWND( 3 );
@@ -127,18 +126,11 @@ HB_FUNC( REGISTER_CLASS )
    WndClass.hInstance = GetModuleHandle( NULL );
    WndClass.hIcon = 0;
    WndClass.hCursor = LoadCursor( NULL, IDC_ARROW );
-   hbrush = HB_ISNIL( 2 ) ? ( HBRUSH ) ( COLOR_WINDOW + 1 ) : hmg_par_raw_HBRUSH( 2 );
-   WndClass.hbrBackground = hbrush;
+   WndClass.hbrBackground = HB_ISNIL( 2 ) ? ( HBRUSH ) ( COLOR_WINDOW + 1 ) : hmg_par_raw_HBRUSH( 2 );
    WndClass.lpszMenuName = NULL;
    WndClass.lpszClassName = lpClassName;
 
-   if( !RegisterClass( &WndClass ) )
-   {
-      MessageBox( 0, TEXT( "Window Registration Failed!" ), TEXT( "Error!" ), MB_ICONEXCLAMATION | MB_OK | MB_SYSTEMMODAL );
-      ExitProcess( 0 );
-   }
-
-   hmg_ret_raw_HBRUSH( hbrush );
+   hb_retl( RegisterClass( &WndClass ) );
 
 #ifdef UNICODE
    hb_strfree( hClassName );

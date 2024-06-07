@@ -13,6 +13,7 @@
 #define MsgInfo( c ) MsgInfo( c, , , .f. )
 
 Function Main
+    LOCAL bBlock := {|nCol| MsgInfo('Header '+hb_ntos(nCol-1)+' Clicked !')}
 
 	DEFINE WINDOW Form_1 ;
 		AT 0,0 ;
@@ -215,7 +216,7 @@ Function Main
 					ITEMS { { 0,'Simpson','Homer'} , {1,'Mulder','Fox'} } 
 					VALUE 1 
 					TOOLTIP 'Grid Control' 
-					ONHEADCLICK { {|| MsgInfo('Header 1 Clicked !')} , { || MsgInfo('Header 2 Clicked !')} } 
+					ONHEADCLICK { Nil, bBlock, bBlock } 
 					IMAGE {"br_no","br_ok"} 
 					ONDBLCLICK MsgInfo ('DoubleClick!','Grid') 
 				END GRID
@@ -1178,11 +1179,11 @@ Procedure Color_CLick
 *-----------------------------------------------------------------------------*
 	DEFINE WINDOW Form_Color ;
 		AT 100,100 ;
-		WIDTH 200 HEIGHT 200 ;
+		WIDTH 250 HEIGHT 200 ;
 		TITLE 'Color Window' ;
 		BACKCOLOR RED
 
-		DEFINE LABEL Label_9
+		DEFINE LABEL NUL
 			ROW	10
 			COL	10
 			VALUE 'A COLOR Label !!!' 
@@ -1195,7 +1196,7 @@ Procedure Color_CLick
 			FONTBOLD .T.
 		END LABEL 
 
-		DEFINE LABEL Label_99
+		DEFINE LABEL NUL
 			ROW	60
 			COL	10
 			VALUE 'Another COLOR Label !!!' 

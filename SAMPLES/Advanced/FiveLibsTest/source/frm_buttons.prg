@@ -77,12 +77,13 @@ STATIC FUNCTION IconFromCaption( cCaption )
       { "Cancel",   "icoNoOk" }, ;
       { "Mail",     "icoMail" }, ;
       { "Print",    "icoPrint" }, ;
-      { "CtlList",  "AppIcon" }, ;
-      { "ThisDlg",  "AppIcon" }, ;
-      { "Exit",     "icoDoor" } }
+      { "Exit",     "icoDoor" }, ;
+      { "History",  "icoBook" } }
 
    IF ( nPos := hb_AScan( aList, { | e | e[1] == cCaption } ) ) != 0
       cResName := aList[ nPos, 2 ]
+   ELSE
+      cResName := "icowindow"
    ENDIF
 
    RETURN cResName

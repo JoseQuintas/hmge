@@ -11,35 +11,47 @@ frm_browseaction - action for browse
 
 FUNCTION frm_BrowseAction( aItemOld, nKey, oFrmOld )
 
-   LOCAL oFrm, nPos, aItem, nSelect
+   LOCAL oFrm, nPos, nSelect, aOrdScope
 
    nSelect := Select()
    oFrm := frm_Class():New()
    WITH OBJECT oFrm
       :cFileDbf    := aItemOld[ CFG_BRWTABLE ]
-      :cTitle      := gui_LibName() + " - BROWSE " + :cFileDbf + "KEY:" + Ltrim( Str( nkey ) )
+      :cTitle      := gui_LibName() + " - BROWSE " + :cFileDbf
       :cOptions    := "S"
       :lNavigate   := .F.
-      :lSingleEdit := .T.
       :lModal      := .T.
       :nLayout     := oFrmOld:nLayout
       :aAllSetup   := AClone( oFrmOld:aAllSetup )
 
-       nPos := hb_ASCan( :aAllSetup, { | e | e[ 1 ] == aItemOld[ CFG_BRWTABLE ] } )
-      :aEditList := :aAllSetup[ nPos, 2 ]
-      FOR EACH aItem IN oFrm:aEditList
-         DO CASE
-         CASE aItem[ CFG_FNAME ] == aItemOld[ CFG_BRWKEYTO ]
-            aItem[ CFG_SAVEONLY ] := .T.
-            aItem[ CFG_VALUE ] := ( nSelect )->( FieldGet( FieldNum( aItemOld[ CFG_BRWKEYFROM ] ) ) )
-         CASE aItem[ CFG_FNAME ] == aItemOld[ CFG_BRWKEYTO2 ]
-            aItem[ CFG_SAVEONLY ] := .T.
-            aItem[ CFG_VALUE ] := FieldGet( FieldNum( aItem[ CFG_FNAME ] ) )
-          ENDCASE
-      NEXT
+      nPos := hb_ASCan( :aAllSetup, { | e | e[ 1 ] == aItemOld[ CFG_BRWTABLE ] } )
+      :aEditList   := :aAllSetup[ nPos, 2 ]
+      :nInitRecno  := ( aItemOld[ CFG_BRWTABLE ] )->( RecNo() )
+      :aInitValue1 := { aItemOld[ CFG_BRWKEYTO ],  ( oFrmOld:cFileDbf )->( FieldGet( FieldNum( aItemOld[ CFG_BRWKEYFROM ] ) ) ) }
+      IF nKey == VK_INSERT
+         SELECT ( Select( aItemOld[ CFG_BRWTABLE ] ) )
+         aOrdScope := { OrdScope( 0 ), OrdScope( 1 ) }
+         SET ORDER TO 1
+         SET SCOPE TO
+         GOTO BOTTOM // fail, SET SCOPE is activated
+         :aInitValue2 := { aItemOld[ CFG_BRWKEYTO2 ], ( aItemOld[ CFG_BRWTABLE ] )->( FieldGet( FieldNum( aItemOld[ CFG_BRWKEYTO2 ] ) ) ) + 1 }
+         SET ORDER TO ( aItemOld[ CFG_BRWIDXORD ] )
+         OrdScope( 0, aOrdScope[1] )
+         OrdScope( 1, aOrdScope[2] )
+         GOTO ( LastRec() + 1 )
+         SELECT ( nSelect )
+      ELSE
+         :aInitValue2 := { aItemOld[ CFG_BRWKEYTO2 ], ( aItemOld[ CFG_BRWTABLE ] )->( FieldGet( FieldNum( aItemOld[ CFG_BRWKEYTO2 ] ) ) ) }
+      ENDIF
+      DO CASE
+      CASE nKey == VK_INSERT; :cOptions := "IS" ; :bActivate := { || :Insert() }
+      CASE nKey == VK_DELETE; :cOptions := "D" // :bActivate := { || :Delete() }
+      CASE nKey == VK_RETURN; :cOptions := "ES"; :bActivate := { || :Edit() }
+      ENDCASE
       :Execute()
    ENDWITH
    SELECT ( nSelect )
+   gui_SetFocus( oFrmOld:xDlg )
 
    RETURN Nil
 

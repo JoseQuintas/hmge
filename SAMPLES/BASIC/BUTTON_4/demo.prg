@@ -6,18 +6,19 @@
 
 FUNCTION Main()
 
-   LOCAL aBtn, n
-   LOCAL cPngPath := ".\images\"
+   LOCAL aBtn, n, nCnt
+   LOCAL cPngPath := hb_DirBase() + "images\"
    LOCAL aPng := {}
 
    AEval( { 3, 1, 2, 6, 7, 8, 9, 10 }, {| c | ;
       AAdd( aPng, cPngPath + "image" + hb_ntos( c ) + ".png" ) } )
 
-   aBtn := Array( Len( aPng ) )
+   nCnt := Len( aPng )
+   aBtn := Array( nCnt )
 
    DEFINE WINDOW Form_1 ;
          AT 0, 0 ;
-         WIDTH 80 + 70 * Len( aPng ) ;
+         WIDTH 80 + 70 * nCnt ;
          HEIGHT 430 ;
          MAIN ;
          TITLE 'Disabled Buttons Test' ;
@@ -26,11 +27,11 @@ FUNCTION Main()
 
       @ 40, 40 LABEL Lbl_1 VALUE "ENABLED BUTTONS NORMAL LOOK" AUTOSIZE
 
-      FOR n := 1 TO Len( aPng )
+      FOR n := 1 TO nCnt
 
-         aBtn[ n ] := "Btn1_" + hb_ntos( n )
+         aBtn[ n ] := HMG_GetUniqueName()
 
-         DEFINE BUTTON &( aBtn[ n ] )
+         DEFINE BUTTON ( aBtn[ n ] )
             ROW 70
             COL n * 70 - 30
             ACTION NIL
@@ -43,10 +44,11 @@ FUNCTION Main()
 
       @ 150, 40 LABEL Lbl_2 VALUE "LOADED PICTURES NORMAL LOOK" AUTOSIZE
 
-      FOR n := 1 TO Len( aPng )
-         aBtn[ n ] := "Img2_" + hb_ntos( n )
+      FOR n := 1 TO nCnt
 
-         DEFINE IMAGE &( aBtn[ n ] )
+         aBtn[ n ] := HMG_GetUniqueName()
+
+         DEFINE IMAGE ( aBtn[ n ] )
             ROW 180
             COL n * 70 - 20
             ACTION NIL
@@ -63,10 +65,11 @@ FUNCTION Main()
 
       @ 260, 40 LABEL Lbl_3 VALUE "DISABLED BUTTONS" AUTOSIZE
 
-      FOR n := 1 TO Len( aPng )
-         aBtn[ n ] := "Btn3_" + hb_ntos( n )
+      FOR n := 1 TO nCnt
 
-         DEFINE BUTTON &( aBtn[ n ] )
+         aBtn[ n ] := HMG_GetUniqueName()
+
+         DEFINE BUTTON ( aBtn[ n ] )
             ROW 290
             COL n * 70 - 30
             ACTION NIL
@@ -75,7 +78,7 @@ FUNCTION Main()
             HEIGHT 64
          END BUTTON
 
-         Form_1.&( aBtn[ n ] ).Enabled := .F.
+         Form_1.( aBtn[ n ] ).Enabled := .F.
 
       NEXT
 

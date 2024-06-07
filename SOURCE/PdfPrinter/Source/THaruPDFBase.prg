@@ -439,10 +439,14 @@ RETURN nResult
 
 METHOD Rect( nTop, nLeft, nBottom, nRight, oPen, nColor )
 
+   HPDF_Page_GSave( ::hPage )
+
    ::SetPen( oPen, nColor )
 
    HPDF_Page_Rectangle( ::hPage, nLeft, ::nHeight - nBottom, nRight - nLeft, nBottom - nTop )
    HPDF_Page_Stroke( ::hPage )
+
+   HPDF_Page_GRestore( ::hPage )
 
 RETURN Self
 

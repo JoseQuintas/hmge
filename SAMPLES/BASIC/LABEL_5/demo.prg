@@ -13,9 +13,7 @@
 #define LABEL_HWND 2
 
 FUNCTION Main()
-  LOCAL aLabel := {{"LABEL1", NIL}, ;
-                   {"LABEL2", NIL}, ;
-                   {"LABEL3", NIL}}
+  LOCAL aLabel := Array( 3, 2 )
   LOCAL n
 
   SET DIALOGBOX CENTER OF PARENT
@@ -29,7 +27,9 @@ FUNCTION Main()
 
     // these labels can get focus and process keyboard/mouse messages
     FOR n := 1 TO Len(aLabel)
-      DEFINE LABEL &(aLabel[n][LABEL_NAME])
+      aLabel[n][LABEL_NAME] := HMG_GetUniqueName( "LABEL_" )
+
+      DEFINE LABEL (aLabel[n][LABEL_NAME])
         ROW          10 + 55 * (n - 1)
         COL          10
         WIDTH        140
@@ -48,7 +48,7 @@ FUNCTION Main()
       HMG_ChangeWindowStyle(aLabel[n][LABEL_HWND], WS_EX_STATICEDGE, NIL, .T., .T.)
     NEXT
 
-    DEFINE LABEL LABEL4
+    DEFINE LABEL NUL
       ROW      190
       COL      120
       AUTOSIZE .T.

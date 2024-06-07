@@ -7,23 +7,18 @@
 
 #include <hmg.ch>
 
-PROCEDURE MAIN
+PROCEDURE Main()
 
    LOAD WINDOW Main
-   Main.Activate
+   Main.Activate()
 
 RETURN
 **************************************************************************
 PROCEDURE ChildForm()
 
-   LOCAL ChildForm := "ChildForm_"
-   LOCAL nForm := 1
+   LOCAL ChildForm := HMG_GetUniqueName( "ChildForm_" )
+   LOCAL nForm := Val( SubStr( ChildForm, RAt( "_", ChildForm ) + 1 ) )
 
-   DO WHILE IsWindowDefined( &( ChildForm + hb_ntos( nForm ) ) )
-      nForm++
-   ENDDO
-
-   ChildForm += hb_ntos( nForm )
    LOAD WINDOW Child AS &ChildForm
 
    SetProperty( ChildForm, "Title", "Child Form #" + hb_ntos( nForm ) )
@@ -36,14 +31,9 @@ RETURN
 *************************************************************
 PROCEDURE StdForm()
 
-   LOCAL StdForm := "StandardForm_"
-   LOCAL nForm := 1
+   LOCAL StdForm := HMG_GetUniqueName( "StandardForm_" )
+   LOCAL nForm := Val( SubStr( StdForm, RAt( "_", StdForm ) + 1 ) )
 
-   DO WHILE IsWindowDefined( &( StdForm + hb_ntos( nForm ) ) )
-      nForm++
-   ENDDO
-
-   StdForm += hb_ntos( nForm )
    LOAD WINDOW Standard AS &StdForm
 
    SetProperty ( StdForm, "Title", "Standard Form #" + hb_ntos( nForm ) )

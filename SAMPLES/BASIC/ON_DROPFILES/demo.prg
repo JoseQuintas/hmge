@@ -8,7 +8,7 @@
 #include "MiniGUI.ch"
 
 *-------------------------------------------------------------------*
-FUNCTION Main
+FUNCTION Main()
 *-------------------------------------------------------------------*
 
    DEFINE WINDOW Form_1 AT 50, 50 WIDTH 515 HEIGHT 580 ;
@@ -18,7 +18,7 @@ FUNCTION Main
          NOMINIMIZE ;
          MAIN
 
-      ON KEY ESCAPE ACTION ThisWindow.RELEASE
+      ON KEY ESCAPE ACTION ThisWindow.Release()
 
       @ 0, 8 FRAME Frame_1 ;
          OF Form_1 ;
@@ -64,12 +64,12 @@ RETURN NIL
 FUNCTION ResolveDrop( cForm, aCtrl, aFiles, acExcluded )
 *-------------------------------------------------------------------*
    LOCAL mx, my, ni, tx, ty, bx, by, ct
-   LOCAL aRect := { 0, 0, 0, 0 } /* tx, ty, bx, by */
+   LOCAL aRect := { 0, 0, 0, 0 }
    LOCAL aCtlPos := {}
    LOCAL cTarget, cFilePath, cFileSize
 
    DEFAULT acExcluded TO { "" }
-   AEval( acExcluded, {| x, y | acExcluded[ y ] := Upper( acExcluded[ y ] ) } )
+   AEval( acExcluded, {| x, y | acExcluded[ y ] := Upper( acExcluded[ y ] ), HB_SYMBOL_UNUSED( x ) } )
 
    my := GetCursorRow() /* Mouse y position on desktop */
    mx := GetCursorCol() /* Mouse x position on desktop */
@@ -107,7 +107,7 @@ FUNCTION ResolveDrop( cForm, aCtrl, aFiles, acExcluded )
          FOR ni = 1 TO Len( aFiles )
             AddNewItem( cForm, cTarget, aFiles[ ni ], .T. )
          NEXT ni
-      CASE ct == "LABEL" .OR. Ct = "IMAGE"
+      CASE ct == "LABEL" .OR. ct = "IMAGE"
          FOR ni = 1 TO Len( aFiles )
             Form_1.Image_1.Release
             DO EVENTS

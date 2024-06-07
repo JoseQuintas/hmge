@@ -70,7 +70,7 @@
    #xtranslate <w> . \<p:SaveAs\> (\<a\>) => DoMethod ( <(w)> , "SaveAs", \<a\> ) ;;
    #xtranslate <w> . \<c\> . \<p:SaveAs\> (\<a\>) => DoMethod ( <(w)> , \<(c)\> , "SaveAs", \<a\> ) ;;
    #xtranslate <w> . \<c\> . \<p:Value,Name,Handle,Type,Index,ClientHeight,ClientWidth,Address,BackColor,FontColor,Picture,Icon,HBitmap,ToolTip,FontName,FontSize,FontBold,FontUnderline,FontItalic,FontStrikeOut,Caption,Row,Col,Width,Height,Visible,Enabled,Checked,ItemCount,RangeMin,RangeMax,Cargo,Tabstop,Object,XObject,CheckBoxEnabled,PaintDoubleBuffer,HeaderDragDrop,DisplayValue,InfoTip,CellNavigation,ColumnCOUNT,RowsPerPage,HTForeColor,HTInActiveColor\> => GetProperty ( <(w)>, \<(c)\> , \<"p"\> ) ;;
-   #xtranslate <w> . \<c\> . \<p:Value,Name,Address,BackColor,BackgroundColor,FontColor,Picture,Icon,HBitmap,ToolTip,FontName,FontSize,FontBold,FontUnderline,FontItalic,FontStrikeOut,Caption,Row,DisplayValue,Col,Width,Height,Visible,Enabled,Checked,ItemCount,RangeMin,RangeMax,Cargo,Tabstop,CheckBoxEnabled,PaintDoubleBuffer,HeaderDragDrop,InfoTip,CellNavigation,HTForeColor,HTInActiveColor\> := \<n\> => SetProperty ( <(w)>, \<(c)\> , \<"p"\> , \<n\> ) ;;
+   #xtranslate <w> . \<c\> . \<p:Value,Name,Address,BackColor,FontColor,Picture,Icon,HBitmap,ToolTip,FontName,FontSize,FontBold,FontUnderline,FontItalic,FontStrikeOut,Caption,Row,DisplayValue,Col,Width,Height,Visible,Enabled,Checked,ItemCount,RangeMin,RangeMax,Cargo,Tabstop,CheckBoxEnabled,PaintDoubleBuffer,HeaderDragDrop,InfoTip,CellNavigation,HTForeColor,HTInActiveColor\> := \<n\> => SetProperty ( <(w)>, \<(c)\> , \<"p"\> , \<n\> ) ;;
    #xtranslate <w> . \<c\> . \<p:ListWidth,Position,CaretPos,ForeColor,AllowAppend,AllowDelete,AllowEdit,InputItems,DisplayItems,FormatString,Indent,Linecolor,ItemHeight,ValidMessage,Editable,AutoFont,RichValue,CueBanner,FirstDayOfWeek,Alignment,CaseConvert,Transparent,ColumnWidthLimits,AllValue,RootValue,FirstItemValue,GradientFill,GradientOver,Interval,Once,Increment,OnListDisplay,OnDropDown,OnListClose,OnCloseUp,ImageWidth,ImageHeight\> => GetProperty ( <(w)>, \<(c)\> , \<"p"\> ) ;;
    #xtranslate <w> . \<c\> . \<p:ListWidth,Position,CaretPos,ForeColor,AllowAppend,AllowDelete,AllowEdit,Blink,InputItems,DisplayItems,FormatString,Indent,Linecolor,ItemHeight,ValidMessage,Editable,AutoFont,RichValue,CueBanner,FirstDayOfWeek,Alignment,CaseConvert,Transparent,ColumnWidthLimits,GradientFill,GradientOver,Interval,Once,Increment,OnListDisplay,OnDropDown,OnListClose,OnCloseUp,ImageWidth,ImageHeight,Stretch\> := \<n\> => SetProperty ( <(w)>, \<(c)\> , \<"p"\> , \<n\> ) ;;
    #xtranslate <w> . \<c\> . \<p:Caption,Header,ColumnHeader,Image,Item,Icon,ToolTip,Width,ColumnWidth,Enabled,RichValue,HeaderImage,IsTrueNode,ParentValue,ChildValue,SiblingValue,NodeFlag,IsExpand,CheckboxItem,ColumnDISPLAYPOSITION\> (\<arg\>) => GetProperty ( <(w)>, \<(c)\> , \<"p"\> , \<arg\> ) ;;
@@ -100,7 +100,7 @@
    #xtranslate <w> . \<x\> . \<c\> . \<p:Caption,ToolTip,Picture,Enabled,Value\> => GetProperty ( <(w)> , \<"x"\> , \<(c)\> , \<"p"\> ) ;;
    #xtranslate <w> . \<x\> . \<c\> . \<p:Caption,ToolTip,Picture,PictureIndex,Action,Enabled,Value\> := \<n\> => SetProperty ( <(w)> , \<"x"\> , \<(c)\> , \<"p"\> , \<n\> ) ;;
    #xtranslate <w> . \<x\> (\<k\>) . \<c\> . \<p:Value,Name,Address,BackColor,FontColor,Picture,ToolTip,FontName,FontSize,FontBold,FontItalic,FontUnderline,FontStrikeOut,Caption,Row,DisplayValue,Col,Width,Height,Visible,Enabled,Checked,ItemCount,RangeMin,RangeMax,Cargo\> => GetProperty ( <(w)>, \<"x"\> , \<k\> , \<(c)\> , \<"p"\> ) ;;
-   #xtranslate <w> . \<x\> (\<k\>) . \<c\> . \<p:Value,Name,Address,BackColor,BackgroundColor,FontColor,Picture,ToolTip,FontName,FontSize,FontBold,FontItalic,FontUnderline,FontStrikeOut,Caption,Row,DisplayValue,Col,Width,Height,Visible,Enabled,Checked,ItemCount,RangeMin,RangeMax,Cargo\> := \<n\> => SetProperty ( <(w)> , \<"x"\> , \<k\> , \<(c)\> , \<"p"\> , \<n\> ) ;;
+   #xtranslate <w> . \<x\> (\<k\>) . \<c\> . \<p:Value,Name,Address,BackColor,FontColor,Picture,ToolTip,FontName,FontSize,FontBold,FontItalic,FontUnderline,FontStrikeOut,Caption,Row,DisplayValue,Col,Width,Height,Visible,Enabled,Checked,ItemCount,RangeMin,RangeMax,Cargo\> := \<n\> => SetProperty ( <(w)> , \<"x"\> , \<k\> , \<(c)\> , \<"p"\> , \<n\> ) ;;
    #xtranslate <w> . \<x\> (\<k\>) . \<c\> . \<p:ListWidth,Position,CaretPos,ForeColor,RichValue\> => GetProperty ( <(w)>, \<"x"\> , \<k\> , \<(c)\> , \<"p"\> ) ;;
    #xtranslate <w> . \<x\> (\<k\>) . \<c\> . \<p:ListWidth,Position,CaretPos,ForeColor,RichValue\> := \<n\> => SetProperty ( <(w)> , \<"x"\> , \<k\> , \<(c)\> , \<"p"\> , \<n\> ) ;;
    #xtranslate <w> . \<x\> (\<k\>) . \<c\> . \<p:Caption,Header,Item,Icon,RichValue,CheckboxItem\> (\<arg\>) => GetProperty ( <(w)>, \<"x"\> , \<k\> , \<(c)\> , \<"p"\> , \<arg\> ) ;;
@@ -398,7 +398,7 @@
    _ActivateAllWindows ( <{InitProcedure}> )
 
 
-#xcommand CENTER WINDOW <name> ;
+#translate CENTER WINDOW <name> ;
    => ;
    DoMethod ( <(name)> , 'Center' )
 

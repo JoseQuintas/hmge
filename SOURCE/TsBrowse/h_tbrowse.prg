@@ -182,7 +182,7 @@ FUNCTION _DefineTBrowse( ControlName, ParentFormName, nCol, nRow, nWidth, nHeigh
    IF ! Empty( FontName ) .AND. HB_ISARRAY( FontName )
       AEval( FontName, {| cf | AAdd( aFonts, cf ) } )
       aFont := ASize( aFonts, 6 )
-      FONTNAME := aFont[ 1 ]
+      FontName := aFont[ 1 ]
       cFontHead := aFont[ 2 ]
       cFontFoot := aFont[ 3 ]
       IF ! Empty( cFontHead )
@@ -204,8 +204,8 @@ FUNCTION _DefineTBrowse( ControlName, ParentFormName, nCol, nRow, nWidth, nHeigh
       PUBLIC _TSB_aControlhWnd := {}, _TSB_aControlObjects := {}, _TSB_aClientMDIhWnd := {}
    ENDIF
 
-   IF aColors != NIL .AND. ValType( aColors ) == 'A'
-      IF HB_ISARRAY( aColors ) .AND. Len( aColors ) > 0 .AND. HB_ISARRAY( aColors[ 1 ] )
+   IF HB_ISARRAY( aColors ) .AND. Len( aColors ) > 0
+      IF HB_ISARRAY( aColors[ 1 ] )
          FOR EACH aClr IN aColors
             IF HB_ISNUMERIC( aClr[ 1 ] ) .AND. aClr[ 1 ] > 0 .AND. aClr[ 1 ] <= Len( aTmpColor )
                aTmpColor[ aClr[ 1 ] ] := aClr[ 2 ]
@@ -232,10 +232,10 @@ FUNCTION _DefineTBrowse( ControlName, ParentFormName, nCol, nRow, nWidth, nHeigh
          ParentFormName := iif( _HMG_BeginDialogActive, _HMG_ActiveDialogName, _HMG_ActiveFormName )
       ENDIF
       IF .NOT. Empty( _HMG_ActiveFontName ) .AND. ValType( FontName ) == "U"
-         FONTNAME := _HMG_ActiveFontName
+         FontName := _HMG_ActiveFontName
       ENDIF
       IF .NOT. Empty( _HMG_ActiveFontSize ) .AND. ValType( FontSize ) == "U"
-         FONTSIZE := _HMG_ActiveFontSize
+         FontSize := _HMG_ActiveFontSize
       ENDIF
    ENDIF
 
@@ -337,6 +337,9 @@ FUNCTION _DefineTBrowse( ControlName, ParentFormName, nCol, nRow, nWidth, nHeigh
       ENDIF
 
       IF HB_ISARRAY( aBrush ) .AND. Len( aBrush ) > 2
+         IF oBrw:hBrush != NIL
+            DeleteObject( oBrw:hBrush )
+         ENDIF
          oBrw:hBrush := CreateSolidBrush( aBrush[ 1 ], aBrush[ 2 ], aBrush[ 3 ] )
       ENDIF
       /* BK end */
@@ -531,10 +534,10 @@ FUNCTION _DefineTBrowse( ControlName, ParentFormName, nCol, nRow, nWidth, nHeigh
          oBrw:hFont := FontHandle
       ELSE
          IF ValType( fontname ) == "U"
-            FONTNAME := _HMG_DefaultFontName
+            fontname := _HMG_DefaultFontName
          ENDIF
          IF ValType( fontsize ) == "U"
-            FONTSIZE := _HMG_DefaultFontSize
+            fontsize := _HMG_DefaultFontSize
          ENDIF
          oBrw:hFont := _SetFont( ControlHandle, fontname, fontsize, bold, italic, underline, strikeout )
       ENDIF
@@ -1454,18 +1457,6 @@ METHOD New( cControlName, nRow, nCol, nWidth, nHeight, bLine, aHeaders, aColSize
       aColSel := NIL
    ENDIF
 
-   IF aColors != NIL
-      IF HB_ISARRAY( aColors ) .AND. Len( aColors ) > 0 .AND. HB_ISARRAY( aColors[ 1 ] )
-         FOR EACH aClr IN aColors
-            IF HB_ISNUMERIC( aClr[ 1 ] ) .AND. aClr[ 1 ] > 0 .AND. aClr[ 1 ] <= Len( aTmpColor )
-               aTmpColor[ aClr[ 1 ] ] := aClr[ 2 ]
-            ENDIF
-         NEXT
-      ELSE
-         AEval( aColors, {| bColor, nEle | aTmpColor[ nEle ] := bColor } )
-      ENDIF
-   ENDIF
-
    DEFAULT nRow := 0, ;
       nCol := 0, ;
       nHeight := 100, ;
@@ -1484,45 +1475,54 @@ METHOD New( cControlName, nRow, nCol, nWidth, nHeight, bLine, aHeaders, aColSize
       lEnum := .F., ;
       lAutoSearch := .F., ;
       lTransparent := .F., ;
-      lEditable := .F.
-
-   IF _HMG_BeginWindowActive
-      cParentWnd := _HMG_ActiveFormName
-   ENDIF
-
-   DEFAULT aTmpColor[ 1 ] := GetSysColor( COLOR_WINDOWTEXT ), ; // nClrText
-      aTmpColor[ 2 ] := GetSysColor( COLOR_WINDOW ), ; // nClrPane
-      aTmpColor[ 3 ] := GetSysColor( COLOR_BTNTEXT ), ; // nClrHeadFore
-      aTmpColor[ 4 ] := GetSysColor( COLOR_BTNFACE ), ; // nClrHeadBack
-      aTmpColor[ 5 ] := GetSysColor( COLOR_CAPTIONTEXT ), ; // nClrForeFocu
-      aTmpColor[ 6 ] := GetSysColor( COLOR_ACTIVECAPTION ) // nClrFocuBack
-
-   DEFAULT aTmpColor[ 7 ] := GetSysColor( COLOR_WINDOWTEXT ), ; // nClrEditFore
-      aTmpColor[ 8 ] := GetSysColor( COLOR_WINDOW ), ; // nClrEditBack
-      aTmpColor[ 9 ] := GetSysColor( COLOR_BTNTEXT ), ; // nClrFootFore
-      aTmpColor[ 10 ] := GetSysColor( COLOR_BTNFACE ), ; // nClrFootBack
-      aTmpColor[ 11 ] := CLR_HGRAY, ; // nClrSeleFore inactive focused
-      aTmpColor[ 12 ] := CLR_GRAY, ; // nClrSeleBack inactive focused
-      aTmpColor[ 13 ] := GetSysColor( COLOR_BTNTEXT ), ; // nClrOrdeFore
-      aTmpColor[ 14 ] := GetSysColor( COLOR_BTNFACE ), ; // nClrOrdeBack
-      aTmpColor[ 15 ] := GetSysColor( COLOR_BTNSHADOW ), ; // nClrLine
-      aTmpColor[ 16 ] := GetSysColor( COLOR_BTNTEXT ), ; // nClrSupHeadFore
-      aTmpColor[ 17 ] := GetSysColor( COLOR_BTNFACE ), ; // nClrSupHeadBack
-      aTmpColor[ 18 ] := GetSysColor( COLOR_BTNTEXT ), ; // nClrSpecHeadFore
-      aTmpColor[ 19 ] := GetSysColor( COLOR_BTNFACE ), ; // nClrSpecHeadBack
-      aTmpColor[ 20 ] := CLR_HRED // nClrSpecHeadActive
-
-   DEFAULT lUpdate := .F., ;
+      lEditable := .F., ;
+      lUpdate := .F., ;
       aColSizes := {}, ;
       lCellBrw := lEditable
 
    DEFAULT nStyle := nOr( WS_CHILD, WS_BORDER, WS_VISIBLE, WS_CLIPCHILDREN, WS_TABSTOP, WS_3DLOOK )
+
+   aTmpColor[  1 ] := GetSysColor( COLOR_WINDOWTEXT )    // nClrText
+   aTmpColor[  2 ] := GetSysColor( COLOR_WINDOW )        // nClrPane
+   aTmpColor[  3 ] := GetSysColor( COLOR_BTNTEXT )       // nClrHeadFore
+   aTmpColor[  4 ] := GetSysColor( COLOR_BTNFACE )       // nClrHeadBack
+   aTmpColor[  5 ] := GetSysColor( COLOR_CAPTIONTEXT )   // nClrForeFocu
+   aTmpColor[  6 ] := GetSysColor( COLOR_ACTIVECAPTION ) // nClrFocuBack
+   aTmpColor[  7 ] := GetSysColor( COLOR_WINDOWTEXT )    // nClrEditFore
+   aTmpColor[  8 ] := GetSysColor( COLOR_WINDOW )        // nClrEditBack
+   aTmpColor[  9 ] := GetSysColor( COLOR_BTNTEXT )       // nClrFootFore
+   aTmpColor[ 10 ] := GetSysColor( COLOR_BTNFACE )       // nClrFootBack
+   aTmpColor[ 11 ] := CLR_HGRAY                          // nClrSeleFore inactive focused
+   aTmpColor[ 12 ] := CLR_GRAY                           // nClrSeleBack inactive focused
+   aTmpColor[ 13 ] := GetSysColor( COLOR_BTNTEXT )       // nClrOrdeFore
+   aTmpColor[ 14 ] := GetSysColor( COLOR_BTNFACE )       // nClrOrdeBack
+   aTmpColor[ 15 ] := GetSysColor( COLOR_BTNSHADOW )     // nClrLine
+   aTmpColor[ 16 ] := GetSysColor( COLOR_BTNTEXT )       // nClrSupHeadFore
+   aTmpColor[ 17 ] := GetSysColor( COLOR_BTNFACE )       // nClrSupHeadBack
+   aTmpColor[ 18 ] := GetSysColor( COLOR_BTNTEXT )       // nClrSpecHeadFore
+   aTmpColor[ 19 ] := GetSysColor( COLOR_BTNFACE )       // nClrSpecHeadBack
+   aTmpColor[ 20 ] := CLR_HRED                           // nClrSpecHeadActive
 
    IF lAutoFilter
       aTmpColor[ 19 ] := GetSysColor( COLOR_INACTCAPTEXT )
    ELSEIF lAutoSearch
       aTmpColor[ 19 ] := GetSysColor( COLOR_INFOBK )
    ENDIF
+
+   IF HB_ISARRAY( aColors ) .AND. Len( aColors ) > 0
+      IF HB_ISARRAY( aColors[ 1 ] )
+         FOR EACH aClr IN aColors
+            IF HB_ISNUMERIC( aClr[ 1 ] ) .AND. aClr[ 1 ] > 0 .AND. aClr[ 1 ] <= Len( aTmpColor )
+               IF aClr[ 2 ] != NIL
+                  aTmpColor[ aClr[ 1 ] ] := aClr[ 2 ]
+               ENDIF
+            ENDIF
+         NEXT
+      ELSE
+         AEval( aColors, {| bColor, nEle | iif( bColor != NIL, aTmpColor[ nEle ] := bColor, ) } )
+      ENDIF
+   ENDIF
+
    IF ValType( uAlias ) == "A"
       cAlias := "ARRAY"
       ::cArray := uAlias
@@ -1532,18 +1532,21 @@ METHOD New( cControlName, nRow, nCol, nWidth, nHeight, bLine, aHeaders, aColSize
    ELSEIF ValType( uAlias ) == "C"
       cAlias := Upper( uAlias )
    ELSEIF ValType( uAlias ) == "O"
-
-      IF Upper( uAlias:ClassName() ) == "TOLEAUTO"
+      IF "OLEAUTO" $ Upper( uAlias:ClassName() )
          cAlias := "ADO_"
          ::oRSet := uAlias
       ENDIF
-
 #ifdef __XHARBOUR__
    ELSEIF ValType( uAlias ) == "H"
       cAlias := "ARRAY"
       uAlias := aHash2Array( uAlias )
 #endif
    ENDIF
+
+   IF _HMG_BeginWindowActive
+      cParentWnd := _HMG_ActiveFormName
+   ENDIF
+
    IF _HMG_BeginWindowMDIActive
       ParentHandle := GetActiveMdiHandle()
       cParentWnd := _GetWindowProperty( ParentHandle, "PROP_FORMNAME" )
@@ -5437,7 +5440,7 @@ METHOD Edit( uVar, nCell, nKey, nKeyFlags, cPicture, bValid, nClrFore, nClrBack 
          nCol := oCol:nEditCol
       ENDIF
 
-      ::cChildControl := GetUniqueName( "BtnBox" )
+      ::cChildControl := HMG_GetUniqueName( "BtnBox" )
 
       oCol:oEdit := TBtnBox():New( nRow, nCol, bSETGET( uValue ), Self, nWidth, nHeight, ;
          cPicture, nClrFore, nClrBack, hFont, ::cChildControl, cWnd, ;
@@ -5505,7 +5508,7 @@ METHOD Edit( uVar, nCell, nKey, nKeyFlags, cPicture, bValid, nClrFore, nClrBack 
       nWidth += ::aEditCellAdjust[ 3 ]
       nHeight += ::aEditCellAdjust[ 4 ]
 
-      ::cChildControl := GetUniqueName( "EditBox" )
+      ::cChildControl := HMG_GetUniqueName( "EditBox" )
 
       oCol:oEdit := TSMulti():New( nRow, nCol, bSETGET( uValue ), Self, nWidth, nHeight, ;
          hFont, nClrFore, nClrBack, ::cChildControl, cWnd )
@@ -5584,7 +5587,7 @@ METHOD Edit( uVar, nCell, nKey, nKeyFlags, cPicture, bValid, nClrFore, nClrBack 
          nCol := oCol:nEditCol
       ENDIF
 
-      ::cChildControl := GetUniqueName( "ComboBox" )
+      ::cChildControl := HMG_GetUniqueName( "ComboBox" )
 
       oCol:oEdit := TComboBox():New( nRow, nCol, bSETGET( uValue ), aGet, nWidth, nHeight, ;
          Self, bChange, nClrFore, nClrBack, hFont, cMsg, ::cChildControl, cWnd )
@@ -5614,7 +5617,7 @@ METHOD Edit( uVar, nCell, nKey, nKeyFlags, cPicture, bValid, nClrFore, nClrBack 
          nCol := oCol:nEditCol
       ENDIF
 
-      ::cChildControl := GetUniqueName( "DatePicker" )
+      ::cChildControl := HMG_GetUniqueName( "DatePicker" )
 
       oCol:oEdit := TDatePicker():New( nRow, nCol, bSETGET( uValue ), Self, nWidth, nHeight, ;
          cPicture,, nClrFore, nClrBack, hFont, ::cChildControl,, cWnd, ;
@@ -5654,7 +5657,7 @@ METHOD Edit( uVar, nCell, nKey, nKeyFlags, cPicture, bValid, nClrFore, nClrBack 
          cPicture := oCol:cEditPicture
       ENDIF
 
-      ::cChildControl := GetUniqueName( "GetBox" )
+      ::cChildControl := HMG_GetUniqueName( "GetBox" )
 
       oCol:oEdit := TGetBox():New( nRow, nCol, bSETGET( uValue ), Self, nWidth, nHeight, ;
          cPicture,, nClrFore, nClrBack, hFont, ::cChildControl, cWnd, ;
@@ -10542,12 +10545,13 @@ RETURN 0
 
 METHOD MouseMove( nRowPix, nColPix, nKeyFlags ) CLASS TSBrowse
 
-   LOCAL nI, nIcon, lHeader, lMChange, nFirst, nLast, nDestCol, ;
+   LOCAL nI, nIcon, lMChange, nFirst, nLast, nDestCol, ;
       cMsg := ::cMsg, ;
       nColPixPos := 0, ;
       lFrozen := .F., ;
       nColumn := Max( 1, ::nAtColActual( nColPix ) ), ;
       nRowLine := ::GetTxtRow( nRowPix ), ;
+      lHeader := ( nRowLine == 0 .OR. nRowLine == -2 ), ;
       cToolTip
 
    DEFAULT ::lMouseDown := .F., ;
@@ -10586,9 +10590,7 @@ METHOD MouseMove( nRowPix, nColPix, nKeyFlags ) CLASS TSBrowse
 
    IF nColumn <= ::nColCount()
 
-      IF ( lHeader := ( nRowLine == 0 .OR. nRowLine == -2 ) ) .AND. ;
-            ! Empty( ::aColumns ) .AND. ! Empty( ::aColumns[ nColumn ]:cToolTip )
-
+      IF lHeader .AND. ! Empty( ::aColumns ) .AND. ! Empty( ::aColumns[ nColumn ]:cToolTip )
          cToolTip := ::aColumns[ nColumn ]:cToolTip // column's header tooltip
       ELSE
          cToolTip := ::cToolTip // grid's tooltip
@@ -12933,7 +12935,6 @@ METHOD SetArray( aArray, lAutoCols, aHead, aSizes ) CLASS TSBrowse
    ::lIsArr := .T.
    ::lIsDbf := .F.
    ::nLen := Eval( ::bLogicLen := {|| Len( ::aArray ) + iif( ::lAppendMode, 1, 0 ) } )
-   ::lIsArr := .T.
    ::bGoTop := {|| ::nAt := 1 }
    ::bGoBottom := {|| ::nAt := Eval( ::bLogicLen ) }
    ::bSkip := {| nSkip, nOld | nOld := ::nAt, ::nAt += nSkip, ::nAt := Min( Max( ::nAt, 1 ), ::nLen ), ::nAt - nOld }
@@ -12948,7 +12949,7 @@ METHOD SetArray( aArray, lAutoCols, aHead, aSizes ) CLASS TSBrowse
    ::nCell := 1
 
    ::HiliteCell( 1 )
-   lAutocols := iif( lAutocols == NIL, ( ! Empty( aHead ) .AND. ! Empty( aSizes ) ), lAutocols )
+   DEFAULT lAutocols := ( ! Empty( aHead ) .AND. ! Empty( aSizes ) )
 
    IF lAutoCols .AND. Empty( ::aColumns ) .AND. lListBox
       nMax := ( ::nRight - ::nLeft + 1 ) * iif( Empty( ::hWnd ), 2, 1 )
@@ -12957,7 +12958,6 @@ METHOD SetArray( aArray, lAutoCols, aHead, aSizes ) CLASS TSBrowse
       ::lNoHScroll := .T.
       ::AddColumn( TSColumn():New( NIL, ArrayWBlock( Self, 1 ),,,, nMax,, ::lEditable,,,,,,,,,,, Self, ;
          "ArrayWBlock(::oBrw,1)" ) )
-
    ELSEIF lAutoCols .AND. Empty( ::aColumns ) .AND. ValType( ::aArray[ 1 ] ) == "A"
       IF Empty( aHead )
          aHead := AutoHeaders( Len( ::aArray[ 1 ] ) )
@@ -12994,7 +12994,6 @@ METHOD SetArray( aArray, lAutoCols, aHead, aSizes ) CLASS TSBrowse
          ::AddColumn( TSColumn():New( cHead, bData,,,, nMax,, ::lEditable,,,,,,,,,,, Self, ;
             "ArrayWBlock(::oBrw," + LTrim( Str( nI ) ) + ")" ) )
       NEXT
-
    ENDIF
 
    IF ::lPhantArrRow .AND. Len( ::aArray ) > 1
@@ -13365,6 +13364,10 @@ METHOD SetColor( xColor1, xColor2, nColumn ) CLASS TSBrowse
       RETURN ::SetColor( xColor1, xColor2 ) // FW SetColor Method only nClrText and nClrPane
    ENDIF
 
+   IF Len( ::aColumns ) != 0 .AND. ::hBrush != NIL
+      DeleteObject( ::hBrush )
+   ENDIF
+
    IF Len( ::aColumns ) == 0 .AND. ! ::lTransparent .AND. ::hBrush == NIL
       nColor := iif( ValType( xColor2[ 2 ] ) == "B", Eval( xColor2[ 2 ], 1, 1, Self ), xColor2[ 2 ] )
       ::hBrush := CreateSolidBrush( GetRed( nColor ), GetGreen( nColor ), GetBlue( nColor ) )
@@ -13372,7 +13375,6 @@ METHOD SetColor( xColor1, xColor2, nColumn ) CLASS TSBrowse
 
    IF nColumn == 0 .AND. ValType( xColor2[ 1 ] ) == "N" .AND. ValType( xColor1 ) == "A" .AND. xColor1[ 1 ] == 1 .AND. ;
          Len( xColor1 ) > 1 .AND. ValType( xColor2 ) == "A" .AND. ValType( xColor2[ 2 ] ) == "N" .AND. xColor1[ 2 ] == 2
-
       nColor := iif( ValType( xColor2[ 2 ] ) == "B", Eval( xColor2[ 2 ], 1, 1, Self ), xColor2[ 2 ] )
       ::Super:SetColor( xColor2[ 1 ], nColor )
    ENDIF
@@ -15051,6 +15053,7 @@ METHOD Enabled( lEnab ) CLASS TSBrowse
          ::SetColor( { 18, 19 }, { ::nCLR_GRAY, ::nCLR_HGRAY } )
          ::nClrPane := ::nCLR_HGRAY
          ::nClrLine := ::nCLR_Lines
+         DeleteObject( ::hBrush )
          ::hBrush := CreateSolidBrush( GetRed( ::nClrPane ), GetGreen( ::nClrPane ), GetBlue( ::nClrPane ) )
          IF ::lSelector .AND. ::lDrawSpecHd
             ::nClrSpcHdBack := ::nCLR_HGRAY
@@ -15061,7 +15064,7 @@ METHOD Enabled( lEnab ) CLASS TSBrowse
          IF ! ::lEnabled
             FOR nI := 1 TO Len( ::aColumns )
                ::aColumns[ nI ]:RestColor()
-               SetColor( , ::aColumns[ nI ]:aColors, nI )
+               // SetColor( , ::aColumns[ nI ]:aColors, nI )
             NEXT
             IF ! Empty( ::oPhant )
                ::oPhant:RestColor()
@@ -15729,14 +15732,6 @@ STATIC FUNCTION EmptyAlias( cAlias )
 RETURN lEmpty
 
 // ============================================================================
-// FUNCTION TSBrowse GetUniqueName( cName ) Version 9.0 Nov/30/2009
-// ============================================================================
-
-FUNCTION GetUniqueName( cName )
-
-RETURN ( "TSB_" + cName + hb_ntos( _GetId() ) )
-
-// ============================================================================
 // FUNCTION TSBrowse IsChar() Version 9.0 Nov/30/2009
 // Used by METHOD KeyChar() to filter keys according to the field type
 // Clipper's function IsAlpha() doesn't fit the purpose in some cases
@@ -15791,7 +15786,7 @@ METHOD SetRecordSet( oRSet ) CLASS TSBrowse
       ::bKeyCount := {|| ::oRSet:RecordCount() }, ;
       ::bBof := {|| ::oRSet:Bof() }, ;
       ::bEof := {|| ::oRSet:Eof() }, ;
-      ::bSkip := {| n | RSetSkip( ::oRSet, iif( n == NIL, 1, n ), Self ) }, ;
+      ::bSkip := {| n | RSetSkip( ::oRSet, iif( n == NIL, 1, n ) ) }, ;
       ::bKeyNo := {| n | iif( n == NIL, ::oRSet:AbsolutePosition, ::oRSet:AbsolutePosition := n ) }, ;
       ::bLogicLen := {|| ::oRSet:RecordCount() }, ;
       ::bGoToPos := {| n | Eval( ::bKeyNo, n ) }

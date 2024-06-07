@@ -4,8 +4,7 @@
 
 #include "hmg.ch"
 
-
-FUNCTION Main
+FUNCTION Main()
 
    DEFINE WINDOW oWindow1;
       ROW    10;
@@ -18,23 +17,25 @@ FUNCTION Main
 
       This.OnDropFiles := {| aFiles | ResolveDrop( "oWindow1", HMG_GetFormControls( "oWindow1" ), aFiles ) }
 
-      DEFINE LABEL oLabel1 
-                   ROW 10; COL 10
-                   WIDTH 300; HEIGHT 40
-                   ALIGNMENT CENTER
-                   ALIGNMENT VCENTER
-                   BORDER .T.
-                   VALUE "Drag one or more files from explorer into the controls."
+      DEFINE LABEL NUL 
+         ROW 10
+         COL 10
+         WIDTH 300
+         HEIGHT 40
+         ALIGNMENT CENTER
+         ALIGNMENT VCENTER
+         BORDER .T.
+         VALUE "Drag one or more files from explorer into the controls."
       END LABEL
 
-      DEFINE CHECKBOX Check1
+      DEFINE CHECKBOX NUL
          Row      10
          Col      350
          Value    .F.
          Caption  'CheckBox!!!'
       END CHECKBOX
 
-      DEFINE COMBOBOX oCombo1
+      DEFINE COMBOBOX NUL
          Row      40
          Col      350
          Width    100
@@ -42,24 +43,24 @@ FUNCTION Main
          Value    3
       END COMBOBOX
 
-      DEFINE DATEPICKER oDatePicker1
+      DEFINE DATEPICKER NUL
          Row    80
          Col    350
          Value  DATE()
          UpDown .T.
       END DATEPICKER
 
-      DEFINE EDITBOX oEditBox1
+      DEFINE EDITBOX NUL
          Row        60
          Col        10
          Width      300
          Height     100
          Value      "Checkbox, Combobox, Datepicker, Label, Textbox, " + ;
-		"Editbox, Listbox and Tree work well and accept OnDropFiles event."
+                    "Editbox, Listbox and Tree work well and accept OnDropFiles event."
          NOHSCROLLBAR .T.
       END EDITBOX
 
-      Define ListBox oList1
+      Define ListBox NUL
          Row        170
          Col        10
          Width      150
@@ -68,14 +69,14 @@ FUNCTION Main
          Value      3
       End ListBox
        
-      DEFINE TEXTBOX oText1
+      DEFINE TEXTBOX NUL
          Row     260
          Col     10
          Width   300
          Value   'TextBox'
       END TEXTBOX
        
-      DEFINE TREE Tree1;
+      DEFINE TREE NUL;
          ROW     120;
          COL     350;
          WIDTH   120;
@@ -110,7 +111,7 @@ RETURN NIL
 FUNCTION ResolveDrop( cForm, aCtrl, aFiles )
 
    LOCAL mx, my, ni, tx, ty, bx, by, ct
-   LOCAL aRect := { 0, 0, 0, 0 } /* tx, ty, bx, by */
+   LOCAL aRect := { 0, 0, 0, 0 }, txt := ""
    LOCAL aCtlPos := {}
    LOCAL cTarget := ""
 
@@ -136,7 +137,10 @@ FUNCTION ResolveDrop( cForm, aCtrl, aFiles )
 
    IF Len( cTarget ) > 0
       ct := GetControlType( cTarget, cForm )
-      AlertInfo( aFiles[1] + " received into " + cTarget, ct )
+      for ni = 1 to Len(aFiles)
+         txt += aFiles[ni] + " received into " + cTarget + " (" + ct + ")" + CRLF
+      NEXT ni
+      AlertInfo( txt )
    ENDIF
 
 RETURN NIL

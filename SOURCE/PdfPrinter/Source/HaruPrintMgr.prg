@@ -14,7 +14,7 @@ FUNCTION PrtMgrObject( oPrintObj )
       oPrint := oPrintObj
    ENDIF
 
-RETURN oPrintObj
+RETURN oPrint
 
 FUNCTION PrtMgrStartPage()
 RETURN oPrint:StartPage()

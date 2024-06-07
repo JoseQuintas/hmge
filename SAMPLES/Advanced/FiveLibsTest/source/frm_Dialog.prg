@@ -11,7 +11,9 @@ FUNCTION frm_Dialog( Self )
 
    SELECT ( Select( ::cFileDbf ) )
    USE
-   USE ( ::cFileDBF )
+   IF ! Empty( ::cFileDbf )
+      USE ( ::cFileDBF )
+   ENDIF
    IF hb_ASCan( ::aEditList, { | e | e[ CFG_ISKEY ] } ) != 0
       SET INDEX TO ( ::cFileDBF )
    ENDIF
@@ -45,18 +47,26 @@ FUNCTION frm_Dialog( Self )
          ENDIF
       NEXT
    NEXT
-
-   SELECT ( Select( ::cFileDbf ) )
+   IF ! Empty( ::cFileDbf )
+      SELECT ( Select( ::cFileDbf ) )
+   ENDIF
+   FOR EACH aItem IN ::aEditList
+      IF aItem[ CFG_CTLTYPE ] == TYPE_ADDBUTTON
+         AAdd( ::aOptionList, { aItem[ CFG_CAPTION ], aItem[ CFG_ACTION ] } )
+      ENDIF
+   NEXT
 
    gui_DialogCreate( @::xDlg, 0, 0, APP_DLG_WIDTH, APP_DLG_HEIGHT, ::cTitle,, ::lModal )
    ::CreateControls()
-   gui_DialogActivate( ::xDlg, ::DlgInit() )
+   gui_DialogActivate( ::xDlg, ::DlgInit(), ::bActivate )
 
 #ifdef HBMK_HAS_GTWVG
    DO WHILE Inkey(1) != K_ESC
    ENDDO
 #endif
-   //fivewin window is not modal
-   //CLOSE DATABASES
+   // nested calls can't close databases
+   // IF gui_LibName() != "FIVEWIN"
+   //    CLOSE DATABASES
+   // ENDIF
 
    RETURN Nil

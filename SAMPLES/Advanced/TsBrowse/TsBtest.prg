@@ -40,15 +40,6 @@ Function TsBTest(nSample)
     aBrush[ 6 ] := CLR_BLACK
     aBrush[ 7 ] := CLR_WHITE
 
-    aBmp[ 1 ] := LoadImage ("Bitmaps\Head.bmp")
-    aBmp[ 2 ] := LoadImage ("Bitmaps\Mark.bmp")
-    aBmp[ 3 ] := LoadImage ("Bitmaps\Ok.bmp")
-    aBmp[ 4 ] := LoadImage ("Bitmaps\Cancel.bmp")
-    aBmp[ 5 ] := LoadImage ("Bitmaps\Cake.bmp")
-    aBmp[ 6 ] := LoadImage ("Bitmaps\Clipv.bmp" )
-    aBmp[ 7 ] := LoadImage ("Bitmaps\Arrow.bmp" )
-    aBmp[ 8 ] := LoadImage ("Bitmaps\Calen16.bmp" )
-
    IF ! _IsControlDefined ("Font_1","Main")
      DEFINE FONT Font_1  FONTNAME "Arial" SIZE 12
      DEFINE FONT Font_2  FONTNAME "Wingdings" SIZE 18
@@ -62,8 +53,6 @@ Function TsBTest(nSample)
    aFont[ 4 ] := GetFontHandle( "Font_4"  )
    aFont[ 5 ] := GetFontHandle( "Font_5"  )
 
-
-
     cWnd    := "Sample_"+LTrim( Str( nSample ) )
     cBrw    := "Brw_"+LTrim( Str( nSample ) )
     cTitle  := "Sample " + LTrim( Str( nSample ) )
@@ -71,6 +60,7 @@ Function TsBTest(nSample)
     nBrwHeight:= nWinHeight-60
 
     IF !IsWIndowDefined (&cWnd )
+
         Select ("Employee" )
         DBSetOrder(1)
         nMarried := 0
@@ -81,6 +71,14 @@ Function TsBTest(nSample)
         nOldSal  := 0
         aStates  := {}
 
+        aBmp[ 1 ] := LoadImage ("Bitmaps\Head.bmp")
+        aBmp[ 2 ] := LoadImage ("Bitmaps\Mark.bmp")
+        aBmp[ 3 ] := LoadImage ("Bitmaps\Ok.bmp")
+        aBmp[ 4 ] := LoadImage ("Bitmaps\Cancel.bmp")
+        aBmp[ 5 ] := LoadImage ("Bitmaps\Cake.bmp")
+        aBmp[ 6 ] := LoadImage ("Bitmaps\Clipv.bmp" )
+        aBmp[ 7 ] := LoadImage ("Bitmaps\Arrow.bmp" )
+        aBmp[ 8 ] := LoadImage ("Bitmaps\Calen16.bmp" )
 
         DEFINE WINDOW &cWnd ;
             AT 30+20*nSample,2+20*nSample ;
@@ -90,7 +88,10 @@ Function TsBTest(nSample)
             CHILD;
             ON SIZE ResizeEdit(cBrw);
             ON MAXIMIZE ResizeEdit(cBrw);
-            ON MINIMIZE ResizeEdit(cBrw)
+            ON MINIMIZE ResizeEdit(cBrw);
+            ON RELEASE ( ;
+               AEval( aBmp, { | x | DeleteObject( x ) } ) ;
+            )
 
             DEFINE STATUSBAR
                 STATUSITEM '' DEFAULT
@@ -720,7 +721,7 @@ Function TsBTest(nSample)
 
         RESTORE WINDOW &cWnd
 
-    endif
+    ENDIF
 
      RELEASE FONT Font_1
      RELEASE FONT Font_2

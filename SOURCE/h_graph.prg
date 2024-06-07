@@ -925,7 +925,8 @@ RETURN
 FUNCTION _PiePrint( cForm, fromrow, fromcol, torow, tocol, series, aname, colors, ctitle, depth, l3d, lxval, lsleg, cPicture, x, y, cLibrary, placement )
 *-----------------------------------------------------------------------------*
    LOCAL b := _HMG_IsModalActive
-   LOCAL FormName := '_Tmp_' + hb_ntos( _GetId() )
+   LOCAL FormName := HMG_GetUniqueName( '_Tmp_' )
+
 #ifdef __XHARBOUR__
    IF _IsWindowDefined ( FormName )
       DoMethod ( FormName, 'Release' )
@@ -956,7 +957,8 @@ FUNCTION _GraphPrint( cForm, nTop, nLeft, nBottom, nRight, nHeight, nWidth, aDat
       l3D, lGrid, lxGrid, lyGrid, lxVal, lyVal, lLegends, aSeries, aColors, nType, lViewVal, cPicture, nLegendsWidth, x, y, cLibrary )
 *-----------------------------------------------------------------------------*
    LOCAL b := _HMG_IsModalActive
-   LOCAL FormName := '_Tmp_' + hb_ntos( _GetId() )
+   LOCAL FormName := HMG_GetUniqueName( '_Tmp_' )
+
 #ifdef __XHARBOUR__
    IF _IsWindowDefined ( FormName )
       DoMethod ( FormName, 'Release' )

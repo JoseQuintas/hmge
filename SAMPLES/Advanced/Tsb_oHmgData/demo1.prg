@@ -144,6 +144,7 @@ INIT PROCEDURE Sets_ENV()
    SET OOP ON
 
    SET WINDOW MAIN OFF
+   SET AUTOSCROLL OFF
 
    IF !HB_ISOBJECT( App.Cargo ) ; App.Cargo := oHmgData()
    ENDIF

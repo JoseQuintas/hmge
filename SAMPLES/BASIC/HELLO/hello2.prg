@@ -14,19 +14,20 @@ FUNCTION Main
 	DEFINE WINDOW Win_1 ;
 		TITLE 'Hello World!' ;
 		/*WINDOWTYPE*/ MAIN ;
-		ON GOTFOCUS iif( IsWindowDefined( Win_2 ) .AND. iswinnt(), Win_2.Setfocus(), NIL )
+		ON INIT Win_2.Setfocus()
 
 	END WINDOW
 
-	DEFINE WINDOW Win_2 ;
+	DEFINE WINDOW Win_3 ;
 		TITLE 'Child Window' ;
 		/*WINDOWTYPE*/ CHILD
 
 	END WINDOW
 
-	DEFINE WINDOW Win_3 ;
+	DEFINE WINDOW Win_2 ;
 		TITLE 'Modal Window' ;
-		/*WINDOWTYPE*/ MODAL
+		/*WINDOWTYPE*/ MODAL ;
+		ON RELEASE SetFocusToChildWin()
 
 	END WINDOW
 
@@ -41,3 +42,15 @@ FUNCTION Main
 	ACTIVATE WINDOW Win_3, Win_2, Win_1
 
 RETURN NIL
+
+
+PROCEDURE SetFocusToChildWin()
+
+	DEFINE TIMER NUL
+		PARENT Win_1
+		INTERVAL 20
+		ONCE .T.
+		ACTION Win_3.Setfocus()
+	END TIMER
+
+RETURN

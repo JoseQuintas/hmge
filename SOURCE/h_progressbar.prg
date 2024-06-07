@@ -65,6 +65,7 @@ FUNCTION _DefineProgressBar ( ControlName, ParentFormName, x, y, w, h, lo, hi, ;
    LOCAL Style
    LOCAL lDialogInMemory
    LOCAL oc := NIL, ow := NIL
+
 #ifdef _OBJECT_
    ow := oDlu2Pixel()
 #endif
@@ -81,15 +82,22 @@ FUNCTION _DefineProgressBar ( ControlName, ParentFormName, x, y, w, h, lo, hi, ;
    IF _HMG_BeginWindowActive .OR. _HMG_BeginDialogActive
       ParentFormName := iif( _HMG_BeginDialogActive, _HMG_ActiveDialogName, _HMG_ActiveFormName )
    ENDIF
+
    IF _HMG_FrameLevel > 0 .AND. !_HMG_ParentWindowActive
       x := x + _HMG_ActiveFrameCol [_HMG_FrameLevel]
       y := y + _HMG_ActiveFrameRow [_HMG_FrameLevel]
       ParentFormName := _HMG_ActiveFrameParentFormName [_HMG_FrameLevel]
    ENDIF
    lDialogInMemory := _HMG_DialogInMemory
+
    IF .NOT. _IsWindowDefined ( ParentFormName ) .AND. .NOT. lDialogInMemory
       MsgMiniGuiError( "Window: " + IFNIL( ParentFormName, "Parent", ParentFormName ) + " is not defined." )
    ENDIF
+
+   IF ISCHAR ( ControlName ) .AND. ControlName == "0"
+      ControlName := HMG_GetUniqueName()
+   ENDIF
+
    IF _IsControlDefined ( ControlName, ParentFormName ) .AND. .NOT. lDialogInMemory
       MsgMiniGuiError ( "Control: " + ControlName + " Of " + ParentFormName + " Already defined." )
    ENDIF
@@ -153,6 +161,9 @@ FUNCTION _DefineProgressBar ( ControlName, ParentFormName, x, y, w, h, lo, hi, ;
       ENDIF
 
       IF _HMG_IsThemed .AND. ( IsArrayRGB ( BarColor ) .OR. IsArrayRGB ( BackColor ) )
+         IF IsArrayRGB( BarColor ) .AND. .NOT. IsArrayRGB ( BackColor )
+            BackColor := { 201, 201, 201 }
+         ENDIF
          SetWindowTheme ( ControlHandle, "", "" )
       ENDIF
 
@@ -243,10 +254,6 @@ FUNCTION InitDialogProgressBar( ParentName, ControlHandle, k )
 
    BackColor := _HMG_aControlBkColor [k]
    BarColor  := _HMG_aControlFontColor [k]
-
-   IF _HMG_IsThemed .AND. ( IsArrayRGB ( BarColor ) .OR. IsArrayRGB ( BackColor ) )
-      SetWindowTheme ( ControlHandle, "", "" )
-   ENDIF
 
    IF ValType( ParentName ) <> 'U'
       SendMessage( ControlHandle , PBM_SETPOS , _HMG_aControlValue [k] , 0 )

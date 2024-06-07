@@ -446,7 +446,11 @@ FUNCTION _DefinePropSheet ( FormName, ParentForm,  y, x, w, h,  caption, IdIcon,
    ENDIF
 
    IF Len( _HMG_aPropSheetTemplate ) > 0
+#ifdef _NAMES_LIST_
+      _HMG_aPropSheetTemplate[ 1 ]  := k
+#else
       _HMG_aPropSheetTemplate[ 1 ]  := &mVar.
+#endif
    ENDIF
 
 RETURN ( FormHandle )

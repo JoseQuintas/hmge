@@ -126,9 +126,15 @@ FUNCTION _DefineGrid ( ControlName, ParentFormName, x, y, w, h, ;
    IF .NOT. _IsWindowDefined ( ParentFormName ) .AND. .NOT. lDialogInMemory
       MsgMiniGuiError ( _HMG_BRWLangError[ 1 ] + IFNIL( ParentFormName, "Parent", ParentFormName ) + _HMG_BRWLangError[ 2 ], .F. )
    ENDIF
+
+   IF ISCHAR ( ControlName ) .AND. ControlName == "0"
+      ControlName := HMG_GetUniqueName()
+   ENDIF
+
    IF _IsControlDefined ( ControlName, ParentFormName ) .AND. .NOT. lDialogInMemory
       MsgMiniGuiError ( _HMG_BRWLangError[ 4 ] + ControlName + _HMG_BRWLangError[ 5 ] + ParentFormName + _HMG_BRWLangError[ 6 ], .F. )
    ENDIF
+
    IF Len( aHeadClick ) > 0
       FOR EACH mVar IN aHeadClick
          IF !( mVar == NIL ) .AND. ! ISBLOCK ( mVar )

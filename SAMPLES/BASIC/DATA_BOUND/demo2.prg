@@ -7,6 +7,7 @@
 
 #include "hmg.ch"
 
+STATIC FirstEdit
 
 PROCEDURE Main
 
@@ -37,7 +38,7 @@ RETURN
 
 PROCEDURE CREATE_TOOLBAR
 
-   DEFINE TOOLBAR ToolBar_1 OF Win_1 BUTTONSIZE 20, 20 FLAT BOTTOM
+   DEFINE TOOLBAR NUL OF Win_1 BUTTONSIZE 20, 20 FLAT BOTTOM
 
    BUTTON TOP ;
       TOOLTIP '&Top' ;
@@ -90,26 +91,26 @@ PROCEDURE CREATE_CONTROLS
    LOCAL lChecked
    LOCAL nEditHeight := _HMG_DefaultFontSize * 2 - 1
 
-   @  10, 20 LABEL LABEL_0 VALUE 'EDIT test' WIDTH 380 CENTERALIGN
+   @  10, 20 LABEL NUL VALUE 'EDIT test' WIDTH 380 CENTERALIGN
 
-   @  60, 20 LABEL LABEL_1 VALUE 'Code:' WIDTH 100 RIGHTALIGN
-   @  90, 20 LABEL LABEL_2 VALUE 'First Name:' WIDTH 100 RIGHTALIGN
-   @ 120, 20 LABEL LABEL_3 VALUE 'Last Name:' WIDTH 100 RIGHTALIGN
-   @ 150, 20 LABEL LABEL_4 VALUE 'Birth Date:' WIDTH 100 RIGHTALIGN
-   @ 180, 20 LABEL LABEL_5 VALUE 'Married:' WIDTH 100 RIGHTALIGN
-   @ 208, 20 LABEL LABEL_6 VALUE 'Bio:' WIDTH 100 RIGHTALIGN
+   @  60, 20 LABEL NUL VALUE 'Code:' WIDTH 100 RIGHTALIGN
+   @  90, 20 LABEL NUL VALUE 'First Name:' WIDTH 100 RIGHTALIGN
+   @ 120, 20 LABEL NUL VALUE 'Last Name:' WIDTH 100 RIGHTALIGN
+   @ 150, 20 LABEL NUL VALUE 'Birth Date:' WIDTH 100 RIGHTALIGN
+   @ 180, 20 LABEL NUL VALUE 'Married:' WIDTH 100 RIGHTALIGN
+   @ 208, 20 LABEL NUL VALUE 'Bio:' WIDTH 100 RIGHTALIGN
 
-   @ 60, 130 TEXTBOX TEXT_1;
+   @ 60, 130 TEXTBOX NUL;
       WIDTH 100 ;
       HEIGHT nEditHeight ;
       FIELD TEST->CODE ;
       NUMERIC ;
       MAXLENGTH 10 ;
-      ON GOTFOCUS DrawRR ( .T. ) ;
+      ON GOTFOCUS ( FirstEdit := This.Name, DrawRR ( .T. ) ) ;
       ON LOSTFOCUS DrawRR( .F. ) ;
       BACKCOLOR WHITE NOBORDER
 
-   @ 90, 130 TEXTBOX TEXT_2;
+   @ 90, 130 TEXTBOX NUL;
       WIDTH 250 ;
       HEIGHT nEditHeight ;
       FIELD TEST->FIRST ;
@@ -118,7 +119,7 @@ PROCEDURE CREATE_CONTROLS
       ON LOSTFOCUS DrawRR( .F. ) ;
       BACKCOLOR WHITE NOBORDER
 
-   @ 120, 130 TEXTBOX TEXT_3;
+   @ 120, 130 TEXTBOX NUL;
       WIDTH 250 ;
       HEIGHT nEditHeight ;
       FIELD TEST->LAST ;
@@ -127,7 +128,7 @@ PROCEDURE CREATE_CONTROLS
       ON LOSTFOCUS DrawRR( .F. ) ;
       BACKCOLOR WHITE NOBORDER
 
-   @ 150, 130 DATEPICKER DATE_4 ;
+   @ 150, 130 DATEPICKER NUL ;
       WIDTH 130 ;
       HEIGHT nEditHeight ;
       FIELD TEST->BIRTH ;
@@ -135,12 +136,12 @@ PROCEDURE CREATE_CONTROLS
       ON GOTFOCUS DrawRR ( .T. ) ;
       ON LOSTFOCUS DrawRR( .F. )
 
-   @ 180, 130 SWITCHER CHECK_5 ;
+   @ 180, 130 SWITCHER NUL ;
       HEIGHT 46 IMAGE { 'MINIGUI_SWITCH_ON', 'MINIGUI_SWITCH_OFF' } ;
       LEFTCHECK ;
       FIELD TEST->MARRIED ;
-      ONCLICK ( lChecked := Win_1.Check_5.Checked, Win_1.Check_5.Value := iif( lChecked, 'No', 'Yes' ), ;
-         Win_1.Check_5.Checked := ! lChecked )
+      ONCLICK ( Ctrl := This.Name, lChecked := Win_1.(Ctrl).Checked, Win_1.(Ctrl).Value := iif( lChecked, 'No', 'Yes' ), ;
+         Win_1.(Ctrl).Checked := ! lChecked )
 /*
    DEFINE SWITCHER CHECK_5
 	ROW	180
@@ -161,7 +162,7 @@ PROCEDURE CREATE_CONTROLS
       BACKCOLOR WHITE ;
       MAXLENGTH 1024*1024 NOBORDER
 */
-   DEFINE EDITBOX EDIT_6
+   DEFINE EDITBOX NUL
       ROW 208
       COL 130
       WIDTH 250
@@ -177,7 +178,7 @@ PROCEDURE CREATE_CONTROLS
 
    FOR EACH Ctrl IN HMG_GetFormControls( cWindowName )
 
-      IF ! ( "LABEL" $ Ctrl .OR. "CHECK" $ Ctrl )
+      IF ! ( "LABEL" $ GetControlType( Ctrl, cWindowName ) .OR. "CHECK" $ GetControlType( Ctrl, cWindowName ) )
          DrawRR( , This.&(Ctrl).Row, This.&(Ctrl).Col, This.&(Ctrl).Height, This.&(Ctrl).Width )
       ENDIF
 
@@ -210,29 +211,41 @@ RETURN
 
 PROCEDURE Refresh
 
-   LOCAL Ctrl
-   LOCAL aControls := { 'Text_1', 'Text_2', 'Text_3', 'Date_4', 'Check_5', 'Edit_6' }
+   LOCAL Ctrl, cWindowName := ThisWindow.Name
 
-   FOR EACH Ctrl IN aControls
-      Win_1.&(Ctrl).Refresh
+   FOR EACH Ctrl IN HMG_GetFormControls( cWindowName )
+
+      IF ( "EDIT" $ GetControlType( Ctrl, cWindowName ) .OR. ;
+         "TEXT" $ GetControlType( Ctrl, cWindowName ) .OR. ;
+         "CHECK" $ GetControlType( Ctrl, cWindowName ) )
+         Win_1.(Ctrl).Refresh
+      ENDIF
+
+      IF "CHECK" $ GetControlType( Ctrl, cWindowName )
+         Win_1.(Ctrl).Value := iif( TEST->MARRIED, 'Yes', 'No' )
+      ENDIF
+
    NEXT
 
-   Win_1.Check_5.Value := iif( TEST->MARRIED, 'Yes', 'No' )
-
-   Win_1.Text_1.SetFocus
+   Win_1.(FirstEdit).SetFocus
 
 RETURN
 
 
 PROCEDURE Save
 
-   LOCAL Ctrl
-   LOCAL aControls := { 'Text_1', 'Text_2', 'Text_3', 'Date_4', 'Check_5', 'Edit_6' }
+   LOCAL Ctrl, cWindowName := ThisWindow.Name
 
    IF TEST->( NetRecLock() )
 
-      FOR EACH Ctrl IN aControls
-         Win_1.&(Ctrl).Save
+      FOR EACH Ctrl IN HMG_GetFormControls( cWindowName )
+
+         IF ( "EDIT" $ GetControlType( Ctrl, cWindowName ) .OR. ;
+            "TEXT" $ GetControlType( Ctrl, cWindowName ) .OR. ;
+            "CHECK" $ GetControlType( Ctrl, cWindowName ) )
+            Win_1.&(Ctrl).Save
+         ENDIF
+
       NEXT
 
       TEST->( dbRUnLock() )
@@ -282,13 +295,21 @@ RETURN
 
 PROCEDURE OpenTables
 
+   LOCAL Ctrl, cWindowName := ThisWindow.Name
+
    USE TEST SHARED
 
    INDEX ON FIELD->CODE TO TEST MEMORY
 
    GO TOP
 
-   Win_1.Check_5.Value := iif( TEST->MARRIED, 'Yes', 'No' )
+   FOR EACH Ctrl IN HMG_GetFormControls( cWindowName )
+
+      IF "CHECK" $ GetControlType( Ctrl, cWindowName )
+         Win_1.(Ctrl).Value := iif( TEST->MARRIED, 'Yes', 'No' )
+      ENDIF
+
+   NEXT
 
    SELECT 0
 

@@ -1,8 +1,8 @@
 #include <minigui.ch>
 #define CrLf       chr(13)+chr(10)
-#define cAcercaDe  "Ejemplo de definición de menú"+CrLf+"en tiempo de ejecución"+CrLf+CrLf+cVersion+CrLf+CrLf+chr(174)+" Abril 2006, Roberto Sánchez"+CrLf+CrLf+MiniGUIVersion()+CrLf+Version()
+#define cAcercaDe  "Ejemplo de definición de menú"+CrLf+"en tiempo de ejecución"+CrLf+CrLf+cVersion+CrLf+CrLf+chr(174)+" Abril 2006, Roberto Sánchez"+CrLf+ Chr( 174 ) + " June 2024, Marcos Jarrin" +CrLf+MiniGUIVersion()+CrLf+Version()
 #define cFaltaMenu "Falta la tabla MenuDBF.DBF","Falta Archivo"
-#define cVersion   "Versión 00.00.01"
+#define cVersion   "Versión 00.10.00"
 
 STATIC aListItens := {}
 
@@ -24,7 +24,7 @@ FUNCTION Main()
 
    LOCAL x // added code
 
-   if ! lescolha
+   IF ! lescolha
       // se remover estas duas linhas vai ocorrer o erro ao clicar no menu current folder e get folder
       msginfo( getcurrentfolder() )
       msginfo( getfolder() )
@@ -45,14 +45,14 @@ FUNCTION Main()
          ( Alias() )->CAPTIONP, ; // 2
          ( Alias() )->CAPTIONE, ; // 3
          ( Alias() )->CAPTIONI, ; // 4
-         ( Alias() )->NOME, ;  // 5
-         ( Alias() )->ACTION, ;  // 6
-         ( Alias() )->IMAGE, ;  // 7
+         ( Alias() )->NOME, ;     // 5
+         ( Alias() )->ACTION, ;   // 6
+         ( Alias() )->IMAGE, ;    // 7
          ( Alias() )->MESSAGEP, ; // 8
          ( Alias() )->MESSAGEE, ; // 9
          ( Alias() )->MESSAGEI, ; // 10
          ( Alias() )->CHECKED, ;  // 11
-         ( Alias() )->DISABLED } // 12
+         ( Alias() )->DISABLED }  // 12
          SKIP
       ENDDO
       USE
@@ -73,7 +73,7 @@ FUNCTION Main()
                IF cm_tipo = "DEFINE POPUP"
                   DEFINE POPUP cm_caption NAME cm_name
                   ELSEIF cm_tipo = "MENUITEM"
-                     If ! cm_checked
+                     IF ! cm_checked
                         IF cm_Disabled
                            IF cm_action = NIL
                               MENUITEM cm_caption ACTION NIL NAME cm_name IMAGE cm_image DISABLED MESSAGE cm_Message
@@ -86,7 +86,6 @@ FUNCTION Main()
                               MENUITEM cm_caption ACTION NIL NAME cm_name IMAGE cm_image MESSAGE cm_Message
                            ELSE
                               MENUITEM cm_caption ACTION &cm_action NAME cm_name IMAGE cm_image MESSAGE cm_Message
-                              // MENUITEM "aaa" ACTION nada() NAME "aaaaaaa" IMAGE "kdkkddk.jpg" MESSAGE "kdjkjdsjskdjs"
                            ENDIF
                         ENDIF
 
@@ -136,6 +135,7 @@ RETURN NIL
 // (r) 2006, Roberto Sánchez
 // ------------------------------------------------------------
 FUNCTION Salir()
+
    RELEASE WINDOW ALL
 
 RETURN NIL
@@ -145,6 +145,7 @@ RETURN NIL
 // (r) 2006, Roberto Sánchez
 // ------------------------------------------------------------
 FUNCTION AcercaDe()
+
    MsgInfo( cAcercaDe )
 
 RETURN NIL

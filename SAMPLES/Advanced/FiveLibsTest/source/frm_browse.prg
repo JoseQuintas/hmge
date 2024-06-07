@@ -35,7 +35,7 @@ FUNCTION frm_Browse( Self, xDlg, xControl, cTable )
    SET ORDER TO ( nIndexOrd )
 
    SELECT ( nSelect )
-   (xDlg)
+   gui_SetFocus( ::xDlg )
 
    RETURN Nil
 
@@ -45,13 +45,14 @@ FUNCTION DialogBrowse( oTBrowse, cTable, cField, xValue )
 
    oThisForm := frm_Class():New()
    oThisForm:cOptions := ""
+   oThisForm:lNavigate := .F.
    gui_DialogCreate( @oThisForm:xDlg, 0, 0, APP_DLG_WIDTH, APP_DLG_HEIGHT, gui_libName() + " " + cTable,, .T. )
    frm_Buttons( oThisForm, .F. )
    AAdd( oThisForm:aControlList, EmptyFrmClassItem() )
    aItem := Atail( oThisForm:aControlList )
    aItem[ CFG_CTLTYPE ] := TYPE_BROWSE
    gui_Browse( oThisForm:xDlg, oThisForm:xDlg, @aItem[ CFG_FCONTROL ], 70, 5, ;
-      APP_DLG_WIDTH - 10, APP_DLG_HEIGHT - 80, ;
+      APP_DLG_WIDTH - 10, APP_DLG_HEIGHT - 115, ;
       oTbrowse, cField, @xValue, cTable, {}, oThisForm )
    // works for hmge from button
    gui_SetFocus( oThisForm:xDlg, aItem[ CFG_FCONTROL ] )

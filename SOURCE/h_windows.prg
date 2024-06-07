@@ -161,8 +161,8 @@ FUNCTION _DefineWindow ( FormName, Caption, x, y, w, h, nominimize, nomaximize, 
          h := GetDesktopHeight()
          IF child
             IF w / h > 1.4 // widescreen display
-               w *= .7
-               h *= .7
+               w *= .5
+               h *= .77
             ELSE
                w *= .78125
                h *= .78125
@@ -531,8 +531,8 @@ FUNCTION _DefineModalWindow ( FormName, Caption, x, y, w, h, Parent, nosize, nos
          w := GetDesktopWidth()
          h := GetDesktopHeight()
          IF w / h > 1.75 // widescreen display
-            w *= .7
-            h *= .7
+            w *= .4
+            h *= .6
          ELSE
             w *= 0.614
             h *= 0.614
@@ -2742,15 +2742,13 @@ RETURN iif( i > 0, _HMG_aFormNames [ i ], "" )
 *-----------------------------------------------------------------------------*
 FUNCTION MsgDebug ( ... )
 *-----------------------------------------------------------------------------*
-   LOCAL nCnt := PCount()
+   LOCAL aParams := hb_AParams()
+   LOCAL nCnt := Len( aParams )
    LOCAL cMsg
-   LOCAL i
 
    cMsg := "Called from: " + ProcName( 1 ) + "(" + hb_ntos( ProcLine( 1 ) ) + ") --> " + ProcFile( 1 ) + CRLF + CRLF
 
-   FOR i = 1 TO nCnt
-      cMsg += hb_ValToExp( PValue( i ) ) + iif( i < nCnt, ", ", "" )
-   NEXT
+   AEval( aParams, {| e, i | cMsg += hb_ValToExp( e ) + iif( i < nCnt, ", ", "" ) } )
 
    MsgInfo( cMsg, "DEBUG INFO" )
 

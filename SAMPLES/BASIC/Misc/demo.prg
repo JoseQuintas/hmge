@@ -4,8 +4,7 @@
 
 #include "hmg.ch"
 
-
-FUNCTION MAIN
+FUNCTION Main()
 
    DEFINE WINDOW oWindow1 ;
          ROW 10 ;
@@ -13,10 +12,10 @@ FUNCTION MAIN
          WIDTH 400 ;
          HEIGHT 400 ;
          TITLE 'HMG misc funcs/objects' ;
-         WindowType MAIN ;
+         WindowType Main ;
          OnInit oWindow1.Center()
 
-      DEFINE MAIN MENU OF oWindow1
+      DEFINE MAIN MENU
 
          DEFINE POPUP 'Misc functions'
 
@@ -61,6 +60,7 @@ FUNCTION MAIN
 
 RETURN NIL
 
+// -----------------------------------------------------------------------------
 
 #include "directry.ch"
 #include "fileio.ch"

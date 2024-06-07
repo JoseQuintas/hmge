@@ -1,16 +1,14 @@
 /*
  * MINIGUI - Harbour Win32 GUI library Demo
  *
- * (c) 2020 Grigory Filatov <gfilatov@inbox.ru>
- */
+ * (c) 2020-2024 Grigory Filatov
+*/
 
 #include "minigui.ch"
 #include "winprint.ch"
 
-STATIC nLabelObj := 1
 
-
-FUNCTION MAIN
+FUNCTION Main()
 
    LOCAL aSymbol, aSymbol2, aSymbol3, y, x, cSymbol
 
@@ -28,8 +26,8 @@ FUNCTION MAIN
       x := 20
 
       FOR EACH cSymbol IN aSymbol
-         @ y, x LABEL ( 'Lbl_' + hb_ntos( nLabelObj++ ) ) WIDTH 100 HEIGHT 24 ;
-            VALUE cSymbol CENTERALIGN VCENTERALIGN BACKCOLOR cColorToArray( cSymbol )
+         @ y, x LABEL NUL WIDTH 100 HEIGHT 24 ;
+            VALUE cSymbol CENTERALIGN VCENTERALIGN BACKCOLOR cColorToRGB( cSymbol )
 
          y += 30
       NEXT
@@ -38,8 +36,8 @@ FUNCTION MAIN
       x += 120
 
       FOR EACH cSymbol IN aSymbol2
-         @ y, x LABEL ( 'Lbl_' + hb_ntos( nLabelObj++ ) ) WIDTH 100 HEIGHT 24 ;
-            VALUE cSymbol CENTERALIGN VCENTERALIGN BACKCOLOR cColorToArray( cSymbol )
+         @ y, x LABEL NUL WIDTH 100 HEIGHT 24 ;
+            VALUE cSymbol CENTERALIGN VCENTERALIGN BACKCOLOR cColorToRGB( cSymbol )
 
          y += 30
       NEXT
@@ -48,11 +46,13 @@ FUNCTION MAIN
       x += 120
 
       FOR EACH cSymbol IN aSymbol3
-         @ y, x LABEL ( 'Lbl_' + hb_ntos( nLabelObj++ ) ) WIDTH 100 HEIGHT 24 ;
-            VALUE cSymbol CENTERALIGN VCENTERALIGN BACKCOLOR cColorToArray( cSymbol )
+         @ y, x LABEL NUL WIDTH 100 HEIGHT 24 ;
+            VALUE cSymbol CENTERALIGN VCENTERALIGN BACKCOLOR cColorToRGB( cSymbol )
 
          y += 30
       NEXT
+
+      ON KEY ESCAPE ACTION ThisWindow.Release
 
    END WINDOW
 
@@ -63,15 +63,14 @@ FUNCTION MAIN
 RETURN NIL
 
 
-FUNCTION cColorToArray( gr )
+FUNCTION cColorToRGB( gr )
 
-   LOCAL data, hexNumber, r
+   LOCAL cColor, hexNumber
 
    INIT PRINTSYS
-   data := HBPRNCOLOR( gr )
+   cColor := HBPRNCOLOR( gr )
    RELEASE PRINTSYS
 
-   hexNumber := DECTOHEXA( data )
-   r := Rgb( HEXATODEC( SubStr( HexNumber, -2 ) ), HEXATODEC( SubStr( HexNumber, 5, 2 ) ), HEXATODEC( SubStr( HexNumber, 3, 2 ) ) )
+   hexNumber := DECTOHEXA( cColor )
 
-RETURN HMG_n2RGB( r )
+RETURN RGB( HEXATODEC( SubStr( HexNumber, -2 ) ), HEXATODEC( SubStr( HexNumber, 5, 2 ) ), HEXATODEC( SubStr( HexNumber, 3, 2 ) ) )

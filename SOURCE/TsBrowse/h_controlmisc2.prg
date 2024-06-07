@@ -77,7 +77,7 @@ FUNCTION SBrowse( uAlias, cTitle, bSetUp, aCols, nWidth, nHeight, lSql, lModal, 
    IF ValType( uAlias ) == 'C' .AND. Select( uAlias ) == 0
       nSaveSelect := Select()
       IF lSql
-         cTable := GetUniqueName( "SqlTable" )
+         cTable := HMG_GetUniqueName( "SqlTable" )
 
          dbUseArea( .T.,, "SELECT * FROM " + uAlias, cTable,,, "UTF8" )
          SELECT &cTable
@@ -113,7 +113,7 @@ FUNCTION SBrowse( uAlias, cTitle, bSetUp, aCols, nWidth, nHeight, lSql, lModal, 
 #endif
    ENDIF
 
-   cFormName := GetUniqueName( "SBrowse" )
+   cFormName := HMG_GetUniqueName( "SBrowse" )
 
    lRec := HB_ISARRAY( uAlias ) .AND. ;
       Len( uAlias[ 1 ] ) == 2 .AND. Len( aCols ) == 2 .AND. ;
@@ -401,8 +401,7 @@ FUNCTION _TBrowse( oParam, uAlias, cBrw, nY, nX, nW, nH )
    aField := oParam:aField ; DEFAULT aField := oParam:aFields
    aFoot := oParam:aFoot ; DEFAULT aFoot := oParam:aFooter
 
-   DEFAULT aBrush := { 255, 255, 230 }, ;
-      aFoot := ! Empty( aFoot ), ;
+   DEFAULT aFoot := ! Empty( aFoot ), ;
       nY := 0, ;
       nX := 0, ;
       nW := _GetClientRect( hForm )[ 3 ] - nX * 2, ; // GetClientWidth

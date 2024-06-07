@@ -83,12 +83,17 @@ FUNCTION _BeginTab( ControlName, ParentFormName, row, col, w, h, value, f, s, to
       row  := row + _HMG_ActiveFrameRow [_HMG_FrameLevel]
       ParentFormName := _HMG_ActiveFrameParentFormName [_HMG_FrameLevel]
    ENDIF
+
    STATIC _HMG_lDialogInMemory AS GLOBAL VALUE _HMG_DialogInMemory, ;
       _HMG_bOnInit AS GLOBAL VALUE bInit, ;
       _HMG_ActiveTabImage_NoTransparent AS GLOBAL VALUE NoTrans
 
    IF ParentFormName == NIL
       ParentFormName := _HMG_ActiveFormName
+   ENDIF
+
+   IF ISCHAR ( ControlName ) .AND. ControlName == "0"
+      ControlName := HMG_GetUniqueName()
    ENDIF
 
    IF value == NIL .OR. value < 1
@@ -151,6 +156,7 @@ STATIC FUNCTION _DefineTab( ControlName, ParentFormName, x, y, w, h, aCaptions, 
    LOCAL ImageFlag := .F.
    LOCAL lDialogInMemory := _SetGetGlobal( "_HMG_lDialogInMemory" )
    LOCAL oc := NIL, ow := NIL
+
 #ifdef _OBJECT_
    ow := oDlu2Pixel()
 #endif

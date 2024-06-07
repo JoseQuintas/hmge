@@ -86,7 +86,7 @@ METHOD New( nRow, nCol, bSetGet, oWnd, nWidth, nHeight, cPict, bValid,;
    ::lFocused      := .F.
    ::nHelpId       := nHelpId
 
-   ::SetColor( nClrFore, nClrBack )
+   //::SetColor( nClrFore, nClrBack )
 
    nId             := ::nId
    ParentFormName  := oWnd:cParentWnd

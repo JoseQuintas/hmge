@@ -361,6 +361,7 @@ STATIC FUNCTION _AddToolBarToSplitBox ( ControlName , break , Caption , ParentFo
       MinWidth  := _HMG_aControlWidth [ix]
       MinHeight := HiWord ( w )
    ENDIF
+
    IF i > 0
       AddSplitBoxItem ( c , _HMG_aFormReBarHandle [i] , w , break , Caption , MinWidth , MinHeight , _HMG_ActiveSplitBoxInverted , _HMG_aControlRangeMin [ix] )
    ENDIF
@@ -396,6 +397,10 @@ FUNCTION _BeginToolBar ( name, parent, row, col, w, h, caption, ProcedureName, f
 
    IF break == NIL
       break := ! _HMG_ActiveSplitBox
+   ENDIF
+
+   IF ISCHAR ( name ) .AND. name == "0"
+      name := HMG_GetUniqueName()
    ENDIF
 
    _HMG_ActiveToolBarName := name
@@ -447,6 +452,10 @@ FUNCTION _BeginToolBarEx( name, parent, row, col, w, h, caption, ProcedureName, 
 
    IF break == NIL
       break := ! _HMG_ActiveSplitBox
+   ENDIF
+
+   IF ISCHAR ( name ) .AND. name == "0"
+      name := HMG_GetUniqueName()
    ENDIF
 
    _HMG_ActiveToolBarName := name

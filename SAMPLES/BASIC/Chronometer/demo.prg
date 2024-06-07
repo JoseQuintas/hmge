@@ -55,8 +55,7 @@ Function ChronoMeter()
       TITLE "Chronometer Modal Form" ;
       ICON "clock.ico" ;
       MODAL ;
-      ON INIT Eval( bInit ) ;
-      ON RELEASE Form_2.oTimer.Release()
+      ON INIT Eval( bInit )
 
    @ 40, 40 BUTTON oBtnStart CAPTION "START" WIDTH 100 HEIGHT 40 ;
       ACTION iif( nStartSec == nil, ;

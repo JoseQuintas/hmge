@@ -6,9 +6,9 @@
 #include <hmg.ch>
 
 *----------------------------------------------------------------------------*
-FUNCTION Main
+FUNCTION Main()
 *----------------------------------------------------------------------------*
-   LOCAL cImgCtl := "image_1"
+   LOCAL cImgCtl
 
    DEFINE WINDOW win_1 ;
          MAIN ;
@@ -20,19 +20,22 @@ FUNCTION Main
          ON MAXIMIZE Img_center( cImgCtl )
 
       ON KEY F2 ACTION ;
-         ( win_1.width := win_1.image_1.width + 2 * getborderwidth(), ;
-         win_1.height := win_1.image_1.height + gettitleheight() + 2 * getborderheight(), ;
+         ( win_1.width := win_1.(cImgCtl).width + 2 * getborderwidth(), ;
+         win_1.height := win_1.(cImgCtl).height + gettitleheight() + 2 * getborderheight(), ;
          win_1.Center )
+
       ON KEY ESCAPE ACTION win_1.Release()
 
-      DEFINE IMAGE image_1
+      DEFINE IMAGE NUL
          PICTURE 'OLGA'
       END IMAGE
 
+      cImgCtl := HMG_GetFormControls( This.Name, "IMAGE" )[ 1 ]
+
    END WINDOW
 
-   win_1.Center
-   win_1.Activate
+   win_1.Center()
+   win_1.Activate()
 
 RETURN NIL
 

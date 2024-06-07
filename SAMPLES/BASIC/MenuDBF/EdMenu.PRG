@@ -1,63 +1,83 @@
+/*
+
+ Program       : MenuDBF
+ Modulo        : menudbf.prg
+ Compilador    : MINIGUI - Harbour Win32 GUI
+ Link          : BCC 32 bit
+ Author        : André Luiz Neto Cobas
+ Update        : Roberto Sánchez
+ Update        : Marcos Jarrín
+ email         : marvijarrin@gmail.com
+ website       : badasystem.tech
+ Date          : Abril 2006
+ Update        : 11/06/2024
+ Rev           : 1.0
+
+*/
 #include "minigui.ch"
 #define CrLf       chr(13)+chr(10)
 #define cAcercaDe   "Editor de Menus"+CrLf+"A partir do exemplo de Roberto Sánchez"+CrLf+;
-      Chr( 174 ) + " Abril 2006, André Luiz Neto Cobas" + CrLf + CrLf + ;
+      Chr( 174 ) + " Abril 2006, André Luiz Neto Cobas " + CrLf + CrLf + ;
       "----------------------------------------------------------" + CrLf + CrLf + ;
-      "Ejemplo de definición de menú" + CrLf + "en tiempo de ejecución" + CrLf + CrLf + cVersion + CrLf + CrLf + Chr( 174 ) + " Abril 2006, Roberto Sánchez" + CrLf + CrLf + MiniGUIVersion() + CrLf + Version()
-#define cVersion   "Versión 00.00.01"
+      "Ejemplo de definición de menú" + CrLf + "en tiempo de ejecución" + CrLf + CrLf + cVersion + CrLf + Chr( 174 ) + " Abril 2006, Roberto Sánchez" + CrLf + Chr( 174 ) + " June 2024, Marcos Jarrin" +  CrLf + MiniGUIVersion() + CrLf + Version()
+#define cVersion   "Versión 00.10.00"
+
 /*
 ShellExecute(0,"open","rundll32.exe","url.dll,FileProtocolHandler"+"mailto:andrecobas@yahoo.com.br?cc=&bcc="+"&subject=Editor%20de%20Menus:"+"&body=How%20are%20you%2C%20André%3F", , 1)
 
 ShellExecute(0, "open", "rundll32.exe","url.dll,FileProtocolHandler " + "mailto:andrecobas@yahoo.com.br?cc=&bcc=" + "&subject=Editor%20de%20Menus:" + "&body=Como%20vai%20você%2C%20André%3F", , 1)
 */
-STATIC Mitem := 0
-STATIC qesp := 0
-STATIC QTS := 0
-STATIC MyMenu := "0"
-STATIC MenuPai := "0"
-STATIC MnuLn := {}
-STATIC ITMAT := 0
-STATIC Fpos := 0
-STATIC TAG := 0
+STATIC Mitem      := 0
+STATIC qesp       := 0
+STATIC MyMenu     := "0"
+STATIC MenuPai    := "0"
+STATIC MnuLn      := {}
+STATIC ITMAT      := 0
+STATIC Fpos       := 0
+STATIC TAG        := 0
 STATIC aListItens := {}
-STATIC ATIVADO := .F.
+STATIC ATIVADO    := .F.
+//Static QTS := 0 Unused variable
+
 // ------------------------------------------------------------------------------------
 FUNCTION Main()
 
    SET NAVIGATION EXTENDED
-   SET DELE ON
+   SET DELETE ON
    SET EXCLUSIVE OFF
+
    AAdd( aListItens, { "-", "", "", "", "", "", "", "", "", "", "", "", "", .F., .F. } )
+
    DEFINE WINDOW FORM1 ;
          AT 82, 157 ;
          WIDTH 800 ;
          HEIGHT 610 ;
-         TITLE "Editor de Menus " + Chr( 174 ) + " Abril 2006, André Luiz Neto Cobas" ;
+         TITLE "Editor de Menus " + Chr( 174 ) + " June 2024, André Luiz Neto Cobas - Marcos Jarrin" ;
          MAIN ;
          NOMAXIMIZE ;
          NOSIZE ;
          ON INIT formActivate() ;
          ON RELEASE NIL
 
-      @ 10, 10 LABEL Lbltxt WIDTH 770 HEIGHT 20 BACKCOLOR { 255, 255, 206 } FONTCOLOR NIL BORDER
+      @ 10,  10 LABEL Lbltxt WIDTH 770 HEIGHT 20 BACKCOLOR { 255, 255, 206 } FONTCOLOR NIL BORDER
 
-      @ 34, 10 FRAME Frame_1 WIDTH 120 HEIGHT 175 CAPTION ""
+      @ 34,  10 FRAME Frame_1 WIDTH 120 HEIGHT 175 CAPTION ""
       @ 34, 138 FRAME Frame_2 WIDTH 122 HEIGHT 115 CAPTION ""
       @ 210, 10 FRAME Frame_3 WIDTH 253 HEIGHT 350 CAPTION ""
 
       @ 150, 138 FRAME Frame_4 WIDTH 122 HEIGHT 60 CAPTION ""
 
       @ 227, 20 LABEL Lbl_P WIDTH 70 HEIGHT 24 VALUE "Caption Port.:" TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
-      @ 257, 20 LABEL Lbl_E WIDTH 70 HEIGHT 24 VALUE "Caption Esp.:" TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
-      @ 287, 20 LABEL Lbl_I WIDTH 70 HEIGHT 24 VALUE "Caption Ing.:" TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
+      @ 257, 20 LABEL Lbl_E WIDTH 70 HEIGHT 24 VALUE "Caption Esp.:"  TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
+      @ 287, 20 LABEL Lbl_I WIDTH 70 HEIGHT 24 VALUE "Caption Ing.:"  TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
       // -----------------------------------------------------------------------------
       @ 317, 20 LABEL LblAction WIDTH 70 HEIGHT 24 VALUE "Action:" TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
-      @ 347, 20 LABEL LblName WIDTH 70 HEIGHT 24 VALUE "Name:" TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
-      @ 377, 20 LABEL LblImage WIDTH 70 HEIGHT 24 VALUE "Image:" TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
+      @ 347, 20 LABEL LblName   WIDTH 70 HEIGHT 24 VALUE "Name:"   TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
+      @ 377, 20 LABEL LblImage  WIDTH 70 HEIGHT 24 VALUE "Image:"  TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
       // -----------------------------------------------------------------------------
       @ 407, 20 LABEL LbMsg_P WIDTH 70 HEIGHT 20 VALUE "Message Port.:" TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
-      @ 437, 20 LABEL LbMsg_E WIDTH 70 HEIGHT 20 VALUE "Message Esp.:" TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
-      @ 467, 20 LABEL LbMsg_I WIDTH 70 HEIGHT 20 VALUE "Message Ing.:" TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
+      @ 437, 20 LABEL LbMsg_E WIDTH 70 HEIGHT 20 VALUE "Message Esp.:"  TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
+      @ 467, 20 LABEL LbMsg_I WIDTH 70 HEIGHT 20 VALUE "Message Ing.:"  TRANSPARENT FONTCOLOR { 0, 0, 255 } AUTOSIZE
 
       // -----------------------------------------------------------------------------
       @ 50, 20 BUTTONEX BtModifica WIDTH 100 HEIGHT 30 CAPTION "Modificar Linha" ;
@@ -158,6 +178,7 @@ FUNCTION Main()
    ACTIVATE WINDOW Form1
 
 RETURN NIL
+
 // ------------------------------------------------------------------------------------
 FUNCTION ValidaNome( cNome )
 
@@ -178,14 +199,18 @@ FUNCTION ValidaNome( cNome )
    ENDIF
 
 RETURN lret
+
 // ------------------------------------------------------------------------------------
-PROC formActivate()
-   QTS := 100
+PROCEDURE formActivate()
+
+   //QTS := 100 Unused variable
    Inicia()
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC Inicia()
+PROCEDURE Inicia()
+
    MyMenu := Str( 0 )
    MenuPai := Str( 0 )
    BtApagarTudo_Click( .F. )
@@ -202,89 +227,100 @@ PROC Inicia()
 RETURN
 
 // ------------------------------------------------------------------------------------
-PROC LimpaInFo()
-   form1.TxtCaptionP.VALUE := Space( 50 )
-   form1.TxtCaptionE.VALUE := Space( 50 )
-   form1.TxtCaptionI.VALUE := Space( 50 )
-   form1.TxtAction.VALUE := Space( 200 )
-   form1.TxtNome.VALUE := Space( 50 )
-   form1.TxtImage.VALUE := Space( 100 )
-   form1.TxtMessageP.VALUE := Space( 100 )
-   form1.TxtMessageE.VALUE := Space( 100 )
-   form1.TxtMessageI.VALUE := Space( 100 )
-   form1.Chk_Checked.VALUE := .F.
+PROCEDURE LimpaInFo()
+
+   form1.TxtCaptionP.VALUE  := Space( 50 )
+   form1.TxtCaptionE.VALUE  := Space( 50 )
+   form1.TxtCaptionI.VALUE  := Space( 50 )
+   form1.TxtAction.VALUE    := Space( 200 )
+   form1.TxtNome.VALUE      := Space( 50 )
+   form1.TxtImage.VALUE     := Space( 100 )
+   form1.TxtMessageP.VALUE  := Space( 100 )
+   form1.TxtMessageE.VALUE  := Space( 100 )
+   form1.TxtMessageI.VALUE  := Space( 100 )
+   form1.Chk_Checked.VALUE  := .F.
    form1.Chk_Disabled.VALUE := .F.
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC PegaInFo( I )
-   form1.TxtCaptionP.VALUE := iif ( ! Empt( aListItens[ I ][ 5 ] ), aListItens[ I ][ 5 ], "" ) // "CAPTION_P"
-   form1.TxtCaptionE.VALUE := iif ( ! Empt( aListItens[ I ][ 6 ] ), aListItens[ I ][ 6 ], "" ) // "CAPTION_E"
-   form1.TxtCaptionI.VALUE := iif ( ! Empt( aListItens[ I ][ 7 ] ), aListItens[ I ][ 7 ], "" ) // "CAPTION_I"
-   form1.TxtNome.VALUE := iif ( ! Empt( aListItens[ I ][ 8 ] ), aListItens[ I ][ 8 ], "" ) // "NOME"
-   form1.TxtAction.VALUE := iif ( ! Empt( aListItens[ I ][ 9 ] ), aListItens[ I ][ 9 ], "" ) // "ACTION"
-   form1.TxtImage.VALUE := iif ( ! Empt( aListItens[ I ][ 10 ] ), aListItens[ I ][ 10 ], "" ) // "IMAGE"
-   form1.TxtMessageP.VALUE := iif ( ! Empt( aListItens[ I ][ 11 ] ), aListItens[ I ][ 11 ], "" ) // "MESSAGE_P"
-   form1.TxtMessageE.VALUE := iif ( ! Empt( aListItens[ I ][ 12 ] ), aListItens[ I ][ 12 ], "" ) // "MESSAGE_E"
-   form1.TxtMessageI.VALUE := iif ( ! Empt( aListItens[ I ][ 13 ] ), aListItens[ I ][ 13 ], "" ) // "MESSAGE_I"
-   form1.Chk_Checked.VALUE := iif ( ! Empt( aListItens[ I ][ 14 ] ), aListItens[ I ][ 14 ], .F. ) // "CHECKED"
+PROCEDURE PegaInFo( I )
+   form1.TxtCaptionP.VALUE  := iif ( ! Empt( aListItens[ I ][ 5 ] ), aListItens[ I ][ 5 ], "" ) // "CAPTION_P"
+   form1.TxtCaptionE.VALUE  := iif ( ! Empt( aListItens[ I ][ 6 ] ), aListItens[ I ][ 6 ], "" ) // "CAPTION_E"
+   form1.TxtCaptionI.VALUE  := iif ( ! Empt( aListItens[ I ][ 7 ] ), aListItens[ I ][ 7 ], "" ) // "CAPTION_I"
+   form1.TxtNome.VALUE      := iif ( ! Empt( aListItens[ I ][ 8 ] ), aListItens[ I ][ 8 ], "" ) // "NOME"
+   form1.TxtAction.VALUE    := iif ( ! Empt( aListItens[ I ][ 9 ] ), aListItens[ I ][ 9 ], "" ) // "ACTION"
+   form1.TxtImage.VALUE     := iif ( ! Empt( aListItens[ I ][ 10 ] ), aListItens[ I ][ 10 ], "" ) // "IMAGE"
+   form1.TxtMessageP.VALUE  := iif ( ! Empt( aListItens[ I ][ 11 ] ), aListItens[ I ][ 11 ], "" ) // "MESSAGE_P"
+   form1.TxtMessageE.VALUE  := iif ( ! Empt( aListItens[ I ][ 12 ] ), aListItens[ I ][ 12 ], "" ) // "MESSAGE_E"
+   form1.TxtMessageI.VALUE  := iif ( ! Empt( aListItens[ I ][ 13 ] ), aListItens[ I ][ 13 ], "" ) // "MESSAGE_I"
+   form1.Chk_Checked.VALUE  := iif ( ! Empt( aListItens[ I ][ 14 ] ), aListItens[ I ][ 14 ], .F. ) // "CHECKED"
    form1.Chk_Disabled.VALUE := iif ( ! Empt( aListItens[ I ][ 15 ] ), aListItens[ I ][ 15 ], .F. ) // "DISABLED"
 
    ITMAT := I
 
 RETURN
 // ------------------------------------------------------------------------------------
-PROC E_D_Frame3( lvalor )
-   form1.TxtCaptionP.Enabled := lvalor
-   form1.TxtCaptionE.Enabled := lvalor
-   form1.TxtCaptionI.Enabled := lvalor
-   form1.TxtAction.Enabled := lvalor
-   form1.TxtNome.Enabled := lvalor
-   form1.TxtImage.Enabled := lvalor
-   form1.TxtMessageP.Enabled := lvalor
-   form1.TxtMessageE.Enabled := lvalor
-   form1.TxtMessageI.Enabled := lvalor
-   form1.Chk_Checked.Enabled := lvalor
+PROCEDURE E_D_Frame3( lvalor )
+   form1.TxtCaptionP.Enabled  := lvalor
+   form1.TxtCaptionE.Enabled  := lvalor
+   form1.TxtCaptionI.Enabled  := lvalor
+   form1.TxtAction.Enabled    := lvalor
+   form1.TxtNome.Enabled      := lvalor
+   form1.TxtImage.Enabled     := lvalor
+   form1.TxtMessageP.Enabled  := lvalor
+   form1.TxtMessageE.Enabled  := lvalor
+   form1.TxtMessageI.Enabled  := lvalor
+   form1.Chk_Checked.Enabled  := lvalor
    form1.Chk_Disabled.Enabled := lvalor
-   form1.BtOK.enabled := lvalor
-   form1.BtCancel.enabled := lvalor
+   form1.BtOK.enabled         := lvalor
+   form1.BtCancel.enabled     := lvalor
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC E_D_Frame1( lvalor )
+PROCEDURE E_D_Frame1( lvalor )
    form1.BtModifica.Enabled := lvalor
-   form1.BtLoad.Enabled := lvalor
-   form1.BtSalvar.Enabled := lvalor
-   form1.BtApagar.Enabled := lvalor
-   form1.BtRemover.Enabled := lvalor
+   form1.BtLoad.Enabled     := lvalor
+   form1.BtSalvar.Enabled   := lvalor
+   form1.BtApagar.Enabled   := lvalor
+   form1.BtRemover.Enabled  := lvalor
 
 RETURN
 // ------------------------------------------------------------------------------------
 FUNCTION PegaTabulacao( wpos )
+LOCAL Wdif := 0, ln, wtmp
 
-   LOCAL Wdif := 0, ln, wtmp
    IF empty( wpos )
       wpos := 0
    ENDIF
+
    IF wpos > 0
-      ln := form1.Grid1.CELL( ( wpos - 1 ), 1 )
+      //Update
+      //ln := form1.Grid1.CELL((wpos-1),1)
+      ln := form1.Grid1.CELL( ( wpos ), 1 )
       wtmp := LTrim( ln )
       wdif := Len( ln ) - Len( wtmp )
+
       IF Left( wtmp, 12 ) = "DEFINE POPUP"
          wdif := wdif + 4
       END IF
+
    END IF
 
 RETURN wdif
+
 // ------------------------------------------------------------------------------------
-PROC E_D_Frame2( valor )
-   Form1.Btpopup.Enabled := valor
-   Form1.BtMenuitem.Enabled := valor
+PROCEDURE E_D_Frame2( valor )
+
+   Form1.Btpopup.Enabled     := valor
+   Form1.BtMenuitem.Enabled  := valor
    Form1.BtSeparator.Enabled := valor
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC Bt_Inc_Click( nIndex )
+PROCEDURE Bt_Inc_Click( nIndex )
 
    LOCAL Nm := ""
    LOCAL tx := ""
@@ -294,56 +330,58 @@ PROC Bt_Inc_Click( nIndex )
    E_D_Frame1( .F. )
    E_D_Frame2( .F. )
    E_D_Frame3( .F. )
-   form1.BtOK.enabled := .T.
+   form1.BtOK.enabled     := .T.
    form1.BtCancel.enabled := .T.
 
    IF nIndex # 3
       limpaInfo()
-
    END IF
 
    DO CASE
-   CASE nIndex = 0
-      form1.TxtCaptionP.enabled := .T.
-      form1.TxtCaptionE.enabled := .T.
-      form1.TxtCaptionI.enabled := .T.
-      form1.TxtNome.enabled := .T.
+      CASE nIndex = 0
+         form1.TxtCaptionP.enabled := .T.
+         form1.TxtCaptionE.enabled := .T.
+         form1.TxtCaptionI.enabled := .T.
+         form1.TxtNome.enabled     := .T.
 
-      form1.TxtCaptionP.VALUE := "Menu PopUp P" + AllTrim( Str( Val( MyMenu ) + 1 ) )
-      form1.TxtCaptionE.VALUE := "Menu PopUp E" + AllTrim( Str( Val( MyMenu ) + 1 ) )
-      form1.TxtCaptionI.VALUE := "Menu PopUp I" + AllTrim( Str( Val( MyMenu ) + 1 ) )
-      form1.TxtCaptionP.SetFocus()
-      TAG := nIndex
-   CASE nIndex = 1
-      E_D_Frame3( .T. )
-      form1.TxtCaptionP.VALUE := "Menu Item P" + AllTrim( Str( Val( MyMenu ) + 1 ) )
-      form1.TxtCaptionE.VALUE := "Menu Item E" + AllTrim( Str( Val( MyMenu ) + 1 ) )
-      form1.TxtCaptionI.VALUE := "Menu Item I" + AllTrim( Str( Val( MyMenu ) + 1 ) )
-      form1.TxtCaptionP.SetFocus()
-      TAG := nIndex
-   CASE nIndex = 2
-      E_D_Frame1( .T. )
-      E_D_Frame2( .T. )
-      E_D_Frame3( .F. )
-      MenuPai := PegaMenuPai()
-      InsereMENUITEM ( "-" )
-      ChecaList()
-
-   CASE nIndex = 3
-      ln := AllTrim( form1.Grid1.cell( form1.Grid1.VALUE, 1 ) )
-      IF Upper( Left( Ln, 12 ) ) = "DEFINE POPUP"
-         form1.TxtCaptionP.Enabled := .T.
-         form1.TxtCaptionE.Enabled := .T.
-         form1.TxtCaptionI.Enabled := .T.
-         form1.TxtNome.Enabled := .T.
-      ELSE
+         form1.TxtCaptionP.VALUE := "Menu PopUp P" + AllTrim( Str( Val( MyMenu ) + 1 ) )
+         form1.TxtCaptionE.VALUE := "Menu PopUp E" + AllTrim( Str( Val( MyMenu ) + 1 ) )
+         form1.TxtCaptionI.VALUE := "Menu PopUp I" + AllTrim( Str( Val( MyMenu ) + 1 ) )
+         form1.TxtCaptionP.SetFocus()
+         TAG := nIndex
+      CASE nIndex = 1
          E_D_Frame3( .T. )
-      END IF
-      form1.TxtCaptionP.SetFocus()
-      TAG := nIndex
+         form1.TxtCaptionP.VALUE := "Menu Item P" + AllTrim( Str( Val( MyMenu ) + 1 ) )
+         form1.TxtCaptionE.VALUE := "Menu Item E" + AllTrim( Str( Val( MyMenu ) + 1 ) )
+         form1.TxtCaptionI.VALUE := "Menu Item I" + AllTrim( Str( Val( MyMenu ) + 1 ) )
+         form1.TxtCaptionP.SetFocus()
+         TAG := nIndex
+      CASE nIndex = 2
+         E_D_Frame1( .T. )
+         E_D_Frame2( .T. )
+         E_D_Frame3( .F. )
+         MenuPai := PegaMenuPai()
+         InsereMENUITEM ( "-" )
+         ChecaList()
+
+      CASE nIndex = 3
+         ln := AllTrim( form1.Grid1.cell( form1.Grid1.VALUE, 1 ) )
+
+         IF Upper( Left( Ln, 12 ) ) = "DEFINE POPUP"
+            form1.TxtCaptionP.Enabled := .T.
+            form1.TxtCaptionE.Enabled := .T.
+            form1.TxtCaptionI.Enabled := .T.
+            form1.TxtNome.Enabled := .T.
+         ELSE
+            E_D_Frame3( .T. )
+         END IF
+
+         form1.TxtCaptionP.SetFocus()
+         TAG := nIndex
    ENDCASE
 
 RETURN
+
 // ------------------------------------------------------------------------------------
 FUNCTION PegaMenuPai()
 
@@ -352,23 +390,30 @@ FUNCTION PegaMenuPai()
    LOCAL wp := form1.Grid1.VALUE
    LOCAL qEnd := 1
 
-   FOR f := wp - 1 TO 0 STEP -1
+   //Update
+   //FOR f := wp - 1 TO 0 STEP -1
+   FOR f := wp - 1 TO 1 STEP -1
       ln := LTrim( form1.Grid1.CELL( f, 1 ) )
+
       IF Upper( Left( ln, 12 ) ) = "DEFINE POPUP"
          qEnd := qEnd - 1
       ENDIF
+
       IF Upper( Left( ln, 3 ) ) = "END"
          qEnd := qEnd + 1
       ENDIF
+
       IF qEnd = 0
          wret := form1.Grid1.cell( f, 2 )
          RETURN wret
       END IF
+
    NEXT
 
 RETURN wret
+
 // ------------------------------------------------------------------------------------
-PROC ChecaList()
+PROCEDURE ChecaList()
 
    LOCAL it
    LOCAL wp := form1.Grid1.VALUE
@@ -376,26 +421,29 @@ PROC ChecaList()
 
    IF FORM1.Grid1.ITEMCOUNT > 0
       it := form1.Grid1.cell( form1.Grid1.VALUE, 4 )
+
       IF Left( AllTrim( txt ), 3 ) = "END" .OR. txt = "-"
-         form1.BtRemover.Enabled := .F.
+         form1.BtRemover.Enabled  := .F.
          form1.BtModifica.Enabled := .F.
          LIMPAINFO()
       ELSE
          form1.BtRemover.Enabled := .T.
+
          IF ( "SEPAR" $ it )
             form1.BtModifica.Enabled := .F.
             LIMPAINFO()
          ELSE
             form1.BtModifica.Enabled := .T.
          END IF
+
       END IF
 
       IF Left( txt, 1 ) # " " .AND. Upper( Left( txt, 1 ) ) # "E"
          form1.Btseparator.Enabled := .F.
-         form1.BtMenuItem.Enabled := .F.
+         form1.BtMenuItem.Enabled  := .F.
       ELSE
          form1.Btseparator.Enabled := .T.
-         form1.BtMenuItem.Enabled := .T.
+         form1.BtMenuItem.Enabled  := .T.
       END IF
 
       IF it = "DEFINE POPUP" .OR. it = "MENUITEM"
@@ -406,6 +454,7 @@ PROC ChecaList()
    ENDIF
 
 RETURN
+
 // ------------------------------------------------------------------------------------
 FUNCTION PegaPos( wpos )
 
@@ -426,8 +475,9 @@ FUNCTION PegaPos( wpos )
    wret := Val( form1.Grid1.cell( wpos, 2 ) )
 
 RETURN wret
+
 // ------------------------------------------------------------------------------------
-PROC ModificaMENUITEM()
+procedure ModificaMENUITEM()
 
    LOCAL tipo
    LOCAL TXT
@@ -465,8 +515,9 @@ PROC ModificaMENUITEM()
    form1.Grid1.VALUE := fpos
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC InsereMenuItem( txtsep )
+procedure InsereMenuItem( txtsep )
 
    LOCAL tipo
    LOCAL TXT
@@ -525,7 +576,7 @@ PROC InsereMenuItem( txtsep )
 
 RETURN
 // ------------------------------------------------------------------------------------
-PROC InserePopUp()
+PROCEDURE InserePopUp()
 
    LOCAL cTipo := ""
    LOCAL Texto, nome, tx
@@ -549,6 +600,7 @@ PROC InserePopUp()
    IF fpos < 1
       fpos := 1
    ENDIF
+
    qesp := PegaTabulacao( fpos )
 
    tx := Space( qesp ) + "DEFINE POPUP " + Texto
@@ -576,8 +628,10 @@ PROC InserePopUp()
    form1.Grid1.VALUE := fpos
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC Bt_Cancel_Click()
+PROCEDURE Bt_Cancel_Click()
+
    E_D_Frame3( .F. )
    E_D_Frame2( .T. )
    E_D_Frame1( .T. )
@@ -587,7 +641,7 @@ PROC Bt_Cancel_Click()
 
 RETURN
 // ------------------------------------------------------------------------------------
-PROC AtualList()
+PROCEDURE AtualList()
 
    LOCAL f
 
@@ -612,8 +666,9 @@ PROC AtualList()
    NEXT
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC BtOk_Click()
+PROCEDURE BtOk_Click()
 
    LOCAL tx := ""
 
@@ -626,20 +681,21 @@ PROC BtOk_Click()
 
 RETURN
 // ------------------------------------------------------------------------------------
-PROC SelecionaTipo()
+PROCEDURE SelecionaTipo()
 
    DO CASE
-   CASE Tag = 0
-      InserePopUp()
-   CASE Tag = 1
-      InsereMENUITEM()
-   CASE Tag = 2
-      InsereMENUITEM( '-' )
-   CASE Tag = 3
-      ModificaMENUITEM()
+      CASE Tag = 0
+         InserePopUp()
+      CASE Tag = 1
+         InsereMENUITEM()
+      CASE Tag = 2
+         InsereMENUITEM( '-' )
+      CASE Tag = 3
+         ModificaMENUITEM()
    END CASE
 
 RETURN
+
 // ------------------------------------------------------------------------------------
 FUNCTION LinhaMenu( TxtCaptionP, TxtCaptionE, TxtCaptionI, TxtAction, TxtNome, TxtImage, TxtMessageP, TxtMessageE, TxtMessageI, Chk_Checked, Chk_Disabled, tipo )
 
@@ -657,6 +713,7 @@ FUNCTION LinhaMenu( TxtCaptionP, TxtCaptionE, TxtCaptionI, TxtAction, TxtNome, T
    END IF
 
    IF tipo = "MENUITEM"
+
       IF Empty( AllTrim( TxtAction ) )
          ctxtAction := " ACTION Nil"
       ELSE
@@ -671,9 +728,11 @@ FUNCTION LinhaMenu( TxtCaptionP, TxtCaptionE, TxtCaptionI, TxtAction, TxtNome, T
       IF Empty( ctxtMsg )
          ctxtMsg := AllTrim( TxtMessageE )
       ENDIF
+
       IF Empty( ctxtMsg )
          ctxtMsg := AllTrim( TxtMessageI )
       ENDIF
+
       If ! Empty( AllTrim( ctxtMsg ) )
          ctxtMsg := " MESSAGE " + Chr( 34 ) + AllTrim( ctxtMsg ) + Chr( 34 )
       END IF
@@ -686,6 +745,7 @@ FUNCTION LinhaMenu( TxtCaptionP, TxtCaptionE, TxtCaptionI, TxtAction, TxtNome, T
          ctxtDisabled := " DISABLED"
       END IF
    ENDIF
+
    IF tipo = "MENUITEM" .OR. TIPO = "DEFINE POPUP"
       TXT := AllTrim( tipo ) + " " + Chr( 34 ) + AllTrim( TxtCaptionP ) + Chr( 34 )
    ELSE
@@ -695,36 +755,42 @@ FUNCTION LinhaMenu( TxtCaptionP, TxtCaptionE, TxtCaptionI, TxtAction, TxtNome, T
    TXT += ctxtAction + ctxtName + ctxtImage + ctxtChecked + ctxtDisabled + ctxtMsg
 
 RETURN Txt
+
 // ------------------------------------------------------------------------------------
-PROC BtApagarTudo_Click( lpergunta )
+PROCEDURE BtApagarTudo_Click( lpergunta )
 
    LOCAL lescolha := .F.
 
    IF lpergunta
       lescolha := msgyesno( "Tem Certeza Que Deseja Apagar Tudo?", "Atenção", .F. )
+
       IF lescolha = .F.
          RETURN
       ENDIF
+
    ENDIF
 
-   MyMenu := Str( 0 )
+   MyMenu  := Str( 0 )
    MenuPai := Str( 0 )
-   mItem := 1
+   mItem   := 1
    Apagatudo()
    AtualList()
    FORM1.Grid1.VALUE := 1
    FORM1.Grid1.SETFOCUS()
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC ApagaTudo()
+PROCEDURE ApagaTudo()
    Form1.Grid1.deleteAllItems()
    ASize( aListItens, 0 )
    AAdd( aListItens, { "-", "", "", "", "", "", "", "", "", "", "", "", "", .F., .F. } )
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC BtLoad_Click()
+PROCEDURE BtLoad_Click()
+local cSpace := ""
 
    LOCAL cFile, c1, c_dbf
    LOCAL txt
@@ -734,8 +800,10 @@ PROC BtLoad_Click()
    If ! Empt( AllTrim( cFile ) )
       C1 := RAt( ".", CFILE )
       C_DBF := Left( CFILE, C1 - 1 )
-      // C1:=RAT("\",C_DBF)
-      // C_NTAB:= RIGHT(C_DBF,LEN(C_DBF)-C1)
+
+       C1:=RAT("\",C_DBF)
+       C_NTAB:= RIGHT(C_DBF,LEN(C_DBF)-C1)
+
       Mitem := 1
       fpos := 1
       qesp := 0
@@ -754,10 +822,20 @@ PROC BtLoad_Click()
          IF ( Alias() )->TIPO = "DEFINE POPUP"
             qesp := qesp - 4
          ENDIF
+
+         //Update
+         //Place 5 spaces at the beginning of the MENUITEM option
+         IF ( Alias() )->TIPO = "MENUITEM"
+            qesp := 5
+         ELSE
+            qesp := qesp - 4
+         ENDIF
+
          IF qesp > 0
             txt := Space( qesp ) + txt
          ENDIF
 
+         if( alltrim(( Alias() )->TIPO) == "MENUITEM",cSpace := space(5),cSpace := "")
          TxT += LinhaMenu( ( Alias() )->CAPTIONP, ;
             ( Alias() )->CAPTIONE, ;
             ( Alias() )->CAPTIONI, ;
@@ -770,6 +848,7 @@ PROC BtLoad_Click()
             ( Alias() )->CHECKED, ;
             ( Alias() )->DISABLED, ;
             ( Alias() )->TIPO )
+
 
          aListItens[ fpos++ ] := { TXT, ;
             AllTrim( MyMenu ), ;
@@ -802,8 +881,9 @@ PROC BtLoad_Click()
    ENDIF
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC BtSalvar_Click()
+PROCEDURE BtSalvar_Click()
 
    LOCAL cFile, x, c1, f
    LOCAL AaRQ := {}
@@ -817,6 +897,7 @@ PROC BtSalvar_Click()
    If ! Empty( cFile )
       IF File( cfile )
          x := msgyesno( "Tem certeza que quer substituir este arquivo?", "Arquivo já existe", .F. )
+
          IF x = .F.
             RETURN
          ELSE
@@ -834,21 +915,21 @@ PROC BtSalvar_Click()
          C1 := RAt( "\", C_DBF )
          C_NTAB := Right( C_DBF, Len( C_DBF ) - C1 )
 
-         AAdd( aArq, { 'LINHA', 'C', 6, 0 } )
-         AAdd( aArq, { 'ID', 'C', 6, 0 } )
-         AAdd( aArq, { 'MNUPAI', 'C', 6, 0 } )
-         AAdd( aArq, { 'TIPO', 'C', 12, 0 } ) // POPUP MENUITEM  SEPARATOR
-         AAdd( aArq, { 'CAPTIONP', 'C', 50, 0 } )
-         AAdd( aArq, { 'CAPTIONE', 'C', 50, 0 } )
-         AAdd( aArq, { 'CAPTIONI', 'C', 50, 0 } )
-         AAdd( aArq, { 'NOME', 'C', 50, 0 } )
-         AAdd( aArq, { 'ACTION', 'C', 200, 0 } )
-         AAdd( aArq, { 'IMAGE', 'C', 100, 0 } )
-         AAdd( aArq, { 'MESSAGEP', 'C', 100, 0 } )
-         AAdd( aArq, { 'MESSAGEE', 'C', 100, 0 } )
-         AAdd( aArq, { 'MESSAGEI', 'C', 100, 0 } )
-         AAdd( aArq, { 'CHECKED', 'L', 1, 0 } )
-         AAdd( aArq, { 'DISABLED', 'L', 1, 0 } )
+         AAdd( aArq, { 'LINHA',   'C',   6, 0 } )
+         AAdd( aArq, { 'ID',      'C',   6, 0 } )
+         AAdd( aArq, { 'MNUPAI',  'C',   6, 0 } )
+         AAdd( aArq, { 'TIPO',    'C',  12, 0 } ) // POPUP MENUITEM  SEPARATOR
+         AAdd( aArq, { 'CAPTIONP','C',  50, 0 } )
+         AAdd( aArq, { 'CAPTIONE','C',  50, 0 } )
+         AAdd( aArq, { 'CAPTIONI','C',  50, 0 } )
+         AAdd( aArq, { 'NOME',    'C',  50, 0 } )
+         AAdd( aArq, { 'ACTION',  'C', 200, 0 } )
+         AAdd( aArq, { 'IMAGE',   'C', 100, 0 } )
+         AAdd( aArq, { 'MESSAGEP','C', 100, 0 } )
+         AAdd( aArq, { 'MESSAGEE','C', 100, 0 } )
+         AAdd( aArq, { 'MESSAGEI','C', 100, 0 } )
+         AAdd( aArq, { 'CHECKED', 'L',   1, 0 } )
+         AAdd( aArq, { 'DISABLED','L',   1, 0 } )
          dbCreate ( CFILE, aArq )
 
          USE &C_DBF NEW
@@ -856,20 +937,20 @@ PROC BtSalvar_Click()
 
          FOR F := 1 TO Len( aListItens ) - 1
             APPEND BLANK
-            REPL LINHA WITH StrZero( F, 6 )
-            REPL ID WITH aListItens[ f ][ 2 ]
-            REPL MNUPAI WITH aListItens[ f ][ 3 ]
-            REPL TIPO WITH aListItens[ f ][ 4 ]
+            REPL LINHA    WITH StrZero( F, 6 )
+            REPL ID       WITH aListItens[ f ][ 2 ]
+            REPL MNUPAI   WITH aListItens[ f ][ 3 ]
+            REPL TIPO     WITH aListItens[ f ][ 4 ]
             REPL CAPTIONP WITH aListItens[ f ][ 5 ]
             REPL CAPTIONE WITH aListItens[ f ][ 6 ]
             REPL CAPTIONI WITH aListItens[ f ][ 7 ]
-            REPL NOME WITH aListItens[ f ][ 8 ]
-            REPL ACTION WITH aListItens[ f ][ 9 ]
-            REPL IMAGE WITH aListItens[ f ][ 10 ]
+            REPL NOME     WITH aListItens[ f ][ 8 ]
+            REPL ACTION   WITH aListItens[ f ][ 9 ]
+            REPL IMAGE    WITH aListItens[ f ][ 10 ]
             REPL MESSAGEP WITH aListItens[ f ][ 11 ]
             REPL MESSAGEE WITH aListItens[ f ][ 12 ]
             REPL MESSAGEI WITH aListItens[ f ][ 13 ]
-            REPL CHECKED WITH aListItens[ f ][ 14 ]
+            REPL CHECKED  WITH aListItens[ f ][ 14 ]
             REPL DISABLED WITH aListItens[ f ][ 15 ]
             COMMIT
          NEXT
@@ -879,13 +960,14 @@ PROC BtSalvar_Click()
    ENDIF
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC BtRemover_Click()
+PROCEDURE BtRemover_Click()
 
    LOCAL fpos := form1.Grid1.VALUE
-   LOCAL ID := aListItens[ fpos ][ 2 ]
+   LOCAL ID   := aListItens[ fpos ][ 2 ]
    LOCAL Tipo := aListItens[ fpos ][ 4 ]
-   LOCAL fim := .F., ItemID
+   LOCAL fim  := .F., ItemID
 
    ApagaUmItem( fpos )
    IF Tipo = "DEFINE POPUP"
@@ -904,12 +986,12 @@ PROC BtRemover_Click()
 
 RETURN
 // ------------------------------------------------------------------------------------
-PROC ApagaUmItem( fPos )
+procedure ApagaUmItem( fPos )
 
    LOCAL f
 
    FOR f := fpos + 1 TO Len( aListItens )
-      aListItens[ f - 1 ] := { aListItens[ f ][ 1 ], aListItens[ f ][ 2 ], aListItens[ f ][ 3 ], ;
+         aListItens[ f - 1 ] := { aListItens[ f ][ 1 ], aListItens[ f ][ 2 ], aListItens[ f ][ 3 ], ;
          aListItens[ f ][ 4 ], aListItens[ f ][ 5 ], aListItens[ f ][ 6 ], ;
          aListItens[ f ][ 7 ], aListItens[ f ][ 8 ], aListItens[ f ][ 9 ], ;
          aListItens[ f ][ 10 ], aListItens[ f ][ 11 ], aListItens[ f ][ 12 ], ;
@@ -920,7 +1002,7 @@ PROC ApagaUmItem( fPos )
 RETURN
 
 // ------------------------------------------------------------------------------------
-PROC Bt_Testar_Click()
+PROCEDURE Bt_Testar_Click()
 
    LOCAL nIdioma := QualIdioma()
 
@@ -947,8 +1029,9 @@ PROC Bt_Testar_Click()
    ACTIVATE WINDOW WinModal
 
 RETURN
+
 // ------------------------------------------------------------------------------------
-PROC MontaMenu( nIdioma )
+procedure MontaMenu( nIdioma )
 
    LOCAL f
    LOCAL cm_tipo
@@ -1015,8 +1098,8 @@ PROC MontaMenu( nIdioma )
    END MENU
 
 RETURN
-// ------------------------------------------------------------------------------------
 
+// ------------------------------------------------------------------------------------
 FUNCTION QualIdioma()
 
    LOCAL lRet := 0
@@ -1098,6 +1181,7 @@ RETURN lret
 // (r) 2006, Roberto Sánchez
 // ------------------------------------------------------------
 FUNCTION Salir()
+
    RELEASE WINDOW WinModal
 
 RETURN NIL
@@ -1105,8 +1189,10 @@ RETURN NIL
 // ------------------------------------------------------------
 // Ejemplo de definición de menú partiendo de una tabla
 // (r) 2006, Roberto Sánchez
+//Function that is not used
 // ------------------------------------------------------------
 FUNCTION AcercaDe()
+
    MsgInfo( cAcercaDe )
 
 RETURN NIL

@@ -143,6 +143,10 @@ FUNCTION _DefineOwnerButton ( ControlName, ParentForm, x, y, Caption, ProcedureN
       MsgMiniGuiError ( "Window: " + IFNIL( ParentForm, "Parent", ParentForm ) + " is not defined." )
    ENDIF
 
+   IF ISCHAR ( ControlName ) .AND. ControlName == "0"
+      ControlName := HMG_GetUniqueName()
+   ENDIF
+
    IF _IsControlDefined ( ControlName, ParentForm )
       MsgMiniGuiError ( "Control: " + ControlName + " Of " + ParentForm + " Already defined." )
    ENDIF

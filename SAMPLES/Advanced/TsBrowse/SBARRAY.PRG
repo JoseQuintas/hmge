@@ -53,7 +53,10 @@ Function SBArray()
              TITLE "MiniGUI TsBrowse  ( Browsing an array ) " ;
              ICON "Demo.ico" ;
              FONT "MS Sans Serif" SIZE 8 ;
-             CHILD
+             CHILD ;
+             ON RELEASE ( ;
+                AEval( aBmp, { | x | DeleteObject( x ) } ) ;
+             )
 
             DEFINE TBROWSE oLbx AT 10,15  ;
                    OF Form_3 WIDTH 635 HEIGHT 290 CELLED;
