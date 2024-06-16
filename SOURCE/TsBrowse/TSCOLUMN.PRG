@@ -312,7 +312,7 @@ METHOD New( cHeading, bData, cPicture, aColors, aAlign, nWidth, ;
       cPostEdit := "", ;
       cSpcHeading := "", ;
       cDefData := "", ;
-      lTotal := .F., ; 
+      lTotal := .F., ;
       cName := "", ;
       cAlias := NIL
 
@@ -435,7 +435,7 @@ METHOD New( cHeading, bData, cPicture, aColors, aAlign, nWidth, ;
          nEle := Max( If( LoWord( aTmpAlign[ 2 ] ) == 3, 2, Len( cHeading ) ), ;
             Len( If( Empty( cPicture ), cValToChar( Eval( ::bData ) ), ;
             Transform( cValToChar( Eval( ::bData ) ), cPicture ) ) ) )
-         nWidth := Round( nWidth * ( nEle + 1 ) * 1.3, 0 ) 
+         nWidth := Round( nWidth * ( nEle + 1 ) * 1.3, 0 )
       ELSE
          nWidth := Int( If( ! lBitMap .AND. ! lCheck, 0.67 * ;
             GetTextWidth( 0, Replicate( "B", ;
@@ -448,7 +448,7 @@ METHOD New( cHeading, bData, cPicture, aColors, aAlign, nWidth, ;
    ENDIF
 
    ::cOrder = cOrder
-   ::lSeek = ! Empty( cOrder ) .AND. ! lEdit 
+   ::lSeek = ! Empty( cOrder ) .AND. ! lEdit
    ::cHeading = cHeading
    ::cFooting = cFooting
    ::cSpcHeading = cSpcHeading
@@ -463,7 +463,7 @@ METHOD New( cHeading, bData, cPicture, aColors, aAlign, nWidth, ;
    ::lNoLite = lNoLite
    ::lNoHilite = lNoLite
    ::cMsg = cMsg
-   ::cToolTip = cToolTip 
+   ::cToolTip = cToolTip
    ::cMsgEdit = cMsg
    ::bValid = bValid
    ::cError = cError
@@ -499,14 +499,14 @@ METHOD New( cHeading, bData, cPicture, aColors, aAlign, nWidth, ;
    ::lComboBox = lCombo
    ::lCheckBox = lCheck
    ::cDataType = ValType( Eval( ::bData ) )
-   ::lTotal := lTotal 
+   ::lTotal := lTotal
    ::cName := cName
    ::oCellHead := TSBcell():New()
    ::oCellEnum := TSBcell():New()
    ::oCellFoot := TSBcell():New()
    ::oCell := TSBcell():New()
 
-   IF ! Empty( oBrw ) .AND. oBrw:lIsArr
+   IF ! Empty( oBrw ) .AND. oBrw:nBrowseType == BROWSE_TYPE_ARRAY
       ::lIndexCol := .T.
    ENDIF
 
@@ -1091,7 +1091,7 @@ FUNCTION ComboWBlock( oBrw, uField, nCol, aList )
       aItems := aList
    ENDIF
 
-   IF oBrw:lIsDbf
+   IF oBrw:nBrowseType == BROWSE_TYPE_DBF
 
       IF ValType( uField ) == "C"
 

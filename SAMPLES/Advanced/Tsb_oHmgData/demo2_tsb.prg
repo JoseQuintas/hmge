@@ -131,11 +131,11 @@ FUNCTION Draw_TSB( oTsb, oWnd, cBrw )
    IF IsString( oBrw:Cargo:cMaska )
       cMaska := oBrw:Cargo:cMaska
    ELSE
-      cMaska := App.Cargo:oIni:MAIN:cMaska 
+      cMaska := App.Cargo:oIni:MAIN:cMaska
    ENDIF
    cMaska  := ALLTRIM(cMaska)                             // № док.оплаты
    IF LEN(cMaska) == 0
-      cMaska := App.Cargo:oIni:MAIN:cMaska 
+      cMaska := App.Cargo:oIni:MAIN:cMaska
    ENDIF
    // --------- подключаем здесь SCOPE ---------
    nLen    := LEN( (oBrw:cAlias)->DOCUM )                 // кол-во символов поля DOCUM
@@ -766,7 +766,7 @@ STATIC FUNCTION RecnoDelete(oWnd,nPost,cBtn,oBrw)
    LOCAL aSumm, oCol, nCol, nSum, cFld
 
    ? " -Del- "+ProcNL(), "oWnd:", oWnd:Name, nPost, cBtn, oBrw:ClassName
-   ?? ":nLen=", oBrw:nLen //,":lIsXXX=", oBrw:lIsDbf, oBrw:lIsArr
+   ?? ":nLen=", oBrw:nLen //,":lIsXXX=", oBrw:nBrowseType
    ?? ":nRowPos=", oBrw:nRowPos
 
    IF oBrw:nLen == 0        // нет записей в таблице
@@ -827,12 +827,12 @@ STATIC FUNCTION RecnoDelete(oWnd,nPost,cBtn,oBrw)
    ? " -Del-  lDelete=", lDelete, "nRecno=",nRecno
 
    nMetod := 0
-   IF oBrw:lIsArr                 //  для массива
+   IF oBrw:nBrowseType == BROWSE_TYPE_ARRAY  //  для массива
       ? " -Del- :nLen == :nAt", oBrw:nLen, oBrw:nAt
       IF oBrw:nLen == oBrw:nAt
          nMetod := 1  // это последняя запись
       ENDIF
-   ELSEIF oBrw:lIsDbf            //  для dbf
+   ELSEIF oBrw:nBrowseType == BROWSE_TYPE_DBF //  для dbf
       ? " -Del- ordKeyNo() == ordKeyCount()"
       ?? ordKeyNo(), ordKeyCount()
       IF ordKeyNo() == ordKeyCount()
@@ -850,12 +850,12 @@ STATIC FUNCTION RecnoDelete(oWnd,nPost,cBtn,oBrw)
       ? " -Del- " + ProcNL(), "lChange="+cValToChar(lChange), "переход! новая запись!"
       ?? "-> nMetod=" + HB_NtoS(nMetod)
       IF nMetod == 1        // это последняя запись в базе и таблице
-         IF oBrw:lIsArr                   // для массива
+         IF oBrw:nBrowseType = BROWSE_TYPE_ARRAY    // для массива
             oBrw:Refresh(.T., .T.)
             nRec := oBrw:nLen
             oBrw:GoPos(nRec, nCell)
             ?? "переход :GoPos(:nLen=", nRec
-         ELSEIF oBrw:lIsDbf               // для dbf
+         ELSEIF oBrw:nBrowseType == BROWSE_TYPE_DBF // для dbf
             (oBrw:cAlias)->( dbSkip(0) )
             oBrw:Reset()
             oBrw:Refresh(.T., .T.)
@@ -1178,7 +1178,7 @@ FUNCTION TitleSuperHider(cMaska,lSay)
    LOCAL cTtl
    DEFAULT lSay := .T.
 
-   IF lSay 
+   IF lSay
       IF App.Cargo:cLang == "RU"
          cTtl := "Выборка: No документа оплаты = " + cMaska + CRLF
          cTtl += "Редактирование колонок - разрешено" + CRLF

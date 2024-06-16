@@ -7,7 +7,7 @@
 #define _HMG_OUTLOG
 
 #define PBM_SETPOS       1026
-#define LINE_WRITE       100                // Количество строк для записи блоками 
+#define LINE_WRITE       100                // Количество строк для записи блоками
 
 #include "minigui.ch"
 #include "tsbrowse.ch"
@@ -22,19 +22,19 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
    LOCAL nRecNo := ( oBrw:cAlias )->( RecNo() ), nAt := oBrw:nAt
    LOCAL nOldRow := oBrw:nLogicPos(), nOldCol := oBrw:nCell
    Local lBrSelector := oBrw:lSelector
-           
+
    ////////////// структура отчёта ///////////////
-   // nLine := 1  // титул таблицы 
-   // nLine := 2  // пустая строка 
-   // nLine := 3  // суперхидер таблицы, если есть 
-   // nLine := 4  // шапка таблицы, если есть 
+   // nLine := 1  // титул таблицы
+   // nLine := 2  // пустая строка
+   // nLine := 3  // суперхидер таблицы, если есть
+   // nLine := 4  // шапка таблицы, если есть
    // nLine := 5  // ячейки таблицы, первая ячейка (если есть суперхидер и шапка таблицы)
-   // nLine := nLine + oBrw:nLen // подвал таблицы, если есть 
+   // nLine := nLine + oBrw:nLen // подвал таблицы, если есть
 
    CursorWait()
    WaitThreadCreateIcon( 'Loading the report in', 'OO Calc OLE ...' )   // запуск без времени
 
-   IF ( oSM := win_oleCreateObject( "com.sun.star.ServiceManager" ) ) == NIL 
+   IF ( oSM := win_oleCreateObject( "com.sun.star.ServiceManager" ) ) == NIL
       cMsg := REPLICATE( "-._.", 16 ) + ";;"
       IF Hb_LangSelect() == "ru.RU1251"
          cMsg += "OO Calc не доступен !;;   Ошибка"
@@ -50,7 +50,7 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
       cMsg += REPLICATE( "-._.", 16 ) + ";;"
       cMsg := AtRepl( ";", cMsg, CRLF )
       MsgStop( cMsg , cVal )
-      RETURN Nil 
+      RETURN Nil
    ENDIF
 
    AADD(aProps, oSM:Bridge_GetStruct("com.sun.star.beans.PropertyValue"))
@@ -74,12 +74,12 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
    IF lTsbSuperHd
       lTsbSuperHd := ( AScan( oBrw:aSuperHead, {|a| !Empty(a[3]) } ) > 0 )
       // если суперхидер таблицы задан пустым, то нет вывода суперхидера таблицы
-      // пустой суперхидер задаётся в demo2.prg строка 232 - :aSuperhead[ 1, 3 ] := '' 
+      // пустой суперхидер задаётся в demo2.prg строка 232 - :aSuperhead[ 1, 3 ] := ''
    ENDIF
 
    // проверка шапки таблицы
    lTsbHeading := oBrw:lDrawHeaders
-   If lTsbHeading    
+   If lTsbHeading
       lTsbHeading := ( AScan( oBrw:aColumns, { |o| !Empty( o:cHeading ) } ) > 0 )
       // если шапка таблицы задана пустые колонки, то нет вывода шапки таблицы
       // пустая шапка задаётся в demo2.prg строка 266 - oCol:cHeading := '' или NIL
@@ -87,7 +87,7 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
 
    // проверка подвала таблицы
    lTsbFooting := oBrw:lDrawFooters
-   If lTsbFooting    
+   If lTsbFooting
       lTsbFooting := ( AScan( oBrw:aColumns, { |o| !Empty( o:cFooting ) } ) > 0 )
       // если подвал таблицы задан пустые колонки, то нет вывода подвала таблицы
       // пустой подвал задаётся в demo2.prg строка 269 - oCol:cFooting := '' или NIL
@@ -95,12 +95,12 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
 
    // бегунок таблицы, если есть
    If hProgress != Nil
-      nTotal := oBrw:nLen 
+      nTotal := oBrw:nLen
       SetProgressBarRange ( hProgress , 1 , nTotal )
       SendMessage(hProgress, PBM_SETPOS, 0, 0)
       nEvery := Max( 1, Int( nTotal * 0.05 ) ) // refresh hProgress every 5 %
    EndIf
- 
+
    nColDbf := Len( oBrw:aColumns )            // кол-во столбцов в таблице
    aSet := Array(Min(LINE_WRITE,oBrw:nLen), nColDbf )
    aTipeChars := Array( nColDbf )
@@ -121,10 +121,10 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
       EndIf
       ++nLine
    EndIf
-   nColDegTbl := 3  // начальная строка заголовка таблицы 
+   nColDegTbl := 3  // начальная строка заголовка таблицы
 
    // Выводим суперхидер таблицы
-   If lTsbSuperHd 
+   If lTsbSuperHd
 
       nVar  := If( oBrw:lSelector, 1, 0 )
       FOR EACH aCol IN oBrw:aSuperHead
@@ -139,7 +139,7 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
    Endif
 
    // Выводим шапку таблицы
-   If lTsbHeading     
+   If lTsbHeading
       nColHead := 0
       FOR EACH oCol IN oBrw:aColumns
 
@@ -166,7 +166,7 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
    nStart := nLine
    nBeginTable := nStart
    For nRow := 1 TO oBrw:nLen
-   
+
       For nCol := 1 TO nColDbf
 
          oCol  := oBrw:aColumns[ nCol ]
@@ -191,7 +191,7 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
          //         aWidthChars [nCol] := max(aWidthChars [nCol], LenStrokaWithCRLF(uData))
 
          // запоминаем данные в массив
-         aSet[ nIndexaSet , nCol ] := uData 
+         aSet[ nIndexaSet , nCol ] := uData
 
       Next
 
@@ -201,7 +201,7 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
 
       ++nLine
 
-      // Заполнение таблицы по LINE_WRITE строк из накопленного масссива 
+      // Заполнение таблицы по LINE_WRITE строк из накопленного масссива
       IF flag_new_OutXls
 
          oRange := OORange( oSheet, nStart, 1, nLine-1, nColDbf )
@@ -214,7 +214,7 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
 
          nIndexaSet := 1        // Следующее заполнение с начала массива
          nStart := nLine        // начало нового диапазона строк
-         flag_new_OutXls := .f. 
+         flag_new_OutXls := .f.
       ELSE
          nIndexaSet++          // будем заполнять массив дальше
       EndIf
@@ -270,20 +270,20 @@ FUNCTION Brw4OleCalc( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, b
       SendMessage( hProgress, PBM_SETPOS, 0, 0 )
    EndIf
 
-   If bExtern != Nil  
+   If bExtern != Nil
       Eval( oBrw:bGoTop )  // переход на начало таблицы
       Eval( bExtern, oSheet, oBrw )   // вызов внешнего блока дообработки таблицы
    EndIf
 
    If lBrSelector  // если есть селектор в таблице
-      oBrw:lSelector := .T.  
-      oBrw:InsColumn( oBrw:aClipBoard[ 2 ], oBrw:aClipBoard[ 1 ] ) 
+      oBrw:lSelector := .T.
+      oBrw:InsColumn( oBrw:aClipBoard[ 2 ], oBrw:aClipBoard[ 1 ] )
       oBrw:lNoPaint  := .F.
    EndIf
 
    // вернуть первоначальную позицию курсора в таблице
    oBrw:Reset()
-   If oBrw:lIsDbf
+   If oBrw:nBrowseType == BROWSE_TYPE_DBF
       ( oBrw:cAlias )->( DbGoTo( nRecNo ) )
       oBrw:GoPos(nOldRow, nOldCol)
    EndIf
@@ -391,18 +391,18 @@ Function OOCellBorder(oRange, nNSEW, nWidth)
    Return nil
 
 //////////////////////////////////////////////////////////////////////
-// окно Calc или LibreOffice на передний план 
+// окно Calc или LibreOffice на передний план
 STATIC FUNCTION SetCalcWindowToForeground(cFile)
    LOCAL hWnd, cTitle, cText := hb_FNameNameExt(cFile)
 
    // вариант 1
    hWnd := myGetWindowHandles(cText, .F.)  // поиск по списку всех окон в памяти
 
-   IF hWnd == 0  
+   IF hWnd == 0
      // вариант 2
-     //  поиск ХЕНДЛА открытого окна документа 
+     //  поиск ХЕНДЛА открытого окна документа
      cTitle := cText + " - OpenOffice Calc"
-     hWnd := FindWindowEx(,,, cTitle )    
+     hWnd := FindWindowEx(,,, cTitle )
      IF hWnd == 0
         MsgStop("Не нашёл окно: " + cTitle, "Error")
      ENDIF
@@ -413,28 +413,28 @@ STATIC FUNCTION SetCalcWindowToForeground(cFile)
       ShowWindow( hWnd, 3 )      // MAXIMIZE windows
       BringWindowToTop( hWnd )   // A window on the foreground
    ENDIF
-  
+
    RETURN NIL
 
 * ======================================================================
 * Использование EnumWindows - список окон программ в памяти
 * Using EnumWindows - a list of program windows in memory
-FUNCTION myGetWindowHandles(cText, lLogOut)     
-LOCAL nI, hWnd := 0, ahWnd := EnumWindows()  
+FUNCTION myGetWindowHandles(cText, lLogOut)
+LOCAL nI, hWnd := 0, ahWnd := EnumWindows()
 
-   IF ! Empty(lLogOut) 
-      FOR nI := 1 TO Len(ahWnd) 
-         ? nI, , ahWnd[ nI ], GetClassName(ahWnd[ nI ]), GetWindowText(ahWnd[ nI ]) 
-      NEXT 
+   IF ! Empty(lLogOut)
+      FOR nI := 1 TO Len(ahWnd)
+         ? nI, , ahWnd[ nI ], GetClassName(ahWnd[ nI ]), GetWindowText(ahWnd[ nI ])
+      NEXT
    ENDIF
 
-   cText := UPPER(cText) 
-   FOR nI := 1 TO Len(ahWnd) 
+   cText := UPPER(cText)
+   FOR nI := 1 TO Len(ahWnd)
       IF cText $ UPPER( GetWindowText(ahWnd[ nI ]) )
-         //? nI, , ahWnd[ nI ], GetClassName(ahWnd[ nI ]), GetWindowText(ahWnd[ nI ]) 
+         //? nI, , ahWnd[ nI ], GetClassName(ahWnd[ nI ]), GetWindowText(ahWnd[ nI ])
          hWnd := ahWnd[ nI ]
       ENDIF
-   NEXT 
+   NEXT
 
-RETURN hWnd 
+RETURN hWnd
 

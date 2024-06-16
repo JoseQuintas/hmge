@@ -11,14 +11,14 @@
 #include "tsbrowse.ch"
 #include "word.ch"
 
-#define wdWord8TableBehavior 0 
+#define wdWord8TableBehavior 0
 #define wdWord9TableBehavior 1
 #define wdAutoFitFixed       0
 #define wdAutoFitContent     1
 #define wdLineStyleSingle    1
 
 #define BUFFER_CLIPBOARD    1000000  // при появлении переносов строк в таблице
-                                     // можно увеличить размер 
+                                     // можно увеличить размер
 #define PBM_SETPOS          1026
 
 * =====================================================================================
@@ -37,7 +37,7 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
    Local lTsbSuperHd, lTsbHeading, lTsbFooting
    Local lBrSelector := oBrw:lSelector
    Local aColWidth := {}, rColWidth
-  
+
    Default cFile := "", lActivate := .T., hProgress := nil
    Default aTitle := {"",0}, hFont := 10, lSave := .F. , bExtern := nil
 
@@ -75,19 +75,19 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
 
    oWord:Visible := .F.                         // если открыты другие документы в Word-е
    oWord:DisplayAlerts := .F.                   // убрать предупреждения Word
-   oWord:Options:CheckSpellingAsYouType := .F.  // Отключить автопроверку текста документа 
+   oWord:Options:CheckSpellingAsYouType := .F.  // Отключить автопроверку текста документа
 
    // проверка суперхидер таблицы
    lTsbSuperHd := oBrw:lDrawSuperHd
    IF lTsbSuperHd
       lTsbSuperHd := ( AScan( oBrw:aSuperHead, {|a| !Empty(a[3]) } ) > 0 )
       // если суперхидер таблицы задан пустым, то нет вывода суперхидера таблицы
-      // пустой суперхидер задаётся в demo2.prg строка 232 - :aSuperhead[ 1, 3 ] := '' 
+      // пустой суперхидер задаётся в demo2.prg строка 232 - :aSuperhead[ 1, 3 ] := ''
    ENDIF
 
    // проверка шапки таблицы
    lTsbHeading := oBrw:lDrawHeaders
-   If lTsbHeading    
+   If lTsbHeading
       lTsbHeading := ( AScan( oBrw:aColumns, { |o| !Empty( o:cHeading ) } ) > 0 )
       // если шапка таблицы задана пустые колонки, то нет вывода шапки таблицы
       // пустая шапка задаётся в demo2.prg строка 266 - oCol:cHeading := '' или NIL
@@ -95,7 +95,7 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
 
    // проверка подвала таблицы
    lTsbFooting := oBrw:lDrawFooters
-   If lTsbFooting    
+   If lTsbFooting
       lTsbFooting := ( AScan( oBrw:aColumns, { |o| !Empty( o:cFooting ) } ) > 0 )
       // если подвал таблицы задан пустые колонки, то нет вывода подвала таблицы
       // пустой подвал задаётся в demo2.prg строка 269 - oCol:cFooting := '' или NIL
@@ -114,7 +114,7 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
    oBrw:lNoPaint := .F.
 
    If hProgress != Nil
-      nTotal := oBrw:nLen  
+      nTotal := oBrw:nLen
       SetProgressBarRange ( hProgress , 1 , nTotal )
       SendMessage(hProgress, PBM_SETPOS, 0, 0)
       nEvery := Max( 1, Int( nTotal * .02 ) ) // refresh hProgress every 2 %
@@ -122,7 +122,7 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
 
    // Нужно определиться с форматом листа для DOC.
    // Единица измерения для Word равна пунктам (points)
-   // так как размер таблицы представлены в пикселях, то будем считать далее в пикселах 
+   // так как размер таблицы представлены в пикселях, то будем считать далее в пикселах
    nWidthTsb := oBrw:GetAllColsWidth()    // ширина всех колонок таблицы (пикселы)
    ?  "  ------ nWidthTsb=",nWidthTsb,"(px, пикселы)"
 
@@ -131,24 +131,24 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
    // А4 = 2480 x 3508 px при dpi=300  // А4 = 1240 x 1754 px при dpi=150
    // А3 = 3508 x 4961 px при dpi=300  // А3 = 1754 x 2480 px при dpi=150
 
-   // Размер печати таблицы на листе = отступ слева + отступ справа 
+   // Размер печати таблицы на листе = отступ слева + отступ справа
    nLeftRightMargin := 29     // пунктам (points) (примерно 1 см) - отступ слева
    nPxLRM := 38.8 * 2         // пикселей - отступ слева + отступ справа
-   
-   // ------- Установка параметров страницы (листа) ------- 
+
+   // ------- Установка параметров страницы (листа) -------
    If nWidthTsb + nPxLRM >= 1754
       ? "  ==> The size of the paper to print the table is larger than A4"
-      // Word имеет ограничение в установке размеров - 55,87 см по любой из сторон листа. 
+      // Word имеет ограничение в установке размеров - 55,87 см по любой из сторон листа.
       // 55.87 сантиметров равно 1 583.717 пунктов
       // Высоту листа возьмем как у A4 (210х297 мм) == 297
-      // 297 миллиметров равно 841.889862 пункта 
+      // 297 миллиметров равно 841.889862 пункта
       oActive:PageSetup:PageWidth = 1583
       oActive:PageSetup:PageHeight = 841
       // книжная ориентация
       oActive:PageSetup:Orientation := wdOrientPortrait
    Else
       ? "  ==> The size of the paper to print the table is A4 "
-      oActive:PageSetup:PaperSize := wdPaperA4 
+      oActive:PageSetup:PaperSize := wdPaperA4
       If nWidthTsb + nPxLRM < 1240
          // книжная ориентация
          oActive:PageSetup:Orientation := wdOrientPortrait
@@ -157,7 +157,7 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
          oActive:PageSetup:Orientation := wdOrientLandscape
       Endif
    Endif
-   
+
    // поля страницы (отступ слева и справа)
    oActive:PageSetup:LeftMargin  := nLeftRightMargin //~1 см
    oActive:PageSetup:RightMargin := nLeftRightMargin //~1 см
@@ -171,12 +171,12 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
    // -------- Заголовок таблицы ------------------
    cTitle:= aTitle[1]
    cTitle := AllTrim( cTitle )
-   if !Empty(cTitle) 
+   if !Empty(cTitle)
      oText:HomeKey(wdStory)         // в начало текста
      aFont := GetFontParam( aTitle[2] )
      oText := oWord:Selection()
      oText:Text := cTitle + CRLF
-     oText:InsertAfter(CRLF) 
+     oText:InsertAfter(CRLF)
      oText:Font:Name = aFont[1]
      oText:Font:Size = aFont[2]
      oText:Font:Bold = aFont[3]
@@ -206,15 +206,15 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
 
    ///////// таблица без автоподстройки по ширине странице (вариант 2)  ////////////
    oTbl:= oActive:Tables:Add(oRange,nRowDbf,nColDbf,wdWord8TableBehavior,wdAutoFitFixed)
-   oTbl:Borders:OutsideLineStyle := wdLineStyleSingle 
-   oTbl:Borders:OutsideLineWidth := wdLineWidth100pt 
-   oTbl:Borders:InsideLineStyle := wdLineStyleSingle 
+   oTbl:Borders:OutsideLineStyle := wdLineStyleSingle
+   oTbl:Borders:OutsideLineWidth := wdLineWidth100pt
+   oTbl:Borders:InsideLineStyle := wdLineStyleSingle
 
-   nWidth := oActive:PageSetup:PageWidth  
+   nWidth := oActive:PageSetup:PageWidth
    nWidthWordTsb := oWord:PixelsToPoints( nWidthTsb, 0 )
 
-   // меняем ширину колонок пропорционально ширине Tsbrowse 
-   oColumn := oTbl:Columns 
+   // меняем ширину колонок пропорционально ширине Tsbrowse
+   oColumn := oTbl:Columns
    For nCol := 1 To Len( oBrw:aColumns )
       nPxToPnt := oWord:PixelsToPoints( oBrw:aColumns[ nCol ]:nWidth, 0 )
       rColWidth := (nWidth - 2 * nLeftRightMargin) / nWidthWordTsb * nPxToPnt
@@ -336,7 +336,7 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
         oRange:Paste()
         InkeyGui(100)
         cText := ""
-        nStart := nLine 
+        nStart := nLine
         flag_new_OutWrd:=.f.
       EndIf
 
@@ -360,9 +360,9 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
         oRange:=oActive:Range(oTbl:Cell( nLenHead+1, nCol):Range:Start, oTbl:Cell( nRowDbf-1, nColDbf):Range:End)
         oRange:Select()
         findObject := oRange:Find
-        MSWordFind_Replace(findObject, "&&", "^l") 
+        MSWordFind_Replace(findObject, "&&", "^l")
         DO EVENTS
-      Next           
+      Next
    EndIf
 
    CLEARCLIPBOARD()
@@ -379,15 +379,15 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
 
    oBrw:Reset()
 
-   If oBrw:lIsDbf
+   If oBrw:nBrowseType == BROWSE_TYPE_DBF
       ( oBrw:cAlias )->( DbGoTo( nRecNo ) )
       oBrw:GoPos(nOldRow, nOldCol)
    EndIf
    oBrw:nAt := nAt
 
    If lBrSelector // если есть селектор в таблице
-      oBrw:lSelector := .T.  
-      oBrw:InsColumn( oBrw:aClipBoard[ 2 ], oBrw:aClipBoard[ 1 ] ) 
+      oBrw:lSelector := .T.
+      oBrw:InsColumn( oBrw:aClipBoard[ 2 ], oBrw:aClipBoard[ 1 ] )
       oBrw:lNoPaint  := .F.
    EndIf
 
@@ -413,15 +413,15 @@ FUNCTION Brw2Doc(oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bExter
 RETURN NIL
 
 //////////////////////////////////////////////////////////////////////
-STATIC FUNCTION MSWordFind_Replace(oFind, cFind, cReplace) 
+STATIC FUNCTION MSWordFind_Replace(oFind, cFind, cReplace)
 
-   With object oFind 
-   :ClearFormatting() 
+   With object oFind
+   :ClearFormatting()
 
-   :Execute(cFind,0,0,0,0,0,1,1,0,cReplace,wdReplaceAll) 
+   :Execute(cFind,0,0,0,0,0,1,1,0,cReplace,wdReplaceAll)
 
-   :ClearFormatting() 
-   END 
+   :ClearFormatting()
+   END
 
 RETURN NIL
 
@@ -434,15 +434,15 @@ FUNCTION SetWordWindowToForeground(oWord)
    hWnd := 0
    nVer := VAL( oWord:Version ) // Версия Word
    IF nVer > 14  // Word 2010
-      hWnd := oWord:ActiveDocument:ActiveWindow:Hwnd 
+      hWnd := oWord:ActiveDocument:ActiveWindow:Hwnd
    ELSE
       //hWnd:=oWord:hwnd - так делать нельзя !
-      cCaption := oWord:Windows[1]:Caption  
+      cCaption := oWord:Windows[1]:Caption
       cTitle := cCaption + " - MICROSOFT WORD"
-      hWnd := FindWindowEx(,,, cTitle )    
+      hWnd := FindWindowEx(,,, cTitle )
       IF hWnd == 0
          cTitle := cCaption + " [Режим ограниченной функциональности] - MICROSOFT WORD"
-         hWnd := FindWindowEx(,,, cTitle )    
+         hWnd := FindWindowEx(,,, cTitle )
       ENDIF
    ENDIF
 
@@ -451,23 +451,23 @@ FUNCTION SetWordWindowToForeground(oWord)
       ShowWindow( hWnd, 3 )      // MAXIMIZE windows
       BringWindowToTop( hWnd )   // A window on the foreground
    ENDIF
-  
+
    RETURN NIL
 
 * =======================================================================================
 FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
    Local lTsbSuperHd, lTsbHeading, lTsbFooting, oRange
    LOCAL nLine, nCol, nRow, aFColor, nBColor, nFColor, oPar, lendTabl
-   LOCAL nCount, nTotal, nEvery, aFont, oCol, hFont, nmerge 
+   LOCAL nCount, nTotal, nEvery, aFont, oCol, hFont, nmerge
    LOCAL oldnFColor, aRCnFColor[4], oldaFont[3]
    LOCAL oldnBColor, aRCnBColor[4], aRCaFont[4]
 
-   // nLine := 1  // титул таблицы 
-   // nLine := 2  // пустая строка 
-   // nLine := 3  // суперхидер таблицы, если есть 
-   // nLine := 4  // шапка таблицы, если есть 
+   // nLine := 1  // титул таблицы
+   // nLine := 2  // пустая строка
+   // nLine := 3  // суперхидер таблицы, если есть
+   // nLine := 4  // шапка таблицы, если есть
    // nLine := 5  // ячейки таблицы, первая ячейка (если есть суперхидер и шапка таблицы)
-   // nLine := nLine + oBrw:nLen // подвал таблицы, если есть 
+   // nLine := nLine + oBrw:nLen // подвал таблицы, если есть
 
    // проверка суперхидер таблицы
    lTsbSuperHd := oBrw:lDrawSuperHd
@@ -477,22 +477,22 @@ FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
 
    // проверка шапки таблицы
    lTsbHeading := oBrw:lDrawHeaders
-   If lTsbHeading    
+   If lTsbHeading
       lTsbHeading := ( AScan( oBrw:aColumns, { |o| !Empty( o:cHeading ) } ) > 0 )
    Endif
 
    // проверка подвала таблицы
    lTsbFooting := oBrw:lDrawFooters
-   If lTsbFooting    
+   If lTsbFooting
       lTsbFooting := ( AScan( oBrw:aColumns, { |o| !Empty( o:cFooting ) } ) > 0 )
    Endif
 
    // Цвет шрифта титула таблицы (пример смены цвета)
    aFColor := BLUE
-   nLine := 1  
+   nLine := 1
    oTbl:Cell(nLine, 1):Range:Font:Color := RGB(aFColor[1],aFColor[2],aFColor[3])
 
-   nLine :=1 
+   nLine :=1
    // выводим цвета фона и текста суперхидера таблицы
    If lTsbSuperHd
 
@@ -507,7 +507,7 @@ FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
          oTbl:Cell(nLine, nmerge):Range:Font:Color    := nFColor  // Цвет шрифта шапки
          oTbl:Cell(nLine, nmerge):Range:Shading:BackgroundPatternColor := nBColor
 
-         If lTsbFont 
+         If lTsbFont
            oTbl:Cell(nLine, nmerge):Range:Font:Name := aFont[ 1 ]
            oTbl:Cell(nLine, nmerge):Range:Font:Size := aFont[ 2 ]
            oTbl:Cell(nLine, nmerge):Range:Font:Bold := aFont[ 3 ]
@@ -519,16 +519,16 @@ FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
    EndIf
 
    // выводим цвета фона и текста шапки таблицы
-   If lTsbHeading    
+   If lTsbHeading
 
       For nCol := 1 TO Len( oBrw:aColumns )
           oCol    := oBrw:aColumns[ nCol ]
-          nFColor := myColorN( oCol:nClrHeadFore, oBrw, nCol ) 
-          nBColor := myColorN( oCol:nClrHeadBack, oBrw, nCol ) 
+          nFColor := myColorN( oCol:nClrHeadFore, oBrw, nCol )
+          nBColor := myColorN( oCol:nClrHeadBack, oBrw, nCol )
 
           oTbl:Cell(nLine, nCol):Range:Font:Color    := nFColor  // Цвет шрифта шапки
           oTbl:Cell(nLine, nCol):Range:Shading:BackgroundPatternColor := nBColor // Цвет фона шапки
-          If lTsbFont 
+          If lTsbFont
             hFont := oCol:hFontHead              // шрифт шапки таблицы
             aFont := myFontParam( hFont, oBrw, nCol, 0 )
             oTbl:Cell(nLine, nCol):Range:Font:Name := aFont[ 1 ]
@@ -540,7 +540,7 @@ FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
    Endif
 
    If hProgress != Nil
-      nTotal := oBrw:nLen 
+      nTotal := oBrw:nLen
       SetProgressBarRange ( hProgress , 1 , nTotal )
       SendMessage(hProgress, PBM_SETPOS, 0, 0)
       nEvery := Max( 1, Int( nTotal * 0.05 ) ) // refresh hProgress every 5 %
@@ -558,12 +558,12 @@ FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
 
       For nCol := 1 TO Len( oBrw:aColumns )
          If nRow == oBrw:nLen.and.nCol == Len( oBrw:aColumns )
-            lendTabl :=.t. //флаг последней ячейки таблицы 
+            lendTabl :=.t. //флаг последней ячейки таблицы
          Endif
 
-        oCol    := oBrw:aColumns[ nCol ] 
-        nFColor := myColorN( oCol:nClrFore, oBrw, nCol, oBrw:nAt ) 
-          if (!oldnFColor == nFColor) 
+        oCol    := oBrw:aColumns[ nCol ]
+        nFColor := myColorN( oCol:nClrFore, oBrw, nCol, oBrw:nAt )
+          if (!oldnFColor == nFColor)
              //при изменении цвета либо по концу таблицы раскрашиваем область
              if !oldnFColor==Nil
                 oRange:=oActive:Range(oTbl:Cell( aRCnFColor[1], aRCnFColor[2]):Range:Start, oTbl:Cell( aRCnFColor[3], aRCnFColor[4]):Range:End)
@@ -579,7 +579,7 @@ FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
           Endif
 
 
-          nBColor := myColorN( oCol:nClrBack, oBrw, nCol, oBrw:nAt ) 
+          nBColor := myColorN( oCol:nClrBack, oBrw, nCol, oBrw:nAt )
           // Фон шрифта
           if (!oldnBColor == nBColor)
              // при изменении цвета либо по концу таблицы раскрашиваем область
@@ -597,7 +597,7 @@ FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
           Endif
 
            // Фонт шрифта
-          If lTsbFont 
+          If lTsbFont
             aFont := myFontParam( oCol:hFont, oBrw, nCol, oBrw:nAt )
 
             if (!(oldaFont[1] == aFont[1].and.oldaFont[2] == aFont[2].and.oldaFont[3] == aFont[3])).or.lEndTabl
@@ -635,37 +635,37 @@ FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
       ++nLine
       oBrw:Skip(1)
    Next
-   
+
    // выводим цвета фона и текста подвала таблицы
    If lTsbFooting
 
       For nCol := 1 TO Len( oBrw:aColumns )
-          oCol    := oBrw:aColumns[ nCol ] 
-          nFColor := myColorN( oCol:nClrFootFore, oBrw, nCol, oBrw:nAt ) 
-          nBColor := myColorN( oCol:nClrFootBack, oBrw, nCol, oBrw:nAt ) 
+          oCol    := oBrw:aColumns[ nCol ]
+          nFColor := myColorN( oCol:nClrFootFore, oBrw, nCol, oBrw:nAt )
+          nBColor := myColorN( oCol:nClrFootBack, oBrw, nCol, oBrw:nAt )
 
           oTbl:Cell(nLine, nCol):Range:Font:Color    := nFColor  // Цвет шрифта шапки
           oTbl:Cell(nLine, nCol):Range:Shading:BackgroundPatternColor := nBColor // Цвет фона шапки
-   
-          If lTsbFont 
+
+          If lTsbFont
              aFont := myFontParam( oCol:hFontFoot, oBrw, nCol, 0 )
-   
+
             oTbl:Cell(nLine, nCol):Range:Font:Name := aFont[ 1 ]
             oTbl:Cell(nLine, nCol):Range:Font:Size := aFont[ 2 ]
             oTbl:Cell(nLine, nCol):Range:Font:Bold := aFont[ 3 ]
           Endif
       Next
 
-      nLine++                          
+      nLine++
    Endif
 
    // Доп.надпись под таблицей
    aFColor := RED
    oPar := oActive:Paragraphs:Add()
-   oPar:Range:Font:Color := RGB(aFColor[1],aFColor[2],aFColor[3])   
-   oPar:Range:Font:Name  := "Times New Roman"   
-   oPar:Range:Font:Size  := 14   
-   oPar:Range:Font:Bold  := .T.   
+   oPar:Range:Font:Color := RGB(aFColor[1],aFColor[2],aFColor[3])
+   oPar:Range:Font:Name  := "Times New Roman"
+   oPar:Range:Font:Size  := 14
+   oPar:Range:Font:Bold  := .T.
    oPar:Range:Text:= CRLF + "End table ! - Version " + WordVersion(VAL(oWord:Version)) + CRLF
 
    RETURN Nil
@@ -674,29 +674,29 @@ FUNCTION WordOleExtern( hProgress, lTsbFont, oTbl, oBrw, oWord, oActive )
 STATIC FUNCTION myColorN( nColor, oBrw, nCol, nAt )
 
    If Valtype( nColor ) == "B"
-      If empty(nAt) 
+      If empty(nAt)
          nColor := Eval( nColor, nCol, oBrw )
       Else
          nColor := Eval( nColor, nAt, nCol, oBrw )
       EndIf
-   EndIf  
+   EndIf
 
    If Valtype( nColor ) == "A"
       nColor := nColor[1]
-   EndIf  
+   EndIf
 
 RETURN nColor
 
 * =======================================================================================
 STATIC FUNCTION myFontParam( hFont, oBrw, nCol, nAt )
-   LOCAL aFont, oCol := oBrw:aColumns[ nCol ] 
+   LOCAL aFont, oCol := oBrw:aColumns[ nCol ]
    DEFAULT nAt := 0
    // шрифт ячеек таблицы
-   hFont := If( hFont == Nil, oBrw:hFont, hFont )  
-   hFont := If( ValType( hFont ) == "B", Eval( hFont, nAt, nCol, oBrw ), hFont )  
+   hFont := If( hFont == Nil, oBrw:hFont, hFont )
+   hFont := If( ValType( hFont ) == "B", Eval( hFont, nAt, nCol, oBrw ), hFont )
 
    If empty(hFont)
-      aFont    := array(3) 
+      aFont    := array(3)
       aFont[1] := _HMG_DefaultFontName
       aFont[2] := _HMG_DefaultFontSize
       aFont[3] := .F.
@@ -724,4 +724,4 @@ STATIC FUNCTION WordVersion(nVer)
    aDim[17] := "Word 2019"
    aDim[18] := "Word New!"
 
-   RETURN aDim[nVer] 
+   RETURN aDim[nVer]

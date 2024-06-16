@@ -1,5 +1,5 @@
 /*
- * MINIGUI - Harbour Win32 GUI library Demo 
+ * MINIGUI - Harbour Win32 GUI library Demo
  *
  * Copyright 2018 Sergej Kiselev
  *
@@ -9,26 +9,26 @@
 #include "hbclass.ch"
 
 FUNC oTsb2Xml2Xls( cXml, oBrw, aTitle, aBefore, aAfter, aForma, cSheet )
-   LOCAL oXml 
+   LOCAL oXml
 
    oXml := Tsb2Xml2Xls():New(cXml, oBrw, aTitle, aBefore, aAfter, aForma, cSheet )
 
-   oXml:StyleForma  ()   
-   oXml:StyleTitle  ()   
-   oXml:StyleBefore ()   
-   oXml:StyleAfter  ()   
+   oXml:StyleForma  ()
+   oXml:StyleTitle  ()
+   oXml:StyleBefore ()
+   oXml:StyleAfter  ()
 
    oXml:StyleTable  ()
 
-   oXml:WriteForma  ()   
-   oXml:WriteTitle  ()   
-   oXml:WriteBefore ()   
-   oXml:WriteSuperHd()  
+   oXml:WriteForma  ()
+   oXml:WriteTitle  ()
+   oXml:WriteBefore ()
+   oXml:WriteSuperHd()
    oXml:WriteHeader ()
    oXml:WriteColumns()
-   oXml:WriteFooter ()   
-   oXml:WriteAfter  ()   
-   
+   oXml:WriteFooter ()
+   oXml:WriteAfter  ()
+
 RETURN oXml
 
 FUNC oColorN2H( cPref, nDef, cDef )
@@ -55,9 +55,9 @@ METHOD Name( nKey ) CLASS ColorN2H
    LOCAL cName := ::cPref
 
    If HB_ISARRAY( nKey )
-      cName += strzero(::oNH:Pos( nKey[1] ), ::nLenN ) 
+      cName += strzero(::oNH:Pos( nKey[1] ), ::nLenN )
       If len(nKey) > 1 .and. nKey[2] != Nil
-         cName += strzero(::oNH:Pos( nKey[2] ), ::nLenN ) 
+         cName += strzero(::oNH:Pos( nKey[2] ), ::nLenN )
       EndIf
    Else
       cName += strzero(::oNH:Pos( nKey )   , ::nLenN )
@@ -76,144 +76,144 @@ METHOD Def( nDef, cDef ) CLASS ColorN2H
       ::cDef := cDef
    EndIf
 
-   aClr := {                            ; 
-             CLR_BLACK                , ; 
-             CLR_MAROON               , ; 
-             CLR_DARKRED              , ; 
-             CLR_RED                  , ; 
-             CLR_ORANGERED            , ; 
-             CLR_DARKGREEN            , ; 
-             CLR_GREEN                , ; 
-             CLR_OLIVE                , ; 
-             CLR_DARKORANGE           , ; 
-             CLR_ORANGE               , ; 
-             CLR_GOLD                 , ; 
-             CLR_LAWNGREEN            , ; 
-             CLR_LIME                 , ; 
-             CLR_CHARTREUSE           , ; 
-             CLR_DARKGOLDENROD        , ; 
-             CLR_SADDLEBROWN          , ; 
-             CLR_CHOCOLATE            , ; 
-             CLR_GOLDENROD            , ; 
-             CLR_FIREBRICK            , ; 
-             CLR_FORESTGREEN          , ; 
-             CLR_OLIVEDRAB            , ; 
-             CLR_BROWN                , ; 
-             CLR_SIENNA               , ; 
-             CLR_DARKOLIVEGREEN       , ; 
-             CLR_GREENYELLOW          , ; 
-             CLR_LIMEGREEN            , ; 
-             CLR_YELLOWGREEN          , ; 
-             CLR_CRIMSON              , ; 
-             CLR_PERU                 , ; 
-             CLR_TOMATO               , ; 
-             CLR_DARKSLATEGRAY        , ; 
-             CLR_CORAL                , ; 
-             CLR_SEAGREEN             , ; 
-             CLR_YELLOW               , ; 
-             CLR_SANDYBROWN           , ; 
-             CLR_DIMGRAY              , ; 
-             CLR_DARKKHAKI            , ; 
-             CLR_MIDNIGHTBLUE         , ; 
-             CLR_MEDIUMSEAGREEN       , ; 
-             CLR_SALMON               , ; 
-             CLR_DARKSALMON           , ; 
-             CLR_LIGHTSALMON          , ; 
-             CLR_SPRINGGREEN          , ; 
-             CLR_NAVY                 , ; 
-             CLR_PURPLE               , ; 
-             CLR_TEAL                 , ; 
-             CLR_GRAY                 , ; 
-             CLR_LIGHTCORAL           , ; 
-             CLR_INDIGO               , ; 
-             CLR_MEDIUMVIOLETRED      , ; 
-             CLR_BURLYWOOD            , ; 
-             CLR_DARKBLUE             , ; 
-             CLR_DARKMAGENTA          , ; 
-             CLR_DARKSLATEBLUE        , ; 
-             CLR_DARKCYAN             , ; 
-             CLR_TAN                  , ; 
-             CLR_KHAKI                , ; 
-             CLR_ROSYBROWN            , ; 
-             CLR_DARKSEAGREEN         , ; 
-             CLR_SLATEGRAY            , ; 
-             CLR_LIGHTGREEN           , ; 
-             CLR_DEEPPINK             , ; 
-             CLR_PALEVIOLETRED        , ; 
-             CLR_PALEGREEN            , ; 
-             CLR_LIGHTSLATEGRAY       , ; 
-             CLR_MEDIUMSPRINGGREEN    , ; 
-             CLR_CADETBLUE            , ; 
-             CLR_DARKGRAY             , ; 
-             CLR_LIGHTSEAGREEN        , ; 
-             CLR_MEDIUMAQUAMARINE     , ; 
-             CLR_PALEGOLDENROD        , ; 
-             CLR_NAVAJOWHITE          , ; 
-             CLR_WHEAT                , ; 
-             CLR_HOTPINK              , ; 
-             CLR_STEELBLUE            , ; 
-             CLR_MOCCASIN             , ; 
-             CLR_PEACHPUFF            , ; 
-             CLR_SILVER               , ; 
-             CLR_LIGHTPINK            , ; 
-             CLR_BISQUE               , ; 
-             CLR_PINK                 , ; 
-             CLR_DARKORCHID           , ; 
-             CLR_MEDIUMTURQUOISE      , ; 
-             CLR_MEDIUMBLUE           , ; 
-             CLR_SLATEBLUE            , ; 
-             CLR_BLANCHEDALMOND       , ; 
-             CLR_LEMONCHIFFON         , ; 
-             CLR_TURQUOISE            , ; 
-             CLR_DARKTURQUOISE        , ; 
-             CLR_LIGHTGOLDENRODYELLOW , ; 
-             CLR_DARKVIOLET           , ; 
-             CLR_MEDIUMORCHID         , ; 
-             CLR_LIGHTGRAY            , ; 
-             CLR_AQUAMARINE           , ; 
-             CLR_PAPAYAWHIP           , ; 
-             CLR_ORCHID               , ; 
-             CLR_ANTIQUEWHITE         , ; 
-             CLR_THISTLE              , ; 
-             CLR_MEDIUMPURPLE         , ; 
-             CLR_GAINSBORO            , ; 
-             CLR_BEIGE                , ; 
-             CLR_CORNSILK             , ; 
-             CLR_PLUM                 , ; 
-             CLR_LIGHTSTEELBLUE       , ; 
-             CLR_LIGHTYELLOW          , ; 
-             CLR_ROYALBLUE            , ; 
-             CLR_MISTYROSE            , ; 
-             CLR_BLUEVIOLET           , ; 
-             CLR_LIGHTBLUE            , ; 
-             CLR_POWDERBLUE           , ; 
-             CLR_LINEN                , ; 
-             CLR_OLDLACE              , ; 
-             CLR_SKYBLUE              , ; 
-             CLR_CORNFLOWERBLUE       , ; 
-             CLR_MEDIUMSLATEBLUE      , ; 
-             CLR_VIOLET               , ; 
-             CLR_PALETURQUOISE        , ; 
-             CLR_SEASHELL             , ; 
-             CLR_FLORALWHITE          , ; 
-             CLR_HONEYDEW             , ; 
-             CLR_IVORY                , ; 
-             CLR_LAVENDERBLUSH        , ; 
-             CLR_WHITESMOKE           , ; 
-             CLR_LIGHTSKYBLUE         , ; 
-             CLR_LAVENDER             , ; 
-             CLR_SNOW                 , ; 
-             CLR_MINTCREAM            , ; 
-             CLR_BLUE                 , ; 
-             CLR_FUCHSIA              , ; 
-             CLR_DODGERBLUE           , ; 
-             CLR_DEEPSKYBLUE          , ; 
-             CLR_ALICEBLUE            , ; 
-             CLR_GHOSTWHITE           , ; 
-             CLR_CYAN                 , ; 
-             CLR_LIGHTCYAN            , ; 
-             CLR_AZURE                , ; 
-             CLR_WHITE                  ; 
+   aClr := {                            ;
+             CLR_BLACK                , ;
+             CLR_MAROON               , ;
+             CLR_DARKRED              , ;
+             CLR_RED                  , ;
+             CLR_ORANGERED            , ;
+             CLR_DARKGREEN            , ;
+             CLR_GREEN                , ;
+             CLR_OLIVE                , ;
+             CLR_DARKORANGE           , ;
+             CLR_ORANGE               , ;
+             CLR_GOLD                 , ;
+             CLR_LAWNGREEN            , ;
+             CLR_LIME                 , ;
+             CLR_CHARTREUSE           , ;
+             CLR_DARKGOLDENROD        , ;
+             CLR_SADDLEBROWN          , ;
+             CLR_CHOCOLATE            , ;
+             CLR_GOLDENROD            , ;
+             CLR_FIREBRICK            , ;
+             CLR_FORESTGREEN          , ;
+             CLR_OLIVEDRAB            , ;
+             CLR_BROWN                , ;
+             CLR_SIENNA               , ;
+             CLR_DARKOLIVEGREEN       , ;
+             CLR_GREENYELLOW          , ;
+             CLR_LIMEGREEN            , ;
+             CLR_YELLOWGREEN          , ;
+             CLR_CRIMSON              , ;
+             CLR_PERU                 , ;
+             CLR_TOMATO               , ;
+             CLR_DARKSLATEGRAY        , ;
+             CLR_CORAL                , ;
+             CLR_SEAGREEN             , ;
+             CLR_YELLOW               , ;
+             CLR_SANDYBROWN           , ;
+             CLR_DIMGRAY              , ;
+             CLR_DARKKHAKI            , ;
+             CLR_MIDNIGHTBLUE         , ;
+             CLR_MEDIUMSEAGREEN       , ;
+             CLR_SALMON               , ;
+             CLR_DARKSALMON           , ;
+             CLR_LIGHTSALMON          , ;
+             CLR_SPRINGGREEN          , ;
+             CLR_NAVY                 , ;
+             CLR_PURPLE               , ;
+             CLR_TEAL                 , ;
+             CLR_GRAY                 , ;
+             CLR_LIGHTCORAL           , ;
+             CLR_INDIGO               , ;
+             CLR_MEDIUMVIOLETRED      , ;
+             CLR_BURLYWOOD            , ;
+             CLR_DARKBLUE             , ;
+             CLR_DARKMAGENTA          , ;
+             CLR_DARKSLATEBLUE        , ;
+             CLR_DARKCYAN             , ;
+             CLR_TAN                  , ;
+             CLR_KHAKI                , ;
+             CLR_ROSYBROWN            , ;
+             CLR_DARKSEAGREEN         , ;
+             CLR_SLATEGRAY            , ;
+             CLR_LIGHTGREEN           , ;
+             CLR_DEEPPINK             , ;
+             CLR_PALEVIOLETRED        , ;
+             CLR_PALEGREEN            , ;
+             CLR_LIGHTSLATEGRAY       , ;
+             CLR_MEDIUMSPRINGGREEN    , ;
+             CLR_CADETBLUE            , ;
+             CLR_DARKGRAY             , ;
+             CLR_LIGHTSEAGREEN        , ;
+             CLR_MEDIUMAQUAMARINE     , ;
+             CLR_PALEGOLDENROD        , ;
+             CLR_NAVAJOWHITE          , ;
+             CLR_WHEAT                , ;
+             CLR_HOTPINK              , ;
+             CLR_STEELBLUE            , ;
+             CLR_MOCCASIN             , ;
+             CLR_PEACHPUFF            , ;
+             CLR_SILVER               , ;
+             CLR_LIGHTPINK            , ;
+             CLR_BISQUE               , ;
+             CLR_PINK                 , ;
+             CLR_DARKORCHID           , ;
+             CLR_MEDIUMTURQUOISE      , ;
+             CLR_MEDIUMBLUE           , ;
+             CLR_SLATEBLUE            , ;
+             CLR_BLANCHEDALMOND       , ;
+             CLR_LEMONCHIFFON         , ;
+             CLR_TURQUOISE            , ;
+             CLR_DARKTURQUOISE        , ;
+             CLR_LIGHTGOLDENRODYELLOW , ;
+             CLR_DARKVIOLET           , ;
+             CLR_MEDIUMORCHID         , ;
+             CLR_LIGHTGRAY            , ;
+             CLR_AQUAMARINE           , ;
+             CLR_PAPAYAWHIP           , ;
+             CLR_ORCHID               , ;
+             CLR_ANTIQUEWHITE         , ;
+             CLR_THISTLE              , ;
+             CLR_MEDIUMPURPLE         , ;
+             CLR_GAINSBORO            , ;
+             CLR_BEIGE                , ;
+             CLR_CORNSILK             , ;
+             CLR_PLUM                 , ;
+             CLR_LIGHTSTEELBLUE       , ;
+             CLR_LIGHTYELLOW          , ;
+             CLR_ROYALBLUE            , ;
+             CLR_MISTYROSE            , ;
+             CLR_BLUEVIOLET           , ;
+             CLR_LIGHTBLUE            , ;
+             CLR_POWDERBLUE           , ;
+             CLR_LINEN                , ;
+             CLR_OLDLACE              , ;
+             CLR_SKYBLUE              , ;
+             CLR_CORNFLOWERBLUE       , ;
+             CLR_MEDIUMSLATEBLUE      , ;
+             CLR_VIOLET               , ;
+             CLR_PALETURQUOISE        , ;
+             CLR_SEASHELL             , ;
+             CLR_FLORALWHITE          , ;
+             CLR_HONEYDEW             , ;
+             CLR_IVORY                , ;
+             CLR_LAVENDERBLUSH        , ;
+             CLR_WHITESMOKE           , ;
+             CLR_LIGHTSKYBLUE         , ;
+             CLR_LAVENDER             , ;
+             CLR_SNOW                 , ;
+             CLR_MINTCREAM            , ;
+             CLR_BLUE                 , ;
+             CLR_FUCHSIA              , ;
+             CLR_DODGERBLUE           , ;
+             CLR_DEEPSKYBLUE          , ;
+             CLR_ALICEBLUE            , ;
+             CLR_GHOSTWHITE           , ;
+             CLR_CYAN                 , ;
+             CLR_LIGHTCYAN            , ;
+             CLR_AZURE                , ;
+             CLR_WHITE                  ;
            }
 
    AEval( aClr, {|nclr| ::oNH:Set( nclr, HMG_ClrToHTML( nclr ) ) } )
@@ -228,29 +228,29 @@ CLASS Tsb2Xml2Xls
   VAR nCol         INIT 1
   VAR cFile        INIT "Book.xml"
   VAR oBrw
-  VAR oXml 
+  VAR oXml
   VAR cSheet       INIT "Sheet1"
   VAR oSheet
   VAR aForma
   VAR hFormaFont
   VAR nFormaAlign
-  VAR nFormaFore 
-  VAR nFormaBack 
+  VAR nFormaFore
+  VAR nFormaBack
   VAR aTitle
   VAR hTitleFont
   VAR nTitleAlign
-  VAR nTitleFore 
-  VAR nTitleBack 
+  VAR nTitleFore
+  VAR nTitleBack
   VAR aBefore
   VAR hBeforeFont
   VAR nBeforeAlign
-  VAR nBeforeFore 
-  VAR nBeforeBack 
-  VAR aAfter 
+  VAR nBeforeFore
+  VAR nBeforeBack
+  VAR aAfter
   VAR hAfterFont
   VAR nAfterAlign
-  VAR nAfterFore 
-  VAR nAfterBack 
+  VAR nAfterFore
+  VAR nAfterBack
   VAR aLogicalText INIT { "Yes", "No" }
   VAR cDateFormat  INIT "dd.mm.yyyy"
   VAR lActivate    INIT .T.
@@ -274,9 +274,9 @@ CLASS Tsb2Xml2Xls
   VAR nClrHead     INIT CLR_HGRAY
   VAR nClrFoot     INIT CLR_HGRAY
 
-  VAR cShellExec 
+  VAR cShellExec
   // cShellExec := "C:\Program Files\OpenOffice 4\program\scalc.exe"
-  // cShellExec := "C:\Program Files (x86)\OpenOffice 4\program\scalc.exe"   
+  // cShellExec := "C:\Program Files (x86)\OpenOffice 4\program\scalc.exe"
 
   METHOD New( cFile, oBrw, aTitle, aBefore, aAfter, Forma, cSheet )
 
@@ -286,26 +286,26 @@ CLASS Tsb2Xml2Xls
   METHOD StyleTable()
   METHOD StyleCreate( cName )
 
-  METHOD StyleForma  () 
-  METHOD StyleTitle  () 
-  METHOD StyleBefore () 
-  METHOD StyleAfter  () 
+  METHOD StyleForma  ()
+  METHOD StyleTitle  ()
+  METHOD StyleBefore ()
+  METHOD StyleAfter  ()
   METHOD StyleSet( cKey, xVal, cPic, nAlign, nBord, hFont, nFore, nBack )
 
-  METHOD WriteForma  () 
-  METHOD WriteTitle  () 
-  METHOD WriteBefore () 
-  METHOD WriteSuperHd() 
-  METHOD WriteHeader () 
+  METHOD WriteForma  ()
+  METHOD WriteTitle  ()
+  METHOD WriteBefore ()
+  METHOD WriteSuperHd()
+  METHOD WriteHeader ()
   METHOD WriteColumns()
   METHOD WriteFooter ()
-  METHOD WriteAfter  () 
+  METHOD WriteAfter  ()
   METHOD WriteValue( nRow, nCol, xVal, cPic, cNam, nMerge )
 
   METHOD WriteData()
 
 ENDCLASS
-  
+
 METHOD New( cFile, oBrw, aTitle, aBefor, aAfter, aForma, cSheet ) CLASS Tsb2Xml2Xls
    LOCAL i, oCol, nCell
    DEFAULT cFile  := ::cFile, ;
@@ -325,10 +325,10 @@ METHOD New( cFile, oBrw, aTitle, aBefor, aAfter, aForma, cSheet ) CLASS Tsb2Xml2
 
    AEval(array(5), {|xb,nb| ::oBorder:Set(nb-1, 'B' + hb_ntos(::oBorder:Len)) })
 
-   ::nOldRec := iif( oBrw:lIsDbf, ( oBrw:cAlias )->( RecNo() ), oBrw:nAt )
+   ::nOldRec := iif( oBrw:nBrowseType == BROWSE_TYPE_DBF, ( oBrw:cAlias )->( RecNo() ), oBrw:nAt )
    ::nOldRow := oBrw:nLogicPos()
    ::nOldCol := oBrw:nCell
-   
+
    If ! empty( aForma )
       If ! HB_ISARRAY( aForma ); aForma := { { aForma } }
       EndIf
@@ -336,7 +336,7 @@ METHOD New( cFile, oBrw, aTitle, aBefor, aAfter, aForma, cSheet ) CLASS Tsb2Xml2
       i := Len( aForma )
 
       ::aForma := aForma[1]
-      
+
       If     i == 2
          ::hFormaFont  := aForma[2]
       ElseIf i == 3
@@ -353,7 +353,7 @@ METHOD New( cFile, oBrw, aTitle, aBefor, aAfter, aForma, cSheet ) CLASS Tsb2Xml2
          ::nFormaBack  := aForma[5]
       EndIf
    EndIf
-   
+
    If ! empty( aTitle )
       If ! HB_ISARRAY( aTitle ); aTitle := { { aTitle } }
       EndIf
@@ -361,7 +361,7 @@ METHOD New( cFile, oBrw, aTitle, aBefor, aAfter, aForma, cSheet ) CLASS Tsb2Xml2
       i := Len( aTitle )
 
       ::aTitle := aTitle[1]
-      
+
       If     i == 2
          ::hTitleFont  := aTitle[2]
       ElseIf i == 3
@@ -378,7 +378,7 @@ METHOD New( cFile, oBrw, aTitle, aBefor, aAfter, aForma, cSheet ) CLASS Tsb2Xml2
          ::nTitleBack  := aTitle[5]
       EndIf
    EndIf
-   
+
    If ! empty( aBefor )
       If ! HB_ISARRAY( aBefor ); aBefor := { { aBefor } }
       EndIf
@@ -401,7 +401,7 @@ METHOD New( cFile, oBrw, aTitle, aBefor, aAfter, aForma, cSheet ) CLASS Tsb2Xml2
          ::nBeforeBack  := aBefor[5]
       EndIf
    EndIf
-   
+
    If ! empty( aAfter )
       If ! HB_ISARRAY( aAfter ); aAfter := { { aAfter } }
       EndIf
@@ -448,27 +448,27 @@ METHOD New( cFile, oBrw, aTitle, aBefor, aAfter, aForma, cSheet ) CLASS Tsb2Xml2
            ::hBeforeFont  := oBrw:hFont, ;
            ::nBeforeAlign := DT_LEFT,    ;
            ::hAfterFont   := oBrw:hFont, ;
-           ::nAfterAlign  := DT_LEFT      
+           ::nAfterAlign  := DT_LEFT
 
 RETURN Self
 
 METHOD StyleOut( cName, hFont, nAlign, cFrm, nFore, nBack, nBord ) CLASS Tsb2Xml2Xls
    LOCAL aFont  := GetFontParam( hFont )
    LOCAL oStyle := ::oXml:addStyle( cName )
-  
+
    oStyle:alignHorizontal( ::cAlign( nAlign    ) )
    oStyle:alignVertical  ( ::cAlign( DT_CENTER ) )
    oStyle:SetfontName( aFont[1] )
    oStyle:SetfontSize( aFont[2] )
       If aFont[3]
-   oStyle:setFontBold()         
-      EndIf                                     
+   oStyle:setFontBold()
+      EndIf
       If aFont[4]
-   oStyle:setFontItalic()       
-      EndIf                                     
+   oStyle:setFontItalic()
+      EndIf
       If aFont[5]
-   oStyle:setFontUnderline()    
-      EndIf                                     
+   oStyle:setFontUnderline()
+      EndIf
       If aFont[6]
    oStyle:setFontStrikethrough()
       EndIf
@@ -476,7 +476,7 @@ METHOD StyleOut( cName, hFont, nAlign, cFrm, nFore, nBack, nBord ) CLASS Tsb2Xml
    oStyle:setFontColor( ::oFore:Get( nFore ) )
       EndIf
       If nBack != Nil
-   oStyle:bgColor     ( ::oBack:Get( nBack ) )  
+   oStyle:bgColor     ( ::oBack:Get( nBack ) )
       EndIf
       If nBord != Nil .and. nBord >= 0 .and. nBord <= ::oBorder:Len
    oStyle:Border( "All", nBord, "Automatic",  "Continuous" )
@@ -492,7 +492,7 @@ RETURN Nil
 
 METHOD StyleForma() CLASS Tsb2Xml2Xls
    LOCAL cName, hFont, nAlign, cFrm, nFore, nBack, nBord
-   
+
    If empty( ::aForma ); RETURN Nil
    EndIf
 
@@ -501,7 +501,7 @@ METHOD StyleForma() CLASS Tsb2Xml2Xls
    nAlign := ::nFormaAlign
 
    ::StyleOut( cName, hFont, nAlign, cFrm, nFore, nBack, nBord )
-  
+
 RETURN Nil
 
 METHOD StyleTitle() CLASS Tsb2Xml2Xls
@@ -515,21 +515,21 @@ METHOD StyleTitle() CLASS Tsb2Xml2Xls
    nAlign := ::nTitleAlign
 
    ::StyleOut( cName, hFont, nAlign, cFrm, nFore, nBack, nBord )
-  
+
 RETURN Nil
 
 METHOD StyleBefore() CLASS Tsb2Xml2Xls
    LOCAL cName, hFont, nAlign, cFrm, nFore, nBack, nBord
 
    If empty( ::aBefore ); RETURN Nil
-   EndIf               
+   EndIf
 
    cName  := "Before"
    hFont  := ::hBeforeFont
    nAlign := ::nBeforeAlign
 
    ::StyleOut( cName, hFont, nAlign, cFrm, nFore, nBack, nBord )
-   
+
 RETURN Nil
 
 METHOD StyleAfter() CLASS Tsb2Xml2Xls
@@ -561,7 +561,7 @@ METHOD WriteForma  ()  CLASS Tsb2Xml2Xls
    nLen := Len( ::oBrw:aColumns )
 
    FOR i := 1 TO Len( aForma )
-       ::WriteValue(nRow + i - 1, 1, aForma[ i ], , cName, nLen - 1) 
+       ::WriteValue(nRow + i - 1, 1, aForma[ i ], , cName, nLen - 1)
        ::nRow++
    NEXT
 
@@ -582,7 +582,7 @@ METHOD WriteTitle  ()  CLASS Tsb2Xml2Xls
    nLen := Len( ::oBrw:aColumns )
 
    FOR i := 1 TO Len( aTitle )
-       ::WriteValue(nRow + i - 1, 1, aTitle[ i ], , cName, nLen - 1) 
+       ::WriteValue(nRow + i - 1, 1, aTitle[ i ], , cName, nLen - 1)
        ::nRow++
    NEXT
 
@@ -603,7 +603,7 @@ METHOD WriteBefore ()  CLASS Tsb2Xml2Xls
    nLen := Len( ::oBrw:aColumns )
 
    FOR i := 1 TO Len( aBefor )
-       ::WriteValue(nRow + i - 1, 1, aBefor[ i ], , cName, nLen - 1) 
+       ::WriteValue(nRow + i - 1, 1, aBefor[ i ], , cName, nLen - 1)
        ::nRow++
    NEXT
 
@@ -624,7 +624,7 @@ METHOD WriteAfter  ()  CLASS Tsb2Xml2Xls
    nLen := Len( ::oBrw:aColumns )
 
    FOR i := 1 TO Len( aAfter )
-       ::WriteValue(nRow + i - 1, 1, aAfter[ i ], , cName, nLen - 1) 
+       ::WriteValue(nRow + i - 1, 1, aAfter[ i ], , cName, nLen - 1)
        ::nRow++
    NEXT
 
@@ -644,7 +644,7 @@ METHOD WriteSuperHd()  CLASS Tsb2Xml2Xls
        n := :aSuperHead[ i ][1]
        k := :aSuperHead[ i ][2]
        ::WriteValue( nRow, n, t, , s, k - n )
-   NEXT 
+   NEXT
    ::oSheet:cellHeight ( nRow, 1, :nHeightSuper )
    ::nRow++
    END WITH
@@ -665,7 +665,7 @@ METHOD WriteHeader ()  CLASS Tsb2Xml2Xls
        nCell++
        t := :GetValProp( o:cHeading, "", i )
        ::WriteValue( nRow, nCell, t, , s )
-   NEXT 
+   NEXT
    ::oSheet:cellHeight( nRow, 1, :nHeightHead )
    ::nRow++
    END WITH
@@ -700,13 +700,13 @@ METHOD WriteColumns()  CLASS Tsb2Xml2Xls
    ENDDO
    ::nRow := nRow
    END WITH
-   
+
 RETURN Nil
 
 METHOD WriteFooter ()  CLASS Tsb2Xml2Xls
    LOCAL a, c, o, i, t, s
    LOCAL nRow  := ::nRow
-   LOCAL cPref := "F", nCell 
+   LOCAL cPref := "F", nCell
 
    WITH OBJECT ::oBrw
    nCell := 0
@@ -718,16 +718,16 @@ METHOD WriteFooter ()  CLASS Tsb2Xml2Xls
        nCell++
        t := :GetValProp( o:cFooting, "", i )
        ::WriteValue( nRow, nCell, t, , s )
-   NEXT 
+   NEXT
    ::oSheet:cellHeight( nRow, 1, :nHeightFoot )
    ::nRow++
    END WITH
-   
+
 RETURN Nil
 
 METHOD WriteValue( nRow, nCol, xVal, cPic, cNameStyle, nMerge )  CLASS Tsb2Xml2Xls
    LOCAL cTyp := ValType( xVal ), cName, aVal
-   
+
    If   ! empty( ::oStyles:Get(cNameStyle) )
       cName := cNameStyle
    ElseIf empty( aVal := ::oName:Get( cNameStyle ) )
@@ -764,7 +764,7 @@ METHOD WriteValue( nRow, nCol, xVal, cPic, cNameStyle, nMerge )  CLASS Tsb2Xml2X
    If HB_ISNUMERIC( nMerge )
       ::oSheet:cellMerge( nRow, nCol, nMerge, 0 )
    EndIf
-   
+
 RETURN Nil
 
 METHOD WriteData()  CLASS Tsb2Xml2Xls
@@ -796,7 +796,7 @@ METHOD WriteData()  CLASS Tsb2Xml2Xls
    EndIf
    :Display()
    END WITH
-   
+
 RETURN Nil
 
 METHOD StyleTable()  CLASS Tsb2Xml2Xls
@@ -807,7 +807,7 @@ METHOD StyleTable()  CLASS Tsb2Xml2Xls
    LOCAL oFore := ::oFore, cFore, nFore
    LOCAl oBack := ::oBack, cBack, nBack
    LOCAL oName := ::oName, cName
-   
+
    WITH OBJECT ::oBrw
    // selected fonts. SuperHead
    FOR nCol := 1 TO Len( :aSuperHead )
@@ -829,7 +829,7 @@ METHOD StyleTable()  CLASS Tsb2Xml2Xls
    // selected fonts. All cell
    Eval( :bGoTop )
    nCnt  := :nLen
-   nLine := 1 
+   nLine := 1
    DO WHILE nLine <= nCnt
        cLine := hb_ntos(nLine)
        FOR nCol := 1  To Len( :aColumns )
@@ -904,7 +904,7 @@ METHOD StyleTable()  CLASS Tsb2Xml2Xls
    // all cell
    Eval( :bGoTop )
    nCnt  := :nLen
-   nLine := 1 
+   nLine := 1
    DO WHILE nLine <= nCnt
        cLine := hb_ntos(nLine)
        FOR nCol := 1  To Len( :aColumns )
@@ -956,11 +956,11 @@ METHOD StyleTable()  CLASS Tsb2Xml2Xls
    :GotoRec(::nOldRec)
    :GoPos( ::nOldRow, ::nOldCol )
    :Display()
-   
+
    END WITH
-   
+
    ::StyleCreate()
-  
+
 RETURN Nil
 
 METHOD StyleCreate( cKey )  CLASS Tsb2Xml2Xls
@@ -988,27 +988,27 @@ METHOD StyleCreate( cKey )  CLASS Tsb2Xml2Xls
        cTyp   := aName[6]
        cFrm   := aName[7]
        aFont  := GetFontParam( hFont )
-  
+
        oStyle := ::oXml:addStyle( cName )
-  
+
        oStyle:alignHorizontal( ::cAlign( nAlign    ) )
        oStyle:alignVertical  ( ::cAlign( DT_CENTER ) )
        oStyle:SetfontName( aFont[1] )
        oStyle:SetfontSize( aFont[2] )
           If aFont[3]
-       oStyle:setFontBold()         
-          EndIf                                     
+       oStyle:setFontBold()
+          EndIf
           If aFont[4]
-       oStyle:setFontItalic()       
-          EndIf                                     
+       oStyle:setFontItalic()
+          EndIf
           If aFont[5]
-       oStyle:setFontUnderline()    
-          EndIf                                     
+       oStyle:setFontUnderline()
+          EndIf
           If aFont[6]
        oStyle:setFontStrikethrough()
           EndIf
        oStyle:setFontColor( ::oFore:Get( nFore ) )
-       oStyle:bgColor     ( ::oBack:Get( nBack ) )  
+       oStyle:bgColor     ( ::oBack:Get( nBack ) )
           If nBord >= 0 .and. nBord <= ::oBorder:Len
        oStyle:Border( "All", nBord, "Automatic",  "Continuous" )
           EndIf
@@ -1061,5 +1061,5 @@ METHOD StyleSet( cKey, xVal, cPic, nAlign, nBord, hFont, nFore, nBack ) CLASS Ts
 
    ::oStyl:Set( cKey , cName )
    ::oName:Set( cName, { hFont, nFore, nBack, nAlign, nBord, cTyp, cFrm } )
-   
+
 RETURN cName

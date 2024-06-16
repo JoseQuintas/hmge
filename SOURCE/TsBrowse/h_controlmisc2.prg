@@ -235,7 +235,7 @@ FUNCTION SBrowse( uAlias, cTitle, bSetUp, aCols, nWidth, nHeight, lSql, lModal, 
          oCol:nAlign := iif( oCol:cName == "KEY", DT_CENTER, DT_LEFT )
       NEXT
       oBrw:AdjColumns( nY )
-      IF HB_ISOBJECT( oBrw:Cargo ) .AND. oBrw:ClassName == "TSBROWSE" .AND. oBrw:Cargo:lIsDbf
+      IF HB_ISOBJECT( oBrw:Cargo ) .AND. oBrw:ClassName == "TSBROWSE" .AND. oBrw:Cargo:nBrowseType == BROWSE_TYPE_DBF
          oBrw:Cargo:lRecLockArea := .T.
          oCol := oBrw:GetColumn( "VALUE" )
          oCol:lEdit := .T.
@@ -248,7 +248,7 @@ FUNCTION SBrowse( uAlias, cTitle, bSetUp, aCols, nWidth, nHeight, lSql, lModal, 
          xv := obr:GetValue( "VALUE" )
          obr:GetColumn( "VALUE" ):Cargo := NIL
          ob := obr:Cargo
-         IF ! HB_ISOBJECT( ob ) .OR. ! ob:lIsDbf
+         IF ! HB_ISOBJECT( ob ) .OR. ob:nBrowseType != BROWSE_TYPE_DBF
             RETURN .F.
          ENDIF
          oc := ob:GetColumn( cn )
@@ -275,7 +275,7 @@ FUNCTION SBrowse( uAlias, cTitle, bSetUp, aCols, nWidth, nHeight, lSql, lModal, 
             RETURN NIL
          ENDIF
          ob := obr:Cargo
-         IF ! HB_ISOBJECT( ob ) .OR. ! ob:lIsDbf
+         IF ! HB_ISOBJECT( ob ) .OR. ob:nBrowseType != BROWSE_TYPE_DBF
             RETURN NIL
          ENDIF
          oc := ob:GetColumn( cn )

@@ -621,7 +621,7 @@ FUNCTION SBrowse_Viewer( uTsb, nW, nH, cTitul, lNumber, aFont, lModal, lCenter )
         IF hb_IsBlock(oTsb:bBefore) ; Eval(oTsb:bBefore, ob, oTsb)
         ENDIF
      ELSE                                   // after END TBROWSE
-        nColNo := ob:nColumn( iif( ob:lIsDbf, "ORDKEYNO", "ARRAYNO" ) )
+        nColNo := ob:nColumn( iif( ob:nBrowseType == BROWSE_TYPE_DBF, "ORDKEYNO", "ARRAYNO" ) )
         IF nColNo > 0
            oCol := ob:aColumns[ nColNo ]
            IF !Empty(oTsb:aFHand[1]) ; oCol:hFont := oTsb:aFHand[1]

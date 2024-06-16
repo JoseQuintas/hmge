@@ -375,7 +375,7 @@ FUNCTION Brw4XlsOle( oBrw, cFile, lActivate, hProgress, aTitle, hFont, lSave, bE
 
    // вернуть первоначальную позицию курсора в таблице
    oBrw:Reset()
-   If oBrw:lIsDbf
+   If oBrw:nBrowseType == BROWSE_TYPE_DBF
       ( oBrw:cAlias )->( DbGoTo( nRecNo ) )
       oBrw:GoPos(nOldRow, nOldCol)
    EndIf

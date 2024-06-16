@@ -22,7 +22,7 @@ FUNCTION XmlSetDefault( oBrw )
 
        oCol := oBrw:aColumns[n]
 
-       __objAddData  (oCol, 'XML_ColWidth'     )         
+       __objAddData  (oCol, 'XML_ColWidth'     )
        oCol:XML_ColWidth   := oBrw:aColumns[n]:nWidth / 1.3
 
        __objAddData  (oCol, 'XML_ColFontName'  )
@@ -120,7 +120,7 @@ FUNCTION XmlResetDefault( oBrw )
    Return nil
 
 * ======================================================================
-FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel ) 
+FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    LOCAL oXml, oSheet, oStyle, uData
    LOCAL nLen, nLine, cTitle, i
    LOCAL nRow  :=  0
@@ -131,11 +131,11 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    LOCAL cAlign := ''
    LOCAL cType  := ''
    LOCAL aFont  := {} , aFontTemp := {}
-   LOCAL nRec := iif( oBrw:lIsDbf, ( oBrw:cAlias )->( RecNo() ), 0 )
+   LOCAL nRec := iif( oBrw:nBrowseType == BROWSE_TYPE_DBF, ( oBrw:cAlias )->( RecNo() ), 0 )
    LOCAL nOldRow := oBrw:nLogicPos()
    LOCAL nOldCol := oBrw:nCell
    LOCAL lError   := .F.
-   LOCAL nColHead 
+   LOCAL nColHead
    LOCAL lTsbSuperHd, lTsbHeading, lTsbFooting
    LOCAL nColDbf , aCol
 
@@ -147,12 +147,12 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    IF lTsbSuperHd
       lTsbSuperHd := ( AScan( oBrw:aSuperHead, {|a| !Empty(a[3]) } ) > 0 )
       // если суперхидер таблицы задан пустым, то нет вывода суперхидера таблицы
-      // пустой суперхидер задаётся в demo2.prg строка 232 - :aSuperhead[ 1, 3 ] := '' 
+      // пустой суперхидер задаётся в demo2.prg строка 232 - :aSuperhead[ 1, 3 ] := ''
    ENDIF
 
    // проверка шапки таблицы
    lTsbHeading := oBrw:lDrawHeaders
-   If lTsbHeading    
+   If lTsbHeading
       lTsbHeading := ( AScan( oBrw:aColumns, { |o| !Empty( o:cHeading ) } ) > 0 )
       // если шапка таблицы задана пустые колонки, то нет вывода шапки таблицы
       // пустая шапка задаётся в demo2.prg строка 266 - oCol:cHeading := '' или NIL
@@ -160,7 +160,7 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
 
    // проверка подвала таблицы
    lTsbFooting := oBrw:lDrawFooters
-   If lTsbFooting    
+   If lTsbFooting
       lTsbFooting := ( AScan( oBrw:aColumns, { |o| !Empty( o:cFooting ) } ) > 0 )
       // если подвал таблицы задан пустые колонки, то нет вывода подвала таблицы
       // пустой подвал задаётся в demo2.prg строка 269 - oCol:cFooting := '' или NIL
@@ -191,7 +191,7 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    // Определяем Лист
    oSheet := oXml:addSheet( "Sheet1" )
 
-   //Определяем колонки  
+   //Определяем колонки
    if aColSel= Nil .or. Len(aColSel) = 0
      aColSel := CalcAcolselForTbl( oBrw,aColSel)
    Endif
@@ -244,8 +244,8 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
                Exit
          End switch
 
-     oStyle:alignVertical( cAlign )  
-     oStyle:bgColor( HMG_ClrToHTML(oBrw:nClrHeadBack) ) 
+     oStyle:alignVertical( cAlign )
+     oStyle:bgColor( HMG_ClrToHTML(oBrw:nClrHeadBack) )
      oStyle:SetfontName( GetFontParam(oBrw:aSuperHead[i][7])[1] )
      oStyle:SetfontSize( GetFontParam(oBrw:aSuperHead[i][7])[2] )
      if  GetFontParam(oBrw:aSuperHead[i][7])[3]
@@ -261,13 +261,13 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
     nColHead := 0
     FOR EACH i IN aColSel
        nColHead ++
-       If lTsbHeading    
+       If lTsbHeading
        //Определяем стили шапки таблицы
           oStyle := oXml:addStyle( "H" + hb_ntoc(nColHead) )
           oStyle:Border( "All", 2, "Automatic",  "Continuous" )
           oStyle:alignHorizontal( "Center" )
           oStyle:alignVertical( "Center" )
-          oStyle:bgColor( HMG_ClrToHTML(oBrw:nClrHeadBack) ) 
+          oStyle:bgColor( HMG_ClrToHTML(oBrw:nClrHeadBack) )
           oStyle:alignWraptext()
           oStyle:SetfontName( oBrw:aColumns[i]:XML_HdrFontName  )
           oStyle:SetfontSize( oBrw:aColumns[i]:XML_HdrFontSize )
@@ -292,13 +292,13 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
          oStyle:setNumberFormat( oBrw:aColumns[i]:XML_Format )
        end
 
-       If lTsbFooting    
+       If lTsbFooting
        //Определяем стили колонок подвала таблицы
           oStyle := oXml:addStyle( "F" + hb_ntoc(nColHead) )
           oStyle:Border( "All", 2, "Automatic",  "Continuous" )
           oStyle:alignHorizontal( "Center" )
           oStyle:alignVertical( "Center" )
-          oStyle:bgColor( HMG_ClrToHTML(oBrw:nClrFootBack) ) 
+          oStyle:bgColor( HMG_ClrToHTML(oBrw:nClrFootBack) )
           oStyle:alignWraptext()
           oStyle:SetfontName( oBrw:aColumns[i]:XML_FootFontName  )
           oStyle:SetfontSize( oBrw:aColumns[i]:XML_FootFontSize )
@@ -313,7 +313,7 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    // Пишем название отчета
    cTitle:= aTitle[1]
    cTitle := AllTrim( cTitle )
-   If !Empty(cTitle) 
+   If !Empty(cTitle)
       oSheet:writeString( nRow, 1, cTitle, "Title" )
       nRow++
    Endif
@@ -329,8 +329,8 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
          oSheet:cellMerge(    nRow, MaxNumFromArr(aColSel,aCol[1]), MinNumFromArr(aColSel,aCol[2]) - MaxNumFromArr(aColSel,aCol[1]), 0 )
       NEXT
    Endif
-  
-   If lTsbHeading    
+
+   If lTsbHeading
    // Пишем шапку бровса
      nRow ++
      nColHead := 0
@@ -392,7 +392,7 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    End
 
    // Пишем подвал бровса
-   If lTsbFooting    
+   If lTsbFooting
      nColHead := 0
 
      FOR EACH i IN aColSel
@@ -403,7 +403,7 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    Endif
    oSheet:cellHeight( nRow, 1, oBrw:nHeightFoot )
 
-   if oBrw:lIsDbf
+   if oBrw:nBrowseType == BROWSE_TYPE_DBF
       ( oBrw:cAlias )->( DbGoTo( nRec ) )
    else
       oBrw:GoPos(nOldRow, nOldCol)
@@ -418,17 +418,17 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    RETURN NIL
 
 * ======================================================================
-FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel ) 
+FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    LOCAL oXml, oSheet, oStyle, uData
    LOCAL nLen, nLine, i, j, hFont
    LOCAL nRow :=  0, nCol := 0, cStr := "", nAlign := 0
    LOCAL cAlign  := '', cType  := '', nSkip  := 0, lError   := .F.
-   LOCAL nRec := iif( oBrw:lIsDbf, ( oBrw:cAlias )->( RecNo() ), 0 )
+   LOCAL nRec := iif( oBrw:nBrowseType == BROWSE_TYPE_DBF, ( oBrw:cAlias )->( RecNo() ), 0 )
    LOCAL nOldRow := oBrw:nLogicPos()
    LOCAL nOldCol := oBrw:nCell
    LOCAL aColors := {{0,0,""}}
    LOCAL nTotal, nEvery, nColor := 0
-   LOCAL nColHead 
+   LOCAL nColHead
    LOCAL lTsbSuperHd, lTsbHeading, lTsbFooting
    LOCAL nColDbf , aCol
 
@@ -443,18 +443,18 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
 
    // проверка шапки таблицы
    lTsbHeading := oBrw:lDrawHeaders
-   If lTsbHeading    
+   If lTsbHeading
       lTsbHeading := ( AScan( oBrw:aColumns, { |o| !Empty( o:cHeading ) } ) > 0 )
    Endif
 
    // проверка подвала таблицы
    lTsbFooting := oBrw:lDrawFooters
-   If lTsbFooting    
+   If lTsbFooting
       lTsbFooting := ( AScan( oBrw:aColumns, { |o| !Empty( o:cFooting ) } ) > 0 )
    Endif
 
    If hProgress != Nil
-      nTotal := oBrw:nLen 
+      nTotal := oBrw:nLen
       SetProgressBarRange ( hProgress , 1 , nTotal )
       SendMessage(hProgress, PBM_SETPOS, 0, 0)
       nEvery := Max( 1, Int( nTotal * .02 ) ) // refresh hProgress every 2 %
@@ -472,7 +472,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
            lError := .T.
          end
          if lError
-            cFile := GetFileNameMaskNum(cFile)  // получить новое имя файла 
+            cFile := GetFileNameMaskNum(cFile)  // получить новое имя файла
          end
      end
    End
@@ -485,7 +485,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    // Определяем Лист
    oSheet := oXml:addSheet( "Sheet1" )
 
-   //Определяем колонки  
+   //Определяем колонки
    if aColSel= Nil .or. Len(aColSel) = 0
      aColSel := CalcAcolselForTbl( oBrw,aColSel)
    Endif
@@ -556,7 +556,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
     FOR EACH i IN aColSel
        nColHead ++
 
-       If lTsbHeading    
+       If lTsbHeading
        //Определяем стили шапки таблицы
           oStyle := oXml:addStyle( "H" + hb_ntoc(nColHead) )
           oStyle:Border( "All", 2, "Automatic",  "Continuous" )
@@ -577,7 +577,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
        oStyle:alignVertical( oBrw:aColumns[i]:XML_AlignV  )
        oStyle:SetfontName( oBrw:aColumns[i]:XML_ColFontName )
        oStyle:SetfontSize( oBrw:aColumns[i]:XML_ColFontSize )
-       //oStyle:bgColor( HMG_ClrToHTML( CLR_BLUE) ) 
+       //oStyle:bgColor( HMG_ClrToHTML( CLR_BLUE) )
        if oBrw:aColumns[i]:XML_ColFontBold
      oStyle:setFontBold()
        end
@@ -588,7 +588,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
        end*/
 
        // Определяем стили подвалов
-       If lTsbFooting    
+       If lTsbFooting
           oStyle := oXml:addStyle( "F" + hb_ntoc(nColHead) )
           oStyle:Border( "All", 2, "Automatic",  "Continuous" )
           oStyle:alignHorizontal( "Center" )
@@ -614,7 +614,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
        FOR EACH nCol IN aColSel
           nColHead ++
 
-          nColor := myColorN( oBrw:aColumns[nCol]:nClrBack, oBrw, nCol, oBrw:nAt ) 
+          nColor := myColorN( oBrw:aColumns[nCol]:nClrBack, oBrw, nCol, oBrw:nAt )
           // в aColors храним массивы ( строка, столбец. стиль )
           Aadd( aColors, {nLine, nColHead, "S" + HMG_ClrToHTML(nColor)} )
 
@@ -637,7 +637,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
           oStyle:alignVertical( "Center" )
           //шрифт
           hFont := oBrw:aColumns[nCol]:hFont
-          If hb_isBlock( hFont ) 
+          If hb_isBlock( hFont )
              hFont := Eval(hFont, oBrw:nAt, nCol, oBrw )
           end
           oStyle:SetfontName(   GetFontParam(hFont)[1]  )
@@ -645,7 +645,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
           if  GetFontParam(hFont)[3]
                  oStyle:setFontBold()
           end
-          oStyle:bgColor( HMG_ClrToHTML(nColor) ) 
+          oStyle:bgColor( HMG_ClrToHTML(nColor) )
           oStyle:alignWraptext()
 
       NEXT
@@ -686,7 +686,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
       NEXT
       nRow ++
   Endif
-  If lTsbHeading    
+  If lTsbHeading
 
    // Пишем шапку бровса
    nColHead := 0
@@ -711,7 +711,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
 
    While  nLine <= nLen
       oSheet:cellHeight( nRow, 1, oBrw:nHeightCell / 1.3 )
-      
+
       nColHead := 0
       FOR EACH nCol IN aColSel
          nColHead ++
@@ -756,7 +756,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
       SysRefresh()
    End
 
-   If lTsbFooting    
+   If lTsbFooting
    // Пишем подвал бровса
     nColHead := 0
     FOR EACH i IN aColSel
@@ -769,7 +769,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    oSheet:cellHeight( nRow, 1, oBrw:nHeightFoot )
    Endif
 
-   if oBrw:lIsDbf
+   if oBrw:nBrowseType == BROWSE_TYPE_DBF
       ( oBrw:cAlias )->( DbGoTo( nRec ) )
    else
       oBrw:GoPos(nOldRow, nOldCol)
@@ -778,7 +778,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
    oXml:writeData( cFile )
 
    If lActivate
-      WaitWindow( 'Loading the report in EXCEL ...', .T. ) 
+      WaitWindow( 'Loading the report in EXCEL ...', .T. )
 
       hb_memowrit('_e_.cmd', '@Start Excel ' + cFile + CRLF)
       RUN '_e_.cmd'
@@ -786,7 +786,7 @@ FUNCTION Brw2XmlColor( oBrw, cFile, lActivate, hProgress, aTitle, aColSel )
       fErase('_e_.cmd')
 
       // можно и так, если назначен Excel для открытия *.xml
-      // ShellExecute( 0, "Open", cFile,,, 3 )  
+      // ShellExecute( 0, "Open", cFile,,, 3 )
       INKEYGUI(800)
       WaitWindow()            // close the wait window
    EndIf
@@ -804,7 +804,7 @@ STATIC FUNCTION CalcAcolselForTbl( oBrw,aColSel)
    InCol := If(oBrw:lSelector,2,1)
    If aColSel != Nil .and. Len( aColSel) >0
        aRab := aColSel
-   Else  
+   Else
          Arab:={}
          For nCol := InCol TO Len( oBrw:aColumns )
             if oBrw:aColumns[nCol]:lVisible
@@ -812,10 +812,10 @@ STATIC FUNCTION CalcAcolselForTbl( oBrw,aColSel)
             Endif
          Next
    Endif
-   RETURN aRab 
+   RETURN aRab
 
 * =======================================================================================
-// Взять номер из массива равным или меньше заданного 
+// Взять номер из массива равным или меньше заданного
 STATIC FUNCTION MinNumFromArr(aColSel,nIn)
    LOCAL nRet := Ascan(aColSel,nIn), nI
    if nRet == 0
@@ -830,13 +830,13 @@ STATIC FUNCTION MinNumFromArr(aColSel,nIn)
    RETURN nRet
 
 * =======================================================================================
-// Взять номер из массива равным или больше заданного 
+// Взять номер из массива равным или больше заданного
 STATIC FUNCTION MaxNumFromArr(aColSel,nIn)
    LOCAL nRet := Ascan(aColSel,nIn), nI
    if nRet == 0
      For nI := 1 to Len(aColSel)
         nRet := aColSel[nI]
-        if nRet > nIn 
+        if nRet > nIn
           Exit
         endif
      Next
@@ -847,15 +847,15 @@ STATIC FUNCTION MaxNumFromArr(aColSel,nIn)
 * =======================================================================================
 STATIC FUNCTION myColorN( nColor, oBrw, nCol, nAt )
    If Valtype( nColor ) == "B"
-      If empty(nAt) 
+      If empty(nAt)
          nColor := Eval( nColor, nCol, oBrw )
       Else
          nColor := Eval( nColor, nAt, nCol, oBrw )
       EndIf
-   EndIf  
+   EndIf
 
    If Valtype( nColor ) == "A"
       nColor := nColor[1]
-   EndIf  
+   EndIf
 
 RETURN nColor

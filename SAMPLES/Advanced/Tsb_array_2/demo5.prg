@@ -71,7 +71,7 @@ PROCEDURE MAIN ( Employee, FieldMax )
              LOADFIELDS                                     ;
              ENUMERATOR EDIT GOTFOCUSSELECT
 
-                IF :lIsDbf
+                IF :nBrowseType == BROWSE_TYPE_DBF
              :GetColumn("FLD10"):nWidth += 20
                 ENDIF
              mySetTsb  ( oBrw )

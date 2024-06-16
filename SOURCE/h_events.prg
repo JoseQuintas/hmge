@@ -50,6 +50,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include "i_winuser.ch"
 #include "minigui.ch"
 #include "error.ch"
+#include "tsbrowse.ch"
 
 #define lOpaque                      s_Global [1]
 #define IsInitMenuPopup              s_Global [2]
@@ -4445,7 +4446,7 @@ PROCEDURE _AutoAdjust ( hWnd, aInitSize )
 #ifdef _TSBROWSE_
             IF ControlType == "TBROWSE"
                oBrw := _HMG_aControlIds [k]
-               IF oBrw:lIsDbf
+               IF oBrw:nBrowseType == BROWSE_TYPE_DBF
                   oBrw:UpStable()
                ELSE
                   oBrw:Refresh( .T. )

@@ -50,6 +50,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #endif
 
 #include "hmg.ch"
+#define BROWSE_TYPE_ARRAY 2
 
 #ifndef HMG_LEGACY_OFF
 #undef _BT_
@@ -1026,7 +1027,7 @@ FUNCTION _DeleteAllItems ( ControlName , ParentForm )
 #ifdef _TSBROWSE_
    CASE t == "TBROWSE"
       oGet := GetObjectByHandle( c )
-      IF ISOBJECT( oGet ) .AND. oGet:lIsArr
+      IF ISOBJECT( oGet ) .AND. oGet:nBrowseType == BROWSE_TYPE_ARRAY
          oGet:DeleteRow( .T. )
       ENDIF
 #endif

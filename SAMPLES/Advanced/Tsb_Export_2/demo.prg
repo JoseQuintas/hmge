@@ -577,7 +577,7 @@ STATIC FUNCTION mySumTsb( oBrw )
    LOCAL cFld := oFld:cField
    LOCAL nVal1, nVal2, cVal, aRec, xVal
 
-   IF oBrw:lIsDbf                           // это для tsbrowse-Dbf
+   IF oBrw:nBrowseType == BROWSE_TYPE_DBF // это для tsbrowse-Dbf
 
       dbSelectArea( oBrw:cAlias )
       nOldRec := RecNo()
@@ -605,7 +605,7 @@ STATIC FUNCTION mySumTsb( oBrw )
       GOTO nOldRec
       dbSelectArea( nOldArea )
 
-   ELSEIF oBrw:lIsArr                       // это для tsbrowse-Array
+   ELSEIF oBrw:nBrowseType == BROWSE_TYPE_ARRAY // это для tsbrowse-Array
 
       WITH OBJECT oBrw
       nVal1 := :nColumn("ARRAYNO")          // номер колонки нумерации для Array
@@ -683,7 +683,7 @@ STATIC FUNCTION myDelColumnTsb( oBrw )
 
       oCol := aCol[ nCol ]
 
-      IF oBrw:lIsDbf  // для dbf
+      IF oBrw:nBrowseType == BROWSE_TYPE_DBF // для dbf
          cCol  := oCol:cField
          cType := oCol:cFieldTyp
       ELSE
@@ -897,7 +897,7 @@ STATIC FUNCTION myF9( oBrw )
    LOCAL nCol, oCol, oCel, aSup
    LOCAL nRec := RecNo(), hFnt
 
-   IF ! oBrw:lIsDbf
+   IF oBrw:nBrowseType != BROWSE_TYPE_DBF
       AlertStop( "Switch to Mode tbrowse-dbf !", "INFO" )
       RETURN Nil
    ENDIF
@@ -1239,7 +1239,7 @@ RETURN Nil
 STATIC FUNCTION myCol3132( oBrw )
    LOCAL cFrm1, cFrm2, cAls, nRecno
 
-   IF ! oBrw:lIsDbf
+   IF oBrw:nBrowseType != BROWSE_TYPE_DBF
       AlertStop( "Switch to Mode tbrowse-dbf !", "INFO" )
       RETURN Nil
    ENDIF

@@ -2,6 +2,13 @@
 * TSBrowse.ch  Version 9.0 1/Nov/2009
 * Creating Browse From Code
 *=============================================================================
+
+#define BROWSE_TYPE_NONE  0
+#define BROWSE_TYPE_DBF   1
+#define BROWSE_TYPE_ARRAY 2
+#define BROWSE_TYPE_TXT  3
+#define BROWSE_TYPE_RSET  4
+
 #xcommand @ <row>,<col> TBROWSE <name> ;
         [ ID <nId> ] ;
         [ <dummy1: OF, PARENT, DIALOG> <parent> ] ;

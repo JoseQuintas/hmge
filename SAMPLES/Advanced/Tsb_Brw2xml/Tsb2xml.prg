@@ -133,7 +133,7 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle )
    LOCAL uData
    LOCAL hFont
    LOCAL nSkip
-   LOCAL nRec := iif( oBrw:lIsDbf, ( oBrw:cAlias )->( RecNo() ), 0 )
+   LOCAL nRec := iif( oBrw:nBrowseType == BROWSE_TYPE_DBF, ( oBrw:cAlias )->( RecNo() ), 0 )
    LOCAL nOldRow := oBrw:nLogicPos()
    LOCAL nOldCol := oBrw:nCell
    LOCAL lError := .F.
@@ -398,7 +398,7 @@ FUNCTION Brw2Xml( oBrw, cFile, lActivate, hProgress, aTitle )
 
    oSheet:cellHeight( nRow, 1, oBrw:nHeightFoot )
 
-   IF oBrw:lIsDbf
+   IF oBrw:nBrowseType == BROWSE_TYPE_DBF
       ( oBrw:cAlias )->( dbGoto( nRec ) )
    ELSE
       oBrw:GoPos( nOldRow, nOldCol )
