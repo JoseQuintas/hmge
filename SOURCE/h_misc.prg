@@ -53,7 +53,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 #ifdef _HMG_COMPAT_
 
+#ifndef HB_ZIP_OPEN_ADDINZIP
 #define HB_ZIP_OPEN_ADDINZIP            2
+#endif
 *------------------------------------------------------------------------------*
 PROCEDURE COMPRESSFILES ( cFileName, aDir, bBlock, lOverwrite, lStorePath, cPassword )
 *------------------------------------------------------------------------------*
