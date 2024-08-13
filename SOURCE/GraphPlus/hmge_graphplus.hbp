@@ -18,4 +18,4 @@ hmge.hbc
 
 -hbx=../../lib/${hb_name}.hbx
 
-GraphPlus.Prg
+core.Prg
