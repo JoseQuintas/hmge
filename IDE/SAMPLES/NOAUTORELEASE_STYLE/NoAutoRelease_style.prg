@@ -2,7 +2,7 @@
  * MINIGUI - Harbour Win32 GUI library Demo
  *
  * Copyright 2002-2004 Roberto Lopez <roblez@ciudad.com.ar>
- * http://harbourminigui.googlepages.com/
+ * http://www.geocities.com/harbour_minigui/
 */
 
 * NoAuoRelease Style Demo / ACTIVATE WINDOW ALL command

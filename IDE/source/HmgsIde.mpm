@@ -1,0 +1,135 @@
+PROJECTFOLDER=C:\MiniGUI\ide\source
+DEBUG=NO
+REBUILD=NO
+RUNAFTER=NO
+HIDEBUILD=YES
+DELETETEMP=YES
+XHARBOUR=NO
+MULTITHREAD=NO
+GENPPO=NO
+EXETYPE=GUI
+WARNINGS=BASIC
+GENLIB=NO
+PRGPARAMS=/ko
+CPARAMS=
+EXEPARAMS=
+ZIPSUPPORT=NO
+ODBCSUPPORT=NO
+ADSSUPPORT=NO
+MYSQLSUPPORT=NO
+C:\MiniGUI\Lib\tsbrowse.lib
+C:\MiniGUI\Harbour\lib\hbziparc.lib
+C:\MiniGUI\Harbour\lib\hbmzip.lib
+C:\MiniGUI\harbour\lib\minizip.lib
+C:\MiniGUI\Harbour\lib\hbzlib.lib
+C:\minigui\Harbour\lib\libhpdf.lib
+C:\minigui\Harbour\lib\hbhpdf.lib
+C:\minigui\Harbour\lib\png.lib
+C:\Borland\BCC58\Lib\ws2_32.lib
+C:\Borland\BCC58\Lib\PSDK\iphlpapi.lib
+C:\Borland\BCC58\Lib\PSDK\urlmon.lib
+C:\Borland\BCC58\Lib\PSDK\wininet.lib
+HmgsIde.PRG
+checkdeps.prg
+context.Prg
+corder.Prg
+delete.prg
+dropdown.prg
+fillgrid.prg
+Hbmk2Prg.prg
+h_MRU.prg
+inspector.prg
+LoadFmg.Prg
+mainmenu.Prg
+makestatus.PRG
+move.prg
+mpmc.prg
+mpmc3.prg
+Populate.Prg
+Preferences.prg
+readflds.prg
+report.prg
+SaveForm.Prg
+size.prg
+status.Prg
+toolbar.Prg
+update.prg
+_controlPos3_.prg
+HmgsIde.Rc
+/ menu\close.bmp
+/ menu\delete.bmp
+/ menu\exit.bmp
+/ menu\help.bmp
+/ menu\new.bmp
+/ menu\newform.bmp
+/ menu\nmodule.bmp
+/ menu\open.bmp
+/ menu\preferences.bmp
+/ menu\run.bmp
+/ menu\save.bmp
+/ menu\view.bmp
+/ res\activex.bmp
+/ res\animatebox.bmp
+/ res\ARROW1.bmp
+/ res\ARROW2.bmp
+/ res\ARROW3.bmp
+/ res\ARROW4.bmp
+/ res\br0.bmp
+/ res\br1.bmp
+/ res\br2.bmp
+/ res\browse.bmp
+/ res\button.bmp
+/ res\checkbox.bmp
+/ res\checkbutton.bmp
+/ res\ckeckbox.bmp
+/ res\CLOSEPROJECT.bmp
+/ res\Colors.bmp
+/ res\combobox.bmp
+/ res\CONTEXTMENUBUILDER.bmp
+/ res\CONTROLORDER.bmp
+/ res\datepicker.bmp
+/ res\DELETECONTROL.bmp
+/ res\Dialog.bmp
+/ res\DROPDOWNMENUBUILDER.bmp
+/ res\edit.bmp
+/ res\editbox.bmp
+/ res\frame.bmp
+/ res\grid.bmp
+/ res\help.bmp
+/ res\hmg.ico
+/ res\HMGLogo.bmp
+/ res\hyperlink.bmp
+/ res\image.bmp
+/ res\ipaddress.bmp
+/ res\label.bmp
+/ res\listbox.bmp
+/ res\MAINMENUBUILDER.bmp
+/ res\MONTHCAL01.bmp
+/ res\monthcalendar.bmp
+/ res\NEWFORM.bmp
+/ res\NEWMODULE.bmp
+/ res\NEWPROJECT.bmp
+/ res\NOTIFYMENUBUILDER.bmp
+/ res\Ok.bmp
+/ res\OPENPROJECT.BMP
+/ res\Panel.bmp
+/ res\panel2.bmp
+/ res\player.bmp
+/ res\Player1.bmp
+/ res\progressbar.bmp
+/ res\RADIO.bmp
+/ res\radiogroup.bmp
+/ res\richeditbox.bmp
+/ res\RUN.bmp
+/ res\SELECTOBJECT.bmp
+/ res\slider.bmp
+/ res\spinner.bmp
+/ res\STATUSBARBUILDER.bmp
+/ res\tab.bmp
+/ res\textbox.bmp
+/ res\hbmk2s.bmp
+/ res\TextBtn.bmp
+/ res\TIMER.bmp
+/ res\TOOLBARBUILDER.bmp
+/ res\tree.bmp
+/ res\copy.bmp

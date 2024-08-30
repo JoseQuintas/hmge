@@ -4,10 +4,11 @@
 
 #include "minigui.ch"
 
-Procedure Main
+Function Main
 
 	Load Window Notify
 	Activate Window Notify
 
 Return
+
 

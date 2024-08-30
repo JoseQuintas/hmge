@@ -1,0 +1,129 @@
+*HMGS-MINIGUI-IDE Two-Way Form Designer Generated Code
+*OPEN SOURCE PROJECT 2005-2015 Walter Formigoni http://sourceforge.net/projects/hmgs-minigui/
+
+DEFINE WINDOW TEMPLATE AT 182 , 283 WIDTH 750 HEIGHT 385 TITLE "Data-Bound Controls Test" MAIN NOMINIMIZE NOMAXIMIZE NOSIZE ON INIT OpenTables() ON RELEASE CloseTables()
+
+     DEFINE TOOLBAR Toolbar_1 CAPTION "Toolbar_1" BUTTONSIZE 88,24 FLAT RIGHTTEXT BORDER
+            BUTTON TOP CAPTION "&Top" PICTURE "primero.bmp" ACTION ( TEST->(DbGoTop()) , Refresh() )
+            BUTTON PREVIOUS CAPTION "&Previous" PICTURE "anterior.bmp" ACTION ( TEST->(DbSkip(-1)) , Refresh() )
+            BUTTON NEXT CAPTION "&Next" PICTURE "siguiente.bmp" ACTION ( TEST->(DbSkip(1)) , iif ( TEST->(eof()) , TEST->(DbGoBottom()) , Nil ) , Refresh() )
+            BUTTON BOTTOM CAPTION "&Bottom" PICTURE "ultimo.bmp" ACTION ( TEST->(DbGoBottom()) , Refresh() )
+            BUTTON ADD CAPTION "&Append" PICTURE "agregar.bmp" ACTION ( New() , Refresh() )
+            BUTTON DEL CAPTION "&Delete" PICTURE "suprimir.bmp" ACTION ( DelRec() , Refresh() )
+            BUTTON SAVE CAPTION "&Save" PICTURE "guardar.bmp" ACTION ( Save() , Refresh() )
+            BUTTON UNDO CAPTION "&Undo" PICTURE "deshacer.bmp" ACTION ( Refresh() )
+     END TOOLBAR
+
+     DEFINE LABEL Label_1
+            ROW    60
+            COL    10
+            WIDTH  120
+            HEIGHT 24
+            VALUE 'Code:'
+     END LABEL  
+
+     DEFINE LABEL Label_2
+            ROW    90
+            COL    10
+            WIDTH  120
+            HEIGHT 24
+            VALUE 'First Name:'
+     END LABEL  
+
+     DEFINE LABEL Label_3
+            ROW    120
+            COL    10
+            WIDTH  120
+            HEIGHT 24
+            VALUE 'Last Name:'
+     END LABEL  
+
+     DEFINE LABEL Label_4
+            ROW    150
+            COL    10
+            WIDTH  120
+            HEIGHT 24
+            VALUE 'Birth Date:'
+     END LABEL  
+
+     DEFINE LABEL Label_5
+            ROW    180
+            COL    10
+            WIDTH  120
+            HEIGHT 24
+            VALUE 'Married:'
+     END LABEL  
+
+     DEFINE LABEL Label_6
+            ROW    210
+            COL    10
+            WIDTH  120
+            HEIGHT 24
+            VALUE 'Bio:'
+     END LABEL  
+
+     DEFINE TEXTBOX Text_1
+            ROW    60
+            COL    210
+            WIDTH  120
+            HEIGHT 24
+            FONTNAME 'Arial'
+            FIELD TEST->CODE
+            NUMERIC  .T.
+     END TEXTBOX 
+
+     DEFINE TEXTBOX Text_2
+            ROW    90
+            COL    210
+            WIDTH  120
+            HEIGHT 24
+            FONTNAME 'Arial'
+            FIELD TEST->FIRST
+     END TEXTBOX 
+
+     DEFINE TEXTBOX Text_3
+            ROW    120
+            COL    210
+            WIDTH  120
+            HEIGHT 24
+            FONTNAME 'Arial'
+            FIELD TEST->LAST
+     END TEXTBOX 
+
+     DEFINE DATEPICKER Date_4
+            ROW    150
+            COL    210
+            WIDTH  120
+            HEIGHT 24
+            VALUE CTOD('')
+            FONTNAME 'Arial'
+            TOOLTIP ''
+            SHOWNONE .T.
+            FIELD TEST->BIRTH
+     END DATEPICKER 
+
+     DEFINE CHECKBOX CHECK_5
+            ROW    180
+            COL    210
+            WIDTH  100
+            HEIGHT 28
+            CAPTION ""
+            FONTNAME 'Arial'
+            FIELD TEST->MARRIED
+     END CHECKBOX  
+
+     DEFINE EDITBOX Edit_6
+            ROW    210
+            COL    210
+            WIDTH  120
+            HEIGHT 120
+            VALUE ''
+            FONTNAME 'Arial'
+            TOOLTIP ''
+            FIELD  TEST->BIO
+            HSCROLLBAR  .F.
+     END EDITBOX  
+
+END WINDOW
+
+

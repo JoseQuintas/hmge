@@ -156,8 +156,8 @@ DEFINE WINDOW TEMPLATE AT 168 , 233 WIDTH 400 HEIGHT 301 TITLE "Test" ICON NIL C
             COL    80
             WIDTH  238
             HEIGHT 21
-            VALUE  "http://harbourminigui.googlepages.com"
-            ADDRESS "http://harbourminigui.googlepages.com"
+            VALUE  "http://www.geocities.com/harbour_minigui"
+            ADDRESS "http://www.geocities.com/harbour_minigui"
             FONTNAME "Arial"
             FONTSIZE 9
             TOOLTIP "This is a ToolTip"
