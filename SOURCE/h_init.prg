@@ -59,7 +59,7 @@ PROCEDURE Init
    LOCAL nCellForeColor := GetSysColor ( COLOR_HIGHLIGHTTEXT )
    LOCAL nCellBackColor := GetSysColor ( COLOR_HIGHLIGHT )
 
-#ifdef MT_EXPERIMENTAL
+#ifdef HB_GUI_MT_EXPERIMENTAL
    STATIC lFirstLoad := .T.
 #endif
    STATIC _HMG_SysInit AS GLOBAL VALUE { Date(), Time() }
@@ -487,11 +487,11 @@ PROCEDURE Init
 
    InitMessages()
 
-#ifdef MT_EXPERIMENTAL
+#ifdef HB_GUI_MT_EXPERIMENTAL
    IF lFirstLoad
 #endif
       ResetGlobalListener() // set default Events function
-#ifdef MT_EXPERIMENTAL
+#ifdef HB_GUI_MT_EXPERIMENTAL
       lFirstLoad := .F.
    ENDIF
 #endif

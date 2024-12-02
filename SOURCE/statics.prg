@@ -10,7 +10,7 @@
 *-----------------------------------------------------------------------------*
 FUNCTION _SetGetNamesList( cName, nIndex, lDelete )
 *-----------------------------------------------------------------------------*
-#ifdef MT_EXPERIMENTAL
+#ifdef HB_GUI_MT_EXPERIMENTAL
    THREAD STATIC _HMG_NAMESLIST
 #else
    STATIC _HMG_NAMESLIST
