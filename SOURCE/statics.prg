@@ -10,7 +10,11 @@
 *-----------------------------------------------------------------------------*
 FUNCTION _SetGetNamesList( cName, nIndex, lDelete )
 *-----------------------------------------------------------------------------*
+#ifdef MT_EXPERIMENTAL
+   THREAD STATIC _HMG_NAMESLIST
+#else
    STATIC _HMG_NAMESLIST
+#endif
 
    IF HB_ISNIL( _HMG_NAMESLIST )
       _HMG_NAMESLIST := oHmgData()
@@ -32,7 +36,7 @@ FUNCTION _SetGetNamesList( cName, nIndex, lDelete )
          _HMG_NAMESLIST:Set( cName, NIL )
       ENDIF
 
-   ENDIF 
+   ENDIF
 
 RETURN _HMG_NAMESLIST
 
