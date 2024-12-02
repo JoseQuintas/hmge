@@ -59,6 +59,9 @@ PROCEDURE Init
    LOCAL nCellForeColor := GetSysColor ( COLOR_HIGHLIGHTTEXT )
    LOCAL nCellBackColor := GetSysColor ( COLOR_HIGHLIGHT )
 
+#ifdef MT_EXPERIMENTAL
+   STATIC lFirstLoad := .T.
+#endif
    STATIC _HMG_SysInit AS GLOBAL VALUE { Date(), Time() }
 
    PUBLIC _HMG_SYSDATA [ _HMG_SYSDATA_SIZE ]
@@ -484,7 +487,14 @@ PROCEDURE Init
 
    InitMessages()
 
-   ResetGlobalListener() // set default Events function
+#ifdef MT_EXPERIMENTAL
+   IF lFirstLoad
+#endif
+      ResetGlobalListener() // set default Events function
+#ifdef MT_EXPERIMENTAL
+      lFirstLoad := .F.
+   ENDIF
+#endif
 
    _HMG_IsMultiple := IsExeRunning ( StrTran( GetExeFileName (), '\', '_' ) )
 
