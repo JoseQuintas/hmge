@@ -290,8 +290,8 @@ RETURN hb_osIs64bit()
 #else
 
 // Checks if the operating system is Windows 11.
-FUNCTION hb_osIsWin11()
-RETURN '11' $ WinVersion()[1]
+//FUNCTION hb_osIsWin11()
+//RETURN '11' $ WinVersion()[1]
 
 #endif
 
